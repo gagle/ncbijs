@@ -1,0 +1,23 @@
+{
+  "name": "@ncbijs/mesh",
+  "sourceRoot": "packages/mesh/src",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc -p packages/mesh/tsconfig.build.json" },
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vitest run --config packages/mesh/vitest.config.ts" }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": { "lintFilePatterns": ["{projectRoot}/**/*.ts"] }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc --noEmit -p packages/mesh/tsconfig.json" }
+    }
+  }
+}
