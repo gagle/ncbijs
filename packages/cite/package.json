@@ -1,0 +1,51 @@
+{
+  "name": "@ncbijs/cite",
+  "version": "0.0.1",
+  "description": "Citation formatting in 9 styles via NCBI Literature Citation Exporter",
+  "author": "Gabriel Llamas",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gagle/ncbijs.git",
+    "directory": "packages/cite"
+  },
+  "homepage": "https://github.com/gagle/ncbijs/tree/main/packages/cite#readme",
+  "bugs": {
+    "url": "https://github.com/gagle/ncbijs/issues"
+  },
+  "keywords": [
+    "ncbi",
+    "citation",
+    "apa",
+    "bibtex",
+    "ris",
+    "csl",
+    "vancouver",
+    "mla",
+    "bibliography",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "prepublishOnly": "echo 'Use CI to publish' && exit 1",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "package.json",
+    "LICENSE",
+    "CHANGELOG.md"
+  ]
+}
