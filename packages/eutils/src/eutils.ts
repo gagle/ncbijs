@@ -1,7 +1,7 @@
 import type { Client } from 'openapi-fetch';
 import { TokenBucket } from '@ncbijs/rate-limiter';
 import { createNcbiClient } from './ncbi-client';
-import type { NcbiEUtilsPaths } from './interfaces/ncbi-paths.interface';
+import type { paths } from './schema';
 import { parseECitMatchText } from './parsers/ecitmatch-parser';
 import { parseEGQueryXml } from './parsers/egquery-parser';
 import { parseEInfoJson, parseEInfoXml } from './parsers/einfo-parser';
@@ -42,7 +42,7 @@ function unwrapResponse<T>(response: { data?: T; error?: unknown }): T {
 }
 
 export class EUtils {
-  private readonly client: Client<NcbiEUtilsPaths>;
+  private readonly client: Client<paths>;
 
   constructor(config: EUtilsConfig) {
     if (!config.tool) {

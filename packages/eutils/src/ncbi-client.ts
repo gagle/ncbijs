@@ -2,7 +2,7 @@ import createClient from 'openapi-fetch';
 import type { Client, Middleware } from 'openapi-fetch';
 import type { TokenBucket } from '@ncbijs/rate-limiter';
 import { EUtilsHttpError } from './http-client';
-import type { NcbiEUtilsPaths } from './interfaces/ncbi-paths.interface';
+import type { paths } from './schema';
 
 export interface NcbiClientConfig {
   readonly tool: string;
@@ -20,8 +20,8 @@ const POST_ID_THRESHOLD = 200;
 const POST_TERM_THRESHOLD = 300;
 const FORCE_POST_PATHS = new Set(['/epost.fcgi']);
 
-export function createNcbiClient(config: NcbiClientConfig): Client<NcbiEUtilsPaths> {
-  const client = createClient<NcbiEUtilsPaths>({
+export function createNcbiClient(config: NcbiClientConfig): Client<paths> {
+  const client = createClient<paths>({
     baseUrl: BASE_URL,
     fetch: createRetryFetch(config.rateLimiter, config.maxRetries),
   });
