@@ -19,7 +19,10 @@
     "@ncbijs/nucleotide": "workspace:*",
     "@ncbijs/protein": "workspace:*",
     "@ncbijs/pubchem": "workspace:*",
-    "@ncbijs/snp": "workspace:*"
+    "@ncbijs/snp": "workspace:*",
+    "@ncbijs/omim": "workspace:*",
+    "@ncbijs/medgen": "workspace:*",
+    "@ncbijs/gtr": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.19.0"

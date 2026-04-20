@@ -29,7 +29,10 @@
         "@ncbijs/pubchem",
         "@ncbijs/genbank",
         "@ncbijs/protein",
-        "@ncbijs/nucleotide"
+        "@ncbijs/nucleotide",
+        "@ncbijs/omim",
+        "@ncbijs/medgen",
+        "@ncbijs/gtr"
       ]
     },
     {
@@ -160,6 +163,24 @@
     "packages/nucleotide": {
       "release-type": "node",
       "component": "@ncbijs/nucleotide",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/omim": {
+      "release-type": "node",
+      "component": "@ncbijs/omim",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/medgen": {
+      "release-type": "node",
+      "component": "@ncbijs/medgen",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/gtr": {
+      "release-type": "node",
+      "component": "@ncbijs/gtr",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true
     }

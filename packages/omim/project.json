@@ -1,0 +1,25 @@
+{
+  "name": "@ncbijs/omim",
+  "sourceRoot": "packages/omim/src",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p packages/omim/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/omim/dist"
+      },
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vitest run --config packages/omim/vitest.config.ts" }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": { "lintFilePatterns": ["{projectRoot}/**/*.ts"] }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc --noEmit -p packages/omim/tsconfig.json" }
+    }
+  }
+}

@@ -80,18 +80,27 @@ importers:
       '@ncbijs/genbank':
         specifier: workspace:*
         version: link:../packages/genbank
+      '@ncbijs/gtr':
+        specifier: workspace:*
+        version: link:../packages/gtr
       '@ncbijs/id-converter':
         specifier: workspace:*
         version: link:../packages/id-converter
       '@ncbijs/jats':
         specifier: workspace:*
         version: link:../packages/jats
+      '@ncbijs/medgen':
+        specifier: workspace:*
+        version: link:../packages/medgen
       '@ncbijs/mesh':
         specifier: workspace:*
         version: link:../packages/mesh
       '@ncbijs/nucleotide':
         specifier: workspace:*
         version: link:../packages/nucleotide
+      '@ncbijs/omim':
+        specifier: workspace:*
+        version: link:../packages/omim
       '@ncbijs/pmc':
         specifier: workspace:*
         version: link:../packages/pmc
@@ -143,15 +152,24 @@ importers:
       '@ncbijs/genbank':
         specifier: workspace:*
         version: link:../packages/genbank
+      '@ncbijs/gtr':
+        specifier: workspace:*
+        version: link:../packages/gtr
       '@ncbijs/id-converter':
         specifier: workspace:*
         version: link:../packages/id-converter
+      '@ncbijs/medgen':
+        specifier: workspace:*
+        version: link:../packages/medgen
       '@ncbijs/mesh':
         specifier: workspace:*
         version: link:../packages/mesh
       '@ncbijs/nucleotide':
         specifier: workspace:*
         version: link:../packages/nucleotide
+      '@ncbijs/omim':
+        specifier: workspace:*
+        version: link:../packages/omim
       '@ncbijs/pmc':
         specifier: workspace:*
         version: link:../packages/pmc
@@ -211,6 +229,12 @@ importers:
 
   packages/genbank: {}
 
+  packages/gtr:
+    dependencies:
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
+
   packages/id-converter: {}
 
   packages/jats:
@@ -261,6 +285,15 @@ importers:
         specifier: ^3.24.0
         version: 3.25.76
 
+  packages/medgen:
+    dependencies:
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
+      '@ncbijs/xml':
+        specifier: workspace:*
+        version: link:../xml
+
   packages/mesh: {}
 
   packages/nucleotide:
@@ -271,6 +304,12 @@ importers:
       '@ncbijs/genbank':
         specifier: workspace:*
         version: link:../genbank
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
+
+  packages/omim:
+    dependencies:
       '@ncbijs/rate-limiter':
         specifier: workspace:*
         version: link:../rate-limiter

@@ -23,6 +23,9 @@
     "@ncbijs/blast": "workspace:*",
     "@ncbijs/snp": "workspace:*",
     "@ncbijs/clinvar": "workspace:*",
-    "@ncbijs/pubchem": "workspace:*"
+    "@ncbijs/pubchem": "workspace:*",
+    "@ncbijs/omim": "workspace:*",
+    "@ncbijs/medgen": "workspace:*",
+    "@ncbijs/gtr": "workspace:*"
   }
 }
