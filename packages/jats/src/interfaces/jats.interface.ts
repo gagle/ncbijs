@@ -9,7 +9,8 @@ export interface Author {
   readonly foreName?: string | undefined;
   readonly initials?: string | undefined;
   readonly collectiveName?: string | undefined;
-  readonly affiliation?: string | undefined;
+  readonly orcid?: string | undefined;
+  readonly affiliations: ReadonlyArray<string>;
 }
 
 export interface JournalMeta {
@@ -23,6 +24,7 @@ export interface ArticleMeta {
   readonly title: string;
   readonly authors: ReadonlyArray<Readonly<Author>>;
   readonly abstract?: string | undefined;
+  readonly keywords?: ReadonlyArray<string> | undefined;
   readonly doi?: string | undefined;
   readonly pmid?: string | undefined;
   readonly pmcid?: string | undefined;

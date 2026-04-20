@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { PMC, pmcToMarkdown, pmcToPlainText, pmcToChunks } from './pmc';
-import type { FullTextArticle } from './interfaces/pmc.interface';
+import { PMC, pmcToMarkdown, pmcToPlainText, pmcToChunks } from './pmc.js';
+import type { FullTextArticle } from './interfaces/pmc.interface.js';
 
 const mockEFetch = vi.fn();
 
@@ -45,7 +45,7 @@ function buildFullTextArticle(overrides: Partial<FullTextArticle> = {}): FullTex
       journal: { title: 'Test Journal' },
       article: {
         title: 'Test Article',
-        authors: [{ lastName: 'Smith', foreName: 'John' }],
+        authors: [{ lastName: 'Smith', foreName: 'John', affiliations: [] }],
       },
     },
     body: [

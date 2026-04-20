@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseJATS } from './parse-jats';
+import { parseJATS } from './parse-jats.js';
 
 function wrap(front = '', body = '', back = ''): string {
   return `<article>${front}${body}${back}</article>`;
@@ -116,7 +116,31 @@ describe('parseJATS', () => {
           ),
         );
         const result = parseJATS(xml);
-        expect(result.front.article.authors[0]!.affiliation).toBe('MIT');
+        expect(result.front.article.authors[0]!.affiliations).toEqual(['MIT']);
+      });
+
+      it('should extract multiple affiliations per author', () => {
+        const xml = wrap(
+          wrapFront(
+            '',
+            `<title-group><article-title>T</article-title></title-group>
+          <contrib-group><contrib contrib-type="author"><name><surname>Smith</surname></name><aff>MIT</aff><aff>Harvard</aff></contrib></contrib-group>`,
+          ),
+        );
+        const result = parseJATS(xml);
+        expect(result.front.article.authors[0]!.affiliations).toEqual(['MIT', 'Harvard']);
+      });
+
+      it('should extract author ORCID', () => {
+        const xml = wrap(
+          wrapFront(
+            '',
+            `<title-group><article-title>T</article-title></title-group>
+          <contrib-group><contrib contrib-type="author"><contrib-id contrib-id-type="orcid">0000-0001-2345-6789</contrib-id><name><surname>Smith</surname></name></contrib></contrib-group>`,
+          ),
+        );
+        const result = parseJATS(xml);
+        expect(result.front.article.authors[0]!.orcid).toBe('0000-0001-2345-6789');
       });
 
       it('should extract collective name authors', () => {
@@ -129,6 +153,7 @@ describe('parseJATS', () => {
         );
         const result = parseJATS(xml);
         expect(result.front.article.authors[0]!.collectiveName).toBe('WHO Consortium');
+        expect(result.front.article.authors[0]!.affiliations).toEqual([]);
       });
 
       it('should extract abstract text', () => {
@@ -140,6 +165,25 @@ describe('parseJATS', () => {
         );
         const result = parseJATS(xml);
         expect(result.front.article.abstract).toBe('This is the abstract.');
+      });
+
+      it('should extract keywords from kwd-group', () => {
+        const xml = wrap(
+          wrapFront(
+            '',
+            '<title-group><article-title>T</article-title></title-group><kwd-group><kwd>cancer</kwd><kwd>treatment</kwd></kwd-group>',
+          ),
+        );
+        const result = parseJATS(xml);
+        expect(result.front.article.keywords).toEqual(['cancer', 'treatment']);
+      });
+
+      it('should omit keywords when no kwd-group present', () => {
+        const xml = wrap(
+          wrapFront('', '<title-group><article-title>T</article-title></title-group>'),
+        );
+        const result = parseJATS(xml);
+        expect(result.front.article.keywords).toBeUndefined();
       });
 
       it('should extract DOI', () => {
@@ -195,6 +239,32 @@ describe('parseJATS', () => {
         );
         const result = parseJATS(xml);
         expect(result.front.article.publicationDate).toEqual({ year: 2024 });
+      });
+
+      it('should prefer epub pub-date over ppub', () => {
+        const xml = wrap(
+          wrapFront(
+            '',
+            `<title-group><article-title>T</article-title></title-group>
+            <pub-date pub-type="ppub"><year>2024</year><month>06</month></pub-date>
+            <pub-date pub-type="epub"><year>2024</year><month>03</month><day>15</day></pub-date>`,
+          ),
+        );
+        const result = parseJATS(xml);
+        expect(result.front.article.publicationDate).toEqual({ year: 2024, month: 3, day: 15 });
+      });
+
+      it('should use date-type="pub" when no epub available', () => {
+        const xml = wrap(
+          wrapFront(
+            '',
+            `<title-group><article-title>T</article-title></title-group>
+            <pub-date date-type="collection"><year>2024</year></pub-date>
+            <pub-date date-type="pub"><year>2024</year><month>05</month></pub-date>`,
+          ),
+        );
+        const result = parseJATS(xml);
+        expect(result.front.article.publicationDate).toEqual({ year: 2024, month: 5 });
       });
 
       it('should handle missing optional article fields', () => {

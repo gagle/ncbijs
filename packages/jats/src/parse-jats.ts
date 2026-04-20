@@ -10,7 +10,7 @@ import type {
   Reference,
   Section,
   Table,
-} from './interfaces/jats.interface';
+} from './interfaces/jats.interface.js';
 import {
   decodeEntities,
   readAllBlocks,
@@ -86,11 +86,13 @@ function parseArticleMeta(xml: string): ArticleMeta {
   const pmcid = findArticleId(articleIds, 'pmc');
 
   const publicationDate = parsePublicationDate(xml);
+  const keywords = parseKeywords(xml);
 
   return {
     title,
     authors,
     ...(abstract !== undefined ? { abstract } : {}),
+    ...(keywords.length > 0 ? { keywords } : {}),
     ...(doi !== undefined ? { doi } : {}),
     ...(pmid !== undefined ? { pmid } : {}),
     ...(pmcid !== undefined ? { pmcid } : {}),
@@ -113,34 +115,46 @@ function parseAuthors(contribGroupXml: string): ReadonlyArray<Author> {
     .map((contrib) => {
       const collectiveName = readTag(contrib.content, 'collab');
       if (collectiveName) {
-        return { collectiveName };
+        return { collectiveName, affiliations: [] };
       }
 
       const nameXml = readBlock(contrib.content, 'name') ?? '';
       const lastName = readTag(nameXml, 'surname');
       const foreName = readTag(nameXml, 'given-names');
 
-      const affInfoXml = readBlock(contrib.content, 'aff');
-      const affiliation = affInfoXml ? textContent(affInfoXml) : undefined;
+      const affBlocks = readAllBlocks(contrib.content, 'aff');
+      const affiliations = affBlocks.map((aff) => textContent(aff));
+
+      const contribIds = readAllBlocksWithAttributes(contrib.content, 'contrib-id');
+      const orcidEntry = contribIds.find(
+        (entry) => entry.attributes['contrib-id-type'] === 'orcid',
+      );
+      const orcid = orcidEntry ? textContent(orcidEntry.content) : undefined;
 
       return {
         ...(lastName !== undefined ? { lastName } : {}),
         ...(foreName !== undefined ? { foreName } : {}),
-        ...(affiliation !== undefined ? { affiliation } : {}),
+        ...(orcid !== undefined ? { orcid } : {}),
+        affiliations,
       };
     });
 }
 
 function parsePublicationDate(articleMetaXml: string): PartialDate | undefined {
-  const pubDateXml = readBlock(articleMetaXml, 'pub-date');
-  if (!pubDateXml) return undefined;
+  const pubDates = readAllBlocksWithAttributes(articleMetaXml, 'pub-date');
+  if (pubDates.length === 0) {
+    return undefined;
+  }
 
-  const yearStr = readTag(pubDateXml, 'year');
-  if (!yearStr) return undefined;
+  const selectedPubDate = selectPreferredPubDate(pubDates);
+  const yearStr = readTag(selectedPubDate.content, 'year');
+  if (!yearStr) {
+    return undefined;
+  }
 
   const year = parseInt(yearStr, 10);
-  const monthStr = readTag(pubDateXml, 'month');
-  const dayStr = readTag(pubDateXml, 'day');
+  const monthStr = readTag(selectedPubDate.content, 'month');
+  const dayStr = readTag(selectedPubDate.content, 'day');
 
   const month = monthStr ? parseInt(monthStr, 10) : undefined;
   const day = dayStr ? parseInt(dayStr, 10) : undefined;
@@ -150,6 +164,26 @@ function parsePublicationDate(articleMetaXml: string): PartialDate | undefined {
     ...(month !== undefined ? { month } : {}),
     ...(day !== undefined ? { day } : {}),
   };
+}
+
+function selectPreferredPubDate(
+  pubDates: ReadonlyArray<{ content: string; attributes: Readonly<Record<string, string>> }>,
+): { content: string; attributes: Readonly<Record<string, string>> } {
+  const epub =
+    pubDates.find((pd) => pd.attributes['pub-type'] === 'epub') ??
+    pubDates.find((pd) => pd.attributes['date-type'] === 'pub') ??
+    pubDates.find((pd) => pd.attributes['pub-type'] === 'ppub');
+  const firstPubDate = pubDates[0];
+  return epub ?? firstPubDate ?? { content: '', attributes: {} };
+}
+
+function parseKeywords(articleMetaXml: string): ReadonlyArray<string> {
+  const kwdGroupXml = readBlock(articleMetaXml, 'kwd-group');
+  if (!kwdGroupXml) {
+    return [];
+  }
+
+  return readAllBlocks(kwdGroupXml, 'kwd').map((kwd) => textContent(kwd));
 }
 
 function parseBody(articleXml: string): ReadonlyArray<Section> {
