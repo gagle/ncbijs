@@ -1,0 +1,54 @@
+{
+  "name": "@ncbijs/nucleotide",
+  "version": "0.0.1",
+  "description": "Typed client for NCBI Nucleotide database (EFetch) with FASTA and GenBank format support",
+  "author": "Gabriel Llamas",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gagle/ncbijs.git",
+    "directory": "packages/nucleotide"
+  },
+  "homepage": "https://github.com/gagle/ncbijs/tree/main/packages/nucleotide#readme",
+  "bugs": {
+    "url": "https://github.com/gagle/ncbijs/issues"
+  },
+  "keywords": [
+    "ncbijs",
+    "ncbi",
+    "nucleotide",
+    "efetch",
+    "fasta",
+    "genbank",
+    "dna",
+    "rna",
+    "sequence",
+    "bioinformatics",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "prepublishOnly": "echo 'Use CI to publish' && exit 1",
+  "dependencies": {
+    "@ncbijs/fasta": "workspace:*",
+    "@ncbijs/genbank": "workspace:*",
+    "@ncbijs/rate-limiter": "workspace:*"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ]
+}

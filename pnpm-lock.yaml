@@ -77,6 +77,9 @@ importers:
       '@ncbijs/fasta':
         specifier: workspace:*
         version: link:../packages/fasta
+      '@ncbijs/genbank':
+        specifier: workspace:*
+        version: link:../packages/genbank
       '@ncbijs/id-converter':
         specifier: workspace:*
         version: link:../packages/id-converter
@@ -86,9 +89,15 @@ importers:
       '@ncbijs/mesh':
         specifier: workspace:*
         version: link:../packages/mesh
+      '@ncbijs/nucleotide':
+        specifier: workspace:*
+        version: link:../packages/nucleotide
       '@ncbijs/pmc':
         specifier: workspace:*
         version: link:../packages/pmc
+      '@ncbijs/protein':
+        specifier: workspace:*
+        version: link:../packages/protein
       '@ncbijs/pubchem':
         specifier: workspace:*
         version: link:../packages/pubchem
@@ -131,15 +140,24 @@ importers:
       '@ncbijs/fasta':
         specifier: workspace:*
         version: link:../packages/fasta
+      '@ncbijs/genbank':
+        specifier: workspace:*
+        version: link:../packages/genbank
       '@ncbijs/id-converter':
         specifier: workspace:*
         version: link:../packages/id-converter
       '@ncbijs/mesh':
         specifier: workspace:*
         version: link:../packages/mesh
+      '@ncbijs/nucleotide':
+        specifier: workspace:*
+        version: link:../packages/nucleotide
       '@ncbijs/pmc':
         specifier: workspace:*
         version: link:../packages/pmc
+      '@ncbijs/protein':
+        specifier: workspace:*
+        version: link:../packages/protein
       '@ncbijs/pubchem':
         specifier: workspace:*
         version: link:../packages/pubchem
@@ -190,6 +208,8 @@ importers:
         version: 0.17.0
 
   packages/fasta: {}
+
+  packages/genbank: {}
 
   packages/id-converter: {}
 
@@ -243,6 +263,18 @@ importers:
 
   packages/mesh: {}
 
+  packages/nucleotide:
+    dependencies:
+      '@ncbijs/fasta':
+        specifier: workspace:*
+        version: link:../fasta
+      '@ncbijs/genbank':
+        specifier: workspace:*
+        version: link:../genbank
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
+
   packages/pmc:
     dependencies:
       '@ncbijs/eutils':
@@ -254,6 +286,18 @@ importers:
       '@ncbijs/xml':
         specifier: workspace:*
         version: link:../xml
+
+  packages/protein:
+    dependencies:
+      '@ncbijs/fasta':
+        specifier: workspace:*
+        version: link:../fasta
+      '@ncbijs/genbank':
+        specifier: workspace:*
+        version: link:../genbank
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
 
   packages/pubchem:
     dependencies:

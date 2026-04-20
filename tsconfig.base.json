@@ -40,7 +40,10 @@
       "@ncbijs/blast": ["./packages/blast/src/index.ts"],
       "@ncbijs/snp": ["./packages/snp/src/index.ts"],
       "@ncbijs/clinvar": ["./packages/clinvar/src/index.ts"],
-      "@ncbijs/pubchem": ["./packages/pubchem/src/index.ts"]
+      "@ncbijs/pubchem": ["./packages/pubchem/src/index.ts"],
+      "@ncbijs/genbank": ["./packages/genbank/src/index.ts"],
+      "@ncbijs/protein": ["./packages/protein/src/index.ts"],
+      "@ncbijs/nucleotide": ["./packages/nucleotide/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "dist"]

@@ -26,7 +26,10 @@
         "@ncbijs/blast",
         "@ncbijs/snp",
         "@ncbijs/clinvar",
-        "@ncbijs/pubchem"
+        "@ncbijs/pubchem",
+        "@ncbijs/genbank",
+        "@ncbijs/protein",
+        "@ncbijs/nucleotide"
       ]
     },
     {
@@ -139,6 +142,24 @@
     "packages/pubchem": {
       "release-type": "node",
       "component": "@ncbijs/pubchem",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/genbank": {
+      "release-type": "node",
+      "component": "@ncbijs/genbank",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/protein": {
+      "release-type": "node",
+      "component": "@ncbijs/protein",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/nucleotide": {
+      "release-type": "node",
+      "component": "@ncbijs/nucleotide",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true
     }

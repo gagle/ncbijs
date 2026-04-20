@@ -15,6 +15,9 @@
     "@ncbijs/clinvar": "workspace:*",
     "@ncbijs/datasets": "workspace:*",
     "@ncbijs/fasta": "workspace:*",
+    "@ncbijs/genbank": "workspace:*",
+    "@ncbijs/nucleotide": "workspace:*",
+    "@ncbijs/protein": "workspace:*",
     "@ncbijs/pubchem": "workspace:*",
     "@ncbijs/snp": "workspace:*"
   },
