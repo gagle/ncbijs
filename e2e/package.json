@@ -29,6 +29,8 @@
     "@ncbijs/gtr": "workspace:*",
     "@ncbijs/geo": "workspace:*",
     "@ncbijs/dbvar": "workspace:*",
-    "@ncbijs/sra": "workspace:*"
+    "@ncbijs/sra": "workspace:*",
+    "@ncbijs/structure": "workspace:*",
+    "@ncbijs/cdd": "workspace:*"
   }
 }

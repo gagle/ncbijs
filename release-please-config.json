@@ -35,7 +35,9 @@
         "@ncbijs/gtr",
         "@ncbijs/geo",
         "@ncbijs/dbvar",
-        "@ncbijs/sra"
+        "@ncbijs/sra",
+        "@ncbijs/structure",
+        "@ncbijs/cdd"
       ]
     },
     {
@@ -202,6 +204,18 @@
     "packages/sra": {
       "release-type": "node",
       "component": "@ncbijs/sra",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/structure": {
+      "release-type": "node",
+      "component": "@ncbijs/structure",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/cdd": {
+      "release-type": "node",
+      "component": "@ncbijs/cdd",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true
     }

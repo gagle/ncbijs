@@ -49,7 +49,9 @@
       "@ncbijs/gtr": ["./packages/gtr/src/index.ts"],
       "@ncbijs/geo": ["./packages/geo/src/index.ts"],
       "@ncbijs/dbvar": ["./packages/dbvar/src/index.ts"],
-      "@ncbijs/sra": ["./packages/sra/src/index.ts"]
+      "@ncbijs/sra": ["./packages/sra/src/index.ts"],
+      "@ncbijs/structure": ["./packages/structure/src/index.ts"],
+      "@ncbijs/cdd": ["./packages/cdd/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "dist"]

@@ -32,6 +32,8 @@ export default {
         'geo',
         'dbvar',
         'sra',
+        'structure',
+        'cdd',
         'workspace',
       ],
     ],
