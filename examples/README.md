@@ -20,7 +20,7 @@ export NCBI_API_KEY="your-api-key"
 ## Running an example
 
 ```bash
-npx tsx examples/search-pubmed.ts
+pnpm exec tsx examples/search-pubmed.ts
 ```
 
 ## Single-package examples
