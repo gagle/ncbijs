@@ -31,6 +31,7 @@ The [National Center for Biotechnology Information](https://www.ncbi.nlm.nih.gov
 | Convert between PMID, PMCID, and DOI                  | `@ncbijs/id-converter`              |
 | Expand MeSH terms for comprehensive searches          | `@ncbijs/mesh`                      |
 | Chunk full-text articles for RAG pipelines            | `@ncbijs/jats` (toChunks)           |
+| Expose all tools to LLM agents via MCP                | `@ncbijs/mcp`                       |
 
 ## Packages
 
@@ -46,6 +47,7 @@ The [National Center for Biotechnology Information](https://www.ncbi.nlm.nih.gov
 | [`@ncbijs/pubmed-xml`](./packages/pubmed-xml)     | PubMed/MEDLINE XML and plain-text parser                           | [![npm](https://img.shields.io/npm/v/@ncbijs/pubmed-xml)](https://www.npmjs.com/package/@ncbijs/pubmed-xml)     |
 | [`@ncbijs/jats`](./packages/jats)                 | JATS XML parser with markdown, plain-text, and RAG chunking        | [![npm](https://img.shields.io/npm/v/@ncbijs/jats)](https://www.npmjs.com/package/@ncbijs/jats)                 |
 | [`@ncbijs/xml`](./packages/xml)                   | Zero-dependency regex-based XML reader for NCBI formats            | [![npm](https://img.shields.io/npm/v/@ncbijs/xml)](https://www.npmjs.com/package/@ncbijs/xml)                   |
+| [`@ncbijs/mcp`](./packages/mcp)                   | MCP server exposing all ncbijs tools for LLM agents                | [![npm](https://img.shields.io/npm/v/@ncbijs/mcp)](https://www.npmjs.com/package/@ncbijs/mcp)                   |
 | [`@ncbijs/rate-limiter`](./packages/rate-limiter) | Token bucket rate limiter for browser and Node.js                  | [![npm](https://img.shields.io/npm/v/@ncbijs/rate-limiter)](https://www.npmjs.com/package/@ncbijs/rate-limiter) |
 
 ## Quick start

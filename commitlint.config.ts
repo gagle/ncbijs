@@ -14,6 +14,7 @@ export default {
         'pubtator',
         'mesh',
         'cite',
+        'mcp',
         'rate-limiter',
         'xml',
         'workspace',

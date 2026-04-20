@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "ncbijs": {
+      "command": "npx",
+      "args": ["tsx", "packages/mcp/src/index.ts"],
+      "env": {
+        "NCBI_API_KEY": "",
+        "NCBI_TOOL": "claude-code",
+        "NCBI_EMAIL": "user@example.com"
+      }
+    }
+  }
+}

@@ -18,6 +18,7 @@
         "@ncbijs/pubtator",
         "@ncbijs/mesh",
         "@ncbijs/cite",
+        "@ncbijs/mcp",
         "@ncbijs/rate-limiter",
         "@ncbijs/xml"
       ]
@@ -78,6 +79,12 @@
     "packages/cite": {
       "release-type": "node",
       "component": "@ncbijs/cite",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/mcp": {
+      "release-type": "node",
+      "component": "@ncbijs/mcp",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true
     },
