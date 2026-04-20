@@ -1,4 +1,9 @@
-import type { CitationFormat, CitationSource, CSLData } from './interfaces/cite.interface';
+import type {
+  CitationData,
+  CitationFormat,
+  CitationSource,
+  CSLData,
+} from './interfaces/cite.interface.js';
 
 const BASE_URL = 'https://api.ncbi.nlm.nih.gov/lit/ctxp/v1';
 const REQUEST_DELAY_MS = 334;
@@ -6,14 +11,19 @@ const REQUEST_DELAY_MS = 334;
 export function cite(id: string, format: 'csl', source?: CitationSource): Promise<CSLData>;
 export function cite(
   id: string,
-  format: Exclude<CitationFormat, 'csl'>,
+  format: 'citation',
+  source?: CitationSource,
+): Promise<CitationData>;
+export function cite(
+  id: string,
+  format: 'ris' | 'medline',
   source?: CitationSource,
 ): Promise<string>;
 export function cite(
   id: string,
   format: CitationFormat,
   source?: CitationSource,
-): Promise<string | CSLData> {
+): Promise<string | CSLData | CitationData> {
   return fetchCitation(id, format, source);
 }
 
@@ -21,7 +31,7 @@ export async function* citeMany(
   ids: ReadonlyArray<string>,
   format: CitationFormat,
   source?: CitationSource,
-): AsyncIterableIterator<Readonly<{ id: string; citation: string | CSLData }>> {
+): AsyncIterableIterator<Readonly<{ id: string; citation: string | CSLData | CitationData }>> {
   for (const [index, id] of ids.entries()) {
     if (index > 0) {
       await delay(REQUEST_DELAY_MS);
@@ -36,7 +46,7 @@ async function fetchCitation(
   id: string,
   format: CitationFormat,
   source?: CitationSource,
-): Promise<string | CSLData> {
+): Promise<string | CSLData | CitationData> {
   if (!id) {
     throw new Error('id must not be empty');
   }
@@ -55,7 +65,11 @@ async function fetchCitation(
   const text = await response.text();
 
   if (format === 'csl') {
-    return parseCSLResponse(text);
+    return parseJsonResponse<CSLData>(text, 'type');
+  }
+
+  if (format === 'citation') {
+    return parseJsonResponse<CitationData>(text, 'id');
   }
 
   return text;
@@ -68,19 +82,19 @@ function buildCitationUrl(id: string, format: CitationFormat, source: CitationSo
   return url.toString();
 }
 
-function parseCSLResponse(text: string): CSLData {
+function parseJsonResponse<T>(text: string, requiredKey: string): T {
   let parsed: unknown;
   try {
     parsed = JSON.parse(text);
   } catch {
-    throw new Error('Citation Exporter API returned malformed CSL JSON');
+    throw new Error('Citation Exporter API returned malformed JSON');
   }
 
-  if (typeof parsed !== 'object' || parsed === null || !('type' in parsed)) {
-    throw new Error('Citation Exporter API returned malformed CSL JSON');
+  if (typeof parsed !== 'object' || parsed === null || !(requiredKey in parsed)) {
+    throw new Error('Citation Exporter API returned malformed JSON');
   }
 
-  return parsed as CSLData;
+  return parsed as T;
 }
 
 function delay(ms: number): Promise<void> {

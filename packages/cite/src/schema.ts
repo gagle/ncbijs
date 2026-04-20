@@ -10,16 +10,7 @@ export interface paths {
       parameters: {
         query: {
           readonly id: string;
-          readonly format:
-            | 'ris'
-            | 'nbib'
-            | 'medline'
-            | 'apa'
-            | 'mla'
-            | 'chicago-author-date'
-            | 'vancouver'
-            | 'bibtex'
-            | 'csl';
+          readonly format: 'ris' | 'medline' | 'csl' | 'citation';
         };
         header?: never;
         path?: never;
@@ -52,16 +43,7 @@ export interface paths {
       parameters: {
         query: {
           readonly id: string;
-          readonly format:
-            | 'ris'
-            | 'nbib'
-            | 'medline'
-            | 'apa'
-            | 'mla'
-            | 'chicago-author-date'
-            | 'vancouver'
-            | 'bibtex'
-            | 'csl';
+          readonly format: 'ris' | 'medline' | 'csl' | 'citation';
         };
         header?: never;
         path?: never;
@@ -94,16 +76,7 @@ export interface paths {
       parameters: {
         query: {
           readonly id: string;
-          readonly format:
-            | 'ris'
-            | 'nbib'
-            | 'medline'
-            | 'apa'
-            | 'mla'
-            | 'chicago-author-date'
-            | 'vancouver'
-            | 'bibtex'
-            | 'csl';
+          readonly format: 'ris' | 'medline' | 'csl' | 'citation';
         };
         header?: never;
         path?: never;

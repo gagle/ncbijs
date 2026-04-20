@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cite, citeMany } from './cite';
+import { cite, citeMany } from './cite.js';
 
 function mockFetchText(text: string, status = 200): void {
   vi.stubGlobal(
@@ -45,46 +45,27 @@ describe('cite', () => {
       expect(result).toContain('TY  - JOUR');
     });
 
-    it('should fetch citation in NBIB format', async () => {
-      mockFetchText('PMID- 12345\nTI  - Test\n');
-      const result = await cite('12345', 'nbib');
-      expect(result).toContain('PMID- 12345');
-    });
-
     it('should fetch citation in MEDLINE format', async () => {
       mockFetchText('PMID- 12345\nOWN - NLM');
       const result = await cite('12345', 'medline');
       expect(result).toContain('PMID- 12345');
     });
 
-    it('should fetch citation in APA format', async () => {
-      mockFetchText('Smith, J. (2024). Test article. Nature, 625(1), 100-105.');
-      const result = await cite('12345', 'apa');
-      expect(result).toContain('Smith');
-    });
-
-    it('should fetch citation in MLA format', async () => {
-      mockFetchText('Smith, John. "Test Article." Nature 625.1 (2024): 100-105.');
-      const result = await cite('12345', 'mla');
-      expect(result).toContain('Smith');
-    });
-
-    it('should fetch citation in Chicago Author-Date format', async () => {
-      mockFetchText('Smith, John. 2024. "Test Article." Nature 625 (1): 100-105.');
-      const result = await cite('12345', 'chicago-author-date');
-      expect(result).toContain('Smith');
-    });
-
-    it('should fetch citation in Vancouver format', async () => {
-      mockFetchText('1. Smith J. Test article. Nature. 2024;625(1):100-105.');
-      const result = await cite('12345', 'vancouver');
-      expect(result).toContain('Smith');
-    });
-
-    it('should fetch citation in BibTeX format', async () => {
-      mockFetchText('@article{Smith2024,\n  author = {Smith, John}\n}');
-      const result = await cite('12345', 'bibtex');
-      expect(result).toContain('@article');
+    it('should fetch citation in citation format', async () => {
+      const citationJson = JSON.stringify({
+        id: '12345',
+        ama: { orig: 'Smith J. Test.', format: 'ama' },
+        apa: { orig: 'Smith, J. (2024).', format: 'apa' },
+        mla: { orig: 'Smith, John.', format: 'mla' },
+        nlm: { orig: 'Smith J. Test.', format: 'nlm' },
+      });
+      mockFetchText(citationJson);
+      const result = await cite('12345', 'citation');
+      expect(result.id).toBe('12345');
+      expect(result.ama.orig).toBe('Smith J. Test.');
+      expect(result.apa.orig).toBe('Smith, J. (2024).');
+      expect(result.mla.orig).toBe('Smith, John.');
+      expect(result.nlm.orig).toBe('Smith J. Test.');
     });
 
     it('should fetch citation in CSL format', async () => {
@@ -184,7 +165,7 @@ describe('cite', () => {
     it('should return raw formatted text', async () => {
       const rawText = 'PMID- 12345\nTI  - Test Title\n';
       mockFetchText(rawText);
-      const result = await cite('12345', 'nbib');
+      const result = await cite('12345', 'medline');
       expect(result).toBe(rawText);
     });
   });
@@ -246,7 +227,7 @@ describe('cite', () => {
 
     it('should throw on malformed CSL JSON response', async () => {
       mockFetchText('not valid json');
-      await expect(cite('12345', 'csl')).rejects.toThrow('malformed CSL JSON');
+      await expect(cite('12345', 'csl')).rejects.toThrow('malformed JSON');
     });
   });
 });

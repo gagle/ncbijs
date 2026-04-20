@@ -1,15 +1,19 @@
-export type CitationFormat =
-  | 'ris'
-  | 'nbib'
-  | 'medline'
-  | 'apa'
-  | 'mla'
-  | 'chicago-author-date'
-  | 'vancouver'
-  | 'bibtex'
-  | 'csl';
+export type CitationFormat = 'ris' | 'medline' | 'csl' | 'citation';
 
 export type CitationSource = 'pubmed' | 'pmc' | 'books';
+
+export interface CitationStyle {
+  readonly orig: string;
+  readonly format: string;
+}
+
+export interface CitationData {
+  readonly id: string;
+  readonly ama: CitationStyle;
+  readonly apa: CitationStyle;
+  readonly mla: CitationStyle;
+  readonly nlm: CitationStyle;
+}
 
 export interface CSLData {
   readonly type: string;

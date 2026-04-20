@@ -1,2 +1,8 @@
-export type { CitationFormat, CitationSource, CSLData } from './interfaces/cite.interface';
-export { cite, citeMany } from './cite';
+export type {
+  CitationData,
+  CitationFormat,
+  CitationSource,
+  CitationStyle,
+  CSLData,
+} from './interfaces/cite.interface.js';
+export { cite, citeMany } from './cite.js';
