@@ -2,10 +2,14 @@ import { TokenBucket } from '@ncbijs/rate-limiter';
 import { fetchJson } from './pubchem-client';
 import type { PubChemClientConfig } from './pubchem-client';
 import type {
+  AssayRecord,
+  AssaySummary,
   CompoundDescription,
   CompoundProperty,
   CompoundSynonyms,
   PubChemConfig,
+  SubstanceRecord,
+  SubstanceSynonyms,
 } from './interfaces/pubchem.interface';
 
 const BASE_URL = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug';
@@ -111,6 +115,84 @@ export class PubChem {
       description: information?.Description ?? '',
     };
   }
+
+  public async substanceBySid(sid: number): Promise<SubstanceRecord> {
+    const url = `${BASE_URL}/substance/sid/${encodeURIComponent(sid)}/description/JSON`;
+    const raw = await fetchJson<RawSubstanceDescriptionResponse>(url, this._config);
+
+    return mapSubstanceRecord(raw.InformationList?.Information?.[0]);
+  }
+
+  public async substanceBySidBatch(
+    sids: ReadonlyArray<number>,
+  ): Promise<ReadonlyArray<SubstanceRecord>> {
+    if (sids.length === 0) {
+      return [];
+    }
+
+    const joined = sids.join(',');
+    const url = `${BASE_URL}/substance/sid/${encodeURIComponent(joined)}/description/JSON`;
+    const raw = await fetchJson<RawSubstanceDescriptionResponse>(url, this._config);
+
+    return (raw.InformationList?.Information ?? []).map(mapSubstanceRecord);
+  }
+
+  public async substanceByName(name: string): Promise<SubstanceRecord> {
+    const url = `${BASE_URL}/substance/name/${encodeURIComponent(name)}/description/JSON`;
+    const raw = await fetchJson<RawSubstanceDescriptionResponse>(url, this._config);
+
+    return mapSubstanceRecord(raw.InformationList?.Information?.[0]);
+  }
+
+  public async substanceSynonyms(sid: number): Promise<SubstanceSynonyms> {
+    const url = `${BASE_URL}/substance/sid/${encodeURIComponent(sid)}/synonyms/JSON`;
+    const raw = await fetchJson<RawSubstanceSynonymsResponse>(url, this._config);
+    const information = raw.InformationList?.Information?.[0];
+
+    return {
+      sid: information?.SID ?? 0,
+      synonyms: information?.Synonym ?? [],
+    };
+  }
+
+  public async sidsByName(name: string): Promise<ReadonlyArray<number>> {
+    const url = `${BASE_URL}/substance/name/${encodeURIComponent(name)}/sids/JSON`;
+    const raw = await fetchJson<RawSidResponse>(url, this._config);
+
+    return raw.IdentifierList?.SID ?? [];
+  }
+
+  public async assayByAid(aid: number): Promise<AssayRecord> {
+    const url = `${BASE_URL}/assay/aid/${encodeURIComponent(aid)}/description/JSON`;
+    const raw = await fetchJson<RawAssayDescriptionResponse>(url, this._config);
+
+    return mapAssayRecord(raw.PC_AssayContainer?.[0]);
+  }
+
+  public async assayByAidBatch(aids: ReadonlyArray<number>): Promise<ReadonlyArray<AssayRecord>> {
+    if (aids.length === 0) {
+      return [];
+    }
+
+    const joined = aids.join(',');
+    const url = `${BASE_URL}/assay/aid/${encodeURIComponent(joined)}/description/JSON`;
+    const raw = await fetchJson<RawAssayDescriptionResponse>(url, this._config);
+
+    return (raw.PC_AssayContainer ?? []).map(mapAssayRecord);
+  }
+
+  public async assaySummary(aid: number): Promise<AssaySummary> {
+    const url = `${BASE_URL}/assay/aid/${encodeURIComponent(aid)}/sids/JSON`;
+    const raw = await fetchJson<RawAssaySidsResponse>(url, this._config);
+    const information = raw.InformationList?.Information?.[0];
+
+    return {
+      aid: information?.AID ?? 0,
+      name: '',
+      sidCount: information?.SID?.length ?? 0,
+      cidCount: information?.CID?.length ?? 0,
+    };
+  }
 }
 
 interface RawPropertyResponse {
@@ -161,6 +243,88 @@ interface RawDescriptionResponse {
       readonly Title?: string;
       readonly Description?: string;
     }>;
+  };
+}
+
+interface RawSubstanceDescriptionResponse {
+  readonly InformationList?: {
+    readonly Information?: ReadonlyArray<RawSubstanceInformation>;
+  };
+}
+
+interface RawSubstanceInformation {
+  readonly SID?: number;
+  readonly SourceName?: string;
+  readonly SourceID?: string;
+  readonly Description?: string;
+}
+
+interface RawSubstanceSynonymsResponse {
+  readonly InformationList?: {
+    readonly Information?: ReadonlyArray<{
+      readonly SID?: number;
+      readonly Synonym?: ReadonlyArray<string>;
+    }>;
+  };
+}
+
+interface RawSidResponse {
+  readonly IdentifierList?: {
+    readonly SID?: ReadonlyArray<number>;
+  };
+}
+
+interface RawAssayDescriptionResponse {
+  readonly PC_AssayContainer?: ReadonlyArray<RawAssayContainer>;
+}
+
+interface RawAssayContainer {
+  readonly assay?: {
+    readonly descr?: RawAssayDescription;
+  };
+}
+
+interface RawAssayDescription {
+  readonly aid?: { readonly id?: number };
+  readonly aid_source?: {
+    readonly db?: {
+      readonly name?: string;
+      readonly source_id?: { readonly str?: string };
+    };
+  };
+  readonly name?: string;
+  readonly description?: ReadonlyArray<string>;
+  readonly protocol?: ReadonlyArray<string>;
+}
+
+interface RawAssaySidsResponse {
+  readonly InformationList?: {
+    readonly Information?: ReadonlyArray<{
+      readonly AID?: number;
+      readonly SID?: ReadonlyArray<number>;
+      readonly CID?: ReadonlyArray<number>;
+    }>;
+  };
+}
+
+function mapSubstanceRecord(raw?: RawSubstanceInformation): SubstanceRecord {
+  return {
+    sid: raw?.SID ?? 0,
+    sourceName: raw?.SourceName ?? '',
+    sourceId: raw?.SourceID ?? '',
+    description: raw?.Description ?? '',
+  };
+}
+
+function mapAssayRecord(raw?: RawAssayContainer): AssayRecord {
+  const descr = raw?.assay?.descr;
+  return {
+    aid: descr?.aid?.id ?? 0,
+    name: descr?.name ?? '',
+    description: (descr?.description ?? []).join(' '),
+    protocol: (descr?.protocol ?? []).join(' '),
+    sourceName: descr?.aid_source?.db?.name ?? '',
+    sourceId: descr?.aid_source?.db?.source_id?.str ?? '',
   };
 }
 

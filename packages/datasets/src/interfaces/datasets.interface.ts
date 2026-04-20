@@ -87,3 +87,44 @@ export interface AssemblyStats {
   readonly scaffoldL50: number;
   readonly gcPercent: number;
 }
+
+export interface VirusReport {
+  readonly accession: string;
+  readonly taxId: number;
+  readonly organismName: string;
+  readonly isolateName: string;
+  readonly host: string;
+  readonly collectionDate: string;
+  readonly geoLocation: string;
+  readonly completeness: string;
+  readonly length: number;
+  readonly bioprojectAccession: string;
+  readonly biosampleAccession: string;
+}
+
+export interface BioProjectReport {
+  readonly accession: string;
+  readonly title: string;
+  readonly description: string;
+  readonly organismName: string;
+  readonly taxId: number;
+  readonly projectType: string;
+  readonly registrationDate: string;
+}
+
+export interface BioSampleReport {
+  readonly accession: string;
+  readonly title: string;
+  readonly description: string;
+  readonly organismName: string;
+  readonly taxId: number;
+  readonly ownerName: string;
+  readonly submissionDate: string;
+  readonly publicationDate: string;
+  readonly attributes: ReadonlyArray<BioSampleAttribute>;
+}
+
+export interface BioSampleAttribute {
+  readonly name: string;
+  readonly value: string;
+}

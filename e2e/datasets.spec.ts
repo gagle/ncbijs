@@ -111,4 +111,40 @@ describe('NCBI Datasets API v2 E2E', () => {
       expect(reports[0]!.organism.taxId).toBe(562);
     });
   });
+
+  describe('virusByAccession', () => {
+    it('should retrieve SARS-CoV-2 reference genome', async () => {
+      const reports = await datasets.virusByAccession(['NC_045512.2']);
+
+      expect(reports.length).toBeGreaterThan(0);
+      expect(reports[0]!.accession).toBe('NC_045512.2');
+      expect(reports[0]!.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('virusByTaxon', () => {
+    it('should retrieve viruses by taxon ID', async () => {
+      const reports = await datasets.virusByTaxon(2697049);
+
+      expect(reports.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('bioproject', () => {
+    it('should retrieve a bioproject by accession', async () => {
+      const reports = await datasets.bioproject(['PRJNA168']);
+
+      expect(reports.length).toBeGreaterThan(0);
+      expect(reports[0]!.accession).toBe('PRJNA168');
+    });
+  });
+
+  describe('biosample', () => {
+    it('should retrieve a biosample by accession', async () => {
+      const reports = await datasets.biosample(['SAMN13922059']);
+
+      expect(reports.length).toBeGreaterThan(0);
+      expect(reports[0]!.accession).toBe('SAMN13922059');
+    });
+  });
 });

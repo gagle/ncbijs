@@ -36,4 +36,38 @@ describe('PubChem PUG REST E2E', () => {
     expect(description.cid).toBe(2244);
     expect(description.title).toBeTruthy();
   });
+
+  it('should retrieve substance by SID', async () => {
+    const substance = await pubchem.substanceBySid(175);
+
+    expect(substance.sid).toBe(175);
+    expect(substance.sourceName).toBeTruthy();
+  });
+
+  it('should retrieve substance synonyms', async () => {
+    const synonyms = await pubchem.substanceSynonyms(175);
+
+    expect(synonyms.sid).toBe(175);
+    expect(synonyms.synonyms.length).toBeGreaterThan(0);
+  });
+
+  it('should find SIDs by name', async () => {
+    const sids = await pubchem.sidsByName('aspirin');
+
+    expect(sids.length).toBeGreaterThan(0);
+  });
+
+  it('should retrieve assay description by AID', async () => {
+    const assay = await pubchem.assayByAid(1000);
+
+    expect(assay.aid).toBe(1000);
+    expect(assay.name).toBeTruthy();
+  });
+
+  it('should retrieve assay summary', async () => {
+    const summary = await pubchem.assaySummary(1000);
+
+    expect(summary.aid).toBe(1000);
+    expect(summary.sidCount).toBeGreaterThan(0);
+  });
 });

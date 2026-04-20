@@ -4,6 +4,9 @@ import type { DatasetsClientConfig } from './datasets-client';
 import type {
   AssemblyInfo,
   AssemblyStats,
+  BioProjectReport,
+  BioSampleAttribute,
+  BioSampleReport,
   DatasetsConfig,
   GeneOntology,
   GeneReport,
@@ -12,6 +15,7 @@ import type {
   GoTerm,
   TaxonomyCount,
   TaxonomyReport,
+  VirusReport,
 } from './interfaces/datasets.interface';
 
 const BASE_URL = 'https://api.ncbi.nlm.nih.gov/datasets/v2';
@@ -93,6 +97,55 @@ export class Datasets {
     const raw = await fetchJson<RawGenomeResponse>(url, this._config);
 
     return (raw.reports ?? []).map(mapGenomeReport);
+  }
+
+  public async virusByAccession(
+    accessions: ReadonlyArray<string>,
+  ): Promise<ReadonlyArray<VirusReport>> {
+    if (accessions.length === 0) {
+      throw new Error('accessions must not be empty');
+    }
+
+    const joined = accessions.join(',');
+    const url = `${BASE_URL}/virus/accession/${encodeURIComponent(joined)}/dataset_report`;
+    const raw = await fetchJson<RawVirusResponse>(url, this._config);
+
+    return (raw.reports ?? []).map(mapVirusReport);
+  }
+
+  public async virusByTaxon(taxon: number | string): Promise<ReadonlyArray<VirusReport>> {
+    const url = `${BASE_URL}/virus/taxon/${encodeURIComponent(String(taxon))}/dataset_report`;
+    const raw = await fetchJson<RawVirusResponse>(url, this._config);
+
+    return (raw.reports ?? []).map(mapVirusReport);
+  }
+
+  public async bioproject(
+    accessions: ReadonlyArray<string>,
+  ): Promise<ReadonlyArray<BioProjectReport>> {
+    if (accessions.length === 0) {
+      throw new Error('accessions must not be empty');
+    }
+
+    const joined = accessions.join(',');
+    const url = `${BASE_URL}/bioproject/accession/${encodeURIComponent(joined)}`;
+    const raw = await fetchJson<RawBioProjectResponse>(url, this._config);
+
+    return (raw.reports ?? []).map(mapBioProjectReport);
+  }
+
+  public async biosample(
+    accessions: ReadonlyArray<string>,
+  ): Promise<ReadonlyArray<BioSampleReport>> {
+    if (accessions.length === 0) {
+      throw new Error('accessions must not be empty');
+    }
+
+    const joined = accessions.join(',');
+    const url = `${BASE_URL}/biosample/accession/${encodeURIComponent(joined)}`;
+    const raw = await fetchJson<RawBioSampleResponse>(url, this._config);
+
+    return (raw.reports ?? []).map(mapBioSampleReport);
   }
 }
 
@@ -303,5 +356,107 @@ function mapAssemblyStats(raw?: RawAssemblyStats): AssemblyStats {
     scaffoldN50: raw?.scaffold_n50 ?? 0,
     scaffoldL50: raw?.scaffold_l50 ?? 0,
     gcPercent: raw?.gc_percent ?? 0,
+  };
+}
+
+interface RawVirusResponse {
+  readonly reports?: ReadonlyArray<RawVirusData>;
+}
+
+interface RawVirusData {
+  readonly accession?: string;
+  readonly tax_id?: number;
+  readonly organism_name?: string;
+  readonly isolate_name?: string;
+  readonly host?: string;
+  readonly collection_date?: string;
+  readonly geo_location?: string;
+  readonly completeness?: string;
+  readonly length?: number;
+  readonly bioproject_accession?: string;
+  readonly biosample_accession?: string;
+}
+
+interface RawBioProjectResponse {
+  readonly reports?: ReadonlyArray<RawBioProjectData>;
+}
+
+interface RawBioProjectData {
+  readonly accession?: string;
+  readonly title?: string;
+  readonly description?: string;
+  readonly organism_name?: string;
+  readonly tax_id?: number;
+  readonly project_type?: string;
+  readonly registration_date?: string;
+}
+
+interface RawBioSampleResponse {
+  readonly reports?: ReadonlyArray<RawBioSampleData>;
+}
+
+interface RawBioSampleData {
+  readonly accession?: string;
+  readonly title?: string;
+  readonly description?: string;
+  readonly organism_name?: string;
+  readonly tax_id?: number;
+  readonly owner_name?: string;
+  readonly submission_date?: string;
+  readonly publication_date?: string;
+  readonly attributes?: ReadonlyArray<RawBioSampleAttribute>;
+}
+
+interface RawBioSampleAttribute {
+  readonly name?: string;
+  readonly value?: string;
+}
+
+function mapVirusReport(raw: RawVirusData): VirusReport {
+  return {
+    accession: raw.accession ?? '',
+    taxId: raw.tax_id ?? 0,
+    organismName: raw.organism_name ?? '',
+    isolateName: raw.isolate_name ?? '',
+    host: raw.host ?? '',
+    collectionDate: raw.collection_date ?? '',
+    geoLocation: raw.geo_location ?? '',
+    completeness: raw.completeness ?? '',
+    length: raw.length ?? 0,
+    bioprojectAccession: raw.bioproject_accession ?? '',
+    biosampleAccession: raw.biosample_accession ?? '',
+  };
+}
+
+function mapBioProjectReport(raw: RawBioProjectData): BioProjectReport {
+  return {
+    accession: raw.accession ?? '',
+    title: raw.title ?? '',
+    description: raw.description ?? '',
+    organismName: raw.organism_name ?? '',
+    taxId: raw.tax_id ?? 0,
+    projectType: raw.project_type ?? '',
+    registrationDate: raw.registration_date ?? '',
+  };
+}
+
+function mapBioSampleReport(raw: RawBioSampleData): BioSampleReport {
+  return {
+    accession: raw.accession ?? '',
+    title: raw.title ?? '',
+    description: raw.description ?? '',
+    organismName: raw.organism_name ?? '',
+    taxId: raw.tax_id ?? 0,
+    ownerName: raw.owner_name ?? '',
+    submissionDate: raw.submission_date ?? '',
+    publicationDate: raw.publication_date ?? '',
+    attributes: (raw.attributes ?? []).map(mapBioSampleAttribute),
+  };
+}
+
+function mapBioSampleAttribute(raw: RawBioSampleAttribute): BioSampleAttribute {
+  return {
+    name: raw.name ?? '',
+    value: raw.value ?? '',
   };
 }

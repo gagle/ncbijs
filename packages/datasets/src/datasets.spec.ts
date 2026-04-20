@@ -428,6 +428,284 @@ describe('Datasets', () => {
     });
   });
 
+  describe('virusByAccession', () => {
+    it('should fetch virus by accession and map fields', async () => {
+      mockFetchJson({
+        reports: [
+          {
+            accession: 'NC_045512.2',
+            tax_id: 2697049,
+            organism_name: 'Severe acute respiratory syndrome coronavirus 2',
+            isolate_name: 'Wuhan-Hu-1',
+            host: 'Homo sapiens',
+            collection_date: '2019-12',
+            geo_location: 'China',
+            completeness: 'complete',
+            length: 29903,
+            bioproject_accession: 'PRJNA485481',
+            biosample_accession: 'SAMN13922059',
+          },
+        ],
+      });
+      const datasets = new Datasets();
+
+      const reports = await datasets.virusByAccession(['NC_045512.2']);
+
+      expect(reports).toHaveLength(1);
+      expect(reports[0]!.accession).toBe('NC_045512.2');
+      expect(reports[0]!.taxId).toBe(2697049);
+      expect(reports[0]!.organismName).toBe('Severe acute respiratory syndrome coronavirus 2');
+      expect(reports[0]!.isolateName).toBe('Wuhan-Hu-1');
+      expect(reports[0]!.host).toBe('Homo sapiens');
+      expect(reports[0]!.collectionDate).toBe('2019-12');
+      expect(reports[0]!.geoLocation).toBe('China');
+      expect(reports[0]!.completeness).toBe('complete');
+      expect(reports[0]!.length).toBe(29903);
+      expect(reports[0]!.bioprojectAccession).toBe('PRJNA485481');
+      expect(reports[0]!.biosampleAccession).toBe('SAMN13922059');
+    });
+
+    it('should build correct URL with encoded accession', async () => {
+      mockFetchJson({ reports: [] });
+      const datasets = new Datasets();
+
+      await datasets.virusByAccession(['NC_045512.2']);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('/virus/accession/NC_045512.2/dataset_report');
+    });
+
+    it('should throw on empty accessions array', async () => {
+      const datasets = new Datasets();
+      await expect(datasets.virusByAccession([])).rejects.toThrow('accessions must not be empty');
+    });
+
+    it('should handle missing optional fields gracefully', async () => {
+      mockFetchJson({ reports: [{}] });
+      const datasets = new Datasets();
+
+      const reports = await datasets.virusByAccession(['NC_045512.2']);
+
+      expect(reports[0]!.accession).toBe('');
+      expect(reports[0]!.taxId).toBe(0);
+      expect(reports[0]!.organismName).toBe('');
+      expect(reports[0]!.isolateName).toBe('');
+      expect(reports[0]!.host).toBe('');
+      expect(reports[0]!.collectionDate).toBe('');
+      expect(reports[0]!.geoLocation).toBe('');
+      expect(reports[0]!.completeness).toBe('');
+      expect(reports[0]!.length).toBe(0);
+      expect(reports[0]!.bioprojectAccession).toBe('');
+      expect(reports[0]!.biosampleAccession).toBe('');
+    });
+
+    it('should handle missing reports key', async () => {
+      mockFetchJson({});
+      const datasets = new Datasets();
+
+      const reports = await datasets.virusByAccession(['NC_045512.2']);
+      expect(reports).toEqual([]);
+    });
+  });
+
+  describe('virusByTaxon', () => {
+    it('should fetch viruses by taxon and map fields', async () => {
+      mockFetchJson({
+        reports: [
+          {
+            accession: 'NC_045512.2',
+            tax_id: 2697049,
+            organism_name: 'SARS-CoV-2',
+            completeness: 'complete',
+            length: 29903,
+          },
+        ],
+      });
+      const datasets = new Datasets();
+
+      const reports = await datasets.virusByTaxon(2697049);
+      expect(reports).toHaveLength(1);
+      expect(reports[0]!.taxId).toBe(2697049);
+    });
+
+    it('should build correct URL with taxon name', async () => {
+      mockFetchJson({ reports: [] });
+      const datasets = new Datasets();
+
+      await datasets.virusByTaxon('SARS-CoV-2');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('/virus/taxon/SARS-CoV-2/dataset_report');
+    });
+
+    it('should handle missing reports key', async () => {
+      mockFetchJson({});
+      const datasets = new Datasets();
+
+      const reports = await datasets.virusByTaxon(999999999);
+      expect(reports).toEqual([]);
+    });
+  });
+
+  describe('bioproject', () => {
+    it('should fetch bioproject by accession and map fields', async () => {
+      mockFetchJson({
+        reports: [
+          {
+            accession: 'PRJNA168',
+            title: 'Homo sapiens genome sequencing',
+            description: 'The human genome project.',
+            organism_name: 'Homo sapiens',
+            tax_id: 9606,
+            project_type: 'primary_submission',
+            registration_date: '2001-01-01',
+          },
+        ],
+      });
+      const datasets = new Datasets();
+
+      const reports = await datasets.bioproject(['PRJNA168']);
+
+      expect(reports).toHaveLength(1);
+      expect(reports[0]!.accession).toBe('PRJNA168');
+      expect(reports[0]!.title).toBe('Homo sapiens genome sequencing');
+      expect(reports[0]!.description).toBe('The human genome project.');
+      expect(reports[0]!.organismName).toBe('Homo sapiens');
+      expect(reports[0]!.taxId).toBe(9606);
+      expect(reports[0]!.projectType).toBe('primary_submission');
+      expect(reports[0]!.registrationDate).toBe('2001-01-01');
+    });
+
+    it('should build correct URL with accession', async () => {
+      mockFetchJson({ reports: [] });
+      const datasets = new Datasets();
+
+      await datasets.bioproject(['PRJNA168']);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('/bioproject/accession/PRJNA168');
+    });
+
+    it('should throw on empty accessions array', async () => {
+      const datasets = new Datasets();
+      await expect(datasets.bioproject([])).rejects.toThrow('accessions must not be empty');
+    });
+
+    it('should handle missing optional fields gracefully', async () => {
+      mockFetchJson({ reports: [{}] });
+      const datasets = new Datasets();
+
+      const reports = await datasets.bioproject(['PRJNA168']);
+
+      expect(reports[0]!.accession).toBe('');
+      expect(reports[0]!.title).toBe('');
+      expect(reports[0]!.description).toBe('');
+      expect(reports[0]!.organismName).toBe('');
+      expect(reports[0]!.taxId).toBe(0);
+      expect(reports[0]!.projectType).toBe('');
+      expect(reports[0]!.registrationDate).toBe('');
+    });
+
+    it('should handle missing reports key', async () => {
+      mockFetchJson({});
+      const datasets = new Datasets();
+
+      const reports = await datasets.bioproject(['PRJNA168']);
+      expect(reports).toEqual([]);
+    });
+  });
+
+  describe('biosample', () => {
+    it('should fetch biosample by accession and map fields', async () => {
+      mockFetchJson({
+        reports: [
+          {
+            accession: 'SAMN13922059',
+            title: 'SARS-CoV-2 sample',
+            description: 'Virus isolate.',
+            organism_name: 'SARS-CoV-2',
+            tax_id: 2697049,
+            owner_name: 'Wuhan Institute of Virology',
+            submission_date: '2020-01-05',
+            publication_date: '2020-01-10',
+            attributes: [
+              { name: 'collection_date', value: '2019-12' },
+              { name: 'geo_loc_name', value: 'China' },
+            ],
+          },
+        ],
+      });
+      const datasets = new Datasets();
+
+      const reports = await datasets.biosample(['SAMN13922059']);
+
+      expect(reports).toHaveLength(1);
+      expect(reports[0]!.accession).toBe('SAMN13922059');
+      expect(reports[0]!.title).toBe('SARS-CoV-2 sample');
+      expect(reports[0]!.description).toBe('Virus isolate.');
+      expect(reports[0]!.organismName).toBe('SARS-CoV-2');
+      expect(reports[0]!.taxId).toBe(2697049);
+      expect(reports[0]!.ownerName).toBe('Wuhan Institute of Virology');
+      expect(reports[0]!.submissionDate).toBe('2020-01-05');
+      expect(reports[0]!.publicationDate).toBe('2020-01-10');
+      expect(reports[0]!.attributes).toHaveLength(2);
+      expect(reports[0]!.attributes[0]!.name).toBe('collection_date');
+      expect(reports[0]!.attributes[0]!.value).toBe('2019-12');
+    });
+
+    it('should build correct URL with accession', async () => {
+      mockFetchJson({ reports: [] });
+      const datasets = new Datasets();
+
+      await datasets.biosample(['SAMN13922059']);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('/biosample/accession/SAMN13922059');
+    });
+
+    it('should throw on empty accessions array', async () => {
+      const datasets = new Datasets();
+      await expect(datasets.biosample([])).rejects.toThrow('accessions must not be empty');
+    });
+
+    it('should handle missing optional fields gracefully', async () => {
+      mockFetchJson({ reports: [{}] });
+      const datasets = new Datasets();
+
+      const reports = await datasets.biosample(['SAMN13922059']);
+
+      expect(reports[0]!.accession).toBe('');
+      expect(reports[0]!.title).toBe('');
+      expect(reports[0]!.description).toBe('');
+      expect(reports[0]!.organismName).toBe('');
+      expect(reports[0]!.taxId).toBe(0);
+      expect(reports[0]!.ownerName).toBe('');
+      expect(reports[0]!.submissionDate).toBe('');
+      expect(reports[0]!.publicationDate).toBe('');
+      expect(reports[0]!.attributes).toEqual([]);
+    });
+
+    it('should handle attributes with missing fields', async () => {
+      mockFetchJson({
+        reports: [{ accession: 'SAMN1', attributes: [{}] }],
+      });
+      const datasets = new Datasets();
+
+      const reports = await datasets.biosample(['SAMN1']);
+
+      expect(reports[0]!.attributes[0]!.name).toBe('');
+      expect(reports[0]!.attributes[0]!.value).toBe('');
+    });
+
+    it('should handle missing reports key', async () => {
+      mockFetchJson({});
+      const datasets = new Datasets();
+
+      const reports = await datasets.biosample(['SAMN13922059']);
+      expect(reports).toEqual([]);
+    });
+  });
+
   describe('configuration', () => {
     it('should accept API key in config', async () => {
       mockFetchJson({ reports: [] });

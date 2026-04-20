@@ -517,6 +517,507 @@ describe('PubChem', () => {
     });
   });
 
+  describe('substanceBySid', () => {
+    it('should fetch substance by SID and map fields', async () => {
+      mockFetchJson({
+        InformationList: {
+          Information: [
+            {
+              SID: 175,
+              SourceName: 'DTP/NCI',
+              SourceID: '729456',
+              Description: 'A benzoic acid derivative.',
+            },
+          ],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const substance = await pubchem.substanceBySid(175);
+
+      expect(substance.sid).toBe(175);
+      expect(substance.sourceName).toBe('DTP/NCI');
+      expect(substance.sourceId).toBe('729456');
+      expect(substance.description).toBe('A benzoic acid derivative.');
+    });
+
+    it('should build correct URL with SID', async () => {
+      mockFetchJson({ InformationList: { Information: [{ SID: 175 }] } });
+      const pubchem = new PubChem();
+
+      await pubchem.substanceBySid(175);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('/substance/sid/175/description/JSON');
+    });
+
+    it('should handle missing InformationList', async () => {
+      mockFetchJson({});
+      const pubchem = new PubChem();
+
+      const substance = await pubchem.substanceBySid(1);
+
+      expect(substance.sid).toBe(0);
+      expect(substance.sourceName).toBe('');
+      expect(substance.sourceId).toBe('');
+      expect(substance.description).toBe('');
+    });
+
+    it('should handle empty Information array', async () => {
+      mockFetchJson({ InformationList: { Information: [] } });
+      const pubchem = new PubChem();
+
+      const substance = await pubchem.substanceBySid(1);
+
+      expect(substance.sid).toBe(0);
+    });
+
+    it('should throw on 404 for non-existent substance', async () => {
+      mockFetchError(404, 'PUGREST.NotFound');
+      const pubchem = new PubChem();
+
+      await expect(pubchem.substanceBySid(999999999)).rejects.toThrow(
+        'PubChem API returned status 404',
+      );
+    });
+  });
+
+  describe('substanceBySidBatch', () => {
+    it('should fetch multiple substances and map all entries', async () => {
+      mockFetchJson({
+        InformationList: {
+          Information: [
+            { SID: 175, SourceName: 'DTP/NCI', SourceID: '729456', Description: 'Substance 1' },
+            { SID: 176, SourceName: 'ChEBI', SourceID: '15365', Description: 'Substance 2' },
+          ],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const substances = await pubchem.substanceBySidBatch([175, 176]);
+
+      expect(substances).toHaveLength(2);
+      expect(substances[0]!.sid).toBe(175);
+      expect(substances[0]!.sourceName).toBe('DTP/NCI');
+      expect(substances[1]!.sid).toBe(176);
+      expect(substances[1]!.sourceName).toBe('ChEBI');
+    });
+
+    it('should build correct URL with comma-separated SIDs', async () => {
+      mockFetchJson({ InformationList: { Information: [] } });
+      const pubchem = new PubChem();
+
+      await pubchem.substanceBySidBatch([175, 176]);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('/substance/sid/175%2C176/description/JSON');
+    });
+
+    it('should return empty array for empty SIDs', async () => {
+      const pubchem = new PubChem();
+
+      const substances = await pubchem.substanceBySidBatch([]);
+
+      expect(substances).toEqual([]);
+    });
+
+    it('should handle missing InformationList', async () => {
+      mockFetchJson({});
+      const pubchem = new PubChem();
+
+      const substances = await pubchem.substanceBySidBatch([175]);
+
+      expect(substances).toEqual([]);
+    });
+  });
+
+  describe('substanceByName', () => {
+    it('should fetch substance by name and map fields', async () => {
+      mockFetchJson({
+        InformationList: {
+          Information: [
+            {
+              SID: 175,
+              SourceName: 'DTP/NCI',
+              SourceID: '729456',
+              Description: 'Aspirin substance',
+            },
+          ],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const substance = await pubchem.substanceByName('aspirin');
+
+      expect(substance.sid).toBe(175);
+      expect(substance.sourceName).toBe('DTP/NCI');
+    });
+
+    it('should build correct URL with encoded name', async () => {
+      mockFetchJson({ InformationList: { Information: [{ SID: 1 }] } });
+      const pubchem = new PubChem();
+
+      await pubchem.substanceByName('acetylsalicylic acid');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('/substance/name/acetylsalicylic%20acid/description/JSON');
+    });
+
+    it('should throw on 404 for unknown substance', async () => {
+      mockFetchError(404, 'PUGREST.NotFound');
+      const pubchem = new PubChem();
+
+      await expect(pubchem.substanceByName('notarealsubstance')).rejects.toThrow(
+        'PubChem API returned status 404',
+      );
+    });
+  });
+
+  describe('substanceSynonyms', () => {
+    it('should fetch substance synonyms and map fields', async () => {
+      mockFetchJson({
+        InformationList: {
+          Information: [{ SID: 175, Synonym: ['aspirin', 'Acetylsalicylic acid'] }],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const result = await pubchem.substanceSynonyms(175);
+
+      expect(result.sid).toBe(175);
+      expect(result.synonyms).toEqual(['aspirin', 'Acetylsalicylic acid']);
+    });
+
+    it('should build correct URL', async () => {
+      mockFetchJson({ InformationList: { Information: [{ SID: 175 }] } });
+      const pubchem = new PubChem();
+
+      await pubchem.substanceSynonyms(175);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('/substance/sid/175/synonyms/JSON');
+    });
+
+    it('should handle missing InformationList', async () => {
+      mockFetchJson({});
+      const pubchem = new PubChem();
+
+      const result = await pubchem.substanceSynonyms(1);
+
+      expect(result.sid).toBe(0);
+      expect(result.synonyms).toEqual([]);
+    });
+
+    it('should handle empty Information array', async () => {
+      mockFetchJson({ InformationList: { Information: [] } });
+      const pubchem = new PubChem();
+
+      const result = await pubchem.substanceSynonyms(1);
+
+      expect(result.sid).toBe(0);
+      expect(result.synonyms).toEqual([]);
+    });
+
+    it('should handle Information entry with missing Synonym', async () => {
+      mockFetchJson({ InformationList: { Information: [{ SID: 5 }] } });
+      const pubchem = new PubChem();
+
+      const result = await pubchem.substanceSynonyms(5);
+
+      expect(result.sid).toBe(5);
+      expect(result.synonyms).toEqual([]);
+    });
+  });
+
+  describe('sidsByName', () => {
+    it('should return SIDs for a substance name', async () => {
+      mockFetchJson({ IdentifierList: { SID: [175, 344234] } });
+      const pubchem = new PubChem();
+
+      const sids = await pubchem.sidsByName('aspirin');
+
+      expect(sids).toEqual([175, 344234]);
+    });
+
+    it('should build correct URL with encoded name', async () => {
+      mockFetchJson({ IdentifierList: { SID: [175] } });
+      const pubchem = new PubChem();
+
+      await pubchem.sidsByName('acetylsalicylic acid');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('/substance/name/acetylsalicylic%20acid/sids/JSON');
+    });
+
+    it('should handle missing IdentifierList', async () => {
+      mockFetchJson({});
+      const pubchem = new PubChem();
+
+      const sids = await pubchem.sidsByName('unknown');
+
+      expect(sids).toEqual([]);
+    });
+
+    it('should handle missing SID array', async () => {
+      mockFetchJson({ IdentifierList: {} });
+      const pubchem = new PubChem();
+
+      const sids = await pubchem.sidsByName('unknown');
+
+      expect(sids).toEqual([]);
+    });
+
+    it('should throw on 404 for unknown substance', async () => {
+      mockFetchError(404, 'PUGREST.NotFound');
+      const pubchem = new PubChem();
+
+      await expect(pubchem.sidsByName('notarealsubstance')).rejects.toThrow(
+        'PubChem API returned status 404',
+      );
+    });
+  });
+
+  describe('assayByAid', () => {
+    it('should fetch assay by AID and map fields', async () => {
+      mockFetchJson({
+        PC_AssayContainer: [
+          {
+            assay: {
+              descr: {
+                aid: { id: 1000 },
+                name: 'qHTS for inhibitors',
+                description: ['A screening assay.'],
+                protocol: ['Step 1: add compound.', 'Step 2: measure.'],
+                aid_source: {
+                  db: { name: 'PCBA', source_id: { str: '1000' } },
+                },
+              },
+            },
+          },
+        ],
+      });
+      const pubchem = new PubChem();
+
+      const assay = await pubchem.assayByAid(1000);
+
+      expect(assay.aid).toBe(1000);
+      expect(assay.name).toBe('qHTS for inhibitors');
+      expect(assay.description).toBe('A screening assay.');
+      expect(assay.protocol).toBe('Step 1: add compound. Step 2: measure.');
+      expect(assay.sourceName).toBe('PCBA');
+      expect(assay.sourceId).toBe('1000');
+    });
+
+    it('should build correct URL with AID', async () => {
+      mockFetchJson({ PC_AssayContainer: [] });
+      const pubchem = new PubChem();
+
+      await pubchem.assayByAid(1000);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('/assay/aid/1000/description/JSON');
+    });
+
+    it('should handle missing PC_AssayContainer', async () => {
+      mockFetchJson({});
+      const pubchem = new PubChem();
+
+      const assay = await pubchem.assayByAid(1);
+
+      expect(assay.aid).toBe(0);
+      expect(assay.name).toBe('');
+      expect(assay.description).toBe('');
+      expect(assay.protocol).toBe('');
+      expect(assay.sourceName).toBe('');
+      expect(assay.sourceId).toBe('');
+    });
+
+    it('should handle empty PC_AssayContainer array', async () => {
+      mockFetchJson({ PC_AssayContainer: [] });
+      const pubchem = new PubChem();
+
+      const assay = await pubchem.assayByAid(1);
+
+      expect(assay.aid).toBe(0);
+      expect(assay.name).toBe('');
+    });
+
+    it('should handle container with missing assay wrapper', async () => {
+      mockFetchJson({ PC_AssayContainer: [{}] });
+      const pubchem = new PubChem();
+
+      const assay = await pubchem.assayByAid(1);
+
+      expect(assay.aid).toBe(0);
+      expect(assay.name).toBe('');
+    });
+
+    it('should handle container with missing descr', async () => {
+      mockFetchJson({ PC_AssayContainer: [{ assay: {} }] });
+      const pubchem = new PubChem();
+
+      const assay = await pubchem.assayByAid(1);
+
+      expect(assay.aid).toBe(0);
+    });
+
+    it('should handle missing aid_source fields', async () => {
+      mockFetchJson({
+        PC_AssayContainer: [{ assay: { descr: { aid: { id: 1 }, name: 'test' } } }],
+      });
+      const pubchem = new PubChem();
+
+      const assay = await pubchem.assayByAid(1);
+
+      expect(assay.sourceName).toBe('');
+      expect(assay.sourceId).toBe('');
+    });
+
+    it('should throw on 404 for non-existent assay', async () => {
+      mockFetchError(404, 'PUGREST.NotFound');
+      const pubchem = new PubChem();
+
+      await expect(pubchem.assayByAid(999999999)).rejects.toThrow(
+        'PubChem API returned status 404',
+      );
+    });
+  });
+
+  describe('assayByAidBatch', () => {
+    it('should fetch multiple assays and map all entries', async () => {
+      mockFetchJson({
+        PC_AssayContainer: [
+          {
+            assay: {
+              descr: {
+                aid: { id: 1000 },
+                name: 'Assay 1',
+                description: ['First assay.'],
+                protocol: [],
+                aid_source: { db: { name: 'PCBA', source_id: { str: '1000' } } },
+              },
+            },
+          },
+          {
+            assay: {
+              descr: {
+                aid: { id: 2000 },
+                name: 'Assay 2',
+                description: ['Second assay.'],
+                protocol: [],
+                aid_source: { db: { name: 'PCBA', source_id: { str: '2000' } } },
+              },
+            },
+          },
+        ],
+      });
+      const pubchem = new PubChem();
+
+      const assays = await pubchem.assayByAidBatch([1000, 2000]);
+
+      expect(assays).toHaveLength(2);
+      expect(assays[0]!.aid).toBe(1000);
+      expect(assays[0]!.name).toBe('Assay 1');
+      expect(assays[1]!.aid).toBe(2000);
+      expect(assays[1]!.name).toBe('Assay 2');
+    });
+
+    it('should build correct URL with comma-separated AIDs', async () => {
+      mockFetchJson({ PC_AssayContainer: [] });
+      const pubchem = new PubChem();
+
+      await pubchem.assayByAidBatch([1000, 2000]);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('/assay/aid/1000%2C2000/description/JSON');
+    });
+
+    it('should return empty array for empty AIDs', async () => {
+      const pubchem = new PubChem();
+
+      const assays = await pubchem.assayByAidBatch([]);
+
+      expect(assays).toEqual([]);
+    });
+
+    it('should handle missing PC_AssayContainer', async () => {
+      mockFetchJson({});
+      const pubchem = new PubChem();
+
+      const assays = await pubchem.assayByAidBatch([1000]);
+
+      expect(assays).toEqual([]);
+    });
+  });
+
+  describe('assaySummary', () => {
+    it('should fetch assay summary with SID and CID counts', async () => {
+      mockFetchJson({
+        InformationList: {
+          Information: [{ AID: 1000, SID: [1, 2, 3, 4, 5], CID: [100, 200, 300] }],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const summary = await pubchem.assaySummary(1000);
+
+      expect(summary.aid).toBe(1000);
+      expect(summary.sidCount).toBe(5);
+      expect(summary.cidCount).toBe(3);
+    });
+
+    it('should build correct URL', async () => {
+      mockFetchJson({ InformationList: { Information: [{ AID: 1000 }] } });
+      const pubchem = new PubChem();
+
+      await pubchem.assaySummary(1000);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('/assay/aid/1000/sids/JSON');
+    });
+
+    it('should handle missing InformationList', async () => {
+      mockFetchJson({});
+      const pubchem = new PubChem();
+
+      const summary = await pubchem.assaySummary(1);
+
+      expect(summary.aid).toBe(0);
+      expect(summary.sidCount).toBe(0);
+      expect(summary.cidCount).toBe(0);
+    });
+
+    it('should handle empty Information array', async () => {
+      mockFetchJson({ InformationList: { Information: [] } });
+      const pubchem = new PubChem();
+
+      const summary = await pubchem.assaySummary(1);
+
+      expect(summary.aid).toBe(0);
+      expect(summary.sidCount).toBe(0);
+    });
+
+    it('should handle Information entry with missing SID/CID arrays', async () => {
+      mockFetchJson({ InformationList: { Information: [{ AID: 1000 }] } });
+      const pubchem = new PubChem();
+
+      const summary = await pubchem.assaySummary(1000);
+
+      expect(summary.aid).toBe(1000);
+      expect(summary.sidCount).toBe(0);
+      expect(summary.cidCount).toBe(0);
+    });
+
+    it('should throw on 404 for non-existent assay', async () => {
+      mockFetchError(404, 'PUGREST.NotFound');
+      const pubchem = new PubChem();
+
+      await expect(pubchem.assaySummary(999999999)).rejects.toThrow(
+        'PubChem API returned status 404',
+      );
+    });
+  });
+
   describe('configuration', () => {
     it('should work without any config', async () => {
       mockFetchJson(buildPropertyResponse());

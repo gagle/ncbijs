@@ -32,3 +32,31 @@ export interface CompoundDescription {
   readonly title: string;
   readonly description: string;
 }
+
+export interface SubstanceRecord {
+  readonly sid: number;
+  readonly sourceName: string;
+  readonly sourceId: string;
+  readonly description: string;
+}
+
+export interface SubstanceSynonyms {
+  readonly sid: number;
+  readonly synonyms: ReadonlyArray<string>;
+}
+
+export interface AssayRecord {
+  readonly aid: number;
+  readonly name: string;
+  readonly description: string;
+  readonly protocol: string;
+  readonly sourceName: string;
+  readonly sourceId: string;
+}
+
+export interface AssaySummary {
+  readonly aid: number;
+  readonly name: string;
+  readonly sidCount: number;
+  readonly cidCount: number;
+}
