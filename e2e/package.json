@@ -14,6 +14,12 @@
     "@ncbijs/pubmed-xml": "workspace:*",
     "@ncbijs/pubtator": "workspace:*",
     "@ncbijs/rate-limiter": "workspace:*",
-    "@ncbijs/xml": "workspace:*"
+    "@ncbijs/xml": "workspace:*",
+    "@ncbijs/fasta": "workspace:*",
+    "@ncbijs/datasets": "workspace:*",
+    "@ncbijs/blast": "workspace:*",
+    "@ncbijs/snp": "workspace:*",
+    "@ncbijs/clinvar": "workspace:*",
+    "@ncbijs/pubchem": "workspace:*"
   }
 }

@@ -1,6 +1,7 @@
 import createClient from 'openapi-fetch';
 import type { Client, Middleware } from 'openapi-fetch';
 import type { TokenBucket } from '@ncbijs/rate-limiter';
+import { fetchWithRetry } from '@ncbijs/rate-limiter';
 import { EUtilsHttpError } from './http-client';
 import type { paths } from './schema';
 
@@ -13,9 +14,6 @@ export interface NcbiClientConfig {
 }
 
 const BASE_URL = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils';
-const RETRYABLE_STATUSES = new Set([429, 500, 502, 503]);
-const INITIAL_BACKOFF_MS = 500;
-const MAX_JITTER_MS = 500;
 const POST_ID_THRESHOLD = 200;
 const POST_TERM_THRESHOLD = 300;
 const FORCE_POST_PATHS = new Set(['/epost.fcgi']);
@@ -82,39 +80,12 @@ function createRetryFetch(
   maxRetries: number,
 ): (request: Request) => Promise<Response> {
   return async (request: Request): Promise<Response> => {
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-      await rateLimiter.acquire();
-
-      let response: Response;
-      try {
-        response = await fetch(request.clone());
-      } catch (err) {
-        if (attempt < maxRetries && err instanceof TypeError) {
-          await backoff(attempt);
-          continue;
-        }
-        throw err;
-      }
-
-      if (response.ok) {
-        return response;
-      }
-
-      const body = await response.text();
-
-      if (RETRYABLE_STATUSES.has(response.status) && attempt < maxRetries) {
-        await backoff(attempt);
-        continue;
-      }
-
-      throw new EUtilsHttpError(response.status, body);
-    }
-
-    throw new EUtilsHttpError(0, 'Max retries exceeded');
+    return fetchWithRetry(
+      request,
+      { maxRetries, rateLimiter },
+      {
+        createError: (status, body) => new EUtilsHttpError(status, body),
+      },
+    );
   };
-}
-
-function backoff(attempt: number): Promise<void> {
-  const ms = INITIAL_BACKOFF_MS * Math.pow(2, attempt) + Math.random() * MAX_JITTER_MS;
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }

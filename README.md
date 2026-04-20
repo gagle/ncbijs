@@ -1,7 +1,7 @@
 <h1 align="center">ncbijs</h1>
 
 <p align="center">
-  TypeScript clients for NCBI biomedical literature APIs — PubMed, PMC, MeSH, PubTator, and more.
+  TypeScript clients for NCBI APIs — PubMed, PMC, BLAST, SNP, ClinVar, PubChem, Datasets, and more.
 </p>
 
 <p align="center">
@@ -13,7 +13,7 @@
 
 ## What is NCBI?
 
-The [National Center for Biotechnology Information](https://www.ncbi.nlm.nih.gov/) (NCBI), part of the U.S. National Library of Medicine (NLM), maintains the world's largest collection of biomedical databases. These include **PubMed** (37M+ article citations), **PubMed Central** (PMC, 9M+ full-text articles), **MeSH** (controlled medical vocabulary), and many more. Researchers, clinicians, and developers rely on NCBI's public APIs to search, retrieve, and analyze biomedical literature programmatically.
+The [National Center for Biotechnology Information](https://www.ncbi.nlm.nih.gov/) (NCBI), part of the U.S. National Library of Medicine (NLM), maintains the world's largest collection of biomedical databases. These include **PubMed** (37M+ article citations), **PubMed Central** (PMC, 9M+ full-text articles), **MeSH** (controlled medical vocabulary), **BLAST** (sequence alignment), **dbSNP** (genetic variation), **ClinVar** (clinical variants), **PubChem** (chemical compounds), and many more. Researchers, clinicians, and developers rely on NCBI's public APIs to search, retrieve, and analyze biomedical data programmatically.
 
 **ncbijs** provides typed, zero-dependency TypeScript clients for these APIs. It is designed for two audiences:
 
@@ -31,6 +31,12 @@ The [National Center for Biotechnology Information](https://www.ncbi.nlm.nih.gov
 | Convert between PMID, PMCID, and DOI                  | `@ncbijs/id-converter`              |
 | Expand MeSH terms for comprehensive searches          | `@ncbijs/mesh`                      |
 | Chunk full-text articles for RAG pipelines            | `@ncbijs/jats` (toChunks)           |
+| Look up genes, genomes, and taxonomy                  | `@ncbijs/datasets`                  |
+| Parse FASTA nucleotide/protein sequences              | `@ncbijs/fasta`                     |
+| Run BLAST sequence alignments                         | `@ncbijs/blast`                     |
+| Look up SNP/variant data from dbSNP                   | `@ncbijs/snp`                       |
+| Query clinical variant significance from ClinVar      | `@ncbijs/clinvar`                   |
+| Retrieve chemical compound data from PubChem          | `@ncbijs/pubchem`                   |
 | Expose all tools to LLM agents via MCP                | `@ncbijs/mcp`                       |
 
 ## Packages
@@ -46,6 +52,12 @@ The [National Center for Biotechnology Information](https://www.ncbi.nlm.nih.gov
 | [`@ncbijs/pubtator`](./packages/pubtator)         | PubTator3 text mining — entity search and BioC annotation export   | [![npm](https://img.shields.io/npm/v/@ncbijs/pubtator)](https://www.npmjs.com/package/@ncbijs/pubtator)         |
 | [`@ncbijs/pubmed-xml`](./packages/pubmed-xml)     | PubMed/MEDLINE XML and plain-text parser                           | [![npm](https://img.shields.io/npm/v/@ncbijs/pubmed-xml)](https://www.npmjs.com/package/@ncbijs/pubmed-xml)     |
 | [`@ncbijs/jats`](./packages/jats)                 | JATS XML parser with markdown, plain-text, and RAG chunking        | [![npm](https://img.shields.io/npm/v/@ncbijs/jats)](https://www.npmjs.com/package/@ncbijs/jats)                 |
+| [`@ncbijs/blast`](./packages/blast)               | BLAST sequence alignment with async submit/poll/retrieve workflow  | [![npm](https://img.shields.io/npm/v/@ncbijs/blast)](https://www.npmjs.com/package/@ncbijs/blast)               |
+| [`@ncbijs/snp`](./packages/snp)                   | dbSNP variation data — placements, allele annotations, frequencies | [![npm](https://img.shields.io/npm/v/@ncbijs/snp)](https://www.npmjs.com/package/@ncbijs/snp)                   |
+| [`@ncbijs/clinvar`](./packages/clinvar)           | ClinVar clinical variant significance, genes, traits, locations    | [![npm](https://img.shields.io/npm/v/@ncbijs/clinvar)](https://www.npmjs.com/package/@ncbijs/clinvar)           |
+| [`@ncbijs/pubchem`](./packages/pubchem)           | PubChem compound data — properties, synonyms, descriptions         | [![npm](https://img.shields.io/npm/v/@ncbijs/pubchem)](https://www.npmjs.com/package/@ncbijs/pubchem)           |
+| [`@ncbijs/datasets`](./packages/datasets)         | NCBI Datasets API v2 client for genes, genomes, and taxonomy       | [![npm](https://img.shields.io/npm/v/@ncbijs/datasets)](https://www.npmjs.com/package/@ncbijs/datasets)         |
+| [`@ncbijs/fasta`](./packages/fasta)               | Zero-dependency FASTA format parser for sequences                  | [![npm](https://img.shields.io/npm/v/@ncbijs/fasta)](https://www.npmjs.com/package/@ncbijs/fasta)               |
 | [`@ncbijs/xml`](./packages/xml)                   | Zero-dependency regex-based XML reader for NCBI formats            | [![npm](https://img.shields.io/npm/v/@ncbijs/xml)](https://www.npmjs.com/package/@ncbijs/xml)                   |
 | [`@ncbijs/mcp`](./packages/mcp)                   | MCP server exposing all ncbijs tools for LLM agents                | [![npm](https://img.shields.io/npm/v/@ncbijs/mcp)](https://www.npmjs.com/package/@ncbijs/mcp)                   |
 | [`@ncbijs/rate-limiter`](./packages/rate-limiter) | Token bucket rate limiter for browser and Node.js                  | [![npm](https://img.shields.io/npm/v/@ncbijs/rate-limiter)](https://www.npmjs.com/package/@ncbijs/rate-limiter) |
@@ -78,7 +90,7 @@ for (const article of articles) {
 
 ## Architecture
 
-Zero-dependency philosophy — 8 of 11 packages have zero runtime dependencies. The 2 high-level packages (`pubmed`, `pmc`) depend only on internal `@ncbijs/*` packages. `eutils` depends on `rate-limiter`, `xml`, and `openapi-fetch`.
+Zero-dependency philosophy — most packages have zero runtime dependencies. `eutils` depends on `rate-limiter` + `openapi-fetch`. `datasets`, `blast`, `snp`, `clinvar`, and `pubchem` depend on `rate-limiter`. High-level packages (`pubmed`, `pmc`) depend only on internal `@ncbijs/*` packages.
 
 ### Dependency graph
 
@@ -87,17 +99,22 @@ xml ──────────────┬─ pubmed-xml ──┐
                   ├─ jats ────────┤
 rate-limiter ─────┤               │
                   ├─ eutils ──┬─ pubmed (+ pubmed-xml)
-                  │           └─ pmc (+ jats)
-                  └─ pubtator
+                  │           ├─ pmc (+ jats)
+                  │           └─ clinvar
+                  ├─ pubtator
+                  ├─ datasets
+                  ├─ blast
+                  ├─ snp
+                  └─ pubchem
 
-id-converter, mesh, cite  (zero-dep, independent)
+fasta, id-converter, mesh, cite  (zero-dep, independent)
 ```
 
 ### Build order
 
-1. **Parallel**: `rate-limiter`, `xml`, `id-converter`, `mesh`, `cite`
-2. **After xml**: `eutils`, `pubmed-xml`, `jats`, `pubtator`
-3. **After eutils**: `pubmed`, `pmc`
+1. **Parallel**: `rate-limiter`, `xml`, `id-converter`, `mesh`, `cite`, `fasta`
+2. **After deps**: `eutils`, `datasets`, `blast`, `snp`, `pubchem`, `pubmed-xml`, `jats`, `pubtator`
+3. **After eutils**: `pubmed`, `pmc`, `clinvar`
 
 ## Development
 

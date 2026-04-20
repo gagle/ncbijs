@@ -20,7 +20,13 @@
         "@ncbijs/cite",
         "@ncbijs/mcp",
         "@ncbijs/rate-limiter",
-        "@ncbijs/xml"
+        "@ncbijs/xml",
+        "@ncbijs/fasta",
+        "@ncbijs/datasets",
+        "@ncbijs/blast",
+        "@ncbijs/snp",
+        "@ncbijs/clinvar",
+        "@ncbijs/pubchem"
       ]
     },
     {
@@ -97,6 +103,42 @@
     "packages/xml": {
       "release-type": "node",
       "component": "@ncbijs/xml",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/fasta": {
+      "release-type": "node",
+      "component": "@ncbijs/fasta",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/datasets": {
+      "release-type": "node",
+      "component": "@ncbijs/datasets",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/blast": {
+      "release-type": "node",
+      "component": "@ncbijs/blast",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/snp": {
+      "release-type": "node",
+      "component": "@ncbijs/snp",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/clinvar": {
+      "release-type": "node",
+      "component": "@ncbijs/clinvar",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/pubchem": {
+      "release-type": "node",
+      "component": "@ncbijs/pubchem",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true
     }

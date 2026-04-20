@@ -1,0 +1,25 @@
+{
+  "name": "@ncbijs/fasta",
+  "sourceRoot": "packages/fasta/src",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p packages/fasta/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/fasta/dist"
+      },
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vitest run --config packages/fasta/vitest.config.ts" }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": { "lintFilePatterns": ["{projectRoot}/**/*.ts"] }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc --noEmit -p packages/fasta/tsconfig.json" }
+    }
+  }
+}

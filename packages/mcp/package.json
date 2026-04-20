@@ -49,11 +49,16 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
     "@ncbijs/cite": "workspace:*",
+    "@ncbijs/datasets": "workspace:*",
     "@ncbijs/id-converter": "workspace:*",
     "@ncbijs/pmc": "workspace:*",
     "@ncbijs/pubmed": "workspace:*",
     "@ncbijs/pubtator": "workspace:*",
     "@ncbijs/mesh": "workspace:*",
+    "@ncbijs/blast": "workspace:*",
+    "@ncbijs/snp": "workspace:*",
+    "@ncbijs/clinvar": "workspace:*",
+    "@ncbijs/pubchem": "workspace:*",
     "zod": "^3.24.0"
   }
 }

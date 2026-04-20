@@ -59,12 +59,24 @@ importers:
 
   e2e:
     dependencies:
+      '@ncbijs/blast':
+        specifier: workspace:*
+        version: link:../packages/blast
       '@ncbijs/cite':
         specifier: workspace:*
         version: link:../packages/cite
+      '@ncbijs/clinvar':
+        specifier: workspace:*
+        version: link:../packages/clinvar
+      '@ncbijs/datasets':
+        specifier: workspace:*
+        version: link:../packages/datasets
       '@ncbijs/eutils':
         specifier: workspace:*
         version: link:../packages/eutils
+      '@ncbijs/fasta':
+        specifier: workspace:*
+        version: link:../packages/fasta
       '@ncbijs/id-converter':
         specifier: workspace:*
         version: link:../packages/id-converter
@@ -77,6 +89,9 @@ importers:
       '@ncbijs/pmc':
         specifier: workspace:*
         version: link:../packages/pmc
+      '@ncbijs/pubchem':
+        specifier: workspace:*
+        version: link:../packages/pubchem
       '@ncbijs/pubmed':
         specifier: workspace:*
         version: link:../packages/pubmed
@@ -89,6 +104,9 @@ importers:
       '@ncbijs/rate-limiter':
         specifier: workspace:*
         version: link:../packages/rate-limiter
+      '@ncbijs/snp':
+        specifier: workspace:*
+        version: link:../packages/snp
       '@ncbijs/xml':
         specifier: workspace:*
         version: link:../packages/xml
@@ -121,7 +139,25 @@ importers:
         specifier: ^4.19.0
         version: 4.21.0
 
+  packages/blast:
+    dependencies:
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
+
   packages/cite: {}
+
+  packages/clinvar:
+    dependencies:
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
+
+  packages/datasets:
+    dependencies:
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
 
   packages/eutils:
     dependencies:
@@ -134,6 +170,8 @@ importers:
       openapi-fetch:
         specifier: ^0.17.0
         version: 0.17.0
+
+  packages/fasta: {}
 
   packages/id-converter: {}
 
@@ -148,9 +186,18 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.26.0
         version: 1.29.0(zod@3.25.76)
+      '@ncbijs/blast':
+        specifier: workspace:*
+        version: link:../blast
       '@ncbijs/cite':
         specifier: workspace:*
         version: link:../cite
+      '@ncbijs/clinvar':
+        specifier: workspace:*
+        version: link:../clinvar
+      '@ncbijs/datasets':
+        specifier: workspace:*
+        version: link:../datasets
       '@ncbijs/id-converter':
         specifier: workspace:*
         version: link:../id-converter
@@ -160,12 +207,18 @@ importers:
       '@ncbijs/pmc':
         specifier: workspace:*
         version: link:../pmc
+      '@ncbijs/pubchem':
+        specifier: workspace:*
+        version: link:../pubchem
       '@ncbijs/pubmed':
         specifier: workspace:*
         version: link:../pubmed
       '@ncbijs/pubtator':
         specifier: workspace:*
         version: link:../pubtator
+      '@ncbijs/snp':
+        specifier: workspace:*
+        version: link:../snp
       zod:
         specifier: ^3.24.0
         version: 3.25.76
@@ -183,6 +236,12 @@ importers:
       '@ncbijs/xml':
         specifier: workspace:*
         version: link:../xml
+
+  packages/pubchem:
+    dependencies:
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
 
   packages/pubmed:
     dependencies:
@@ -206,6 +265,12 @@ importers:
         version: link:../xml
 
   packages/rate-limiter: {}
+
+  packages/snp:
+    dependencies:
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
 
   packages/xml: {}
 

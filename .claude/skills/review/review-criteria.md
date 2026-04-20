@@ -56,6 +56,15 @@ Score each item as: **Blocker** (must fix before merge), **Major** (strong recom
 - Are assertions specific and semantic, or do they rely on brittle indices/positions?
 - Do tests actually exercise the new code paths, or do they just assert the old behavior plus the new item appended?
 
+## Enrichment with code-review-graph
+
+If code-review-graph MCP tools are available, integrate structural findings from Phase 1 graph analysis into the evaluation:
+
+- Flag high-risk changes identified by `detect_changes` that lack test coverage
+- Flag affected execution flows that have no corresponding test changes
+- Flag changes with large impact radius that aren't mentioned in the ticket scope
+- Use graph-derived caller/callee data to verify consumer impact claims
+
 ## Enrichment with agent-skills:review
 
 If the `agent-skills:review` skill is available in the current session, invoke it as part of this review. It provides agnostic five-axis checks (correctness, readability, architecture, security, performance) that complement the criteria above. Merge its findings into the output -- do not produce two separate reviews.

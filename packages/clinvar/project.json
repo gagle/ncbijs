@@ -1,0 +1,25 @@
+{
+  "name": "@ncbijs/clinvar",
+  "sourceRoot": "packages/clinvar/src",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p packages/clinvar/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/clinvar/dist"
+      },
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vitest run --config packages/clinvar/vitest.config.ts" }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": { "lintFilePatterns": ["{projectRoot}/**/*.ts"] }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc --noEmit -p packages/clinvar/tsconfig.json" }
+    }
+  }
+}

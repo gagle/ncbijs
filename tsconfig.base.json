@@ -34,7 +34,13 @@
       "@ncbijs/cite": ["./packages/cite/src/index.ts"],
       "@ncbijs/mcp": ["./packages/mcp/src/index.ts"],
       "@ncbijs/rate-limiter": ["./packages/rate-limiter/src/index.ts"],
-      "@ncbijs/xml": ["./packages/xml/src/index.ts"]
+      "@ncbijs/xml": ["./packages/xml/src/index.ts"],
+      "@ncbijs/fasta": ["./packages/fasta/src/index.ts"],
+      "@ncbijs/datasets": ["./packages/datasets/src/index.ts"],
+      "@ncbijs/blast": ["./packages/blast/src/index.ts"],
+      "@ncbijs/snp": ["./packages/snp/src/index.ts"],
+      "@ncbijs/clinvar": ["./packages/clinvar/src/index.ts"],
+      "@ncbijs/pubchem": ["./packages/pubchem/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "dist"]

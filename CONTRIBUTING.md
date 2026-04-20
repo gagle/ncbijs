@@ -23,7 +23,7 @@ This is an intentional design decision, not a gimmick. AI-generated code with st
 3. **Describe what you want** -- tell Claude the feature, bug fix, or improvement
 4. **Claude implements** -- it writes the code, tests, and follows all conventions
 5. **Claude self-reviews** -- the mandatory self-review loop runs:
-   - `/agent-skills:review` (five-axis code review)
+   - `/review` (graph structural analysis + project-specific criteria + five-axis enrichment)
    - `/agent-skills:code-simplify` (simplify without changing behavior)
    - Loop until both produce no issues
 6. **Claude verifies** -- `pnpm lint && pnpm build && pnpm test` must all pass
@@ -41,16 +41,123 @@ This is an intentional design decision, not a gimmick. AI-generated code with st
 
 ### Configuration files Claude reads
 
-| File                                 | Purpose                                                         |
-| ------------------------------------ | --------------------------------------------------------------- |
-| `CLAUDE.md`                          | Project commands, architecture, conventions, verification steps |
-| `.claude/rules/typescript.md`        | TypeScript coding conventions                                   |
-| `.claude/skills/testing/`            | Testing conventions (18 enforced rules)                         |
-| `.claude/skills/review/`             | Code review criteria and process                                |
-| `.claude/skills/explore-codebase.md` | Knowledge graph navigation                                      |
-| `.claude/skills/review-changes.md`   | Risk-aware change review                                        |
-| `.claude/skills/debug-issue.md`      | Systematic debugging                                            |
-| `.claude/skills/refactor-safely.md`  | Safe refactoring with dependency analysis                       |
+| File                               | Purpose                                                         |
+| ---------------------------------- | --------------------------------------------------------------- |
+| `CLAUDE.md`                        | Project commands, architecture, conventions, verification steps |
+| `.claude/rules/typescript.md`      | TypeScript coding conventions                                   |
+| `.claude/skills/testing/`          | Testing conventions (18 enforced rules)                         |
+| `.claude/skills/review/`           | Code review criteria and process                                |
+| `.claude/skills/explore-codebase/` | Knowledge graph navigation                                      |
+| `.claude/skills/debug-issue/`      | Systematic debugging                                            |
+| `.claude/skills/refactor-safely/`  | Safe refactoring with dependency analysis                       |
+
+## Setup (macOS)
+
+### Prerequisites
+
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (CLI, desktop app, or IDE extension)
+- Node.js >= 20, pnpm >= 10.15
+- macOS with Homebrew
+
+### 1. Install Claude Code
+
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+### 2. Install RTK (Rust Token Killer)
+
+RTK is a CLI proxy that reduces Claude Code token consumption by 60-90%.
+
+```bash
+brew install rtk
+```
+
+Add the RTK hook to your **global** Claude settings (`~/.claude/settings.json`), not the repo's `.claude/settings.json`. This way RTK is active across all your projects, not just this one:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/rtk-rewrite.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Create the hook script at `~/.claude/hooks/rtk-rewrite.sh` (run `rtk hook install` to generate it automatically).
+
+### 3. Configure MCP servers
+
+MCP servers give Claude access to external tools (Figma designs, Jira tickets, GitLab MRs, browser DevTools, codebase graph). Create a single `.mcp.json` in the **parent directory** of your repos (e.g., `~/projects/.mcp.json`) so all projects inherit the same servers:
+
+```bash
+brew install uv  # required for code-review-graph
+```
+
+```json
+{
+  "mcpServers": {
+    "code-review-graph": {
+      "command": "uvx",
+      "args": ["code-review-graph", "serve"],
+      "type": "stdio"
+    },
+    "figma": {
+      "type": "http",
+      "url": "https://mcp.figma.com/mcp"
+    },
+    "atlassian": {
+      "type": "sse",
+      "url": "https://mcp.atlassian.com/v1/sse"
+    },
+    "gitlab": {
+      "type": "http",
+      "url": "https://gitlab.com/api/v4/mcp"
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["chrome-devtools-mcp@latest", "--autoConnect", "--channel=beta"]
+    }
+  }
+}
+```
+
+| Server                | Purpose                                                      | Auth                                          |
+| --------------------- | ------------------------------------------------------------ | --------------------------------------------- |
+| **code-review-graph** | Structural codebase analysis, impact detection, code review  | None (local)                                  |
+| **figma**             | Read Figma designs, extract design tokens, design-to-code    | Authenticates via browser on first use        |
+| **atlassian**         | Read/write Jira issues, Confluence pages                     | Authenticates via browser on first use        |
+| **gitlab**            | Read MRs, diffs, pipelines, create issues                    | Authenticates via browser on first use        |
+| **chrome-devtools**   | Browser automation, screenshots, console, network inspection | Requires Chrome with remote debugging enabled |
+
+**code-review-graph** builds automatically on first use and updates via PostToolUse hooks after file changes.
+
+**chrome-devtools** requires Chrome to be running with remote debugging. Launch Chrome with:
+
+```bash
+/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222
+```
+
+Or use Chrome Beta/Canary if `--channel=beta` is configured (as shown above).
+
+### 4. Enable agent-skills plugin
+
+```bash
+claude plugins add --marketplace https://github.com/addyosmani/agent-skills agent-skills
+```
+
+### 5. Verify
+
+Open Claude Code in the repo root. It should automatically read `CLAUDE.md`, `.claude/` conventions, and connect to the MCP servers.
 
 ## Reporting issues
 

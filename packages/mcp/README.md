@@ -7,14 +7,14 @@
 </p>
 
 <p align="center">
-  MCP server exposing NCBI biomedical literature tools for LLM agents.
+  MCP server exposing NCBI biomedical and genomic tools for LLM agents.
 </p>
 
 ---
 
 ## What is this?
 
-An [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that gives AI assistants access to NCBI's biomedical databases — PubMed (37M+ articles), PubMed Central (full text), PubTator3 (entity recognition), MeSH (medical vocabulary), and more.
+An [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that gives AI assistants access to NCBI's biomedical databases — PubMed (37M+ articles), PubMed Central (full text), PubTator3 (entity recognition), MeSH (medical vocabulary), BLAST (sequence alignment), dbSNP (genetic variation), ClinVar (clinical variants), PubChem (chemical compounds), Datasets (genes, genomes, taxonomy), and more.
 
 ## Quick start
 
@@ -72,6 +72,33 @@ Get a free API key at https://www.ncbi.nlm.nih.gov/account/settings/
 | `annotate-text`      | Annotate free text with biomedical named entity recognition     |
 | `export-annotations` | Export BioC annotations for PubMed articles                     |
 
+### Genomics (NCBI Datasets API v2)
+
+| Tool              | Description                                                        |
+| ----------------- | ------------------------------------------------------------------ |
+| `search-gene`     | Retrieve gene metadata by NCBI Gene ID or symbol + taxon           |
+| `lookup-taxonomy` | Retrieve taxonomy data (organism name, rank, lineage, gene counts) |
+| `search-genome`   | Retrieve genome assembly reports by accession or taxon             |
+
+### Sequence alignment (BLAST)
+
+| Tool           | Description                                                           |
+| -------------- | --------------------------------------------------------------------- |
+| `blast-search` | Run a BLAST sequence alignment (blastn, blastp, blastx, tblastn, etc) |
+
+### Variation and clinical genomics
+
+| Tool             | Description                                                              |
+| ---------------- | ------------------------------------------------------------------------ |
+| `lookup-variant` | Look up SNP data by RS IDs — placements, allele annotations, frequencies |
+| `search-clinvar` | Search ClinVar for clinical variant significance, genes, and traits      |
+
+### Chemistry (PubChem)
+
+| Tool              | Description                                                      |
+| ----------------- | ---------------------------------------------------------------- |
+| `search-compound` | Look up chemical compounds by name or CID — properties, synonyms |
+
 ### Utilities
 
 | Tool           | Description                                                      |
@@ -92,3 +119,10 @@ Once the MCP server is configured, you can ask your AI assistant things like:
 - "Get an APA citation for PMID 33024307"
 - "What MeSH terms relate to Alzheimer's disease?"
 - "Find articles related to PMID 33024307"
+- "Look up the BRCA1 gene"
+- "What genome assemblies exist for E. coli?"
+- "Get the taxonomy for Homo sapiens"
+- "Run a BLAST search for the sequence ATCGATCGATCG"
+- "What do we know about SNP rs7412?"
+- "Look up the clinical significance of BRCA1 variants in ClinVar"
+- "What are the properties of aspirin in PubChem?"

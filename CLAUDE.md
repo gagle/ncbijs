@@ -24,7 +24,7 @@ pnpm nx run ncbijs-e2e:e2e
 - **Language**: TypeScript 6, ES2022 target, `strict: true`
 - **Module**: ESM-only (`"type": "module"`), `moduleResolution: "bundler"`, no `.js` in source imports
 - **Build**: `tsc` + post-build script (`scripts/add-import-extensions.mjs`) adds `.js` to compiled output
-- **Zero-dep philosophy**: 8/10 packages have zero runtime dependencies. The 2 that do (`pubmed`, `pmc`) depend only on internal `@ncbijs/*` packages. `eutils` depends on `rate-limiter` + `openapi-fetch`.
+- **Zero-dep philosophy**: Most packages have zero runtime dependencies. `eutils` depends on `rate-limiter` + `openapi-fetch`. `datasets`, `blast`, `snp`, `clinvar`, `pubchem` depend on `rate-limiter`. `pubmed` and `pmc` depend only on internal `@ncbijs/*` packages.
 
 ### Package dependency graph
 
@@ -33,15 +33,20 @@ xml ──────────────┬─ pubmed-xml ──┐
                   ├─ jats ────────┤
 rate-limiter ─────┤               │
                   ├─ eutils ──┬─ pubmed (+ pubmed-xml)
-                  │           └─ pmc (+ jats)
-                  └─ pubtator
-id-converter, mesh, cite  (all zero-dep, independent)
+                  │           ├─ pmc (+ jats)
+                  │           └─ clinvar
+                  ├─ pubtator
+                  ├─ datasets
+                  ├─ blast
+                  ├─ snp
+                  └─ pubchem
+fasta, id-converter, mesh, cite  (all zero-dep, independent)
 ```
 
 ### Build order (Nx topological)
 
-1. Zero-dep parallel: `rate-limiter`, `xml`, `id-converter`, `mesh`, `cite`
-2. `eutils` (after `rate-limiter` + `xml`), `pubmed-xml` (after `xml`), `jats` (after `xml`), `pubtator` (after `xml`)
+1. Zero-dep parallel: `rate-limiter`, `xml`, `id-converter`, `mesh`, `cite`, `fasta`
+2. `eutils` (after `rate-limiter` + `xml`), `datasets` (after `rate-limiter`), `blast` (after `rate-limiter`), `snp` (after `rate-limiter`), `pubchem` (after `rate-limiter`), `pubmed-xml` (after `xml`), `jats` (after `xml`), `pubtator` (after `xml`), `clinvar` (after `rate-limiter`)
 3. `pubmed` (after `eutils` + `pubmed-xml`), `pmc` (after `eutils` + `jats`)
 
 ## Rules and Skills
@@ -51,10 +56,10 @@ This repo includes `.claude/` configuration that Claude reads automatically:
 - **`.claude/rules/typescript.md`** -- TypeScript coding conventions (naming, types, imports, formatting)
 - **`.claude/skills/testing/`** -- Testing conventions with 18 enforced rules
 - **`.claude/skills/review/`** -- Code review process and evaluation criteria
-- **`.claude/skills/explore-codebase.md`** -- Knowledge graph navigation
-- **`.claude/skills/review-changes.md`** -- Risk-aware change review
-- **`.claude/skills/debug-issue.md`** -- Systematic debugging
-- **`.claude/skills/refactor-safely.md`** -- Safe refactoring with dependency analysis
+- **`.claude/skills/commit/`** -- Composable git workflow: `/commit`, `/commit squash`, `/commit push`, `/commit squash push`
+- **`.claude/skills/explore-codebase/`** -- Knowledge graph navigation
+- **`.claude/skills/debug-issue/`** -- Systematic debugging
+- **`.claude/skills/refactor-safely/`** -- Safe refactoring with dependency analysis
 
 See `CONTRIBUTING.md` for the contribution policy.
 
@@ -101,7 +106,7 @@ packages/{name}/
 
 - Prettier: 100 width, single quotes, trailing commas, 2-space indent, LF
 - Commit: `{type}({scope}): {subject}` (conventional commits via commitlint)
-- Scopes: `eutils`, `pubmed-xml`, `pubmed`, `jats`, `pmc`, `id-converter`, `pubtator`, `mesh`, `cite`, `rate-limiter`, `xml`, `workspace`
+- Scopes: `eutils`, `pubmed-xml`, `pubmed`, `jats`, `pmc`, `id-converter`, `pubtator`, `mesh`, `cite`, `rate-limiter`, `xml`, `fasta`, `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `workspace`
 
 ### Adding a new package
 
@@ -123,7 +128,7 @@ pnpm lint && pnpm build && pnpm test
 
 After implementation is complete, run the following skills in sequence. Loop until both produce no issues or improvements:
 
-1. `/agent-skills:review` -- five-axis code review (correctness, readability, architecture, security, performance)
+1. `/review` -- full review (graph structural analysis + project-specific criteria + five-axis enrichment)
 2. `/agent-skills:code-simplify` -- simplify code for clarity without changing behavior
 
 If either skill finds issues, fix them, re-run `pnpm lint && pnpm build && pnpm test`, then repeat the loop.
@@ -152,3 +157,11 @@ Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
 | `semantic_search_nodes`     | Finding functions/classes by name or keyword           |
 | `get_architecture_overview` | Understanding high-level codebase structure            |
 | `refactor_tool`             | Planning renames, finding dead code                    |
+
+### Graph updates
+
+The graph auto-updates via PostToolUse hooks after Edit/Write/Bash operations. However, git operations that bring in external changes (rebase, pull, merge) bypass these hooks. After such operations, update the graph manually:
+
+```
+mcp__code-review-graph__build_or_update_graph_tool
+```
