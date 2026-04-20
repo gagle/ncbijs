@@ -31,7 +31,7 @@ export interface paths {
               readonly responseDate: string;
               readonly request: string;
               readonly records: ReadonlyArray<{
-                readonly pmid?: string;
+                readonly pmid?: number | string;
                 readonly pmcid?: string;
                 readonly doi?: string;
                 readonly mid?: string;
@@ -39,7 +39,7 @@ export interface paths {
                 readonly 'release-date'?: string;
                 readonly versions?: ReadonlyArray<{
                   readonly pmcid: string;
-                  readonly current: string;
+                  readonly current: boolean | string;
                 }>;
                 readonly aiid?: string;
                 readonly errmsg?: string;

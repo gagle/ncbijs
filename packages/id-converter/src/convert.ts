@@ -1,5 +1,5 @@
-import type { ConvertedId, ConvertParams } from './interfaces/id-converter.interface';
-import type { paths } from './schema';
+import type { ConvertedId, ConvertParams } from './interfaces/id-converter.interface.js';
+import type { paths } from './schema.js';
 
 type ApiRecord =
   paths['/']['get']['responses'][200]['content']['application/json']['records'][number];
@@ -79,11 +79,11 @@ function mapRecordToConvertedId(record: ApiRecord): ConvertedId {
 
   const versions = record.versions?.map((version) => ({
     pmcid: version.pmcid,
-    current: version.current === 'true',
+    current: version.current === true || version.current === 'true',
   }));
 
   return {
-    pmid: record.pmid ?? null,
+    pmid: record.pmid !== undefined ? String(record.pmid) : null,
     pmcid: record.pmcid ?? null,
     doi: record.doi ?? null,
     mid: record.mid ?? null,
