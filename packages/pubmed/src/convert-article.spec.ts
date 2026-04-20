@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { PubmedArticle } from '@ncbijs/pubmed-xml';
-import { convertArticle } from './convert-article';
+import { convertArticle } from './convert-article.js';
 
 function buildPubmedArticle(overrides: Partial<PubmedArticle> = {}): PubmedArticle {
   return {
@@ -65,19 +65,19 @@ describe('convertArticle', () => {
   it('should map individual authors', () => {
     const result = convertArticle(
       buildPubmedArticle({
-        authors: [{ lastName: 'Smith', foreName: 'John', initials: 'J', affiliation: 'MIT' }],
+        authors: [{ lastName: 'Smith', foreName: 'John', initials: 'J', affiliations: ['MIT'] }],
       }),
     );
     expect(result.authors).toHaveLength(1);
     expect(result.authors[0]?.lastName).toBe('Smith');
     expect(result.authors[0]?.foreName).toBe('John');
-    expect(result.authors[0]?.affiliation).toBe('MIT');
+    expect(result.authors[0]?.affiliations).toEqual(['MIT']);
   });
 
   it('should map collective authors', () => {
     const result = convertArticle(
       buildPubmedArticle({
-        authors: [{ collectiveName: 'WHO Collaborative Group' }],
+        authors: [{ collectiveName: 'WHO Collaborative Group', affiliations: [] }],
       }),
     );
     expect(result.authors[0]?.collectiveName).toBe('WHO Collaborative Group');

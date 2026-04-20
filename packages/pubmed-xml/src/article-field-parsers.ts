@@ -11,7 +11,7 @@ import type {
   MeshHeading,
   MeshQualifier,
   PartialDate,
-} from './interfaces/pubmed-article.interface';
+} from './interfaces/pubmed-article.interface.js';
 import {
   decodeEntities,
   readAllBlocks,
@@ -131,7 +131,7 @@ export function extractAuthors(articleXml: string): ReadonlyArray<Author> {
   for (const authorBlock of authorBlocks) {
     const collectiveName = readTag(authorBlock, 'CollectiveName');
     if (collectiveName !== undefined) {
-      authors.push({ collectiveName });
+      authors.push({ collectiveName, affiliations: [] });
       continue;
     }
 
@@ -139,14 +139,20 @@ export function extractAuthors(articleXml: string): ReadonlyArray<Author> {
     const foreName = readTag(authorBlock, 'ForeName');
     const initials = readTag(authorBlock, 'Initials');
 
-    const affiliationBlock = readBlock(authorBlock, 'AffiliationInfo');
-    const affiliation = affiliationBlock ? readTag(affiliationBlock, 'Affiliation') : undefined;
+    const affiliationBlocks = readAllBlocks(authorBlock, 'AffiliationInfo');
+    const affiliations: Array<string> = [];
+    for (const affBlock of affiliationBlocks) {
+      const affText = readTag(affBlock, 'Affiliation');
+      if (affText !== undefined) {
+        affiliations.push(affText);
+      }
+    }
 
     authors.push({
       ...(lastName !== undefined ? { lastName } : {}),
       ...(foreName !== undefined ? { foreName } : {}),
       ...(initials !== undefined ? { initials } : {}),
-      ...(affiliation !== undefined ? { affiliation } : {}),
+      affiliations,
     });
   }
 
@@ -228,7 +234,11 @@ export function extractMeshHeadings(citationXml: string): ReadonlyArray<MeshHead
   return headings;
 }
 
-export function extractArticleIds(pubmedDataXml: string, pmid: string): ArticleIds {
+export function extractArticleIds(
+  pubmedDataXml: string,
+  pmid: string,
+  articleXml?: string,
+): ArticleIds {
   if (!pubmedDataXml) {
     return { pmid };
   }
@@ -259,6 +269,16 @@ export function extractArticleIds(pubmedDataXml: string, pmid: string): ArticleI
       case 'mid':
         mid = idEntry.text;
         break;
+    }
+  }
+
+  if (doi === undefined && articleXml) {
+    const eLocationEntries = readAllTagsWithAttributes(articleXml, 'ELocationID');
+    for (const entry of eLocationEntries) {
+      if (entry.attributes['EIdType'] === 'doi' && entry.text) {
+        doi = entry.text;
+        break;
+      }
     }
   }
 

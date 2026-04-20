@@ -1,6 +1,6 @@
 import type { PubmedArticle } from '@ncbijs/pubmed-xml';
 
-import type { Article } from './interfaces/pubmed.interface';
+import type { Article } from './interfaces/pubmed.interface.js';
 
 export function convertArticle(source: PubmedArticle): Article {
   return {
@@ -18,7 +18,7 @@ export function convertArticle(source: PubmedArticle): Article {
       lastName: author.lastName,
       foreName: author.foreName,
       collectiveName: author.collectiveName,
-      affiliation: author.affiliation,
+      affiliations: author.affiliations,
     })),
     journal: {
       title: source.journal.title,

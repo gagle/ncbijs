@@ -15,7 +15,7 @@ export interface Author {
   readonly foreName?: string;
   readonly initials?: string;
   readonly collectiveName?: string;
-  readonly affiliation?: string;
+  readonly affiliations: ReadonlyArray<string>;
 }
 
 export interface JournalInfo {

@@ -11,7 +11,7 @@ export interface Article {
       lastName?: string | undefined;
       foreName?: string | undefined;
       collectiveName?: string | undefined;
-      affiliation?: string | undefined;
+      affiliations: ReadonlyArray<string>;
     }>
   >;
   readonly journal: Readonly<{

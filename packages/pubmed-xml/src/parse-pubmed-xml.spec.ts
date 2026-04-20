@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { PubmedArticle } from './interfaces/pubmed-article.interface';
-import { parsePubmedXml } from './parse-pubmed-xml';
+import type { PubmedArticle } from './interfaces/pubmed-article.interface.js';
+import { parsePubmedXml } from './parse-pubmed-xml.js';
 
 function buildArticleXml(citationContent: string, pubmedDataContent = ''): string {
   const pubmedData = pubmedDataContent ? `<PubmedData>${pubmedDataContent}</PubmedData>` : '';
@@ -219,7 +219,7 @@ describe('parsePubmedXml', () => {
       expect(firstArticle.authors[1]!.collectiveName).toBe('Research Group');
     });
 
-    it('should extract author affiliation', () => {
+    it('should extract author affiliations', () => {
       const xml = buildArticleXml(
         buildMinimalCitation(
           '1',
@@ -227,7 +227,21 @@ describe('parsePubmedXml', () => {
         ),
       );
       const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
-      expect(firstArticle.authors[0]!.affiliation).toBe('MIT, Cambridge, MA');
+      expect(firstArticle.authors[0]!.affiliations).toEqual(['MIT, Cambridge, MA']);
+    });
+
+    it('should extract multiple affiliations per author', () => {
+      const xml = buildArticleXml(
+        buildMinimalCitation(
+          '1',
+          '<AuthorList><Author><LastName>Kim</LastName><ForeName>Bob</ForeName><Initials>B</Initials><AffiliationInfo><Affiliation>MIT, Cambridge, MA</Affiliation></AffiliationInfo><AffiliationInfo><Affiliation>Harvard Medical School, Boston, MA</Affiliation></AffiliationInfo></Author></AuthorList>',
+        ),
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.authors[0]!.affiliations).toEqual([
+        'MIT, Cambridge, MA',
+        'Harvard Medical School, Boston, MA',
+      ]);
     });
 
     it('should handle article with no authors', () => {

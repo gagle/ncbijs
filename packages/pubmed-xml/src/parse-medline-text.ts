@@ -7,8 +7,8 @@ import type {
   MeshQualifier,
   PartialDate,
   PubmedArticle,
-} from './interfaces/pubmed-article.interface';
-import { monthTextToNumber } from './article-field-parsers';
+} from './interfaces/pubmed-article.interface.js';
+import { monthTextToNumber } from './article-field-parsers.js';
 
 type MedlineTagMap = Map<string, Array<string>>;
 
@@ -103,23 +103,23 @@ function parseAuthorsFromMedline(medlineTagMap: MedlineTagMap): ReadonlyArray<Au
 function parseFullAuthorName(fullAuthorName: string): Author {
   const commaIndex = fullAuthorName.indexOf(',');
   if (commaIndex === -1) {
-    return { lastName: fullAuthorName.trim() };
+    return { lastName: fullAuthorName.trim(), affiliations: [] };
   }
 
   const lastName = fullAuthorName.slice(0, commaIndex).trim();
   const foreName = fullAuthorName.slice(commaIndex + 1).trim();
-  return { lastName, foreName };
+  return { lastName, foreName, affiliations: [] };
 }
 
 function parseShortAuthorName(shortAuthorName: string): Author {
   const lastSpaceIndex = shortAuthorName.lastIndexOf(' ');
   if (lastSpaceIndex === -1) {
-    return { lastName: shortAuthorName.trim() };
+    return { lastName: shortAuthorName.trim(), affiliations: [] };
   }
 
   const lastName = shortAuthorName.slice(0, lastSpaceIndex).trim();
   const initials = shortAuthorName.slice(lastSpaceIndex + 1).trim();
-  return { lastName, initials };
+  return { lastName, initials, affiliations: [] };
 }
 
 function parseDateFromMedline(dateString: string): PartialDate {
