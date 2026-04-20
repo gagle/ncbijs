@@ -1,8 +1,8 @@
-# @ncbijs/jats — JATS XML Full-Text Parser Spec Reference
+# @ncbijs/jats — JATS XML Full-Text Parser Guide
 
 ## Overview
 
-Parser for JATS (Journal Article Tag Suite) XML. Zero dependencies.
+Parser for [JATS](https://jats.nlm.nih.gov/) (Journal Article Tag Suite) XML, the standard format for full-text journal articles in PMC. Includes markdown and plain-text conversion, plus a chunking algorithm designed for RAG (retrieval-augmented generation) pipelines. Zero dependencies.
 
 **Spec:** NISO Z39.96 — https://jats.nlm.nih.gov/
 **Versions in PMC:** 1.0, 1.1, 1.2, 1.3, 1.4 (all must be handled)

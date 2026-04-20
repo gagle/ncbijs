@@ -1,4 +1,4 @@
-# Type Safety Architecture
+# Type Safety Guide
 
 ## Principle
 
@@ -100,7 +100,7 @@ export type EntityType = (typeof ENTITY_TYPES)[keyof typeof ENTITY_TYPES];
 | -------------------------- | ------------ | ------------------------------------------------------- |
 | E-utilities (most)         | XML string   | Parsed by `pubmed-xml` or `jats` → typed domain objects |
 | ESummary (retmode=json)    | JSON         | Directly typed interfaces                               |
-| PubTator3 Search/Relations | JSON         | Directly typed interfaces                               |
+| PubTator3 Search           | JSON         | Directly typed interfaces                               |
 | PubTator Export (biocjson) | JSON         | `BioDocument` typed interface                           |
 | PubTator Export (biocxml)  | XML string   | Parsed by internal BioC parser → `BioDocument`          |
 | ID Converter               | JSON/XML/CSV | Parsed to `ConvertedId[]`                               |
@@ -118,7 +118,12 @@ For endpoints where the return type depends on a format parameter:
 export function cite(id: string, format: 'csl', source?: CitationSource): Promise<CSLData>;
 export function cite(
   id: string,
-  format: Exclude<CitationFormat, 'csl'>,
+  format: 'citation',
+  source?: CitationSource,
+): Promise<CitationData>;
+export function cite(
+  id: string,
+  format: 'ris' | 'medline',
   source?: CitationSource,
 ): Promise<string>;
 ```

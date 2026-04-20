@@ -1,8 +1,8 @@
-# @ncbijs/pubmed-xml — PubMed XML Parser Spec Reference
+# @ncbijs/pubmed-xml — PubMed XML Parser Guide
 
 ## Overview
 
-Spec-compliant parser for PubMed/MEDLINE XML and MEDLINE text format. Zero dependencies.
+Parser for PubMed/MEDLINE XML and MEDLINE text format, compliant with the official PubMed DTD. Handles all edge cases in the DTD: structured abstracts, MedlineDate fallbacks, collective authors, multiple affiliations, and BookDocument elements. Zero dependencies.
 
 **DTD:** `pubmed_250101.dtd` — http://dtd.nlm.nih.gov/ncbi/pubmed/out/pubmed_250101.dtd
 **Element docs:** https://www.nlm.nih.gov/bsd/licensee/elements_descriptions.html

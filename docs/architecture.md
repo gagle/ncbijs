@@ -1,4 +1,4 @@
-# Architecture
+# Architecture Guide
 
 ## Monorepo Structure
 
@@ -17,7 +17,7 @@ ncbijs/
 │   ├── mesh/            Zero-dep, ships ~2MB MeSH tree
 │   └── cite/            Zero-dep, citation formatting
 ├── e2e/                 Integration tests against real NCBI APIs
-├── docs/                LLM reference (temporary)
+├── docs/                Technical guides
 └── .github/workflows/   CI + Release
 ```
 

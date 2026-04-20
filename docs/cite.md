@@ -1,8 +1,8 @@
-# @ncbijs/cite — Citation Formatting Spec Reference
+# @ncbijs/cite — Citation Formatting Guide
 
 ## Overview
 
-Citation generation in 9 formats via NCBI's Literature Citation Exporter API. Zero dependencies.
+Citation generation via NCBI's Literature Citation Exporter API. Zero dependencies.
 
 **Base URL:** `https://api.ncbi.nlm.nih.gov/lit/ctxp/`
 **Docs:** https://pmc.ncbi.nlm.nih.gov/api/ctxp/
@@ -18,35 +18,41 @@ Citation generation in 9 formats via NCBI's Literature Citation Exporter API. Ze
 GET /v1/{source}/?format={fmt}&id={id}
 ```
 
-## 3 Sources
+## 2 Sources
 
 - `pubmed` (default) — PubMed articles
-- `pmc` — PubMed Central articles
-- `books` — NCBI Books (⚠️ unverified in public docs, include cautiously)
+- `pmc` — PubMed Central articles (requires numeric PMC ID, e.g., `7886120` not `PMC7886120`)
 
-## 9 Citation Formats
+## 4 Citation Formats
 
-| Format code           | Style                         | Response Content-Type | Return type |
-| --------------------- | ----------------------------- | --------------------- | ----------- |
-| `ris`                 | RIS tagged format             | text/plain            | string      |
-| `nbib`                | PubMed/MEDLINE tagged (.nbib) | text/plain            | string      |
-| `medline`             | MEDLINE display format        | text/plain            | string      |
-| `apa`                 | APA 7th edition               | text/plain            | string      |
-| `mla`                 | MLA 9th edition               | text/plain            | string      |
-| `chicago-author-date` | Chicago Author-Date           | text/plain            | string      |
-| `vancouver`           | Vancouver/ICMJE               | text/plain            | string      |
-| `bibtex`              | BibTeX entry                  | text/plain            | string      |
-| `csl`                 | CSL-JSON                      | application/json      | CSLData     |
+| Format code | Style                                       | Response Content-Type | Return type  |
+| ----------- | ------------------------------------------- | --------------------- | ------------ |
+| `ris`       | RIS tagged format                           | text/plain            | string       |
+| `medline`   | MEDLINE display format                      | text/plain            | string       |
+| `csl`       | CSL-JSON                                    | application/json      | CSLData      |
+| `citation`  | Pre-rendered citations (AMA, APA, MLA, NLM) | application/json      | CitationData |
+
+The `citation` format returns a JSON object with pre-rendered citation strings in four styles:
+
+```typescript
+interface CitationData {
+  id: string;
+  ama: { orig: string; format: string };
+  apa: { orig: string; format: string };
+  mla: { orig: string; format: string };
+  nlm: { orig: string; format: string };
+}
+```
 
 ## Public API
 
 ```typescript
-// Overloaded for type-safe format-dependent returns
 cite(id: string, format: 'csl', source?: CitationSource): Promise<CSLData>;
-cite(id: string, format: Exclude<CitationFormat, 'csl'>, source?: CitationSource): Promise<string>;
+cite(id: string, format: 'citation', source?: CitationSource): Promise<CitationData>;
+cite(id: string, format: 'ris' | 'medline', source?: CitationSource): Promise<string>;
 
 citeMany(ids: ReadonlyArray<string>, format: CitationFormat, source?: CitationSource):
-  AsyncIterableIterator<Readonly<{ id: string; citation: string | CSLData }>>
+  AsyncIterableIterator<Readonly<{ id: string; citation: string | CSLData | CitationData }>>
 ```
 
 ## CSLData Type (CSL-JSON)
@@ -69,7 +75,7 @@ CSLData:
   abstract?: string
 ```
 
-## citeMany() Implementation
+## citeMany() Behavior
 
 Rate-limited serial iteration (3 req/s):
 

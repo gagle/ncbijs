@@ -150,13 +150,11 @@ packages/pubmed-xml/src/
 
 #### @ncbijs/pubtator
 
-- PubTator3: entity autocomplete, relations, search
+- PubTator3: entity autocomplete, search
 - Export: biocjson, biocxml, full vs abstract
 - Legacy: pre-tagged, custom text (session polling)
-- BioC REST: PMC, PubMed, supplementary materials
 - parseBioC (XML and JSON variants)
 - parsePubTatorTsv (all entity types)
-- All 13 relation types
 - All 6 entity types
 
 #### @ncbijs/mesh
@@ -174,10 +172,11 @@ packages/pubmed-xml/src/
 
 #### @ncbijs/cite
 
-- All 9 format codes
+- All 4 format codes (ris, medline, csl, citation)
 - CSL format returns CSLData (parsed JSON)
-- Non-CSL formats return string
-- All 3 sources (pubmed, pmc, books)
+- Citation format returns CitationData (parsed JSON)
+- Non-JSON formats return string
+- 2 sources (pubmed, pmc)
 - citeMany iterator (rate limiting)
 - Error: invalid ID, invalid format
 

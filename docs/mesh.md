@@ -1,8 +1,8 @@
-# @ncbijs/mesh — MeSH Vocabulary Utilities Spec Reference
+# @ncbijs/mesh — MeSH Vocabulary Utilities Guide
 
 ## Overview
 
-MeSH tree traversal, query expansion, and descriptor lookup. Zero dependencies. Ships compact serialized MeSH tree (~2MB).
+[MeSH](https://www.nlm.nih.gov/mesh/) (Medical Subject Headings) is the NLM controlled vocabulary used for indexing articles in PubMed. This package provides offline tree traversal, query expansion for comprehensive PubMed searches, and descriptor lookup. Ships a compact serialized MeSH tree (~2MB). Zero dependencies.
 
 **Spec:** https://www.nlm.nih.gov/mesh/
 **SPARQL:** https://id.nlm.nih.gov/mesh/query

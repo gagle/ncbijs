@@ -1,8 +1,8 @@
-# @ncbijs/pubmed — PubMed Article Client Spec Reference
+# @ncbijs/pubmed — PubMed Article Client Guide
 
 ## Overview
 
-High-level PubMed search and retrieval. Fluent query builder, auto-pagination, typed Article objects.
+High-level PubMed search and retrieval. [PubMed](https://pubmed.ncbi.nlm.nih.gov/) indexes over 37 million citations from biomedical literature. This package provides a fluent query builder, auto-pagination past the 10K result cap, and typed Article objects.
 
 **Dependencies:** `@ncbijs/eutils`, `@ncbijs/pubmed-xml`
 **Spec:** PubMed via ESearch (db=pubmed) + EFetch (rettype=xml)

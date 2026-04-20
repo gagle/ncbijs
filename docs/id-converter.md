@@ -1,8 +1,8 @@
-# @ncbijs/id-converter — Article ID Conversion Spec Reference
+# @ncbijs/id-converter — Article ID Conversion Guide
 
 ## Overview
 
-Batch ID conversion between PMID, PMCID, DOI, and Manuscript ID. Zero dependencies.
+Batch conversion between the different article identifier systems used in biomedical publishing: PMID (PubMed), PMCID (PubMed Central), DOI, and Manuscript ID. Zero dependencies.
 
 **Base URL:** `https://pmc.ncbi.nlm.nih.gov/tools/idconv/api/v1/articles/`
 **Docs:** https://pmc.ncbi.nlm.nih.gov/tools/id-converter-api/

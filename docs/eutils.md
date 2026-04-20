@@ -1,8 +1,8 @@
-# @ncbijs/eutils — E-utilities Spec Reference
+# @ncbijs/eutils — E-utilities Guide
 
 ## Overview
 
-HTTP client for all 9 NCBI E-utilities. Zero dependencies. Uses native `fetch`.
+HTTP client for all 9 NCBI [E-utilities](https://www.ncbi.nlm.nih.gov/books/NBK25501/). E-utilities are the programmatic interface to NCBI's Entrez system, providing access to 38 databases including PubMed, PMC, Gene, and Protein. Zero dependencies; uses native `fetch`.
 
 **Base URL:** `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/`
 

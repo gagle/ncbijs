@@ -1,8 +1,8 @@
-# @ncbijs/pmc — PMC Full-Text Client Spec Reference
+# @ncbijs/pmc — PMC Full-Text Client Guide
 
 ## Overview
 
-Full-text article retrieval from PubMed Central via E-utilities, OA Service, and OAI-PMH.
+Full-text article retrieval from [PubMed Central](https://pmc.ncbi.nlm.nih.gov/) (PMC), the free archive of over 9 million biomedical and life sciences journal articles. Supports three retrieval methods: E-utilities (JATS XML), OA Web Service (bulk download links), and OAI-PMH (metadata harvesting).
 
 **Dependencies:** `@ncbijs/eutils`, `@ncbijs/jats`
 
