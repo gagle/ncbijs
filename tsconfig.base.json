@@ -46,7 +46,10 @@
       "@ncbijs/nucleotide": ["./packages/nucleotide/src/index.ts"],
       "@ncbijs/omim": ["./packages/omim/src/index.ts"],
       "@ncbijs/medgen": ["./packages/medgen/src/index.ts"],
-      "@ncbijs/gtr": ["./packages/gtr/src/index.ts"]
+      "@ncbijs/gtr": ["./packages/gtr/src/index.ts"],
+      "@ncbijs/geo": ["./packages/geo/src/index.ts"],
+      "@ncbijs/dbvar": ["./packages/dbvar/src/index.ts"],
+      "@ncbijs/sra": ["./packages/sra/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "dist"]

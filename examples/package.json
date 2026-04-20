@@ -22,7 +22,10 @@
     "@ncbijs/snp": "workspace:*",
     "@ncbijs/omim": "workspace:*",
     "@ncbijs/medgen": "workspace:*",
-    "@ncbijs/gtr": "workspace:*"
+    "@ncbijs/gtr": "workspace:*",
+    "@ncbijs/geo": "workspace:*",
+    "@ncbijs/dbvar": "workspace:*",
+    "@ncbijs/sra": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.19.0"

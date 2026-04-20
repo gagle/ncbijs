@@ -71,6 +71,9 @@ importers:
       '@ncbijs/datasets':
         specifier: workspace:*
         version: link:../packages/datasets
+      '@ncbijs/dbvar':
+        specifier: workspace:*
+        version: link:../packages/dbvar
       '@ncbijs/eutils':
         specifier: workspace:*
         version: link:../packages/eutils
@@ -80,6 +83,9 @@ importers:
       '@ncbijs/genbank':
         specifier: workspace:*
         version: link:../packages/genbank
+      '@ncbijs/geo':
+        specifier: workspace:*
+        version: link:../packages/geo
       '@ncbijs/gtr':
         specifier: workspace:*
         version: link:../packages/gtr
@@ -125,6 +131,9 @@ importers:
       '@ncbijs/snp':
         specifier: workspace:*
         version: link:../packages/snp
+      '@ncbijs/sra':
+        specifier: workspace:*
+        version: link:../packages/sra
       '@ncbijs/xml':
         specifier: workspace:*
         version: link:../packages/xml
@@ -143,6 +152,9 @@ importers:
       '@ncbijs/datasets':
         specifier: workspace:*
         version: link:../packages/datasets
+      '@ncbijs/dbvar':
+        specifier: workspace:*
+        version: link:../packages/dbvar
       '@ncbijs/eutils':
         specifier: workspace:*
         version: link:../packages/eutils
@@ -152,6 +164,9 @@ importers:
       '@ncbijs/genbank':
         specifier: workspace:*
         version: link:../packages/genbank
+      '@ncbijs/geo':
+        specifier: workspace:*
+        version: link:../packages/geo
       '@ncbijs/gtr':
         specifier: workspace:*
         version: link:../packages/gtr
@@ -188,6 +203,9 @@ importers:
       '@ncbijs/snp':
         specifier: workspace:*
         version: link:../packages/snp
+      '@ncbijs/sra':
+        specifier: workspace:*
+        version: link:../packages/sra
     devDependencies:
       tsx:
         specifier: ^4.19.0
@@ -213,6 +231,12 @@ importers:
         specifier: workspace:*
         version: link:../rate-limiter
 
+  packages/dbvar:
+    dependencies:
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
+
   packages/eutils:
     dependencies:
       '@ncbijs/rate-limiter':
@@ -228,6 +252,12 @@ importers:
   packages/fasta: {}
 
   packages/genbank: {}
+
+  packages/geo:
+    dependencies:
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
 
   packages/gtr:
     dependencies:
@@ -372,6 +402,15 @@ importers:
       '@ncbijs/rate-limiter':
         specifier: workspace:*
         version: link:../rate-limiter
+
+  packages/sra:
+    dependencies:
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
+      '@ncbijs/xml':
+        specifier: workspace:*
+        version: link:../xml
 
   packages/xml: {}
 

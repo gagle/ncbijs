@@ -26,6 +26,9 @@
     "@ncbijs/pubchem": "workspace:*",
     "@ncbijs/omim": "workspace:*",
     "@ncbijs/medgen": "workspace:*",
-    "@ncbijs/gtr": "workspace:*"
+    "@ncbijs/gtr": "workspace:*",
+    "@ncbijs/geo": "workspace:*",
+    "@ncbijs/dbvar": "workspace:*",
+    "@ncbijs/sra": "workspace:*"
   }
 }

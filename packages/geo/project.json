@@ -1,0 +1,25 @@
+{
+  "name": "@ncbijs/geo",
+  "sourceRoot": "packages/geo/src",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p packages/geo/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/geo/dist"
+      },
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vitest run --config packages/geo/vitest.config.ts" }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": { "lintFilePatterns": ["{projectRoot}/**/*.ts"] }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc --noEmit -p packages/geo/tsconfig.json" }
+    }
+  }
+}
