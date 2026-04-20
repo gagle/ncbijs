@@ -1,5 +1,5 @@
 export interface DatasetsConfig {
-  readonly apiKey?: string;
+  readonly apiKey?: string | undefined;
   readonly maxRetries?: number;
 }
 

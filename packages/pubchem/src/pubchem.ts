@@ -54,6 +54,41 @@ export class PubChem {
     return mapCompoundProperty(raw);
   }
 
+  public async compoundByCidBatch(
+    cids: ReadonlyArray<number>,
+  ): Promise<ReadonlyArray<CompoundProperty>> {
+    if (cids.length === 0) {
+      return [];
+    }
+
+    const joined = cids.join(',');
+    const url = `${BASE_URL}/compound/cid/${encodeURIComponent(joined)}/property/${COMPOUND_PROPERTIES}/JSON`;
+    const raw = await fetchJson<RawPropertyResponse>(url, this._config);
+
+    return (raw.PropertyTable?.Properties ?? []).map(mapCompoundPropertyEntry);
+  }
+
+  public async compoundBySmiles(smiles: string): Promise<CompoundProperty> {
+    const url = `${BASE_URL}/compound/smiles/${encodeURIComponent(smiles)}/property/${COMPOUND_PROPERTIES}/JSON`;
+    const raw = await fetchJson<RawPropertyResponse>(url, this._config);
+
+    return mapCompoundProperty(raw);
+  }
+
+  public async compoundByInchiKey(inchiKey: string): Promise<CompoundProperty> {
+    const url = `${BASE_URL}/compound/inchikey/${encodeURIComponent(inchiKey)}/property/${COMPOUND_PROPERTIES}/JSON`;
+    const raw = await fetchJson<RawPropertyResponse>(url, this._config);
+
+    return mapCompoundProperty(raw);
+  }
+
+  public async cidsByName(name: string): Promise<ReadonlyArray<number>> {
+    const url = `${BASE_URL}/compound/name/${encodeURIComponent(name)}/cids/JSON`;
+    const raw = await fetchJson<RawCidResponse>(url, this._config);
+
+    return raw.IdentifierList?.CID ?? [];
+  }
+
   public async synonyms(cid: number): Promise<CompoundSynonyms> {
     const url = `${BASE_URL}/compound/cid/${encodeURIComponent(cid)}/synonyms/JSON`;
     const raw = await fetchJson<RawSynonymsResponse>(url, this._config);
@@ -104,6 +139,12 @@ interface RawCompoundProperty {
   readonly HeavyAtomCount?: number;
 }
 
+interface RawCidResponse {
+  readonly IdentifierList?: {
+    readonly CID?: ReadonlyArray<number>;
+  };
+}
+
 interface RawSynonymsResponse {
   readonly InformationList?: {
     readonly Information?: ReadonlyArray<{
@@ -124,8 +165,10 @@ interface RawDescriptionResponse {
 }
 
 function mapCompoundProperty(raw: RawPropertyResponse): CompoundProperty {
-  const property = raw.PropertyTable?.Properties?.[0] ?? {};
+  return mapCompoundPropertyEntry(raw.PropertyTable?.Properties?.[0] ?? {});
+}
 
+function mapCompoundPropertyEntry(property: RawCompoundProperty): CompoundProperty {
   return {
     cid: property.CID ?? 0,
     molecularFormula: property.MolecularFormula ?? '',

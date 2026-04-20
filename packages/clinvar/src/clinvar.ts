@@ -57,6 +57,19 @@ export class ClinVar {
     };
   }
 
+  public async searchAndFetch(
+    term: string,
+    options?: { readonly retmax?: number },
+  ): Promise<ReadonlyArray<VariantReport>> {
+    const searchResult = await this.search(term, options);
+
+    if (searchResult.ids.length === 0) {
+      return [];
+    }
+
+    return this.fetch(searchResult.ids);
+  }
+
   public async fetch(ids: ReadonlyArray<string>): Promise<ReadonlyArray<VariantReport>> {
     if (ids.length === 0) {
       return [];

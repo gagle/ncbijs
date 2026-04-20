@@ -54,6 +54,28 @@ Search ClinVar by query term. Returns total count and matching UIDs.
 
 Fetch variant details by UIDs. Entries with errors are automatically skipped.
 
+### Convenience
+
+#### `searchAndFetch(term: string, options?): Promise<Array<VariantReport>>`
+
+Search and fetch in one call. Combines `search` + `fetch`. Returns empty array if no results.
+
+## Error handling
+
+```ts
+import { ClinVar, ClinVarHttpError } from '@ncbijs/clinvar';
+
+try {
+  await clinvar.search('TP53 pathogenic');
+} catch (err) {
+  if (err instanceof ClinVarHttpError) {
+    console.error(`HTTP ${err.status}: ${err.body}`);
+  }
+}
+```
+
+The client automatically retries on HTTP 429, 500, 502, 503 and network errors with exponential backoff + jitter.
+
 ## Response types
 
 ### `ClinVarSearchResult`

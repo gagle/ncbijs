@@ -62,6 +62,22 @@ Fetch genome assembly reports by accession (e.g., `GCF_000001405.40`).
 
 Fetch genome assembly reports for all assemblies of a taxon.
 
+## Error handling
+
+```ts
+import { Datasets, DatasetsHttpError } from '@ncbijs/datasets';
+
+try {
+  await datasets.geneById([672]);
+} catch (err) {
+  if (err instanceof DatasetsHttpError) {
+    console.error(`HTTP ${err.status}: ${err.body}`);
+  }
+}
+```
+
+The client automatically retries on HTTP 429, 500, 502, 503 and network errors with exponential backoff + jitter.
+
 ## Response types
 
 ### `GeneReport`

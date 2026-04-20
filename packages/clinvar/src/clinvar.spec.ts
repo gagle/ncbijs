@@ -430,6 +430,67 @@ describe('ClinVar', () => {
     });
   });
 
+  describe('searchAndFetch', () => {
+    it('should search and fetch variant reports in one call', async () => {
+      const entry = buildVariantEntry();
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve(buildSearchResponse()),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: () =>
+            Promise.resolve(
+              buildSummaryResponse({ '846933': entry as Record<string, unknown> }, ['846933']),
+            ),
+        });
+      vi.stubGlobal('fetch', fetchMock);
+      const clinvar = new ClinVar();
+
+      const reports = await clinvar.searchAndFetch('TP53');
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(reports).toHaveLength(1);
+      expect(reports[0]!.uid).toBe('846933');
+    });
+
+    it('should return empty array when search finds no results', async () => {
+      mockFetchJson({ esearchresult: { count: '0', idlist: [] } });
+      const clinvar = new ClinVar();
+
+      const reports = await clinvar.searchAndFetch('nonexistent_variant_xyz');
+
+      expect(reports).toEqual([]);
+      expect(vi.mocked(fetch)).toHaveBeenCalledTimes(1);
+    });
+
+    it('should pass retmax option to search', async () => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve(buildSearchResponse()),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve(buildSummaryResponse({}, [])),
+        });
+      vi.stubGlobal('fetch', fetchMock);
+      const clinvar = new ClinVar();
+
+      await clinvar.searchAndFetch('TP53', { retmax: 5 });
+
+      const searchUrl = fetchMock.mock.calls[0]![0] as string;
+      expect(searchUrl).toContain('retmax=5');
+    });
+  });
+
   describe('configuration', () => {
     it('should work without any config', async () => {
       mockFetchJson(buildSearchResponse());

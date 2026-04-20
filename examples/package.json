@@ -10,7 +10,13 @@
     "@ncbijs/mesh": "workspace:*",
     "@ncbijs/pmc": "workspace:*",
     "@ncbijs/pubmed": "workspace:*",
-    "@ncbijs/pubtator": "workspace:*"
+    "@ncbijs/pubtator": "workspace:*",
+    "@ncbijs/blast": "workspace:*",
+    "@ncbijs/clinvar": "workspace:*",
+    "@ncbijs/datasets": "workspace:*",
+    "@ncbijs/fasta": "workspace:*",
+    "@ncbijs/pubchem": "workspace:*",
+    "@ncbijs/snp": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.19.0"

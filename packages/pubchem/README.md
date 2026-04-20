@@ -50,6 +50,22 @@ Fetch compound properties by PubChem CID.
 
 Fetch compound properties by compound name.
 
+#### `compoundByCidBatch(cids: Array<number>): Promise<Array<CompoundProperty>>`
+
+Fetch properties for multiple compounds by CID in a single request.
+
+#### `compoundBySmiles(smiles: string): Promise<CompoundProperty>`
+
+Fetch compound properties by SMILES string.
+
+#### `compoundByInchiKey(inchiKey: string): Promise<CompoundProperty>`
+
+Fetch compound properties by InChIKey.
+
+#### `cidsByName(name: string): Promise<Array<number>>`
+
+Look up PubChem CIDs matching a compound name.
+
 ### Synonyms
 
 #### `synonyms(cid: number): Promise<CompoundSynonyms>`
@@ -61,6 +77,22 @@ Fetch all known synonyms for a compound by CID.
 #### `description(cid: number): Promise<CompoundDescription>`
 
 Fetch the title and description for a compound by CID.
+
+## Error handling
+
+```ts
+import { PubChem, PubChemHttpError } from '@ncbijs/pubchem';
+
+try {
+  await pubchem.compoundByName('notarealcompound');
+} catch (err) {
+  if (err instanceof PubChemHttpError) {
+    console.error(`HTTP ${err.status}: ${err.body}`);
+  }
+}
+```
+
+The client automatically retries on HTTP 429, 500, 502, 503 and network errors with exponential backoff + jitter. PubChem is rate-limited to 5 requests/second.
 
 ## Response types
 

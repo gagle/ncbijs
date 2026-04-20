@@ -37,6 +37,10 @@ Parses a FASTA-formatted string into an array of records.
 - Comment lines (`;`) and blank lines are skipped
 - Handles GenBank, UniProt/SwissProt, and NCBI identifier formats
 
+## Error handling
+
+`parseFasta` is a pure synchronous parser. It does not throw on malformed input — records without a header line (`>`) are silently skipped, and empty sequences produce records with an empty `sequence` string.
+
 ### `FastaRecord`
 
 ```ts

@@ -127,6 +127,26 @@ interface BlastHsp {
 }
 ```
 
+## Error handling
+
+```ts
+import { Blast, BlastHttpError, BlastTimeoutError, BlastSearchError } from '@ncbijs/blast';
+
+try {
+  await blast.search('ATCG', 'blastn', 'nt');
+} catch (err) {
+  if (err instanceof BlastTimeoutError) {
+    console.error('Search timed out after max poll attempts');
+  } else if (err instanceof BlastSearchError) {
+    console.error('BLAST search failed on the server');
+  } else if (err instanceof BlastHttpError) {
+    console.error(`HTTP ${err.status}: ${err.body}`);
+  }
+}
+```
+
+The client automatically retries on HTTP 429, 500, 502, 503 and network errors with exponential backoff + jitter.
+
 ## Rate limits
 
 Built-in rate limiting enforces NCBI guidelines:

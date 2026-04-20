@@ -113,12 +113,24 @@ importers:
 
   examples:
     dependencies:
+      '@ncbijs/blast':
+        specifier: workspace:*
+        version: link:../packages/blast
       '@ncbijs/cite':
         specifier: workspace:*
         version: link:../packages/cite
+      '@ncbijs/clinvar':
+        specifier: workspace:*
+        version: link:../packages/clinvar
+      '@ncbijs/datasets':
+        specifier: workspace:*
+        version: link:../packages/datasets
       '@ncbijs/eutils':
         specifier: workspace:*
         version: link:../packages/eutils
+      '@ncbijs/fasta':
+        specifier: workspace:*
+        version: link:../packages/fasta
       '@ncbijs/id-converter':
         specifier: workspace:*
         version: link:../packages/id-converter
@@ -128,12 +140,18 @@ importers:
       '@ncbijs/pmc':
         specifier: workspace:*
         version: link:../packages/pmc
+      '@ncbijs/pubchem':
+        specifier: workspace:*
+        version: link:../packages/pubchem
       '@ncbijs/pubmed':
         specifier: workspace:*
         version: link:../packages/pubmed
       '@ncbijs/pubtator':
         specifier: workspace:*
         version: link:../packages/pubtator
+      '@ncbijs/snp':
+        specifier: workspace:*
+        version: link:../packages/snp
     devDependencies:
       tsx:
         specifier: ^4.19.0

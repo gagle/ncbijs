@@ -1,5 +1,5 @@
 export interface ClinVarConfig {
-  readonly apiKey?: string;
+  readonly apiKey?: string | undefined;
   readonly tool?: string;
   readonly email?: string;
   readonly maxRetries?: number;

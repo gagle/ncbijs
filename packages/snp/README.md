@@ -54,6 +54,22 @@ Fetch a single RefSNP report by numeric RS ID (without the "rs" prefix).
 
 Fetch multiple RefSNP reports sequentially.
 
+## Error handling
+
+```ts
+import { Snp, SnpHttpError } from '@ncbijs/snp';
+
+try {
+  await snp.refsnp(7412);
+} catch (err) {
+  if (err instanceof SnpHttpError) {
+    console.error(`HTTP ${err.status}: ${err.body}`);
+  }
+}
+```
+
+The client automatically retries on HTTP 429, 500, 502, 503 and network errors with exponential backoff + jitter.
+
 ## Response types
 
 ### `RefSnpReport`
