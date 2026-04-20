@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm nx run-many -t build
+      - uses: actions/cache/save@v4
+        with:
+          path: packages/*/dist
+          key: dist-${{ matrix.node-version }}-${{ github.sha }}
+
+  lint:
+    needs: [setup]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm nx run-many -t lint
+      - run: pnpm nx run-many -t typecheck
+
+  test:
+    needs: [setup]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/cache/restore@v4
+        with:
+          path: packages/*/dist
+          key: dist-${{ matrix.node-version }}-${{ github.sha }}
+      - run: pnpm nx run-many -t test -- --coverage
+      - uses: actions/upload-artifact@v4
+        if: matrix.node-version == 22
+        with:
+          name: coverage
+          path: packages/*/coverage/
+
+  e2e:
+    needs: [setup]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/cache/restore@v4
+        with:
+          path: packages/*/dist
+          key: dist-${{ matrix.node-version }}-${{ github.sha }}
+      - run: pnpm nx run ncbijs-e2e:e2e
+        env:
+          NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}

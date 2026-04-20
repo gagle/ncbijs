@@ -1,0 +1,29 @@
+{
+  "name": "ncbijs-e2e",
+  "targets": {
+    "e2e": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "@ncbijs/eutils:build",
+        "@ncbijs/pubmed:build",
+        "@ncbijs/pmc:build",
+        "@ncbijs/id-converter:build",
+        "@ncbijs/pubtator:build",
+        "@ncbijs/cite:build",
+        "@ncbijs/jats:build",
+        "@ncbijs/mesh:build",
+        "@ncbijs/pubmed-xml:build",
+        "@ncbijs/rate-limiter:build"
+      ],
+      "options": {
+        "command": "vitest run --config e2e/vitest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["{projectRoot}/**/*.ts"]
+      }
+    }
+  }
+}

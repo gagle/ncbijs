@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      paths_released: ${{ steps.release.outputs.paths_released }}
+      outputs_json: ${{ toJSON(steps.release.outputs) }}
+    steps:
+      - id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  publish:
+    needs: release-please
+    if: join(fromJSON(needs.release-please.outputs.paths_released), '') != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        path: ${{ fromJSON(needs.release-please.outputs.paths_released) }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm nx run-many -t build
+
+      - name: Get release tag
+        id: tag
+        env:
+          OUTPUTS: ${{ needs.release-please.outputs.outputs_json }}
+          PACKAGE_PATH: ${{ matrix.path }}
+        run: |
+          TAG=$(echo "$OUTPUTS" | jq -r --arg p "$PACKAGE_PATH" '.[$p + "--tag_name"]')
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare dist for publishing
+        uses: gagle/prepare-dist@v1
+        with:
+          path: ${{ matrix.path }}
+          tag: ${{ steps.tag.outputs.tag }}
+
+      - name: Publish to npm
+        run: pnpm publish --no-git-checks --provenance
+        working-directory: ${{ matrix.path }}/dist

@@ -1,0 +1,12 @@
+{
+  "packages/eutils": "0.0.1",
+  "packages/pubmed-xml": "0.0.1",
+  "packages/pubmed": "0.0.1",
+  "packages/jats": "0.0.1",
+  "packages/pmc": "0.0.1",
+  "packages/id-converter": "0.0.1",
+  "packages/pubtator": "0.0.1",
+  "packages/mesh": "0.0.1",
+  "packages/cite": "0.0.1",
+  "packages/rate-limiter": "0.0.1"
+}

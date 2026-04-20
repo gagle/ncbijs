@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declarationMap": true,
+    "inlineSources": true,
+    "declaration": false,
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": ["ES2022"],
+    "strict": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "paths": {
+      "@ncbijs/eutils": ["./packages/eutils/src/index.ts"],
+      "@ncbijs/pubmed-xml": ["./packages/pubmed-xml/src/index.ts"],
+      "@ncbijs/pubmed": ["./packages/pubmed/src/index.ts"],
+      "@ncbijs/jats": ["./packages/jats/src/index.ts"],
+      "@ncbijs/pmc": ["./packages/pmc/src/index.ts"],
+      "@ncbijs/id-converter": ["./packages/id-converter/src/index.ts"],
+      "@ncbijs/pubtator": ["./packages/pubtator/src/index.ts"],
+      "@ncbijs/mesh": ["./packages/mesh/src/index.ts"],
+      "@ncbijs/cite": ["./packages/cite/src/index.ts"],
+      "@ncbijs/rate-limiter": ["./packages/rate-limiter/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp", "dist"]
+}
