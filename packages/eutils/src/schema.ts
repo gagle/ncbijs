@@ -15,7 +15,15 @@ export interface paths {
           readonly retstart?: number | undefined;
           readonly retmax?: number | undefined;
           readonly retmode?: 'xml' | 'json' | undefined;
-          readonly sort?: 'relevance' | 'pub_date' | 'Author' | 'JournalName' | undefined;
+          readonly rettype?: 'uilist' | 'count' | undefined;
+          readonly sort?:
+            | 'relevance'
+            | 'pub_date'
+            | 'Author'
+            | 'JournalName'
+            | 'first_author'
+            | 'last_author'
+            | undefined;
           readonly field?: string | undefined;
           readonly datetype?: 'mdat' | 'pdat' | 'edat' | undefined;
           readonly reldate?: number | undefined;

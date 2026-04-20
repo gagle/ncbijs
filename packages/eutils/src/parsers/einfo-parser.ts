@@ -1,4 +1,4 @@
-import type { DbInfo, EInfoResult, FieldInfo, LinkInfo } from '../types/responses';
+import type { DbInfo, EInfoResult, FieldInfo, LinkInfo } from '../types/responses.js';
 import { readAllBlocks, readAllTags, readBlock, readTag } from '@ncbijs/xml';
 
 export function parseEInfoXml(xml: string): EInfoResult {
@@ -24,6 +24,7 @@ export function parseEInfoXml(xml: string): EInfoResult {
 
     const isTruncatable = readTag(fieldBlock, 'IsTruncatable');
     const isRangeable = readTag(fieldBlock, 'IsRangeable');
+    const isHidden = readTag(fieldBlock, 'IsHidden');
 
     fieldList.push({
       name,
@@ -34,6 +35,7 @@ export function parseEInfoXml(xml: string): EInfoResult {
       isNumerical: readTag(fieldBlock, 'IsNumerical') === 'Y',
       ...(isTruncatable !== undefined ? { isTruncatable: isTruncatable === 'Y' } : {}),
       ...(isRangeable !== undefined ? { isRangeable: isRangeable === 'Y' } : {}),
+      ...(isHidden !== undefined ? { isHidden: isHidden === 'Y' } : {}),
     });
   }
 
@@ -84,6 +86,7 @@ export function parseEInfoJson(raw: string): EInfoResult {
         isnumerical?: string;
         istruncatable?: string;
         israngeable?: string;
+        ishidden?: string;
       }>;
       linklist?: ReadonlyArray<{
         name?: string;
@@ -112,6 +115,7 @@ export function parseEInfoJson(raw: string): EInfoResult {
     isNumerical: field.isnumerical === 'Y',
     ...(field.istruncatable !== undefined ? { isTruncatable: field.istruncatable === 'Y' } : {}),
     ...(field.israngeable !== undefined ? { isRangeable: field.israngeable === 'Y' } : {}),
+    ...(field.ishidden !== undefined ? { isHidden: field.ishidden === 'Y' } : {}),
   }));
 
   const linkList: Array<LinkInfo> = (info.linklist ?? []).map((link) => ({

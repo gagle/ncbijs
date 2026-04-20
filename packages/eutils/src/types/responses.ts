@@ -22,6 +22,8 @@ export interface ESearchResult {
   readonly webEnv?: string | undefined;
   /** Query key for the stored result set. */
   readonly queryKey?: number | undefined;
+  /** Fields not found in the database (present when query references invalid fields). */
+  readonly errorList?: ReadonlyArray<string> | undefined;
 }
 
 /** A single document summary record. Database-specific fields live in the index signature. */
@@ -132,6 +134,8 @@ export interface FieldInfo {
   readonly isTruncatable?: boolean | undefined;
   /** Whether range queries are supported. */
   readonly isRangeable?: boolean | undefined;
+  /** Whether this field is hidden from the user interface. */
+  readonly isHidden?: boolean | undefined;
 }
 
 /** Metadata about a link from one Entrez database to another. */

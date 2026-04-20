@@ -1,5 +1,5 @@
-import type { ESearchResult, Translation } from '../types/responses';
-import { readAllBlocks, readAllTags, readTag } from '@ncbijs/xml';
+import type { ESearchResult, Translation } from '../types/responses.js';
+import { readAllBlocks, readAllTags, readBlock, readTag } from '@ncbijs/xml';
 
 export function parseESearchXml(xml: string): ESearchResult {
   const count = Number(readTag(xml, 'Count') ?? '0');
@@ -22,6 +22,9 @@ export function parseESearchXml(xml: string): ESearchResult {
   const webEnv = readTag(xml, 'WebEnv');
   const queryKeyStr = readTag(xml, 'QueryKey');
 
+  const errorListBlock = readBlock(xml, 'ErrorList');
+  const errorList = errorListBlock ? readAllTags(errorListBlock, 'FieldNotFound') : undefined;
+
   return {
     count,
     retMax,
@@ -31,6 +34,7 @@ export function parseESearchXml(xml: string): ESearchResult {
     queryTranslation,
     ...(webEnv ? { webEnv } : {}),
     ...(queryKeyStr ? { queryKey: Number(queryKeyStr) } : {}),
+    ...(errorList && errorList.length > 0 ? { errorList } : {}),
   };
 }
 
@@ -45,6 +49,7 @@ export function parseESearchJson(raw: string): ESearchResult {
       querytranslation?: string;
       webenv?: string;
       querykey?: string;
+      errorlist?: { fieldnotfound?: ReadonlyArray<string> };
     };
   };
 
@@ -68,5 +73,8 @@ export function parseESearchJson(raw: string): ESearchResult {
     queryTranslation: esearchResult.querytranslation ?? '',
     ...(webEnv ? { webEnv } : {}),
     ...(queryKeyStr ? { queryKey: Number(queryKeyStr) } : {}),
+    ...(esearchResult.errorlist?.fieldnotfound?.length
+      ? { errorList: esearchResult.errorlist.fieldnotfound }
+      : {}),
   };
 }
