@@ -27,7 +27,9 @@
     "@ncbijs/dbvar": "workspace:*",
     "@ncbijs/sra": "workspace:*",
     "@ncbijs/structure": "workspace:*",
-    "@ncbijs/cdd": "workspace:*"
+    "@ncbijs/cdd": "workspace:*",
+    "@ncbijs/books": "workspace:*",
+    "@ncbijs/nlm-catalog": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.19.0"

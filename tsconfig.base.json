@@ -51,7 +51,9 @@
       "@ncbijs/dbvar": ["./packages/dbvar/src/index.ts"],
       "@ncbijs/sra": ["./packages/sra/src/index.ts"],
       "@ncbijs/structure": ["./packages/structure/src/index.ts"],
-      "@ncbijs/cdd": ["./packages/cdd/src/index.ts"]
+      "@ncbijs/cdd": ["./packages/cdd/src/index.ts"],
+      "@ncbijs/books": ["./packages/books/src/index.ts"],
+      "@ncbijs/nlm-catalog": ["./packages/nlm-catalog/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "dist"]

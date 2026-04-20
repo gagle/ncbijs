@@ -37,7 +37,9 @@
         "@ncbijs/dbvar",
         "@ncbijs/sra",
         "@ncbijs/structure",
-        "@ncbijs/cdd"
+        "@ncbijs/cdd",
+        "@ncbijs/books",
+        "@ncbijs/nlm-catalog"
       ]
     },
     {
@@ -216,6 +218,18 @@
     "packages/cdd": {
       "release-type": "node",
       "component": "@ncbijs/cdd",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/books": {
+      "release-type": "node",
+      "component": "@ncbijs/books",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/nlm-catalog": {
+      "release-type": "node",
+      "component": "@ncbijs/nlm-catalog",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true
     }

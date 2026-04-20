@@ -34,6 +34,8 @@ export default {
         'sra',
         'structure',
         'cdd',
+        'books',
+        'nlm-catalog',
         'workspace',
       ],
     ],
