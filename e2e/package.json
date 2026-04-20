@@ -1,0 +1,19 @@
+{
+  "name": "ncbijs-e2e",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@ncbijs/cite": "workspace:*",
+    "@ncbijs/eutils": "workspace:*",
+    "@ncbijs/id-converter": "workspace:*",
+    "@ncbijs/jats": "workspace:*",
+    "@ncbijs/mesh": "workspace:*",
+    "@ncbijs/pmc": "workspace:*",
+    "@ncbijs/pubmed": "workspace:*",
+    "@ncbijs/pubmed-xml": "workspace:*",
+    "@ncbijs/pubtator": "workspace:*",
+    "@ncbijs/rate-limiter": "workspace:*",
+    "@ncbijs/xml": "workspace:*"
+  }
+}

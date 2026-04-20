@@ -1,16 +1,91 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { PMC, pmcToChunks, pmcToMarkdown, pmcToPlainText } from '@ncbijs/pmc';
+import type { FullTextArticle } from '@ncbijs/pmc';
 
 describe('PMC E2E', () => {
+  const pmc = new PMC({
+    tool: 'ncbijs-e2e',
+    email: 'ncbijs-e2e@test.com',
+    apiKey: process.env['NCBI_API_KEY'],
+  });
+
+  let article: FullTextArticle;
+
+  it('fetches the article for subsequent tests', async () => {
+    article = await pmc.fetch('PMC3531190');
+  });
+
   describe('fetch full text', () => {
-    it('should fetch a known open-access article by PMCID', () => {});
-    it('should return FullTextArticle with front, body, back', () => {});
-    it('should convert to markdown', () => {});
-    it('should convert to plain text', () => {});
-    it('should convert to chunks', () => {});
+    it('should fetch a known open-access article by PMCID', () => {
+      expect(article).toBeDefined();
+      expect(article.pmcid).toBe('PMC3531190');
+    });
+
+    it('should return FullTextArticle with front, body, back', () => {
+      expect(article.front).toBeDefined();
+      expect(article.body).toBeDefined();
+      expect(article.back).toBeDefined();
+
+      expect(article.front.article).toBeDefined();
+      expect(article.front.article.title).toBeDefined();
+      expect(article.front.article.title.length).toBeGreaterThan(0);
+      expect(article.front.article.authors).toBeInstanceOf(Array);
+      expect(article.front.article.authors.length).toBeGreaterThan(0);
+
+      expect(article.body).toBeInstanceOf(Array);
+      expect(article.body.length).toBeGreaterThan(0);
+    });
+
+    it('should convert to markdown', () => {
+      const markdown = pmcToMarkdown(article);
+
+      expect(markdown).toBeDefined();
+      expect(markdown.length).toBeGreaterThan(0);
+      expect(typeof markdown).toBe('string');
+    });
+
+    it('should convert to plain text', () => {
+      const plainText = pmcToPlainText(article);
+
+      expect(plainText).toBeDefined();
+      expect(plainText.length).toBeGreaterThan(0);
+      expect(typeof plainText).toBe('string');
+    });
+
+    it('should convert to chunks', () => {
+      const chunks = pmcToChunks(article);
+
+      expect(chunks).toBeInstanceOf(Array);
+      expect(chunks.length).toBeGreaterThan(0);
+
+      const firstChunk = chunks[0]!;
+      expect(firstChunk.text).toBeDefined();
+      expect(firstChunk.text.length).toBeGreaterThan(0);
+      expect(firstChunk.section).toBeDefined();
+      expect(typeof firstChunk.tokenCount).toBe('number');
+    });
   });
 
   describe('OA Service', () => {
-    it('should look up a known OA article', () => {});
-    it('should return download links', () => {});
+    it('should look up a known OA article', async () => {
+      const record = await pmc.oa.lookup('PMC3531190');
+
+      expect(record).toBeDefined();
+      expect(record.pmcid).toBe('PMC3531190');
+      expect(record.links).toBeDefined();
+      expect(record.links).toBeInstanceOf(Array);
+    });
+
+    it('should return download links', async () => {
+      const record = await pmc.oa.lookup('PMC3531190');
+
+      expect(record.links.length).toBeGreaterThan(0);
+
+      const firstLink = record.links[0]!;
+      expect(firstLink.format).toBeDefined();
+      expect(['tgz', 'pdf']).toContain(firstLink.format);
+      expect(firstLink.href).toBeDefined();
+      expect(firstLink.href.length).toBeGreaterThan(0);
+    });
   });
 });
