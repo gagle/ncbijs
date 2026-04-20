@@ -1,0 +1,154 @@
+# CLAUDE.md
+
+## Commands
+
+```bash
+pnpm build                # Build all packages (topological order via Nx)
+pnpm test                 # Test all packages (Vitest with coverage)
+pnpm lint                 # Lint all packages (ESLint flat config)
+pnpm typecheck            # Type-check all packages
+
+# Single package
+pnpm nx run @ncbijs/eutils:build
+pnpm nx run @ncbijs/eutils:test
+pnpm nx run @ncbijs/eutils:lint
+pnpm nx run @ncbijs/eutils:typecheck
+
+# E2E (requires NCBI_API_KEY env var)
+pnpm nx run ncbijs-e2e:e2e
+```
+
+## Architecture
+
+- **Monorepo**: Nx 22 + pnpm 10.15 workspaces
+- **Language**: TypeScript 6, ES2022 target, `strict: true`
+- **Module**: ESM-only (`"type": "module"`), `.js` extensions in relative imports
+- **Build**: `tsc` directly (no bundler), outputs to `{package}/dist`
+- **Zero-dep philosophy**: 8/10 packages have zero runtime dependencies. The 2 that do (`pubmed`, `pmc`) depend only on internal `@ncbijs/*` packages. `eutils` depends on `rate-limiter` + `openapi-fetch`.
+
+### Package dependency graph
+
+```
+xml ──────────────┬─ pubmed-xml ──┐
+                  ├─ jats ────────┤
+rate-limiter ─────┤               │
+                  ├─ eutils ──┬─ pubmed (+ pubmed-xml)
+                  │           └─ pmc (+ jats)
+                  └─ pubtator
+id-converter, mesh, cite  (all zero-dep, independent)
+```
+
+### Build order (Nx topological)
+
+1. Zero-dep parallel: `rate-limiter`, `xml`, `id-converter`, `mesh`, `cite`
+2. `eutils` (after `rate-limiter` + `xml`), `pubmed-xml` (after `xml`), `jats` (after `xml`), `pubtator` (after `xml`)
+3. `pubmed` (after `eutils` + `pubmed-xml`), `pmc` (after `eutils` + `jats`)
+
+## Rules and Skills
+
+This repo includes `.claude/` configuration that Claude reads automatically:
+
+- **`.claude/rules/typescript.md`** -- TypeScript coding conventions (naming, types, imports, formatting)
+- **`.claude/skills/testing/`** -- Testing conventions with 18 enforced rules
+- **`.claude/skills/review/`** -- Code review process and evaluation criteria
+- **`.claude/skills/explore-codebase.md`** -- Knowledge graph navigation
+- **`.claude/skills/review-changes.md`** -- Risk-aware change review
+- **`.claude/skills/debug-issue.md`** -- Systematic debugging
+- **`.claude/skills/refactor-safely.md`** -- Safe refactoring with dependency analysis
+
+See `CONTRIBUTING.md` for the contribution policy.
+
+## Conventions
+
+### Imports
+
+```ts
+import { EUtils } from '@ncbijs/eutils'; // path alias (no .js)
+import { helper } from './helpers/my-helper.js'; // relative requires .js
+import type { Config } from './interfaces/x.js'; // type imports separated
+```
+
+### Types
+
+- All interfaces live in `src/interfaces/{feature}.interface.ts`
+- All properties are `readonly`
+- Use generic `Array<T>` syntax, not `T[]` (ESLint enforced)
+- Separate `import type` from value imports (ESLint enforced)
+- No `any` (ESLint enforced)
+- Unused vars must be prefixed with `_`
+
+### File structure (per package)
+
+```
+packages/{name}/
+  src/
+    index.ts                        # Re-exports public API
+    interfaces/{feature}.interface.ts
+    {feature}.ts
+    {feature}.spec.ts               # Co-located tests
+  package.json, project.json, tsconfig.json, tsconfig.build.json
+  vitest.config.ts, eslint.config.mjs
+```
+
+### Testing
+
+- **Framework**: Vitest 4 with `globals: true`, v8 coverage
+- **Target**: 100% coverage (statements, branches, functions, lines)
+- **Mocking**: `vi.stubGlobal('fetch', ...)` + `afterEach(() => vi.unstubAllGlobals())`
+- **Fixtures**: Small inline XML strings; large in `__fixtures__/` directory
+
+### Formatting
+
+- Prettier: 100 width, single quotes, trailing commas, 2-space indent, LF
+- Commit: `{type}({scope}): {subject}` (conventional commits via commitlint)
+- Scopes: `eutils`, `pubmed-xml`, `pubmed`, `jats`, `pmc`, `id-converter`, `pubtator`, `mesh`, `cite`, `rate-limiter`, `xml`, `workspace`
+
+### Adding a new package
+
+1. Create `packages/{name}/` with `src/`, `package.json`, `project.json`, tsconfigs, vitest, eslint
+2. Add path alias to `tsconfig.base.json`
+3. Add to `release-please-config.json` packages + linked-versions components
+4. Add scope to `commitlint.config.ts`
+5. Run `pnpm install`
+
+## Verification
+
+After ANY code change, run lint, build, and test before marking work complete:
+
+```bash
+pnpm lint && pnpm build && pnpm test
+```
+
+### Self-review loop
+
+After implementation is complete, run the following skills in sequence. Loop until both produce no issues or improvements:
+
+1. `/agent-skills:review` -- five-axis code review (correctness, readability, architecture, security, performance)
+2. `/agent-skills:code-simplify` -- simplify code for clarity without changing behavior
+
+If either skill finds issues, fix them, re-run `pnpm lint && pnpm build && pnpm test`, then repeat the loop.
+
+## MCP Tools: code-review-graph
+
+**IMPORTANT: This project has a knowledge graph. ALWAYS use the code-review-graph MCP tools BEFORE using Grep/Glob/Read to explore the codebase.** The graph is faster, cheaper (fewer tokens), and gives you structural context (callers, dependents, test coverage) that file scanning cannot.
+
+### When to use graph tools FIRST
+
+- **Exploring code**: `semantic_search_nodes` or `query_graph` instead of Grep
+- **Understanding impact**: `get_impact_radius` instead of manually tracing imports
+- **Code review**: `detect_changes` + `get_review_context` instead of reading entire files
+- **Finding relationships**: `query_graph` with callers_of/callees_of/imports_of/tests_for
+- **Architecture questions**: `get_architecture_overview` + `list_communities`
+
+Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
+
+| Tool                        | Use when                                               |
+| --------------------------- | ------------------------------------------------------ |
+| `detect_changes`            | Reviewing code changes -- gives risk-scored analysis   |
+| `get_review_context`        | Need source snippets for review -- token-efficient     |
+| `get_impact_radius`         | Understanding blast radius of a change                 |
+| `get_affected_flows`        | Finding which execution paths are impacted             |
+| `query_graph`               | Tracing callers, callees, imports, tests, dependencies |
+| `semantic_search_nodes`     | Finding functions/classes by name or keyword           |
+| `get_architecture_overview` | Understanding high-level codebase structure            |
+| `refactor_tool`             | Planning renames, finding dead code                    |
