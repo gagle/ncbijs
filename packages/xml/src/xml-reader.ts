@@ -1,3 +1,10 @@
+/**
+ * Regex-based XML reader for extracting tags, blocks, and attributes from
+ * NCBI XML responses. Handles nested same-name tags, entity decoding,
+ * self-closing elements, and namespaced attributes without external
+ * dependencies.
+ */
+
 const XML_TAG_NAME_REGEX = /^[a-zA-Z_][\w.-]*$/;
 
 function assertTagName(tagName: string): void {
@@ -27,6 +34,7 @@ export function readAllTags(xml: string, tagName: string): ReadonlyArray<string>
 }
 
 export function readBlock(xml: string, tagName: string): string | undefined {
+  assertTagName(tagName);
   return readBlockAt(xml, tagName, 0)?.[0];
 }
 
@@ -98,20 +106,6 @@ export interface BlockWithAttributes {
   readonly attributes: Readonly<Record<string, string>>;
 }
 
-function parseAttributesFromTag(openingTag: string): Record<string, string> {
-  const attributeMap: Record<string, string> = {};
-  const attributeRegex = /([\w.-]+)="([^"]*)"/g;
-  let attributeMatch: RegExpExecArray | null;
-  while ((attributeMatch = attributeRegex.exec(openingTag)) !== null) {
-    const name = attributeMatch[1];
-    const value = attributeMatch[2];
-    if (name !== undefined && value !== undefined) {
-      attributeMap[name] = decodeEntities(value);
-    }
-  }
-  return attributeMap;
-}
-
 export function readTagWithAttributes(xml: string, tagName: string): TagWithAttributes | null {
   assertTagName(tagName);
   const regex = new RegExp(`<${tagName}(\\s[^>]*)?>([^<]*)</${tagName}>`);
@@ -167,6 +161,33 @@ export function readAllBlocksWithAttributes(
   return results;
 }
 
+export function removeAllBlocks(xml: string, tagName: string): string {
+  assertTagName(tagName);
+  let result = xml;
+
+  for (;;) {
+    const openRegex = new RegExp(`<${tagName}(?:\\s[^>]*)?>`, 'g');
+    const openMatch = openRegex.exec(result);
+    if (!openMatch) {
+      break;
+    }
+
+    if (openMatch[0].endsWith('/>')) {
+      result =
+        result.slice(0, openMatch.index) + result.slice(openMatch.index + openMatch[0].length);
+      continue;
+    }
+
+    const closeEnd = findCloseTag(result, tagName, openMatch.index + openMatch[0].length)?.[1];
+    if (closeEnd === undefined) {
+      break;
+    }
+    result = result.slice(0, openMatch.index) + result.slice(closeEnd);
+  }
+
+  return result;
+}
+
 function readBlockAt(xml: string, tagName: string, offset: number): [string, number] | undefined {
   const result = readBlockWithAttributesAt(xml, tagName, offset);
   if (!result) {
@@ -195,22 +216,45 @@ function readBlockWithAttributesAt(
     return ['', attributeMap, contentStart];
   }
 
+  const closeResult = findCloseTag(xml, tagName, contentStart);
+  if (!closeResult) {
+    return undefined;
+  }
+  return [xml.slice(contentStart, closeResult[0]), attributeMap, closeResult[1]];
+}
+
+function findCloseTag(
+  xml: string,
+  tagName: string,
+  startIndex: number,
+): [closeStart: number, closeEnd: number] | undefined {
   const tagRegex = new RegExp(`<(/?)${tagName}(?:\\s[^>]*)?>`, 'g');
-  tagRegex.lastIndex = contentStart;
+  tagRegex.lastIndex = startIndex;
   let depth = 1;
   let tagMatch: RegExpExecArray | null;
 
   while ((tagMatch = tagRegex.exec(xml)) !== null) {
     if (tagMatch[1] === '/') {
-      depth -= 1;
+      depth--;
       if (depth === 0) {
-        const endOffset = tagMatch.index + tagMatch[0].length;
-        return [xml.slice(contentStart, tagMatch.index), attributeMap, endOffset];
+        return [tagMatch.index, tagMatch.index + tagMatch[0].length];
       }
     } else if (!tagMatch[0].endsWith('/>')) {
-      depth += 1;
+      depth++;
     }
   }
 
   return undefined;
+}
+
+function parseAttributesFromTag(attributeString: string): Record<string, string> {
+  const attributes: Record<string, string> = {};
+  const regex = /([\w:.-]+)="([^"]*)"/g;
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(attributeString)) !== null) {
+    if (match[1] !== undefined && match[2] !== undefined) {
+      attributes[match[1]] = decodeEntities(match[2]);
+    }
+  }
+  return attributes;
 }

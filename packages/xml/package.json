@@ -1,26 +1,26 @@
 {
-  "name": "@ncbijs/pmc",
+  "name": "@ncbijs/xml",
   "version": "0.0.1",
-  "description": "PMC full-text article retrieval via E-utilities, OA Service, and OAI-PMH",
+  "description": "Zero-dependency regex-based XML reader for NCBI document formats",
   "author": "Gabriel Llamas",
   "license": "MIT",
   "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/gagle/ncbijs.git",
-    "directory": "packages/pmc"
+    "directory": "packages/xml"
   },
-  "homepage": "https://github.com/gagle/ncbijs/tree/main/packages/pmc#readme",
+  "homepage": "https://github.com/gagle/ncbijs/tree/main/packages/xml#readme",
   "bugs": {
     "url": "https://github.com/gagle/ncbijs/issues"
   },
   "keywords": [
+    "xml",
+    "xml-reader",
+    "xml-parser",
     "ncbi",
-    "pmc",
-    "pubmed-central",
-    "full-text",
-    "oa",
-    "oai-pmh",
+    "regex",
+    "zero-dependency",
     "typescript"
   ],
   "engines": {
@@ -42,12 +42,8 @@
   "files": [
     "dist",
     "package.json",
+    "README.md",
     "LICENSE",
     "CHANGELOG.md"
-  ],
-  "dependencies": {
-    "@ncbijs/eutils": "workspace:*",
-    "@ncbijs/jats": "workspace:*",
-    "@ncbijs/xml": "workspace:*"
-  }
+  ]
 }

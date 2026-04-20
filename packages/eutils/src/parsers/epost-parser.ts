@@ -1,5 +1,5 @@
 import type { EPostResult } from '../types/responses';
-import { readTag } from '../xml-reader';
+import { readTag } from '@ncbijs/xml';
 
 export function parseEPostXml(xml: string): EPostResult {
   const webEnv = readTag(xml, 'WebEnv');

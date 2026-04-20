@@ -1,5 +1,5 @@
 import type { ESearchResult, Translation } from '../types/responses';
-import { readAllBlocks, readAllTags, readTag } from '../xml-reader';
+import { readAllBlocks, readAllTags, readTag } from '@ncbijs/xml';
 
 export function parseESearchXml(xml: string): ESearchResult {
   const count = Number(readTag(xml, 'Count') ?? '0');

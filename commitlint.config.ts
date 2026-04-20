@@ -15,6 +15,7 @@ export default {
         'mesh',
         'cite',
         'rate-limiter',
+        'xml',
         'workspace',
       ],
     ],

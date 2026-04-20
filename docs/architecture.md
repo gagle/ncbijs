@@ -5,14 +5,15 @@
 ```
 ncbijs/
 ├── packages/
+│   ├── xml/             Zero-dep, shared regex-based XML reader
 │   ├── rate-limiter/    Zero-dep, token bucket rate limiter
-│   ├── eutils/          E-utilities HTTP client (depends on rate-limiter)
-│   ├── pubmed-xml/      Zero-dep, PubMed XML/MEDLINE parser
+│   ├── eutils/          E-utilities HTTP client (depends on rate-limiter, xml)
+│   ├── pubmed-xml/      PubMed XML/MEDLINE parser (depends on xml)
 │   ├── pubmed/          Depends on eutils + pubmed-xml
-│   ├── jats/            Zero-dep, JATS XML full-text parser
-│   ├── pmc/             Depends on eutils + jats
+│   ├── jats/            JATS XML full-text parser (depends on xml)
+│   ├── pmc/             Depends on eutils + jats + xml
 │   ├── id-converter/    Zero-dep, PMID/PMCID/DOI converter
-│   ├── pubtator/        Zero-dep, text mining + BioC
+│   ├── pubtator/        Text mining + BioC (depends on xml)
 │   ├── mesh/            Zero-dep, ships ~2MB MeSH tree
 │   └── cite/            Zero-dep, citation formatting
 ├── e2e/                 Integration tests against real NCBI APIs
@@ -48,18 +49,17 @@ All packages are ESM-only because:
 
 Nx `dependsOn: ["^build"]` in `nx.json` handles topological ordering:
 
-1. `rate-limiter`, `pubmed-xml`, `jats`, `id-converter`, `pubtator`, `mesh`, `cite` (parallel, zero-dep)
-2. `eutils` (after rate-limiter)
-3. `pubmed` (after eutils + pubmed-xml)
-4. `pmc` (after eutils + jats)
+1. `rate-limiter`, `xml`, `id-converter`, `mesh`, `cite` (parallel, zero-dep)
+2. `eutils` (after rate-limiter + xml), `pubmed-xml` (after xml), `jats` (after xml), `pubtator` (after xml)
+3. `pubmed` (after eutils + pubmed-xml), `pmc` (after eutils + jats)
 
 ## Zero-Dep Philosophy
 
-8 of 10 packages have zero runtime dependencies. The remaining 2 (`pubmed`, `pmc`) depend only on internal `@ncbijs/*` packages. `eutils` depends on `rate-limiter`. No external deps at all.
+No external runtime dependencies except `openapi-fetch` in `eutils`. All other dependencies are internal `@ncbijs/*` packages. 5 packages (`xml`, `rate-limiter`, `id-converter`, `mesh`, `cite`) have zero dependencies.
 
 - HTTP: native `fetch`
 - Streaming: `ReadableStream` / `AsyncIterableIterator`
-- XML parsing: custom SAX-style parser (no dependencies)
+- XML parsing: `@ncbijs/xml` (shared regex-based reader)
 - Rate limiting: `@ncbijs/rate-limiter` (token bucket)
 - Retry: custom exponential backoff
 

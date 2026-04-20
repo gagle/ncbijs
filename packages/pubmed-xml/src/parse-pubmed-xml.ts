@@ -13,7 +13,7 @@ import {
   extractPublicationTypes,
   parseDateBlock,
 } from './article-field-parsers';
-import { decodeEntities, readAllBlocks, readBlock, readTag, stripTags } from './xml-reader';
+import { decodeEntities, readAllBlocks, readBlock, readTag, stripTags } from '@ncbijs/xml';
 
 export function parsePubmedXml(xml: string): ReadonlyArray<PubmedArticle> {
   const articleBlocks = readAllBlocks(xml, 'PubmedArticle');

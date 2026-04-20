@@ -1,5 +1,5 @@
 import type { EGQueryResult, EGQueryResultItem } from '../types/responses';
-import { readAllBlocks, readTag } from '../xml-reader';
+import { readAllBlocks, readTag } from '@ncbijs/xml';
 
 export function parseEGQueryXml(xml: string): EGQueryResult {
   const term = readTag(xml, 'Term') ?? '';

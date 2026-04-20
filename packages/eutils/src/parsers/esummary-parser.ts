@@ -1,5 +1,5 @@
 import type { DocSum, ESummaryResult } from '../types/responses';
-import { readAllBlocks, readTag, stripTags } from '../xml-reader';
+import { readAllBlocks, readTag, stripTags } from '@ncbijs/xml';
 
 export function parseESummaryXml(xml: string): ESummaryResult {
   const itemRegex = /<Item\s+Name="([^"]*)"\s+Type="([^"]*)">([\s\S]*?)<\/Item>/g;

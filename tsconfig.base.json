@@ -31,7 +31,8 @@
       "@ncbijs/pubtator": ["./packages/pubtator/src/index.ts"],
       "@ncbijs/mesh": ["./packages/mesh/src/index.ts"],
       "@ncbijs/cite": ["./packages/cite/src/index.ts"],
-      "@ncbijs/rate-limiter": ["./packages/rate-limiter/src/index.ts"]
+      "@ncbijs/rate-limiter": ["./packages/rate-limiter/src/index.ts"],
+      "@ncbijs/xml": ["./packages/xml/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "dist"]

@@ -6,7 +6,7 @@ import type {
   LinkSet,
   LinkSetDb,
 } from '../types/responses';
-import { readAllBlocks, readAllTags, readBlock, readTag } from '../xml-reader';
+import { readAllBlocks, readAllTags, readBlock, readTag } from '@ncbijs/xml';
 
 export function parseELinkXml(xml: string): ELinkResult {
   const linkSetBlocks = readAllBlocks(xml, 'LinkSet');

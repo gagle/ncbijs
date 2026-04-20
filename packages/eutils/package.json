@@ -40,6 +40,7 @@
   "prepublishOnly": "echo 'Use CI to publish' && exit 1",
   "dependencies": {
     "@ncbijs/rate-limiter": "workspace:*",
+    "@ncbijs/xml": "workspace:*",
     "openapi-fetch": "^0.17.0"
   },
   "sideEffects": false,

@@ -8,5 +8,6 @@
   "packages/pubtator": "0.0.1",
   "packages/mesh": "0.0.1",
   "packages/cite": "0.0.1",
-  "packages/rate-limiter": "0.0.1"
+  "packages/rate-limiter": "0.0.1",
+  "packages/xml": "0.0.1"
 }

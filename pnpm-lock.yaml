@@ -64,13 +64,20 @@ importers:
       '@ncbijs/rate-limiter':
         specifier: workspace:*
         version: link:../rate-limiter
+      '@ncbijs/xml':
+        specifier: workspace:*
+        version: link:../xml
       openapi-fetch:
         specifier: ^0.17.0
         version: 0.17.0
 
   packages/id-converter: {}
 
-  packages/jats: {}
+  packages/jats:
+    dependencies:
+      '@ncbijs/xml':
+        specifier: workspace:*
+        version: link:../xml
 
   packages/mesh: {}
 
@@ -82,6 +89,9 @@ importers:
       '@ncbijs/jats':
         specifier: workspace:*
         version: link:../jats
+      '@ncbijs/xml':
+        specifier: workspace:*
+        version: link:../xml
 
   packages/pubmed:
     dependencies:
@@ -92,11 +102,21 @@ importers:
         specifier: workspace:*
         version: link:../pubmed-xml
 
-  packages/pubmed-xml: {}
+  packages/pubmed-xml:
+    dependencies:
+      '@ncbijs/xml':
+        specifier: workspace:*
+        version: link:../xml
 
-  packages/pubtator: {}
+  packages/pubtator:
+    dependencies:
+      '@ncbijs/xml':
+        specifier: workspace:*
+        version: link:../xml
 
   packages/rate-limiter: {}
+
+  packages/xml: {}
 
 packages:
 

@@ -1,5 +1,5 @@
 import type { DbInfo, EInfoResult, FieldInfo, LinkInfo } from '../types/responses';
-import { readAllBlocks, readAllTags, readBlock, readTag } from '../xml-reader';
+import { readAllBlocks, readAllTags, readBlock, readTag } from '@ncbijs/xml';
 
 export function parseEInfoXml(xml: string): EInfoResult {
   const dbListBlock = readBlock(xml, 'DbList');

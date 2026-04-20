@@ -1,5 +1,5 @@
 import type { ESpellResult } from '../types/responses';
-import { readBlock, readTag, stripTags } from '../xml-reader';
+import { readBlock, readTag, stripTags } from '@ncbijs/xml';
 
 export function parseESpellXml(xml: string): ESpellResult {
   const query = readTag(xml, 'Query') ?? '';

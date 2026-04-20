@@ -18,7 +18,7 @@ import {
   readBlock,
   readTag,
   removeAllBlocks,
-} from './xml-reader';
+} from '@ncbijs/xml';
 
 export function parseJATS(xml: string): JATSArticle {
   if (!xml.trim()) {

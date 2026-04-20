@@ -22,7 +22,7 @@ import {
   readTag,
   readTagWithAttributes,
   stripTags,
-} from './xml-reader';
+} from '@ncbijs/xml';
 
 const MONTH_NAMES: Readonly<Record<string, number>> = {
   jan: 1,

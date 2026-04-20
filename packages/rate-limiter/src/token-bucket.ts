@@ -230,9 +230,9 @@ export class TokenBucket {
   }
 
   private drainQueue(): void {
-    while (this.queue.length > 0) {
-      const entry = this.queue[0]!;
-      if (this.tokens < entry.cost) {
+    for (;;) {
+      const entry = this.queue[0];
+      if (!entry || this.tokens < entry.cost) {
         break;
       }
 

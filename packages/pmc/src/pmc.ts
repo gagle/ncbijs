@@ -17,7 +17,7 @@ import {
   readAttribute,
   readBlock,
   readTag,
-} from './xml-reader';
+} from '@ncbijs/xml';
 
 const OA_BASE_URL = 'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi';
 const OAI_BASE_URL = 'https://www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi';

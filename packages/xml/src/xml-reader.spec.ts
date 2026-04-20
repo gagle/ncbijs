@@ -3,10 +3,14 @@ import { describe, expect, it } from 'vitest';
 import {
   decodeEntities,
   readAllBlocks,
+  readAllBlocksWithAttributes,
   readAllTags,
+  readAllTagsWithAttributes,
   readAttribute,
   readBlock,
   readTag,
+  readTagWithAttributes,
+  removeAllBlocks,
   stripTags,
 } from './xml-reader';
 
@@ -207,6 +211,10 @@ describe('readBlock', () => {
     expect(readBlock('<B>unclosed', 'B')).toBeUndefined();
   });
 
+  it('should throw on invalid tag name', () => {
+    expect(() => readBlock('<x>1</x>', '"><script')).toThrow('Invalid XML tag name');
+  });
+
   it('should handle self-closing tags inside a block without affecting depth', () => {
     const xml = '<Parent><Self /><Child>text</Child></Parent>';
     expect(readBlock(xml, 'Parent')).toBe('<Self /><Child>text</Child>');
@@ -311,6 +319,11 @@ describe('readAllBlocks', () => {
     expect(result[1]).toBe('content');
     expect(result[2]).toBe('');
   });
+
+  it('should extract Grant blocks', () => {
+    const xml = '<Grant><GrantID>1</GrantID></Grant><Grant><GrantID>2</GrantID></Grant>';
+    expect(readAllBlocks(xml, 'Grant')).toEqual(['<GrantID>1</GrantID>', '<GrantID>2</GrantID>']);
+  });
 });
 
 describe('readAttribute', () => {
@@ -354,6 +367,11 @@ describe('readAttribute', () => {
     expect(readAttribute(xml, 'Item', 'Name')).toBe('PubDate');
     expect(readAttribute(xml, 'Item', 'Type')).toBe('Date');
   });
+
+  it('should not match when attribute name is a suffix of another attribute', () => {
+    const xml = '<Tag FooType="wrong" Type="right">text</Tag>';
+    expect(readAttribute(xml, 'Tag', 'Type')).toBe('right');
+  });
 });
 
 describe('decodeEntities', () => {
@@ -381,16 +399,22 @@ describe('decodeEntities', () => {
     expect(decodeEntities('it&apos;s')).toBe("it's");
   });
 
+  it('should decode all named entities in one string', () => {
+    expect(decodeEntities('&amp;&lt;&gt;&quot;&apos;')).toBe('&<>"\'');
+  });
+
   it('should decode decimal numeric entities', () => {
     expect(decodeEntities('&#60;')).toBe('<');
     expect(decodeEntities('&#62;')).toBe('>');
     expect(decodeEntities('&#38;')).toBe('&');
+    expect(decodeEntities('&#65;')).toBe('A');
   });
 
   it('should decode hex numeric entities', () => {
     expect(decodeEntities('&#x3C;')).toBe('<');
     expect(decodeEntities('&#x3E;')).toBe('>');
     expect(decodeEntities('&#x26;')).toBe('&');
+    expect(decodeEntities('&#x41;')).toBe('A');
   });
 
   it('should decode mixed entities in one string', () => {
@@ -480,6 +504,204 @@ describe('stripTags', () => {
   it('should handle multiple tags in sequence', () => {
     expect(stripTags('<a>1</a><b>2</b><c>3</c>')).toBe('123');
   });
+
+  it('should handle self-closing tags without space', () => {
+    expect(stripTags('text<br/>more')).toBe('textmore');
+  });
+});
+
+describe('readTagWithAttributes', () => {
+  it('should extract text and attributes from a leaf element', () => {
+    const xml = '<DescriptorName UI="D001249" MajorTopicYN="N">Asthma</DescriptorName>';
+    const result = readTagWithAttributes(xml, 'DescriptorName');
+    expect(result).toEqual({
+      text: 'Asthma',
+      attributes: { UI: 'D001249', MajorTopicYN: 'N' },
+    });
+  });
+
+  it('should return null when tag is absent', () => {
+    expect(readTagWithAttributes('<Foo>bar</Foo>', 'Baz')).toBeNull();
+  });
+
+  it('should return empty attributes when tag has none', () => {
+    const result = readTagWithAttributes('<Year>2024</Year>', 'Year');
+    expect(result).toEqual({ text: '2024', attributes: {} });
+  });
+
+  it('should decode entities in attribute values', () => {
+    const xml = '<Tag Attr="A &amp; B">text</Tag>';
+    const result = readTagWithAttributes(xml, 'Tag');
+    expect(result?.attributes['Attr']).toBe('A & B');
+  });
+
+  it('should extract ArticleId with IdType', () => {
+    const xml = '<ArticleId IdType="doi">10.1000/example</ArticleId>';
+    const result = readTagWithAttributes(xml, 'ArticleId');
+    expect(result).toEqual({
+      text: '10.1000/example',
+      attributes: { IdType: 'doi' },
+    });
+  });
+
+  it('should extract AbstractText with Label and NlmCategory', () => {
+    const xml =
+      '<AbstractText Label="METHODS" NlmCategory="METHODS">Method details.</AbstractText>';
+    const result = readTagWithAttributes(xml, 'AbstractText');
+    expect(result).toEqual({
+      text: 'Method details.',
+      attributes: { Label: 'METHODS', NlmCategory: 'METHODS' },
+    });
+  });
+
+  it('should handle namespaced attributes', () => {
+    const xml = '<link xlink:href="http://example.com" xlink:type="simple">text</link>';
+    const result = readTagWithAttributes(xml, 'link');
+    expect(result?.attributes['xlink:href']).toBe('http://example.com');
+    expect(result?.attributes['xlink:type']).toBe('simple');
+  });
+});
+
+describe('readAllTagsWithAttributes', () => {
+  it('should extract all leaf elements with attributes', () => {
+    const xml =
+      '<ArticleId IdType="pubmed">123</ArticleId>' +
+      '<ArticleId IdType="doi">10.1/x</ArticleId>' +
+      '<ArticleId IdType="pmc">PMC456</ArticleId>';
+    const results = readAllTagsWithAttributes(xml, 'ArticleId');
+    expect(results).toEqual([
+      { text: '123', attributes: { IdType: 'pubmed' } },
+      { text: '10.1/x', attributes: { IdType: 'doi' } },
+      { text: 'PMC456', attributes: { IdType: 'pmc' } },
+    ]);
+  });
+
+  it('should return empty array when no matches', () => {
+    expect(readAllTagsWithAttributes('<Foo>bar</Foo>', 'Baz')).toEqual([]);
+  });
+
+  it('should extract Keyword elements with MajorTopicYN', () => {
+    const xml =
+      '<Keyword MajorTopicYN="N">cytokines</Keyword>' +
+      '<Keyword MajorTopicYN="Y">interleukins</Keyword>';
+    const results = readAllTagsWithAttributes(xml, 'Keyword');
+    expect(results).toEqual([
+      { text: 'cytokines', attributes: { MajorTopicYN: 'N' } },
+      { text: 'interleukins', attributes: { MajorTopicYN: 'Y' } },
+    ]);
+  });
+
+  it('should extract QualifierName elements', () => {
+    const xml =
+      '<QualifierName UI="Q000188" MajorTopicYN="Y">drug therapy</QualifierName>' +
+      '<QualifierName UI="Q000503" MajorTopicYN="N">physiopathology</QualifierName>';
+    const results = readAllTagsWithAttributes(xml, 'QualifierName');
+    expect(results).toHaveLength(2);
+    expect(results[0]).toEqual({
+      text: 'drug therapy',
+      attributes: { UI: 'Q000188', MajorTopicYN: 'Y' },
+    });
+  });
+});
+
+describe('readAllBlocksWithAttributes', () => {
+  it('should extract nested blocks with opening-tag attributes', () => {
+    const xml =
+      '<KeywordList Owner="NLM">' +
+      '<Keyword MajorTopicYN="N">term1</Keyword>' +
+      '</KeywordList>' +
+      '<KeywordList Owner="NOTNLM">' +
+      '<Keyword MajorTopicYN="Y">term2</Keyword>' +
+      '</KeywordList>';
+    const results = readAllBlocksWithAttributes(xml, 'KeywordList');
+    expect(results).toHaveLength(2);
+    expect(results[0]?.attributes).toEqual({ Owner: 'NLM' });
+    expect(results[0]?.content).toContain('term1');
+    expect(results[1]?.attributes).toEqual({ Owner: 'NOTNLM' });
+    expect(results[1]?.content).toContain('term2');
+  });
+
+  it('should return empty array when no matches', () => {
+    expect(readAllBlocksWithAttributes('<Foo>bar</Foo>', 'Baz')).toEqual([]);
+  });
+
+  it('should extract CommentsCorrections with RefType', () => {
+    const xml =
+      '<CommentsCorrections RefType="ErratumIn">' +
+      '<RefSource>J Example. 2024;10:100</RefSource>' +
+      '<PMID>99999</PMID>' +
+      '</CommentsCorrections>';
+    const results = readAllBlocksWithAttributes(xml, 'CommentsCorrections');
+    expect(results).toHaveLength(1);
+    expect(results[0]?.attributes).toEqual({ RefType: 'ErratumIn' });
+    expect(results[0]?.content).toContain('<RefSource>');
+    expect(results[0]?.content).toContain('<PMID>');
+  });
+
+  it('should handle self-closing blocks', () => {
+    const xml = '<Empty Attr="val" />';
+    const results = readAllBlocksWithAttributes(xml, 'Empty');
+    expect(results).toEqual([{ content: '', attributes: { Attr: 'val' } }]);
+  });
+
+  it('should handle namespaced attributes on blocks', () => {
+    const xml = '<ext-link xlink:href="http://doi.org/10.1" xlink:type="simple">DOI</ext-link>';
+    const results = readAllBlocksWithAttributes(xml, 'ext-link');
+    expect(results).toHaveLength(1);
+    expect(results[0]?.attributes['xlink:href']).toBe('http://doi.org/10.1');
+    expect(results[0]?.attributes['xlink:type']).toBe('simple');
+  });
+});
+
+describe('removeAllBlocks', () => {
+  it('should remove a single block', () => {
+    const xml = 'before<xref>link</xref>after';
+    expect(removeAllBlocks(xml, 'xref')).toBe('beforeafter');
+  });
+
+  it('should remove multiple blocks', () => {
+    const xml = 'a<xref>1</xref>b<xref>2</xref>c';
+    expect(removeAllBlocks(xml, 'xref')).toBe('abc');
+  });
+
+  it('should remove nested same-name blocks', () => {
+    const xml = '<A>outer<A>inner</A></A>';
+    expect(removeAllBlocks(xml, 'A')).toBe('');
+  });
+
+  it('should remove self-closing blocks', () => {
+    const xml = 'before<br />after';
+    expect(removeAllBlocks(xml, 'br')).toBe('beforeafter');
+  });
+
+  it('should return original string when no matches', () => {
+    const xml = '<p>no match</p>';
+    expect(removeAllBlocks(xml, 'div')).toBe('<p>no match</p>');
+  });
+
+  it('should handle empty input', () => {
+    expect(removeAllBlocks('', 'tag')).toBe('');
+  });
+
+  it('should handle blocks with attributes', () => {
+    const xml = 'text<sup class="ref">1</sup>more';
+    expect(removeAllBlocks(xml, 'sup')).toBe('textmore');
+  });
+
+  it('should handle blocks with nested children', () => {
+    const xml = '<root><remove><child>deep</child></remove>keep</root>';
+    expect(removeAllBlocks(xml, 'remove')).toBe('<root>keep</root>');
+  });
+
+  it('should handle mixed content around blocks', () => {
+    const xml = 'The gene <italic>BRCA1</italic> is related to <italic>BRCA2</italic>.';
+    expect(removeAllBlocks(xml, 'italic')).toBe('The gene  is related to .');
+  });
+
+  it('should handle unclosed tag gracefully', () => {
+    const xml = '<A>no close';
+    expect(removeAllBlocks(xml, 'A')).toBe('<A>no close');
+  });
 });
 
 describe('NCBI real-world XML patterns', () => {
@@ -532,9 +754,6 @@ describe('NCBI real-world XML patterns', () => {
 
     const docSum = docSums[0]!;
     expect(readTag(docSum, 'Id')).toBe('12345');
-
-    const authorList = readBlock(docSum, 'Item');
-    expect(authorList).toBeDefined();
   });
 
   it('should parse ELink acheck with attributes on Id tag', () => {
@@ -656,6 +875,33 @@ describe('NCBI real-world XML patterns', () => {
   it('should handle entities in NCBI query translations', () => {
     const xml = '<To>&quot;asthma&quot;[MeSH Terms] OR &quot;asthma&quot;[All Fields]</To>';
     expect(readTag(xml, 'To')).toBe('"asthma"[MeSH Terms] OR "asthma"[All Fields]');
+  });
+});
+
+describe('namespaced attributes', () => {
+  it('should parse xlink:href in attribute extraction', () => {
+    const xml = '<ext-link xlink:href="http://doi.org/10.1" xlink:type="simple">DOI</ext-link>';
+    const results = readAllBlocksWithAttributes(xml, 'ext-link');
+    expect(results[0]?.attributes['xlink:href']).toBe('http://doi.org/10.1');
+  });
+
+  it('should parse xml:lang attribute', () => {
+    const xml = '<title xml:lang="en">English Title</title>';
+    const result = readTagWithAttributes(xml, 'title');
+    expect(result?.attributes['xml:lang']).toBe('en');
+    expect(result?.text).toBe('English Title');
+  });
+
+  it('should handle mixed namespaced and plain attributes', () => {
+    const xml = '<element id="e1" xml:id="x1" class="main">content</element>';
+    const result = readTagWithAttributes(xml, 'element');
+    expect(result?.attributes).toEqual({ id: 'e1', 'xml:id': 'x1', class: 'main' });
+  });
+
+  it('should reject namespaced tag names (colons not allowed in tag names)', () => {
+    expect(() => readAllBlocksWithAttributes('<mml:math>x</mml:math>', 'mml:math')).toThrow(
+      'Invalid XML tag name',
+    );
   });
 });
 

@@ -38,6 +38,9 @@
     "provenance": true
   },
   "prepublishOnly": "echo 'Use CI to publish' && exit 1",
+  "dependencies": {
+    "@ncbijs/xml": "workspace:*"
+  },
   "sideEffects": false,
   "files": [
     "dist",
