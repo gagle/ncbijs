@@ -8,5 +8,5 @@ export type {
   OAListOptions,
   OARecord,
   PMCConfig,
-} from './interfaces/pmc.interface';
-export { PMC, pmcToChunks, pmcToMarkdown, pmcToPlainText } from './pmc';
+} from './interfaces/pmc.interface.js';
+export { PMC, pmcToChunks, pmcToMarkdown, pmcToPlainText } from './pmc.js';

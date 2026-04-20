@@ -1,4 +1,4 @@
-import type { MeshDescriptor, MeshTreeData, SparqlResult } from './interfaces/mesh.interface';
+import type { MeshDescriptor, MeshTreeData, SparqlResult } from './interfaces/mesh.interface.js';
 
 const SPARQL_URL = 'https://id.nlm.nih.gov/mesh/sparql';
 const LOOKUP_URL = 'https://id.nlm.nih.gov/mesh/lookup/descriptor';
@@ -144,7 +144,7 @@ export class MeSH {
 
   public async lookupOnline(query: string): Promise<ReadonlyArray<MeshDescriptor>> {
     const url = new URL(LOOKUP_URL);
-    url.searchParams.set('label', `contains:${query}`);
+    url.searchParams.set('label', query);
     url.searchParams.set('match', 'contains');
     url.searchParams.set('limit', '10');
 

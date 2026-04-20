@@ -57,6 +57,42 @@ importers:
         specifier: ^4.1.4
         version: 4.1.4(@types/node@20.19.39)(@vitest/coverage-v8@4.1.4)(vite@8.0.8(@types/node@20.19.39)(jiti@2.6.1)(yaml@2.8.3))
 
+  e2e:
+    dependencies:
+      '@ncbijs/cite':
+        specifier: workspace:*
+        version: link:../packages/cite
+      '@ncbijs/eutils':
+        specifier: workspace:*
+        version: link:../packages/eutils
+      '@ncbijs/id-converter':
+        specifier: workspace:*
+        version: link:../packages/id-converter
+      '@ncbijs/jats':
+        specifier: workspace:*
+        version: link:../packages/jats
+      '@ncbijs/mesh':
+        specifier: workspace:*
+        version: link:../packages/mesh
+      '@ncbijs/pmc':
+        specifier: workspace:*
+        version: link:../packages/pmc
+      '@ncbijs/pubmed':
+        specifier: workspace:*
+        version: link:../packages/pubmed
+      '@ncbijs/pubmed-xml':
+        specifier: workspace:*
+        version: link:../packages/pubmed-xml
+      '@ncbijs/pubtator':
+        specifier: workspace:*
+        version: link:../packages/pubtator
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../packages/rate-limiter
+      '@ncbijs/xml':
+        specifier: workspace:*
+        version: link:../packages/xml
+
   packages/cite: {}
 
   packages/eutils:

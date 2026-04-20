@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parsePubTatorTsv } from './parse-pubtator-tsv';
+import { parsePubTatorTsv } from './parse-pubtator-tsv.js';
 
 describe('parsePubTatorTsv', () => {
   describe('basic parsing', () => {

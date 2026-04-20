@@ -1,5 +1,5 @@
-export { EUtils } from './eutils';
-export { EUtilsHttpError } from './http-client';
+export { EUtils } from './eutils.js';
+export { EUtilsHttpError } from './http-client.js';
 export { TokenBucket } from '@ncbijs/rate-limiter';
 export type { AcquireOptions, RateLimiterOptions, TokenBucketOptions } from '@ncbijs/rate-limiter';
 
@@ -21,7 +21,7 @@ export type {
   ESearchParams,
   ESpellParams,
   ESummaryParams,
-} from './types/params';
+} from './types/params.js';
 
 export type {
   CitationMatch,
@@ -44,4 +44,4 @@ export type {
   LinkSet,
   LinkSetDb,
   Translation,
-} from './types/responses';
+} from './types/responses.js';

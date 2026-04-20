@@ -1,4 +1,4 @@
-import type { JATSArticle, Section } from './interfaces/jats.interface';
+import type { JATSArticle, Section } from './interfaces/jats.interface.js';
 
 export function toPlainText(article: JATSArticle): string {
   const lines: Array<string> = [];

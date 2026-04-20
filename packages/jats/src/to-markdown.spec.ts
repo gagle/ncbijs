@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { toMarkdown } from './to-markdown';
-import type { JATSArticle } from './interfaces/jats.interface';
+import { toMarkdown } from './to-markdown.js';
+import type { JATSArticle } from './interfaces/jats.interface.js';
 
 function buildArticle(overrides: Partial<JATSArticle> = {}): JATSArticle {
   return {

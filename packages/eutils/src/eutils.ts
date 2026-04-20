@@ -1,15 +1,15 @@
 import type { Client } from 'openapi-fetch';
 import { TokenBucket } from '@ncbijs/rate-limiter';
-import { createNcbiClient } from './ncbi-client';
-import type { paths } from './schema';
-import { parseECitMatchText } from './parsers/ecitmatch-parser';
-import { parseEGQueryXml } from './parsers/egquery-parser';
-import { parseEInfoJson, parseEInfoXml } from './parsers/einfo-parser';
-import { parseELinkJson, parseELinkXml } from './parsers/elink-parser';
-import { parseEPostXml } from './parsers/epost-parser';
-import { parseESearchJson, parseESearchXml } from './parsers/esearch-parser';
-import { parseESpellXml } from './parsers/espell-parser';
-import { parseESummaryJson, parseESummaryXml } from './parsers/esummary-parser';
+import { createNcbiClient } from './ncbi-client.js';
+import type { paths } from './schema.js';
+import { parseECitMatchText } from './parsers/ecitmatch-parser.js';
+import { parseEGQueryXml } from './parsers/egquery-parser.js';
+import { parseEInfoJson, parseEInfoXml } from './parsers/einfo-parser.js';
+import { parseELinkJson, parseELinkXml } from './parsers/elink-parser.js';
+import { parseEPostXml } from './parsers/epost-parser.js';
+import { parseESearchJson, parseESearchXml } from './parsers/esearch-parser.js';
+import { parseESpellXml } from './parsers/espell-parser.js';
+import { parseESummaryJson, parseESummaryXml } from './parsers/esummary-parser.js';
 import type {
   ECitMatchParams,
   EFetchParams,
@@ -21,7 +21,7 @@ import type {
   ESpellParams,
   ESummaryParams,
   EUtilsConfig,
-} from './types/params';
+} from './types/params.js';
 import type {
   ECitMatchResult,
   EGQueryResult,
@@ -31,8 +31,8 @@ import type {
   ESearchResult,
   ESpellResult,
   ESummaryResult,
-} from './types/responses';
-import { EUtilsHttpError } from './http-client';
+} from './types/responses.js';
+import { EUtilsHttpError } from './http-client.js';
 
 function unwrapResponse<T>(response: { data?: T; error?: unknown }): T {
   if (response.data === undefined) {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseBioC } from './parse-bioc';
+import { parseBioC } from './parse-bioc.js';
 
 const BIOC_JSON_SINGLE = JSON.stringify({
   documents: [
@@ -105,6 +105,22 @@ describe('parseBioC', () => {
       expect(result.documents).toHaveLength(2);
       expect(result.documents[0]?.id).toBe('11111');
       expect(result.documents[1]?.id).toBe('22222');
+    });
+
+    it('should parse PubTator3 wrapper format', () => {
+      const input = JSON.stringify({
+        PubTator3: [
+          {
+            id: '33856027',
+            passages: [
+              { infons: { type: 'title' }, text: 'Brain study', offset: 0, annotations: [] },
+            ],
+          },
+        ],
+      });
+      const result = parseBioC(input);
+      expect(result.documents).toHaveLength(1);
+      expect(result.documents[0]?.id).toBe('33856027');
     });
   });
 

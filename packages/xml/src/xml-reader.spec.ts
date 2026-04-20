@@ -12,7 +12,7 @@ import {
   readTagWithAttributes,
   removeAllBlocks,
   stripTags,
-} from './xml-reader';
+} from './xml-reader.js';
 
 describe('readTag', () => {
   it('should extract text content of a simple tag', () => {

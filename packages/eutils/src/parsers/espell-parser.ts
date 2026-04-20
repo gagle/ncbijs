@@ -1,4 +1,4 @@
-import type { ESpellResult } from '../types/responses';
+import type { ESpellResult } from '../types/responses.js';
 import { readBlock, readTag, stripTags } from '@ncbijs/xml';
 
 export function parseESpellXml(xml: string): ESpellResult {

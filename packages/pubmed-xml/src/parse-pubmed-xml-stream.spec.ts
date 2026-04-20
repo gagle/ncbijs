@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createPubmedXmlStream } from './parse-pubmed-xml-stream';
+import { createPubmedXmlStream } from './parse-pubmed-xml-stream.js';
 
 function createStringStream(chunks: Array<string>): ReadableStream<string> {
   return new ReadableStream({

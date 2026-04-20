@@ -1,6 +1,6 @@
 import { readAllBlocks, readAllTagsWithAttributes, readAttribute, readTag } from '@ncbijs/xml';
 
-import type { Annotation, BioDocument, BioPassage } from './interfaces/pubtator.interface';
+import type { Annotation, BioDocument, BioPassage } from './interfaces/pubtator.interface.js';
 
 export function parseBioC(input: string): BioDocument {
   const trimmed = input.trim();
@@ -37,6 +37,7 @@ interface BioCJsonDocument {
 
 interface BioCJsonRoot {
   readonly documents?: ReadonlyArray<BioCJsonDocument>;
+  readonly PubTator3?: ReadonlyArray<BioCJsonDocument>;
 }
 
 function parseBioCJson(input: string): BioDocument {
@@ -49,7 +50,7 @@ function parseBioCJson(input: string): BioDocument {
 
   const rawDocuments = Array.isArray(parsed)
     ? (parsed as ReadonlyArray<BioCJsonDocument>)
-    : (parsed.documents ?? []);
+    : (parsed.PubTator3 ?? parsed.documents ?? []);
 
   const documents = rawDocuments.map((doc) => ({
     id: String(doc.id ?? ''),
