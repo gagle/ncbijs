@@ -232,7 +232,3 @@ import type {
   SearchResult,
 } from '@ncbijs/pubtator';
 ```
-
-## License
-
-MIT

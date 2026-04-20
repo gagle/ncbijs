@@ -224,7 +224,3 @@ import type {
   PartialDate,
 } from '@ncbijs/jats';
 ```
-
-## License
-
-MIT

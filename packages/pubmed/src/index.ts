@@ -3,6 +3,6 @@ export type {
   PubMedSort,
   PublicationType,
   RelatedArticle,
-} from './interfaces/pubmed.interface.js';
-export { PubMedQueryBuilder } from './query-builder.js';
-export { PubMed } from './pubmed.js';
+} from './interfaces/pubmed.interface';
+export { PubMedQueryBuilder } from './query-builder';
+export { PubMed } from './pubmed';

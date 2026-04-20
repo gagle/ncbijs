@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseBioC } from './parse-bioc.js';
+import { parseBioC } from './parse-bioc';
 
 const BIOC_JSON_SINGLE = JSON.stringify({
   documents: [

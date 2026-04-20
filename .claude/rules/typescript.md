@@ -21,7 +21,7 @@
 - DO: **`noImplicitOverride: true`** -- always use the `override` keyword on overridden members.
 - DO: **Explicit member accessibility** -- `public`, `protected`, or `private` on every class member. Exception: constructors.
 - NEVER: **Backwards-compatibility shims** -- no re-exports, aliases, or wrappers when renaming code. Update all consumers directly.
-- DO: **`.js` extensions in relative imports** -- all relative imports must include the `.js` extension. Path alias imports (`@ncbijs/*`) do not use extensions.
+- NEVER: **File extensions in imports** -- no `.js` or `.ts` extensions on any import specifier. A post-build script adds `.js` to compiled output for Node.js ESM resolution.
 - DO: **`index.ts` as the single package entry point** -- each package has one `src/index.ts` re-exporting its public API. No other barrel files.
 - DO: **`interfaces/` folder** -- group interface/type-only files under an `interfaces/` directory (not `types/`). Name these files with a `.interface.ts` suffix: `eutils-config.interface.ts`, `search-params.interface.ts`.
 - NEVER: **Redundant `| undefined` on optional properties** -- `readonly prop?: string` is sufficient. Never write `readonly prop?: string | undefined`.
@@ -93,7 +93,7 @@ entries.find((entry) => entry.path === ''); // not (r) => r.path === ''
 - `import type` for type-only when possible.
 - No blank lines between imports.
 - Order: third-party packages -> `@ncbijs/*` packages -> relative imports.
-- `.js` extensions on relative imports, no extensions on `@ncbijs/*` path aliases.
+- No file extensions (`.js`, `.ts`) on any import specifier. A post-build script adds `.js` to compiled output.
 - Import directly from the source file within a package, never through an intermediate barrel.
 
 ## Formatting

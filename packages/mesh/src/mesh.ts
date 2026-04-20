@@ -1,4 +1,4 @@
-import type { MeshDescriptor, MeshTreeData, SparqlResult } from './interfaces/mesh.interface.js';
+import type { MeshDescriptor, MeshTreeData, SparqlResult } from './interfaces/mesh.interface';
 
 const SPARQL_URL = 'https://id.nlm.nih.gov/mesh/sparql';
 const LOOKUP_URL = 'https://id.nlm.nih.gov/mesh/lookup/descriptor';

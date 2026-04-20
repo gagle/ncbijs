@@ -249,7 +249,3 @@ All types are exported for use in your own interfaces:
 ```typescript
 import type { TagWithAttributes, BlockWithAttributes } from '@ncbijs/xml';
 ```
-
-## License
-
-MIT

@@ -1,4 +1,4 @@
-import type { ESearchResult, Translation } from '../types/responses.js';
+import type { ESearchResult, Translation } from '../types/responses';
 import { readAllBlocks, readAllTags, readBlock, readTag } from '@ncbijs/xml';
 
 export function parseESearchXml(xml: string): ESearchResult {

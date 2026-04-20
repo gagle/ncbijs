@@ -252,7 +252,3 @@ Every method maps directly to an [NCBI E-utility endpoint](https://www.ncbi.nlm.
 | `espell`    | `espell.fcgi`   | [ESpell](https://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.ESpell)       |
 | `egquery`   | `egquery.fcgi`  | [EGQuery](https://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.EGQuery)     |
 | `ecitmatch` | `ecitmatch.cgi` | [ECitMatch](https://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.ECitMatch) |
-
-## License
-
-MIT

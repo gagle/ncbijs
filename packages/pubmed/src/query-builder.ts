@@ -1,8 +1,8 @@
 import type { ESearchResult, EUtils } from '@ncbijs/eutils';
 import { parsePubmedXml } from '@ncbijs/pubmed-xml';
 
-import { convertArticle } from './convert-article.js';
-import type { Article, PubMedSort, PublicationType } from './interfaces/pubmed.interface.js';
+import { convertArticle } from './convert-article';
+import type { Article, PubMedSort, PublicationType } from './interfaces/pubmed.interface';
 
 const DEFAULT_BATCH_SIZE = 500;
 const NCBI_RETMAX_LIMIT = 10_000;

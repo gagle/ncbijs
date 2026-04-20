@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { PubMedQueryBuilder } from './query-builder.js';
+import { PubMedQueryBuilder } from './query-builder';
 
 const SINGLE_ARTICLE_XML = `<?xml version="1.0"?>
 <PubmedArticleSet>

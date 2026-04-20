@@ -11,7 +11,7 @@ import type {
   MeshHeading,
   MeshQualifier,
   PartialDate,
-} from './interfaces/pubmed-article.interface.js';
+} from './interfaces/pubmed-article.interface';
 import {
   decodeEntities,
   readAllBlocks,

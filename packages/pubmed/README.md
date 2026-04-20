@@ -291,7 +291,3 @@ Union of standard PubMed publication types: `'Review' | 'Clinical Trial' | 'Meta
 ### `PubMedSort`
 
 `'relevance' | 'pub_date' | 'Author' | 'JournalName'`
-
-## License
-
-MIT

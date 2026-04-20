@@ -4,5 +4,5 @@ export type {
   CitationSource,
   CitationStyle,
   CSLData,
-} from './interfaces/cite.interface.js';
-export { cite, citeMany } from './cite.js';
+} from './interfaces/cite.interface';
+export { cite, citeMany } from './cite';

@@ -5,7 +5,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p packages/rate-limiter/tsconfig.build.json"
+        "command": "tsc -p packages/rate-limiter/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/rate-limiter/dist"
       },
       "outputs": ["{projectRoot}/dist"]
     },

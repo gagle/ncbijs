@@ -4,7 +4,9 @@
   "targets": {
     "build": {
       "executor": "nx:run-commands",
-      "options": { "command": "tsc -p packages/mcp/tsconfig.build.json" },
+      "options": {
+        "command": "tsc -p packages/mcp/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/mcp/dist"
+      },
       "outputs": ["{projectRoot}/dist"]
     },
     "lint": {

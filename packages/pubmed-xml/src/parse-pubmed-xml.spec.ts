@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { PubmedArticle } from './interfaces/pubmed-article.interface.js';
-import { parsePubmedXml } from './parse-pubmed-xml.js';
+import type { PubmedArticle } from './interfaces/pubmed-article.interface';
+import { parsePubmedXml } from './parse-pubmed-xml';
 
 function buildArticleXml(citationContent: string, pubmedDataContent = ''): string {
   const pubmedData = pubmedDataContent ? `<PubmedData>${pubmedDataContent}</PubmedData>` : '';

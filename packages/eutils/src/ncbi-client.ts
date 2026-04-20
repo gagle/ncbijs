@@ -1,8 +1,8 @@
 import createClient from 'openapi-fetch';
 import type { Client, Middleware } from 'openapi-fetch';
 import type { TokenBucket } from '@ncbijs/rate-limiter';
-import { EUtilsHttpError } from './http-client.js';
-import type { paths } from './schema.js';
+import { EUtilsHttpError } from './http-client';
+import type { paths } from './schema';
 
 export interface NcbiClientConfig {
   readonly tool: string;

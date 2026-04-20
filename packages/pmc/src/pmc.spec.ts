@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { PMC, pmcToMarkdown, pmcToPlainText, pmcToChunks } from './pmc.js';
-import type { FullTextArticle } from './interfaces/pmc.interface.js';
+import { PMC, pmcToMarkdown, pmcToPlainText, pmcToChunks } from './pmc';
+import type { FullTextArticle } from './interfaces/pmc.interface';
 
 const mockEFetch = vi.fn();
 

@@ -22,8 +22,8 @@ pnpm nx run ncbijs-e2e:e2e
 
 - **Monorepo**: Nx 22 + pnpm 10.15 workspaces
 - **Language**: TypeScript 6, ES2022 target, `strict: true`
-- **Module**: ESM-only (`"type": "module"`), `.js` extensions in relative imports
-- **Build**: `tsc` directly (no bundler), outputs to `{package}/dist`
+- **Module**: ESM-only (`"type": "module"`), `moduleResolution: "bundler"`, no `.js` in source imports
+- **Build**: `tsc` + post-build script (`scripts/add-import-extensions.mjs`) adds `.js` to compiled output
 - **Zero-dep philosophy**: 8/10 packages have zero runtime dependencies. The 2 that do (`pubmed`, `pmc`) depend only on internal `@ncbijs/*` packages. `eutils` depends on `rate-limiter` + `openapi-fetch`.
 
 ### Package dependency graph
@@ -63,9 +63,9 @@ See `CONTRIBUTING.md` for the contribution policy.
 ### Imports
 
 ```ts
-import { EUtils } from '@ncbijs/eutils'; // path alias (no .js)
-import { helper } from './helpers/my-helper.js'; // relative requires .js
-import type { Config } from './interfaces/x.js'; // type imports separated
+import { EUtils } from '@ncbijs/eutils'; // path alias (no extension)
+import { helper } from './helpers/my-helper'; // relative (no extension)
+import type { Config } from './interfaces/x'; // type imports separated
 ```
 
 ### Types

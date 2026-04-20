@@ -1,4 +1,4 @@
-import type { DocSum, ESummaryResult } from '../types/responses.js';
+import type { DocSum, ESummaryResult } from '../types/responses';
 import { readAllBlocks, readTag, stripTags } from '@ncbijs/xml';
 
 export function parseESummaryXml(xml: string): ESummaryResult {

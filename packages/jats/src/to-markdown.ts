@@ -1,4 +1,4 @@
-import type { JATSArticle, Section, Table } from './interfaces/jats.interface.js';
+import type { JATSArticle, Section, Table } from './interfaces/jats.interface';
 
 export function toMarkdown(article: JATSArticle): string {
   const lines: Array<string> = [];

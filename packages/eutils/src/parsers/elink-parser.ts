@@ -5,7 +5,7 @@ import type {
   LinkOutUrl,
   LinkSet,
   LinkSetDb,
-} from '../types/responses.js';
+} from '../types/responses';
 import { readAllBlocks, readAllTags, readBlock, readTag } from '@ncbijs/xml';
 
 export function parseELinkXml(xml: string): ELinkResult {

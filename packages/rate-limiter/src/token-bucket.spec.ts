@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { TokenBucket, TokenBucketTimeoutError } from './token-bucket.js';
+import { TokenBucket, TokenBucketTimeoutError } from './token-bucket';
 
 describe('TokenBucket', () => {
   beforeEach(() => {

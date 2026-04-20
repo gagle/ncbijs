@@ -296,7 +296,3 @@ All types are exported for use in your own interfaces:
 ```typescript
 import type { TokenBucketOptions, RateLimiterOptions, AcquireOptions } from '@ncbijs/rate-limiter';
 ```
-
-## License
-
-MIT

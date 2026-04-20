@@ -10,7 +10,7 @@ import type {
   OAListOptions,
   OARecord,
   PMCConfig,
-} from './interfaces/pmc.interface.js';
+} from './interfaces/pmc.interface';
 import {
   readAllBlocks,
   readAllBlocksWithAttributes,

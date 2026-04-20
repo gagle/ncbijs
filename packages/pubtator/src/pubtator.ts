@@ -6,8 +6,8 @@ import type {
   ExportOptions,
   SearchOptions,
   SearchResult,
-} from './interfaces/pubtator.interface.js';
-import { parseBioC } from './parse-bioc.js';
+} from './interfaces/pubtator.interface';
+import { parseBioC } from './parse-bioc';
 
 const BASE_URL = 'https://www.ncbi.nlm.nih.gov/research/pubtator3-api';
 

@@ -10,7 +10,7 @@ import type {
   Reference,
   Section,
   Table,
-} from './interfaces/jats.interface.js';
+} from './interfaces/jats.interface';
 import {
   decodeEntities,
   readAllBlocks,

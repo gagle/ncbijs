@@ -1,2 +1,2 @@
-export { TokenBucket, TokenBucketTimeoutError } from './token-bucket.js';
-export type { AcquireOptions, RateLimiterOptions, TokenBucketOptions } from './token-bucket.js';
+export { TokenBucket, TokenBucketTimeoutError } from './token-bucket';
+export type { AcquireOptions, RateLimiterOptions, TokenBucketOptions } from './token-bucket';

@@ -7,8 +7,8 @@ import type {
   MeshQualifier,
   PartialDate,
   PubmedArticle,
-} from './interfaces/pubmed-article.interface.js';
-import { monthTextToNumber } from './article-field-parsers.js';
+} from './interfaces/pubmed-article.interface';
+import { monthTextToNumber } from './article-field-parsers';
 
 type MedlineTagMap = Map<string, Array<string>>;
 

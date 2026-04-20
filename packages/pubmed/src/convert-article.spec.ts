@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { PubmedArticle } from '@ncbijs/pubmed-xml';
-import { convertArticle } from './convert-article.js';
+import { convertArticle } from './convert-article';
 
 function buildPubmedArticle(overrides: Partial<PubmedArticle> = {}): PubmedArticle {
   return {

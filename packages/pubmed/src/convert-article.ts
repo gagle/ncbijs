@@ -1,6 +1,6 @@
 import type { PubmedArticle } from '@ncbijs/pubmed-xml';
 
-import type { Article } from './interfaces/pubmed.interface.js';
+import type { Article } from './interfaces/pubmed.interface';
 
 export function convertArticle(source: PubmedArticle): Article {
   return {

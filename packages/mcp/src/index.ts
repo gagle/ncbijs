@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio';
 import { PMC } from '@ncbijs/pmc';
 import { PubMed } from '@ncbijs/pubmed';
 
-import { registerAllTools } from './register-tools.js';
+import { registerAllTools } from './register-tools';
 
 const SERVER_NAME = 'ncbijs';
 const SERVER_VERSION = '0.0.1';

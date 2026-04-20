@@ -1,4 +1,4 @@
-import type { PubTatorAnnotation } from './interfaces/pubtator.interface.js';
+import type { PubTatorAnnotation } from './interfaces/pubtator.interface';
 
 const ANNOTATION_REGEX = /^(\d+)\t(\d+)\t(\d+)\t([^\t]*)\t([^\t]*)\t(.*)$/;
 

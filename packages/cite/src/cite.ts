@@ -3,7 +3,7 @@ import type {
   CitationFormat,
   CitationSource,
   CSLData,
-} from './interfaces/cite.interface.js';
+} from './interfaces/cite.interface';
 
 const BASE_URL = 'https://api.ncbi.nlm.nih.gov/lit/ctxp/v1';
 const REQUEST_DELAY_MS = 334;

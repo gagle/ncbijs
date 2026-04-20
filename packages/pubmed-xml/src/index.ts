@@ -12,8 +12,8 @@ export type {
   MeshQualifier,
   PartialDate,
   PubmedArticle,
-} from './interfaces/pubmed-article.interface.js';
+} from './interfaces/pubmed-article.interface';
 
-export { parsePubmedXml } from './parse-pubmed-xml.js';
-export { createPubmedXmlStream } from './parse-pubmed-xml-stream.js';
-export { parseMedlineText } from './parse-medline-text.js';
+export { parsePubmedXml } from './parse-pubmed-xml';
+export { createPubmedXmlStream } from './parse-pubmed-xml-stream';
+export { parseMedlineText } from './parse-medline-text';

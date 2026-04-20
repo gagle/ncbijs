@@ -183,7 +183,3 @@ interface VersionedId {
 ### `OutputFormat`
 
 `'json' | 'xml' | 'csv' | 'html'`
-
-## License
-
-MIT

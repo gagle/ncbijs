@@ -1,4 +1,4 @@
-import type { EPostResult } from '../types/responses.js';
+import type { EPostResult } from '../types/responses';
 import { readTag } from '@ncbijs/xml';
 
 export function parseEPostXml(xml: string): EPostResult {

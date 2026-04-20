@@ -5,7 +5,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p packages/pmc/tsconfig.build.json"
+        "command": "tsc -p packages/pmc/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/pmc/dist"
       },
       "outputs": ["{projectRoot}/dist"]
     },

@@ -253,7 +253,3 @@ interface OAIRecord {
   readonly metadata: string;
 }
 ```
-
-## License
-
-MIT

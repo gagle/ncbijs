@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cite, citeMany } from './cite.js';
+import { cite, citeMany } from './cite';
 
 function mockFetchText(text: string, status = 200): void {
   vi.stubGlobal(

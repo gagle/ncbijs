@@ -1,4 +1,4 @@
-import type { CitationMatch, ECitMatchResult } from '../types/responses.js';
+import type { CitationMatch, ECitMatchResult } from '../types/responses';
 
 export function parseECitMatchText(text: string): ECitMatchResult {
   const lines = text.trim().split(/\r?\n|\r/);

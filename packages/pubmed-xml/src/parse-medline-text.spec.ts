@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseMedlineText } from './parse-medline-text.js';
+import { parseMedlineText } from './parse-medline-text';
 
 const MINIMAL_RECORD = [
   'PMID- 12345678',

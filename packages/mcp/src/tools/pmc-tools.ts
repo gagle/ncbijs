@@ -1,4 +1,4 @@
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
 import type { PMC } from '@ncbijs/pmc';
 import { pmcToChunks, pmcToMarkdown } from '@ncbijs/pmc';
 import { z } from 'zod';

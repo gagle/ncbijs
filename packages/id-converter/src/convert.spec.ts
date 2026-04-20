@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { convert } from './convert.js';
+import { convert } from './convert';
 
 function mockFetchJson(data: unknown, status = 200): void {
   vi.stubGlobal(

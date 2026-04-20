@@ -10,6 +10,6 @@ export {
   readTagWithAttributes,
   removeAllBlocks,
   stripTags,
-} from './xml-reader.js';
+} from './xml-reader';
 
-export type { BlockWithAttributes, TagWithAttributes } from './xml-reader.js';
+export type { BlockWithAttributes, TagWithAttributes } from './xml-reader';

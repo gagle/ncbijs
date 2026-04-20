@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { PubTator } from './pubtator.js';
+import { PubTator } from './pubtator';
 
 function mockFetchJson(body: unknown): void {
   vi.stubGlobal(

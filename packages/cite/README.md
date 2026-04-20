@@ -202,7 +202,3 @@ interface CitationStyle {
   readonly format: string;
 }
 ```
-
-## License
-
-MIT

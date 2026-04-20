@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseJATS } from './parse-jats.js';
+import { parseJATS } from './parse-jats';
 
 function wrap(front = '', body = '', back = ''): string {
   return `<article>${front}${body}${back}</article>`;

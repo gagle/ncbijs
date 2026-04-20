@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { PubMed } from './pubmed.js';
-import { PubMedQueryBuilder } from './query-builder.js';
+import { PubMed } from './pubmed';
+import { PubMedQueryBuilder } from './query-builder';
 
 const mockESearch = vi.fn();
 const mockEFetch = vi.fn();

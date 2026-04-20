@@ -2,9 +2,9 @@ import { EUtils } from '@ncbijs/eutils';
 import type { EUtilsConfig } from '@ncbijs/eutils';
 import { parsePubmedXml } from '@ncbijs/pubmed-xml';
 
-import { convertArticle } from './convert-article.js';
-import type { Article, RelatedArticle } from './interfaces/pubmed.interface.js';
-import { PubMedQueryBuilder } from './query-builder.js';
+import { convertArticle } from './convert-article';
+import type { Article, RelatedArticle } from './interfaces/pubmed.interface';
+import { PubMedQueryBuilder } from './query-builder';
 
 const EFETCH_ID_BATCH_SIZE = 200;
 

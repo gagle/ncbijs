@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isDOI, isMID, isPMCID, isPMID } from './validate.js';
+import { isDOI, isMID, isPMCID, isPMID } from './validate';
 
 describe('isPMID', () => {
   it('should return true for valid numeric PMID', () => {

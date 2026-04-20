@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { EUtils } from './eutils.js';
-import { EUtilsHttpError } from './http-client.js';
-import type { EUtilsConfig } from './types/params.js';
+import { EUtils } from './eutils';
+import { EUtilsHttpError } from './http-client';
+import type { EUtilsConfig } from './types/params';
 
 function mockFetch(body: string, status = 200): void {
   vi.stubGlobal(

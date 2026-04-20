@@ -4,7 +4,9 @@
   "targets": {
     "build": {
       "executor": "nx:run-commands",
-      "options": { "command": "tsc -p packages/pubtator/tsconfig.build.json" },
+      "options": {
+        "command": "tsc -p packages/pubtator/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/pubtator/dist"
+      },
       "outputs": ["{projectRoot}/dist"]
     },
     "test": {

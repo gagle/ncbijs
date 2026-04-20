@@ -38,11 +38,11 @@ Add to your Claude Code `.mcp.json`:
 
 ## Environment variables
 
-| Variable       | Required | Default                               | Description                                  |
-| -------------- | -------- | ------------------------------------- | -------------------------------------------- |
-| `NCBI_API_KEY` | No       | --                                    | NCBI API key (raises rate limit to 10 req/s) |
-| `NCBI_TOOL`    | No       | `ncbijs-mcp`                          | Application name (NCBI usage policy)         |
-| `NCBI_EMAIL`   | No       | `ncbijs-mcp@users.noreply.github.com` | Developer email (NCBI usage policy)          |
+| Variable       | Required | Default                               | Description                                         |
+| -------------- | -------- | ------------------------------------- | --------------------------------------------------- |
+| `NCBI_API_KEY` | No       | --                                    | NCBI API key (raises rate limit from 3 to 10 req/s) |
+| `NCBI_TOOL`    | No       | `ncbijs-mcp`                          | Application name (NCBI usage policy)                |
+| `NCBI_EMAIL`   | No       | `ncbijs-mcp@users.noreply.github.com` | Developer email (NCBI usage policy)                 |
 
 Get a free API key at https://www.ncbi.nlm.nih.gov/account/settings/
 
@@ -92,7 +92,3 @@ Once the MCP server is configured, you can ask your AI assistant things like:
 - "Get an APA citation for PMID 33024307"
 - "What MeSH terms relate to Alzheimer's disease?"
 - "Find articles related to PMID 33024307"
-
-## License
-
-MIT

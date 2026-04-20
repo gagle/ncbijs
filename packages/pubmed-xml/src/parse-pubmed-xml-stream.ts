@@ -1,5 +1,5 @@
-import type { PubmedArticle } from './interfaces/pubmed-article.interface.js';
-import { parsePubmedXml } from './parse-pubmed-xml.js';
+import type { PubmedArticle } from './interfaces/pubmed-article.interface';
+import { parsePubmedXml } from './parse-pubmed-xml';
 
 const ARTICLE_CLOSE_TAG = '</PubmedArticle>';
 const ARTICLE_CLOSE_TAG_LENGTH = ARTICLE_CLOSE_TAG.length;

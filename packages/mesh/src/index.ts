@@ -4,5 +4,5 @@ export type {
   MeshTreeData,
   SparqlBinding,
   SparqlResult,
-} from './interfaces/mesh.interface.js';
-export { MeSH } from './mesh.js';
+} from './interfaces/mesh.interface';
+export { MeSH } from './mesh';

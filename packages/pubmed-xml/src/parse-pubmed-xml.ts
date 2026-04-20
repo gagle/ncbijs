@@ -1,4 +1,4 @@
-import type { PubmedArticle } from './interfaces/pubmed-article.interface.js';
+import type { PubmedArticle } from './interfaces/pubmed-article.interface';
 import {
   extractAbstract,
   extractArticleIds,
@@ -12,7 +12,7 @@ import {
   extractPublicationDate,
   extractPublicationTypes,
   parseDateBlock,
-} from './article-field-parsers.js';
+} from './article-field-parsers';
 import { decodeEntities, readAllBlocks, readBlock, readTag, stripTags } from '@ncbijs/xml';
 
 export function parsePubmedXml(xml: string): ReadonlyArray<PubmedArticle> {

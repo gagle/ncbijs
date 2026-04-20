@@ -173,7 +173,3 @@ import type {
   PartialDate,
 } from '@ncbijs/pubmed-xml';
 ```
-
-## License
-
-MIT

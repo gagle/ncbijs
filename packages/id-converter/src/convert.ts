@@ -1,5 +1,5 @@
-import type { ConvertedId, ConvertParams } from './interfaces/id-converter.interface.js';
-import type { paths } from './schema.js';
+import type { ConvertedId, ConvertParams } from './interfaces/id-converter.interface';
+import type { paths } from './schema';
 
 type ApiRecord =
   paths['/']['get']['responses'][200]['content']['application/json']['records'][number];

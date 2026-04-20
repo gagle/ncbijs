@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { toChunks } from './to-chunks.js';
-import type { JATSArticle } from './interfaces/jats.interface.js';
+import { toChunks } from './to-chunks';
+import type { JATSArticle } from './interfaces/jats.interface';
 
 function buildArticle(overrides: Partial<JATSArticle> = {}): JATSArticle {
   return {

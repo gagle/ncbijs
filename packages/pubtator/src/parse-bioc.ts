@@ -1,6 +1,6 @@
 import { readAllBlocks, readAllTagsWithAttributes, readAttribute, readTag } from '@ncbijs/xml';
 
-import type { Annotation, BioDocument, BioPassage } from './interfaces/pubtator.interface.js';
+import type { Annotation, BioDocument, BioPassage } from './interfaces/pubtator.interface';
 
 export function parseBioC(input: string): BioDocument {
   const trimmed = input.trim();

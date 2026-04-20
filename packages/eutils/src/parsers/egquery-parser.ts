@@ -1,4 +1,4 @@
-import type { EGQueryResult, EGQueryResultItem } from '../types/responses.js';
+import type { EGQueryResult, EGQueryResultItem } from '../types/responses';
 import { readAllBlocks, readTag } from '@ncbijs/xml';
 
 export function parseEGQueryXml(xml: string): EGQueryResult {

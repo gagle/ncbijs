@@ -245,7 +245,3 @@ interface MeshQualifier {
   readonly abbreviation: string;
 }
 ```
-
-## License
-
-MIT

@@ -1,4 +1,4 @@
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
 import { cite } from '@ncbijs/cite';
 import { convert } from '@ncbijs/id-converter';
 import { MeSH } from '@ncbijs/mesh';

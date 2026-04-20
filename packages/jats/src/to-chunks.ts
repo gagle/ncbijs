@@ -1,4 +1,4 @@
-import type { Chunk, ChunkOptions, JATSArticle, Section } from './interfaces/jats.interface.js';
+import type { Chunk, ChunkOptions, JATSArticle, Section } from './interfaces/jats.interface';
 
 const DEFAULT_MAX_TOKENS = 512;
 const DEFAULT_OVERLAP = 50;

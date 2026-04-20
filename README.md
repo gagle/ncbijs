@@ -127,7 +127,3 @@ pnpm nx run ncbijs-e2e:e2e
 ```
 
 Get an API key at [ncbi.nlm.nih.gov/account/settings](https://www.ncbi.nlm.nih.gov/account/settings/).
-
-## License
-
-MIT
