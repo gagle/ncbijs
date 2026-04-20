@@ -15,14 +15,13 @@
     "url": "https://github.com/gagle/ncbijs/issues"
   },
   "keywords": [
+    "ncbijs",
     "ncbi",
     "citation",
-    "apa",
-    "bibtex",
     "ris",
-    "csl",
-    "vancouver",
-    "mla",
+    "medline",
+    "csl-json",
+    "references",
     "bibliography",
     "typescript"
   ],
@@ -43,9 +42,6 @@
   "prepublishOnly": "echo 'Use CI to publish' && exit 1",
   "sideEffects": false,
   "files": [
-    "dist",
-    "package.json",
-    "LICENSE",
-    "CHANGELOG.md"
+    "dist"
   ]
 }

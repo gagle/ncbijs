@@ -15,6 +15,7 @@
     "url": "https://github.com/gagle/ncbijs/issues"
   },
   "keywords": [
+    "ncbijs",
     "ncbi",
     "jats",
     "pmc",
@@ -45,9 +46,6 @@
   },
   "sideEffects": false,
   "files": [
-    "dist",
-    "package.json",
-    "LICENSE",
-    "CHANGELOG.md"
+    "dist"
   ]
 }

@@ -15,11 +15,11 @@
     "url": "https://github.com/gagle/ncbijs/issues"
   },
   "keywords": [
+    "ncbijs",
     "ncbi",
     "eutils",
     "e-utilities",
     "entrez",
-    "pubmed",
     "bioinformatics",
     "typescript"
   ],
@@ -45,10 +45,6 @@
   },
   "sideEffects": false,
   "files": [
-    "dist",
-    "package.json",
-    "README.md",
-    "LICENSE",
-    "CHANGELOG.md"
+    "dist"
   ]
 }

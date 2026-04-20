@@ -15,10 +15,13 @@
     "url": "https://github.com/gagle/ncbijs/issues"
   },
   "keywords": [
+    "ncbijs",
     "ncbi",
     "blast",
     "sequence",
     "alignment",
+    "nucleotide",
+    "protein",
     "bioinformatics",
     "typescript"
   ],
@@ -42,9 +45,6 @@
   },
   "sideEffects": false,
   "files": [
-    "dist",
-    "package.json",
-    "LICENSE",
-    "CHANGELOG.md"
+    "dist"
   ]
 }

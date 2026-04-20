@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  MeSH vocabulary tree traversal, query expansion, and descriptor lookup — offline and online.
+  MeSH vocabulary tree traversal, query expansion, and descriptor lookup.
 </p>
 
 ---
@@ -16,13 +16,12 @@
 
 Searching PubMed without MeSH expansion misses relevant articles. A search for "Stress" won't find articles tagged with "Stress, Psychological", "Stress, Physiological", or any of their narrower children.
 
-`@ncbijs/mesh` provides offline tree traversal (instant, works without network) using a bundled MeSH tree dataset, plus online SPARQL and lookup APIs for advanced queries. It can expand a term to all its descendant descriptors, build properly formatted PubMed MeSH queries, and traverse the tree hierarchy.
+`@ncbijs/mesh` provides tree traversal, query expansion, and descriptor lookup using the MeSH vocabulary. It can expand a term to all its descendant descriptors, build properly formatted PubMed MeSH queries, and traverse the tree hierarchy. SPARQL and lookup APIs support advanced online queries.
 
-- **Offline-first** — bundled `mesh-tree.json` for instant lookups without network
 - **Tree traversal** — expand, ancestors, children, and full tree path
 - **Query building** — format descriptors as PubMed `[Mesh]` queries with qualifier support
 - **SPARQL** — execute arbitrary SPARQL queries against the official NLM MeSH endpoint
-- **Online lookup** — search descriptors when the bundled dataset doesn't have what you need
+- **Online lookup** — search descriptors via the NLM MeSH Lookup API
 
 ## Install
 
@@ -34,9 +33,14 @@ npm install @ncbijs/mesh
 
 ```typescript
 import { MeSH } from '@ncbijs/mesh';
-import meshTree from '@ncbijs/mesh/data/mesh-tree.json';
+import type { MeshTreeData } from '@ncbijs/mesh';
 
-const mesh = new MeSH(meshTree);
+const treeData: MeshTreeData = {
+  descriptors: [
+    /* your MeSH data */
+  ],
+};
+const mesh = new MeSH(treeData);
 
 // Look up a descriptor by name or ID
 const descriptor = mesh.lookup('Asthma');
@@ -56,17 +60,17 @@ console.log(query); // '"Asthma"[Mesh]'
 
 ### `new MeSH(treeData)`
 
-Creates a new MeSH instance from a tree dataset.
+Creates a new MeSH instance from a tree dataset. The `MeshTreeData` object must contain a `descriptors` array conforming to the `MeshDescriptor` interface.
 
 ```typescript
-import meshTree from '@ncbijs/mesh/data/mesh-tree.json';
+import { MeSH } from '@ncbijs/mesh';
 
-const mesh = new MeSH(meshTree);
+const mesh = new MeSH(treeData);
 ```
 
-| Parameter  | Type           | Required | Description                                                     |
-| ---------- | -------------- | -------- | --------------------------------------------------------------- |
-| `treeData` | `MeshTreeData` | Yes      | MeSH tree data. Import from `@ncbijs/mesh/data/mesh-tree.json`. |
+| Parameter  | Type           | Required | Description                                        |
+| ---------- | -------------- | -------- | -------------------------------------------------- |
+| `treeData` | `MeshTreeData` | Yes      | MeSH tree data containing an array of descriptors. |
 
 ### `lookup(descriptorIdOrName)`
 
@@ -197,18 +201,6 @@ console.log(descriptors[0].name); // "Asthma"
 | `query`   | `string` | Yes      | Search term. |
 
 Returns `Promise<ReadonlyArray<MeshDescriptor>>`.
-
-## Data
-
-The package exports a bundled MeSH tree dataset at `@ncbijs/mesh/data/mesh-tree.json`. Import it and pass it to the `MeSH` constructor:
-
-```typescript
-import meshTree from '@ncbijs/mesh/data/mesh-tree.json';
-
-const mesh = new MeSH(meshTree);
-```
-
-The dataset conforms to the `MeshTreeData` interface — an array of `MeshDescriptor` objects with tree numbers, qualifiers, pharmacological actions, and supplementary concepts.
 
 ## Types
 

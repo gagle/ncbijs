@@ -15,10 +15,13 @@
     "url": "https://github.com/gagle/ncbijs/issues"
   },
   "keywords": [
+    "ncbijs",
     "ncbi",
     "dbsnp",
     "snp",
     "variation",
+    "allele",
+    "frequency",
     "genomics",
     "bioinformatics",
     "typescript"
@@ -43,9 +46,6 @@
   },
   "sideEffects": false,
   "files": [
-    "dist",
-    "package.json",
-    "LICENSE",
-    "CHANGELOG.md"
+    "dist"
   ]
 }

@@ -15,12 +15,17 @@
     "url": "https://github.com/gagle/ncbijs/issues"
   },
   "keywords": [
+    "ncbijs",
     "ncbi",
     "pubtator",
     "bioc",
     "text-mining",
     "ner",
+    "nlp",
     "entity",
+    "gene",
+    "disease",
+    "chemical",
     "annotation",
     "bioinformatics",
     "typescript"
@@ -45,9 +50,6 @@
   },
   "sideEffects": false,
   "files": [
-    "dist",
-    "package.json",
-    "LICENSE",
-    "CHANGELOG.md"
+    "dist"
   ]
 }

@@ -7,6 +7,9 @@
 <p align="center">
   <a href="https://github.com/gagle/ncbijs/blob/main/LICENSE"><img src="https://img.shields.io/github/license/gagle/ncbijs" alt="license" /></a>
   <a href="https://github.com/gagle/ncbijs/actions"><img src="https://img.shields.io/github/actions/workflow/status/gagle/ncbijs/ci.yml" alt="CI" /></a>
+  <a href="./docs/rag-integration.md"><img src="https://img.shields.io/badge/RAG-Ready-blueviolet" alt="RAG Ready" /></a>
+  <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-Server-blue" alt="MCP Server" /></a>
+  <a href="./packages/mcp"><img src="https://img.shields.io/badge/LLM_Tools-18_tools-green" alt="LLM Tools" /></a>
 </p>
 
 ---
@@ -61,6 +64,12 @@ The [National Center for Biotechnology Information](https://www.ncbi.nlm.nih.gov
 | [`@ncbijs/xml`](./packages/xml)                   | Zero-dependency regex-based XML reader for NCBI formats            | [![npm](https://img.shields.io/npm/v/@ncbijs/xml)](https://www.npmjs.com/package/@ncbijs/xml)                   |
 | [`@ncbijs/mcp`](./packages/mcp)                   | MCP server exposing all ncbijs tools for LLM agents                | [![npm](https://img.shields.io/npm/v/@ncbijs/mcp)](https://www.npmjs.com/package/@ncbijs/mcp)                   |
 | [`@ncbijs/rate-limiter`](./packages/rate-limiter) | Token bucket rate limiter for browser and Node.js                  | [![npm](https://img.shields.io/npm/v/@ncbijs/rate-limiter)](https://www.npmjs.com/package/@ncbijs/rate-limiter) |
+
+## RAG integration
+
+ncbijs is built to power biomedical RAG (Retrieval-Augmented Generation) pipelines. Use it to enrich document chunks with named entities, normalize terminology via MeSH, validate claims against PubMed, and inject formatted citations into generated answers. The MCP server (`@ncbijs/mcp`) lets LLM agents call any ncbijs tool directly during generation with zero glue code.
+
+See **[RAG Integration Guide](./docs/rag-integration.md)** for a full architecture walkthrough covering ingestion enrichment, query-time augmentation, generation-time citation, and priority assessment.
 
 ## Quick start
 

@@ -15,12 +15,14 @@
     "url": "https://github.com/gagle/ncbijs/issues"
   },
   "keywords": [
+    "ncbijs",
     "ncbi",
     "pmc",
     "pubmed-central",
     "full-text",
-    "oa",
-    "oai-pmh",
+    "article",
+    "rag",
+    "bioinformatics",
     "typescript"
   ],
   "engines": {
@@ -40,10 +42,7 @@
   "prepublishOnly": "echo 'Use CI to publish' && exit 1",
   "sideEffects": false,
   "files": [
-    "dist",
-    "package.json",
-    "LICENSE",
-    "CHANGELOG.md"
+    "dist"
   ],
   "dependencies": {
     "@ncbijs/eutils": "workspace:*",

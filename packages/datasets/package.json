@@ -15,12 +15,14 @@
     "url": "https://github.com/gagle/ncbijs/issues"
   },
   "keywords": [
+    "ncbijs",
     "ncbi",
     "datasets",
     "gene",
     "genome",
     "taxonomy",
     "assembly",
+    "gene-ontology",
     "bioinformatics",
     "typescript"
   ],
@@ -44,9 +46,6 @@
   },
   "sideEffects": false,
   "files": [
-    "dist",
-    "package.json",
-    "LICENSE",
-    "CHANGELOG.md"
+    "dist"
   ]
 }

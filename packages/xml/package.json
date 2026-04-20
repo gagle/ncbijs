@@ -15,6 +15,7 @@
     "url": "https://github.com/gagle/ncbijs/issues"
   },
   "keywords": [
+    "ncbijs",
     "xml",
     "xml-reader",
     "xml-parser",
@@ -40,10 +41,6 @@
   "prepublishOnly": "echo 'Use CI to publish' && exit 1",
   "sideEffects": false,
   "files": [
-    "dist",
-    "package.json",
-    "README.md",
-    "LICENSE",
-    "CHANGELOG.md"
+    "dist"
   ]
 }

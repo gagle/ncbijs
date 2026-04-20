@@ -1,7 +1,7 @@
 {
   "name": "@ncbijs/mcp",
   "version": "0.0.1",
-  "description": "MCP server exposing NCBI biomedical literature tools for LLM agents",
+  "description": "MCP server exposing NCBI biomedical tools for LLM agents",
   "author": "Gabriel Llamas",
   "license": "MIT",
   "type": "module",
@@ -15,6 +15,7 @@
     "url": "https://github.com/gagle/ncbijs/issues"
   },
   "keywords": [
+    "ncbijs",
     "ncbi",
     "mcp",
     "model-context-protocol",
@@ -23,6 +24,9 @@
     "biomedical",
     "llm",
     "ai",
+    "rag",
+    "tool",
+    "agent",
     "typescript"
   ],
   "engines": {
@@ -41,10 +45,7 @@
   "prepublishOnly": "echo 'Use CI to publish' && exit 1",
   "sideEffects": false,
   "files": [
-    "dist",
-    "package.json",
-    "LICENSE",
-    "CHANGELOG.md"
+    "dist"
   ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",

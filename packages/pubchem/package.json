@@ -1,7 +1,7 @@
 {
   "name": "@ncbijs/pubchem",
   "version": "0.0.1",
-  "description": "Typed client for the PubChem PUG REST API (compounds, substances, assays)",
+  "description": "Typed client for the PubChem PUG REST API (compound properties, synonyms, descriptions)",
   "author": "Gabriel Llamas",
   "license": "MIT",
   "type": "module",
@@ -15,10 +15,14 @@
     "url": "https://github.com/gagle/ncbijs/issues"
   },
   "keywords": [
+    "ncbijs",
     "ncbi",
     "pubchem",
     "compound",
     "chemical",
+    "molecule",
+    "smiles",
+    "drug",
     "chemistry",
     "bioinformatics",
     "typescript"
@@ -43,9 +47,6 @@
   },
   "sideEffects": false,
   "files": [
-    "dist",
-    "package.json",
-    "LICENSE",
-    "CHANGELOG.md"
+    "dist"
   ]
 }
