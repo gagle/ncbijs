@@ -1,47 +1,38 @@
 import type {
   AnnotateOptions,
-  BiocOptions,
   BioDocument,
   EntityMatch,
   EntityType,
   ExportOptions,
-  RelatedEntity,
-  RelationType,
   SearchOptions,
   SearchResult,
-} from './interfaces/pubtator.interface';
-import { parseBioC } from './parse-bioc';
+} from './interfaces/pubtator.interface.js';
+import { parseBioC } from './parse-bioc.js';
 
 const BASE_URL = 'https://www.ncbi.nlm.nih.gov/research/pubtator3-api';
 
 interface EntityApiResponse {
-  readonly id: string;
+  readonly _id: string;
   readonly name: string;
-  readonly type: EntityType;
-  readonly score: number;
-}
-
-interface RelationApiResponse {
-  readonly id: string;
-  readonly name: string;
-  readonly type: EntityType;
-  readonly relation_type: RelationType;
-  readonly pmids: ReadonlyArray<string>;
-  readonly score: number;
+  readonly biotype: string;
+  readonly db_id: string;
+  readonly db: string;
+  readonly description: string;
+  readonly match: string;
 }
 
 interface SearchApiResult {
-  readonly pmid: string;
+  readonly pmid: number;
   readonly title: string;
   readonly journal: string;
-  readonly year: number;
+  readonly date: string;
   readonly authors: ReadonlyArray<string>;
 }
 
 interface SearchApiResponse {
-  readonly total: number;
-  readonly page: number;
-  readonly pagesize: number;
+  readonly count: number;
+  readonly current: number;
+  readonly page_size: number;
   readonly results: ReadonlyArray<SearchApiResult>;
 }
 
@@ -85,36 +76,9 @@ export class PubTator {
     );
 
     return data.map((item) => ({
-      id: item.id,
+      id: item.db_id,
       name: item.name,
-      type: item.type,
-      score: item.score,
-    }));
-  }
-
-  public async findRelations(
-    entityId: string,
-    targetType: EntityType,
-    relationType: RelationType,
-  ): Promise<ReadonlyArray<RelatedEntity>> {
-    const params = new URLSearchParams({
-      e1: entityId,
-      type: targetType,
-      relation: relationType,
-    });
-
-    const data = await fetchJson<ReadonlyArray<RelationApiResponse>>(
-      `${BASE_URL}/entity/relations/?${params.toString()}`,
-      'PubTator3 relations search failed',
-    );
-
-    return data.map((item) => ({
-      id: item.id,
-      name: item.name,
-      type: item.type,
-      relationType: item.relation_type,
-      pmids: item.pmids,
-      score: item.score,
+      type: item.biotype as EntityType,
     }));
   }
 
@@ -129,14 +93,14 @@ export class PubTator {
     );
 
     return {
-      total: data.total,
-      page: data.page,
-      pageSize: data.pagesize,
+      total: data.count,
+      page: data.current,
+      pageSize: data.page_size,
       results: data.results.map((r) => ({
-        pmid: r.pmid,
+        pmid: String(r.pmid),
         title: r.title,
         journal: r.journal,
-        year: r.year,
+        year: r.date ? new Date(r.date).getFullYear() : 0,
         authors: r.authors,
       })),
     };
@@ -184,32 +148,4 @@ export class PubTator {
       body: text,
     });
   }
-
-  readonly bioc = {
-    pmc: async (id: string, options?: BiocOptions): Promise<BioDocument> => {
-      const format = options?.format ?? 'json';
-      const params = new URLSearchParams();
-      appendParam(params, 'encoding', options?.encoding);
-
-      const query = params.toString();
-      const base = `${BASE_URL}/publications/pmc/${id}/bioc${format}`;
-      const url = query ? `${base}?${query}` : base;
-
-      const text = await fetchText(url, `PubTator3 BioC PMC fetch failed for ${id}`);
-      return parseBioC(text);
-    },
-
-    pubmed: async (pmid: string, options?: BiocOptions): Promise<BioDocument> => {
-      const format = options?.format ?? 'json';
-      const params = new URLSearchParams();
-      appendParam(params, 'encoding', options?.encoding);
-
-      const query = params.toString();
-      const base = `${BASE_URL}/publications/${pmid}/bioc${format}`;
-      const url = query ? `${base}?${query}` : base;
-
-      const text = await fetchText(url, `PubTator3 BioC fetch failed for ${pmid}`);
-      return parseBioC(text);
-    },
-  };
 }

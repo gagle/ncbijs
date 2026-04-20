@@ -9,24 +9,6 @@ export const ENTITY_TYPES = {
 
 export type EntityType = (typeof ENTITY_TYPES)[keyof typeof ENTITY_TYPES];
 
-export const RELATION_TYPES = {
-  Treat: 'treat',
-  Cause: 'cause',
-  Cotreat: 'cotreat',
-  Convert: 'convert',
-  Compare: 'compare',
-  Interact: 'interact',
-  Associate: 'associate',
-  PositiveCorrelate: 'positive_correlate',
-  NegativeCorrelate: 'negative_correlate',
-  Prevent: 'prevent',
-  Inhibit: 'inhibit',
-  Stimulate: 'stimulate',
-  DrugInteract: 'drug_interact',
-} as const satisfies Record<string, string>;
-
-export type RelationType = (typeof RELATION_TYPES)[keyof typeof RELATION_TYPES];
-
 export const CONCEPT_TYPES = {
   Gene: 'Gene',
   Disease: 'Disease',
@@ -42,16 +24,6 @@ export interface EntityMatch {
   readonly id: string;
   readonly name: string;
   readonly type: EntityType;
-  readonly score: number;
-}
-
-export interface RelatedEntity {
-  readonly id: string;
-  readonly name: string;
-  readonly type: EntityType;
-  readonly relationType: RelationType;
-  readonly pmids: ReadonlyArray<string>;
-  readonly score: number;
 }
 
 export interface SearchResult {
@@ -115,9 +87,4 @@ export interface PubTatorAnnotation {
 export interface AnnotateOptions {
   readonly concept?: ConceptType | undefined;
   readonly format?: 'PubTator' | 'BioC' | 'JSON' | undefined;
-}
-
-export interface BiocOptions {
-  readonly format?: 'xml' | 'json' | undefined;
-  readonly encoding?: 'unicode' | 'ascii' | undefined;
 }

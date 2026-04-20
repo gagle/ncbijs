@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { PubTator } from './pubtator';
+import { PubTator } from './pubtator.js';
 
 function mockFetchJson(body: unknown): void {
   vi.stubGlobal(
@@ -89,7 +89,17 @@ describe('PubTator', () => {
 
   describe('findEntity', () => {
     it('should search for entities by query string', async () => {
-      mockFetchJson([{ id: '672', name: 'BRCA1', type: 'gene', score: 0.95 }]);
+      mockFetchJson([
+        {
+          _id: '@GENE_BRCA1',
+          biotype: 'gene',
+          db_id: '672',
+          db: 'ncbi_gene',
+          name: 'BRCA1',
+          description: 'All Species',
+          match: 'Matched on name <m>BRCA1</m>',
+        },
+      ]);
       const client = new PubTator();
       const result = await client.findEntity('BRCA1');
       expect(result).toHaveLength(1);
@@ -98,15 +108,24 @@ describe('PubTator', () => {
       );
     });
 
-    it('should return EntityMatch array with id, name, type, score', async () => {
-      mockFetchJson([{ id: '672', name: 'BRCA1', type: 'gene', score: 0.95 }]);
+    it('should return EntityMatch array with id, name, type', async () => {
+      mockFetchJson([
+        {
+          _id: '@GENE_BRCA1',
+          biotype: 'gene',
+          db_id: '672',
+          db: 'ncbi_gene',
+          name: 'BRCA1',
+          description: 'All Species',
+          match: 'Matched on name <m>BRCA1</m>',
+        },
+      ]);
       const client = new PubTator();
       const result = await client.findEntity('BRCA1');
       expect(result[0]).toEqual({
         id: '672',
         name: 'BRCA1',
         type: 'gene',
-        score: 0.95,
       });
     });
 
@@ -125,42 +144,102 @@ describe('PubTator', () => {
     });
 
     it('should search for gene entities', async () => {
-      mockFetchJson([{ id: '672', name: 'BRCA1', type: 'gene', score: 0.9 }]);
+      mockFetchJson([
+        {
+          _id: '@GENE_BRCA1',
+          biotype: 'gene',
+          db_id: '672',
+          db: 'ncbi_gene',
+          name: 'BRCA1',
+          description: '',
+          match: '',
+        },
+      ]);
       const client = new PubTator();
       await client.findEntity('BRCA1', 'gene');
       expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=gene'));
     });
 
     it('should search for disease entities', async () => {
-      mockFetchJson([{ id: 'MESH:D001943', name: 'breast cancer', type: 'disease', score: 0.9 }]);
+      mockFetchJson([
+        {
+          _id: '@DISEASE_breast_cancer',
+          biotype: 'disease',
+          db_id: 'MESH:D001943',
+          db: 'mesh',
+          name: 'breast cancer',
+          description: '',
+          match: '',
+        },
+      ]);
       const client = new PubTator();
       await client.findEntity('breast cancer', 'disease');
       expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=disease'));
     });
 
     it('should search for chemical entities', async () => {
-      mockFetchJson([{ id: 'MESH:D001241', name: 'aspirin', type: 'chemical', score: 0.9 }]);
+      mockFetchJson([
+        {
+          _id: '@CHEMICAL_aspirin',
+          biotype: 'chemical',
+          db_id: 'MESH:D001241',
+          db: 'mesh',
+          name: 'aspirin',
+          description: '',
+          match: '',
+        },
+      ]);
       const client = new PubTator();
       await client.findEntity('aspirin', 'chemical');
       expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=chemical'));
     });
 
     it('should search for variant entities', async () => {
-      mockFetchJson([{ id: 'tmVar:p.V600E', name: 'V600E', type: 'variant', score: 0.9 }]);
+      mockFetchJson([
+        {
+          _id: '@VARIANT_V600E',
+          biotype: 'variant',
+          db_id: 'tmVar:p.V600E',
+          db: 'litvar',
+          name: 'V600E',
+          description: '',
+          match: '',
+        },
+      ]);
       const client = new PubTator();
       await client.findEntity('V600E', 'variant');
       expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=variant'));
     });
 
     it('should search for species entities', async () => {
-      mockFetchJson([{ id: '9606', name: 'human', type: 'species', score: 0.9 }]);
+      mockFetchJson([
+        {
+          _id: '@SPECIES_human',
+          biotype: 'species',
+          db_id: '9606',
+          db: 'ncbi_taxonomy',
+          name: 'human',
+          description: '',
+          match: '',
+        },
+      ]);
       const client = new PubTator();
       await client.findEntity('human', 'species');
       expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=species'));
     });
 
     it('should search for cell_line entities', async () => {
-      mockFetchJson([{ id: 'CVCL:0030', name: 'HeLa', type: 'cell_line', score: 0.9 }]);
+      mockFetchJson([
+        {
+          _id: '@CELL_LINE_HeLa',
+          biotype: 'cell_line',
+          db_id: 'CVCL:0030',
+          db: 'cellosaurus',
+          name: 'HeLa',
+          description: '',
+          match: '',
+        },
+      ]);
       const client = new PubTator();
       await client.findEntity('HeLa', 'cell_line');
       expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=cell_line'));
@@ -175,96 +254,17 @@ describe('PubTator', () => {
     });
   });
 
-  describe('findRelations', () => {
-    const RELATION_RESPONSE = [
-      {
-        id: 'MESH:D001943',
-        name: 'Breast Neoplasms',
-        type: 'disease',
-        relation_type: 'associate',
-        pmids: ['12345', '67890'],
-        score: 0.85,
-      },
-    ];
-
-    it('should find relations for entity ID', async () => {
-      mockFetchJson(RELATION_RESPONSE);
-      const client = new PubTator();
-      const result = await client.findRelations('672', 'disease', 'associate');
-      expect(result).toHaveLength(1);
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('e1=672'));
-    });
-
-    it('should return RelatedEntity array', async () => {
-      mockFetchJson(RELATION_RESPONSE);
-      const client = new PubTator();
-      const result = await client.findRelations('672', 'disease', 'associate');
-      expect(result[0]).toEqual({
-        id: 'MESH:D001943',
-        name: 'Breast Neoplasms',
-        type: 'disease',
-        relationType: 'associate',
-        pmids: ['12345', '67890'],
-        score: 0.85,
-      });
-    });
-
-    it('should filter by target entity type', async () => {
-      mockFetchJson([]);
-      const client = new PubTator();
-      await client.findRelations('672', 'chemical', 'treat');
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=chemical'));
-    });
-
-    it('should filter by relation type', async () => {
-      mockFetchJson([]);
-      const client = new PubTator();
-      await client.findRelations('672', 'disease', 'cause');
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('relation=cause'));
-    });
-
-    it('should return PMIDs for each relation', async () => {
-      mockFetchJson(RELATION_RESPONSE);
-      const client = new PubTator();
-      const result = await client.findRelations('672', 'disease', 'associate');
-      expect(result[0]?.pmids).toEqual(['12345', '67890']);
-    });
-
-    it('should return score for each relation', async () => {
-      mockFetchJson(RELATION_RESPONSE);
-      const client = new PubTator();
-      const result = await client.findRelations('672', 'disease', 'associate');
-      expect(result[0]?.score).toBe(0.85);
-    });
-
-    it('should handle all 13 relation types', async () => {
-      mockFetchJson([
-        { id: '1', name: 'R1', type: 'disease', relation_type: 'treat', pmids: [], score: 0.1 },
-      ]);
-      const client = new PubTator();
-      const result = await client.findRelations('672', 'disease', 'treat');
-      expect(result[0]?.relationType).toBe('treat');
-    });
-
-    it('should handle empty results', async () => {
-      mockFetchJson([]);
-      const client = new PubTator();
-      const result = await client.findRelations('672', 'disease', 'associate');
-      expect(result).toEqual([]);
-    });
-  });
-
   describe('search', () => {
     const SEARCH_RESPONSE = {
-      total: 42,
-      page: 1,
-      pagesize: 10,
+      count: 42,
+      current: 1,
+      page_size: 10,
       results: [
         {
-          pmid: '12345',
+          pmid: 12345,
           title: 'BRCA1 and Cancer',
           journal: 'Nature',
-          year: 2023,
+          date: '2023-06-15T00:00:00Z',
           authors: ['Smith J', 'Doe A'],
         },
       ],
@@ -301,21 +301,21 @@ describe('PubTator', () => {
     });
 
     it('should support page option', async () => {
-      mockFetchJson({ ...SEARCH_RESPONSE, page: 3 });
+      mockFetchJson({ ...SEARCH_RESPONSE, current: 3 });
       const client = new PubTator();
       await client.search('BRCA1', { page: 3 });
       expect(fetch).toHaveBeenCalledWith(expect.stringContaining('page=3'));
     });
 
     it('should support pageSize option', async () => {
-      mockFetchJson({ ...SEARCH_RESPONSE, pagesize: 25 });
+      mockFetchJson({ ...SEARCH_RESPONSE, page_size: 25 });
       const client = new PubTator();
       await client.search('BRCA1', { pageSize: 25 });
       expect(fetch).toHaveBeenCalledWith(expect.stringContaining('pagesize=25'));
     });
 
     it('should handle empty results', async () => {
-      mockFetchJson({ total: 0, page: 1, pagesize: 10, results: [] });
+      mockFetchJson({ count: 0, current: 1, page_size: 10, results: [] });
       const client = new PubTator();
       const result = await client.search('nonexistent');
       expect(result.total).toBe(0);
@@ -484,102 +484,6 @@ describe('PubTator', () => {
       await expect(client.annotateText('test')).rejects.toThrow(
         'PubTator3 text annotation failed: HTTP 429: Rate limit exceeded',
       );
-    });
-  });
-
-  describe('bioc', () => {
-    describe('pmc', () => {
-      it('should fetch BioC annotations for PMC article', async () => {
-        mockFetchText(BIOC_JSON);
-        const client = new PubTator();
-        const result = await client.bioc.pmc('PMC123456');
-        expect(result.documents).toHaveLength(1);
-        expect(fetch).toHaveBeenCalledWith(
-          expect.stringContaining('/publications/pmc/PMC123456/biocjson'),
-        );
-      });
-
-      it('should support xml format', async () => {
-        mockFetchText(BIOC_XML);
-        const client = new PubTator();
-        await client.bioc.pmc('PMC123456', { format: 'xml' });
-        expect(fetch).toHaveBeenCalledWith(
-          expect.stringContaining('/publications/pmc/PMC123456/biocxml'),
-        );
-      });
-
-      it('should support json format', async () => {
-        mockFetchText(BIOC_JSON);
-        const client = new PubTator();
-        await client.bioc.pmc('PMC123456', { format: 'json' });
-        expect(fetch).toHaveBeenCalledWith(
-          expect.stringContaining('/publications/pmc/PMC123456/biocjson'),
-        );
-      });
-
-      it('should support unicode encoding', async () => {
-        mockFetchText(BIOC_JSON);
-        const client = new PubTator();
-        await client.bioc.pmc('PMC123456', { encoding: 'unicode' });
-        expect(fetch).toHaveBeenCalledWith(expect.stringContaining('encoding=unicode'));
-      });
-
-      it('should support ascii encoding', async () => {
-        mockFetchText(BIOC_JSON);
-        const client = new PubTator();
-        await client.bioc.pmc('PMC123456', { encoding: 'ascii' });
-        expect(fetch).toHaveBeenCalledWith(expect.stringContaining('encoding=ascii'));
-      });
-
-      it('should return BioDocument with passages and annotations', async () => {
-        mockFetchText(BIOC_JSON);
-        const client = new PubTator();
-        const result = await client.bioc.pmc('PMC123456');
-        const passage = result.documents[0]?.passages[0];
-        expect(passage?.type).toBe('title');
-        expect(passage?.annotations[0]?.text).toBe('BRCA1');
-      });
-
-      it('should handle supplementary materials with _supp suffix', async () => {
-        mockFetchText(BIOC_JSON);
-        const client = new PubTator();
-        await client.bioc.pmc('PMC123456_supp');
-        expect(fetch).toHaveBeenCalledWith(
-          expect.stringContaining('/publications/pmc/PMC123456_supp/biocjson'),
-        );
-      });
-    });
-
-    describe('pubmed', () => {
-      it('should fetch BioC annotations for PubMed article', async () => {
-        mockFetchText(BIOC_JSON);
-        const client = new PubTator();
-        const result = await client.bioc.pubmed('12345');
-        expect(result.documents).toHaveLength(1);
-        expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/publications/12345/biocjson'));
-      });
-
-      it('should support xml format', async () => {
-        mockFetchText(BIOC_XML);
-        const client = new PubTator();
-        await client.bioc.pubmed('12345', { format: 'xml' });
-        expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/publications/12345/biocxml'));
-      });
-
-      it('should support json format', async () => {
-        mockFetchText(BIOC_JSON);
-        const client = new PubTator();
-        await client.bioc.pubmed('12345', { format: 'json' });
-        expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/publications/12345/biocjson'));
-      });
-
-      it('should return BioDocument with passages and annotations', async () => {
-        mockFetchText(BIOC_JSON);
-        const client = new PubTator();
-        const result = await client.bioc.pubmed('12345');
-        expect(result.documents[0]?.id).toBe('12345');
-        expect(result.documents[0]?.passages[0]?.annotations[0]?.type).toBe('Gene');
-      });
     });
   });
 });
