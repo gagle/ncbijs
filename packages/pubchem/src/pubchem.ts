@@ -217,29 +217,25 @@ export class PubChem {
 
   /** Fetch full compound annotations from PUG View, optionally filtered by heading. */
   public async compoundAnnotations(cid: number, heading?: string): Promise<AnnotationRecord> {
-    let url = `${PUG_VIEW_BASE_URL}/data/compound/${encodeURIComponent(cid)}/JSON`;
-    if (heading !== undefined) {
-      url += `?heading=${encodeURIComponent(heading)}`;
-    }
-    const raw = await fetchJson<RawPugViewResponse>(url, this._config);
-
-    return mapAnnotationRecord(raw.Record);
+    return this._fetchAnnotations('compound', cid, heading);
   }
 
   /** Fetch full substance annotations from PUG View, optionally filtered by heading. */
   public async substanceAnnotations(sid: number, heading?: string): Promise<AnnotationRecord> {
-    let url = `${PUG_VIEW_BASE_URL}/data/substance/${encodeURIComponent(sid)}/JSON`;
-    if (heading !== undefined) {
-      url += `?heading=${encodeURIComponent(heading)}`;
-    }
-    const raw = await fetchJson<RawPugViewResponse>(url, this._config);
-
-    return mapAnnotationRecord(raw.Record);
+    return this._fetchAnnotations('substance', sid, heading);
   }
 
   /** Fetch full bioassay annotations from PUG View, optionally filtered by heading. */
   public async assayAnnotations(aid: number, heading?: string): Promise<AnnotationRecord> {
-    let url = `${PUG_VIEW_BASE_URL}/data/bioassay/${encodeURIComponent(aid)}/JSON`;
+    return this._fetchAnnotations('bioassay', aid, heading);
+  }
+
+  private async _fetchAnnotations(
+    entityType: string,
+    id: number,
+    heading?: string,
+  ): Promise<AnnotationRecord> {
+    let url = `${PUG_VIEW_BASE_URL}/data/${entityType}/${encodeURIComponent(id)}/JSON`;
     if (heading !== undefined) {
       url += `?heading=${encodeURIComponent(heading)}`;
     }

@@ -263,17 +263,7 @@ export class EUtils {
   }
 
   public async *searchAndFetch(params: SearchAndFetchParams): AsyncIterableIterator<string> {
-    const search = await this.esearch({
-      db: params.db,
-      term: params.term,
-      usehistory: 'y',
-      retmax: 0,
-      datetype: params.datetype,
-      reldate: params.reldate,
-      mindate: params.mindate,
-      maxdate: params.maxdate,
-      sort: params.sort,
-    });
+    const search = await this._searchWithHistory(params);
 
     if (!search.webEnv || search.queryKey === undefined) {
       return;
@@ -293,18 +283,7 @@ export class EUtils {
     params: SearchAndSummarizeParams,
   ): AsyncIterableIterator<ESummaryResult> {
     const batchSize = params.batchSize ?? 500;
-
-    const search = await this.esearch({
-      db: params.db,
-      term: params.term,
-      usehistory: 'y',
-      retmax: 0,
-      datetype: params.datetype,
-      reldate: params.reldate,
-      mindate: params.mindate,
-      maxdate: params.maxdate,
-      sort: params.sort,
-    });
+    const search = await this._searchWithHistory(params);
 
     if (!search.webEnv || search.queryKey === undefined || search.count === 0) {
       return;
@@ -325,5 +304,21 @@ export class EUtils {
       yield result;
       retstart += batchSize;
     }
+  }
+
+  private async _searchWithHistory(
+    params: SearchAndFetchParams | SearchAndSummarizeParams,
+  ): Promise<ESearchResult> {
+    return this.esearch({
+      db: params.db,
+      term: params.term,
+      usehistory: 'y',
+      retmax: 0,
+      datetype: params.datetype,
+      reldate: params.reldate,
+      mindate: params.mindate,
+      maxdate: params.maxdate,
+      sort: params.sort,
+    });
   }
 }

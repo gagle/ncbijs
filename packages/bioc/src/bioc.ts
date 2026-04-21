@@ -1,36 +1,6 @@
-import type {
-  BioCAnnotation,
-  BioCDocument,
-  BioCFormat,
-  BioCLocation,
-  BioCPassage,
-} from './interfaces/bioc.interface';
+import type { BioCDocument, BioCFormat } from './interfaces/bioc.interface';
 
 const BASE_URL = 'https://www.ncbi.nlm.nih.gov/research/bionlp/RESTful';
-
-interface RawBioCDocument {
-  readonly id: string;
-  readonly passages: ReadonlyArray<RawBioCPassage>;
-}
-
-interface RawBioCPassage {
-  readonly offset: number;
-  readonly text: string;
-  readonly infons: Record<string, string>;
-  readonly annotations: ReadonlyArray<RawBioCAnnotation>;
-}
-
-interface RawBioCAnnotation {
-  readonly id: string;
-  readonly text: string;
-  readonly infons: Record<string, string>;
-  readonly locations: ReadonlyArray<RawBioCLocation>;
-}
-
-interface RawBioCLocation {
-  readonly offset: number;
-  readonly length: number;
-}
 
 /** Fetch BioC annotations for a PubMed article by PMID. */
 export function pubmed(pmid: string, format?: 'json'): Promise<BioCDocument>;
@@ -68,37 +38,5 @@ async function fetchBioC(
     return text;
   }
 
-  return mapDocument(JSON.parse(text) as RawBioCDocument);
-}
-
-function mapDocument(raw: RawBioCDocument): BioCDocument {
-  return {
-    id: raw.id,
-    passages: raw.passages.map(mapPassage),
-  };
-}
-
-function mapPassage(raw: RawBioCPassage): BioCPassage {
-  return {
-    offset: raw.offset,
-    text: raw.text,
-    infons: raw.infons,
-    annotations: raw.annotations.map(mapAnnotation),
-  };
-}
-
-function mapAnnotation(raw: RawBioCAnnotation): BioCAnnotation {
-  return {
-    id: raw.id,
-    text: raw.text,
-    infons: raw.infons,
-    locations: raw.locations.map(mapLocation),
-  };
-}
-
-function mapLocation(raw: RawBioCLocation): BioCLocation {
-  return {
-    offset: raw.offset,
-    length: raw.length,
-  };
+  return JSON.parse(text) as BioCDocument;
 }
