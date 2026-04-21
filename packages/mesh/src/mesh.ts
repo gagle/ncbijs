@@ -97,7 +97,7 @@ export class MeSH {
     return [...names];
   }
 
-  /** Return the full path from root to the given descriptor through the MeSH tree hierarchy. */
+  /** Return ancestor names along all tree paths from root to the given descriptor. */
   public treePath(term: string): ReadonlyArray<string> {
     const descriptor = this.resolveDescriptor(term);
     const allPaths: Array<string> = [];

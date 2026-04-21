@@ -211,14 +211,14 @@ I want to...
 
 ### Package capabilities
 
-| Capability        | Packages                                                                                                                              |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Needs API key     | `eutils`, `pubmed`, `pmc`, `clinvar`, `snp`, `datasets` (optional, for rate limit)                                                    |
-| No API key        | All others                                                                                                                            |
-| Rate-limited      | `eutils`, `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `clinical-trials`, `icite`, `rxnorm`, + all that depend on `rate-limiter` |
-| Zero dependencies | `cite`, `id-converter`, `mesh`, `fasta`, `genbank`, `litvar`, `bioc`, `clinical-tables`                                               |
-| Async iterators   | `eutils` (efetchBatches, searchAndFetch, searchAndSummarize), `pubmed` (batch), `clinical-trials` (searchStudies), `cite` (citeMany)  |
-| XML parsing       | `eutils`, `pubmed-xml`, `jats`, `pubtator`, `xml`                                                                                     |
+| Capability        | Packages                                                                                                                                                                                                        |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Supports API key  | `eutils`, `pubmed`, `pmc`, `clinvar`, `snp`, `datasets`, `omim`, `medgen`, `gtr`, `geo`, `dbvar`, `sra`, `structure`, `cdd`, `books`, `nlm-catalog`, `protein`, `nucleotide` (optional, for higher rate limits) |
+| No API key needed | All others (non-NCBI APIs)                                                                                                                                                                                      |
+| Rate-limited      | `eutils`, `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `clinical-trials`, `icite`, `rxnorm`, + all that depend on `rate-limiter`                                                                           |
+| Zero dependencies | `cite`, `id-converter`, `mesh`, `fasta`, `genbank`, `litvar`, `bioc`, `clinical-tables`                                                                                                                         |
+| Async iterators   | `eutils` (efetchBatches, searchAndFetch, searchAndSummarize), `pubmed` (batch), `clinical-trials` (searchStudies), `cite` (citeMany)                                                                            |
+| XML parsing       | `eutils`, `pubmed-xml`, `jats`, `pubtator`, `xml`                                                                                                                                                               |
 
 ## Architecture
 

@@ -10,7 +10,7 @@ import type { ProteinConfig } from './interfaces/protein.interface';
 
 const EFETCH_URL = `${EUTILS_BASE_URL}/efetch.fcgi`;
 
-/** Protein sequence retrieval client supporting FASTA and GenBank formats. */
+/** Protein sequence retrieval client supporting FASTA and GenPept formats. */
 export class Protein {
   private readonly _config: ProteinClientConfig;
 
