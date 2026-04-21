@@ -16,6 +16,32 @@ Technical guides for the ncbijs package ecosystem. Each guide covers one NCBI AP
 | [ID Converter](./id-converter.md) | Batch PMID/PMCID/DOI/MID conversion                            | `@ncbijs/id-converter` |
 | [MeSH](./mesh.md)                 | Vocabulary tree traversal, query expansion, SPARQL             | `@ncbijs/mesh`         |
 
+## Additional Packages
+
+These packages have README documentation in their package directories. See each package's README for API details and usage examples.
+
+| Package                                          | Covers                                                   |
+| ------------------------------------------------ | -------------------------------------------------------- |
+| [`@ncbijs/datasets`](../packages/datasets)       | Genes, genomes, taxonomy, viruses, BioProject, BioSample |
+| [`@ncbijs/blast`](../packages/blast)             | BLAST sequence alignment (submit/poll/retrieve)          |
+| [`@ncbijs/snp`](../packages/snp)                 | dbSNP variation data — placements, alleles, frequencies  |
+| [`@ncbijs/clinvar`](../packages/clinvar)         | ClinVar clinical variant significance and traits         |
+| [`@ncbijs/pubchem`](../packages/pubchem)         | PubChem compounds, substances, and bioassays             |
+| [`@ncbijs/protein`](../packages/protein)         | Protein sequences in FASTA and GenBank formats           |
+| [`@ncbijs/nucleotide`](../packages/nucleotide)   | Nucleotide sequences in FASTA and GenBank formats        |
+| [`@ncbijs/genbank`](../packages/genbank)         | GenBank flat file format parser (zero-dep)               |
+| [`@ncbijs/fasta`](../packages/fasta)             | FASTA format parser (zero-dep)                           |
+| [`@ncbijs/omim`](../packages/omim)               | OMIM genetic disorders and Mendelian inheritance         |
+| [`@ncbijs/medgen`](../packages/medgen)           | MedGen medical genetics concepts                         |
+| [`@ncbijs/gtr`](../packages/gtr)                 | Genetic Testing Registry                                 |
+| [`@ncbijs/geo`](../packages/geo)                 | GEO gene expression datasets                             |
+| [`@ncbijs/dbvar`](../packages/dbvar)             | dbVar structural variants                                |
+| [`@ncbijs/sra`](../packages/sra)                 | SRA sequencing experiment metadata                       |
+| [`@ncbijs/structure`](../packages/structure)     | 3D molecular structures from MMDB/PDB                    |
+| [`@ncbijs/cdd`](../packages/cdd)                 | Conserved Domain Database                                |
+| [`@ncbijs/books`](../packages/books)             | NCBI Bookshelf entries                                   |
+| [`@ncbijs/nlm-catalog`](../packages/nlm-catalog) | NLM Catalog journal and serial records                   |
+
 ## Architecture and Development
 
 | Guide                                           | Covers                                                   |

@@ -1,6 +1,6 @@
 # @ncbijs/datasets
 
-Typed client for the NCBI Datasets API v2. Access gene metadata, genome assemblies, and taxonomy data with zero XML parsing.
+Typed client for the NCBI Datasets API v2. Access genes, genomes, taxonomy, viruses, BioProjects, and BioSamples with zero XML parsing.
 
 ## Installation
 
@@ -61,6 +61,28 @@ Fetch genome assembly reports by accession (e.g., `GCF_000001405.40`).
 #### `genomeByTaxon(taxon: number | string): Promise<Array<GenomeReport>>`
 
 Fetch genome assembly reports for all assemblies of a taxon.
+
+### Virus
+
+#### `virusByAccession(accessions: Array<string>): Promise<Array<VirusReport>>`
+
+Fetch virus genome reports by accessions.
+
+#### `virusByTaxon(taxon: number | string): Promise<Array<VirusReport>>`
+
+Fetch virus genome reports for all viruses of a taxon.
+
+### BioProject
+
+#### `bioproject(accessions: Array<string>): Promise<Array<BioProjectReport>>`
+
+Fetch BioProject reports by accessions (e.g., `PRJNA12345`).
+
+### BioSample
+
+#### `biosample(accessions: Array<string>): Promise<Array<BioSampleReport>>`
+
+Fetch BioSample reports by accessions (e.g., `SAMN12345`).
 
 ## Error handling
 
@@ -127,5 +149,62 @@ interface GenomeReport {
   organism: GenomeOrganism;
   assemblyInfo: AssemblyInfo;
   assemblyStats: AssemblyStats;
+}
+```
+
+### `VirusReport`
+
+```ts
+interface VirusReport {
+  accession: string;
+  taxId: number;
+  organismName: string;
+  isolateName: string;
+  host: string;
+  collectionDate: string;
+  geoLocation: string;
+  completeness: string;
+  length: number;
+  bioprojectAccession: string;
+  biosampleAccession: string;
+}
+```
+
+### `BioProjectReport`
+
+```ts
+interface BioProjectReport {
+  accession: string;
+  title: string;
+  description: string;
+  organismName: string;
+  taxId: number;
+  projectType: string;
+  registrationDate: string;
+}
+```
+
+### `BioSampleReport`
+
+```ts
+interface BioSampleReport {
+  accession: string;
+  title: string;
+  description: string;
+  organismName: string;
+  taxId: number;
+  ownerName: string;
+  submissionDate: string;
+  publicationDate: string;
+  attributes: Array<BioSampleAttribute>;
+}
+```
+
+### `BioSampleAttribute`
+
+```ts
+interface BioSampleAttribute {
+  name: string;
+  value: string;
 }
 ```

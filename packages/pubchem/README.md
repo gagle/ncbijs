@@ -1,6 +1,6 @@
 # @ncbijs/pubchem
 
-Typed client for the PubChem PUG REST API. Look up compound properties, synonyms, and descriptions by CID or name.
+Typed client for the PubChem PUG REST API. Look up compounds, substances, and bioassays by ID or name with automatic rate limiting and retry logic.
 
 ## Installation
 
@@ -78,6 +78,42 @@ Fetch all known synonyms for a compound by CID.
 
 Fetch the title and description for a compound by CID.
 
+### Substance
+
+#### `substanceBySid(sid: number): Promise<SubstanceRecord>`
+
+Fetch substance details by PubChem SID.
+
+#### `substanceBySidBatch(sids: Array<number>): Promise<Array<SubstanceRecord>>`
+
+Fetch details for multiple substances by SID in a single request.
+
+#### `substanceByName(name: string): Promise<SubstanceRecord>`
+
+Fetch substance details by substance name.
+
+#### `substanceSynonyms(sid: number): Promise<SubstanceSynonyms>`
+
+Fetch all known synonyms for a substance by SID.
+
+#### `sidsByName(name: string): Promise<Array<number>>`
+
+Look up PubChem SIDs matching a substance name.
+
+### BioAssay
+
+#### `assayByAid(aid: number): Promise<AssayRecord>`
+
+Fetch bioassay details by PubChem AID.
+
+#### `assayByAidBatch(aids: Array<number>): Promise<Array<AssayRecord>>`
+
+Fetch details for multiple bioassays by AID in a single request.
+
+#### `assaySummary(aid: number): Promise<AssaySummary>`
+
+Fetch a summary of substance and compound counts for a bioassay.
+
 ## Error handling
 
 ```ts
@@ -136,5 +172,49 @@ interface CompoundDescription {
   cid: number;
   title: string;
   description: string;
+}
+```
+
+### `SubstanceRecord`
+
+```ts
+interface SubstanceRecord {
+  sid: number;
+  sourceName: string;
+  sourceId: string;
+  description: string;
+}
+```
+
+### `SubstanceSynonyms`
+
+```ts
+interface SubstanceSynonyms {
+  sid: number;
+  synonyms: Array<string>;
+}
+```
+
+### `AssayRecord`
+
+```ts
+interface AssayRecord {
+  aid: number;
+  name: string;
+  description: string;
+  protocol: string;
+  sourceName: string;
+  sourceId: string;
+}
+```
+
+### `AssaySummary`
+
+```ts
+interface AssaySummary {
+  aid: number;
+  name: string;
+  sidCount: number;
+  cidCount: number;
 }
 ```
