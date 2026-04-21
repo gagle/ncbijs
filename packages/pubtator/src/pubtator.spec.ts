@@ -260,6 +260,21 @@ describe('PubTator', () => {
         'PubTator3 entity search failed: HTTP 503',
       );
     });
+
+    it('should handle HTTP error when response.text() rejects', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: false,
+          status: 502,
+          text: () => Promise.reject(new Error('stream error')),
+        }),
+      );
+      const client = new PubTator();
+      await expect(client.findEntity('BRCA1')).rejects.toThrow(
+        'PubTator3 entity search failed: HTTP 502',
+      );
+    });
   });
 
   describe('search', () => {

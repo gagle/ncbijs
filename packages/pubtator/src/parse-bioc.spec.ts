@@ -294,6 +294,40 @@ describe('parseBioC', () => {
       expect(result.documents[0]?.passages[0]?.annotations[0]?.id).toBe('NCBI:672');
     });
 
+    it('should default id to empty when document has no id tag', () => {
+      const xml = `<collection>
+  <document>
+    <passage>
+      <infon key="type">title</infon>
+      <text>Test</text>
+      <offset>0</offset>
+    </passage>
+  </document>
+</collection>`;
+      const result = parseBioC(xml);
+      expect(result.documents[0]?.id).toBe('');
+    });
+
+    it('should default annotation text to empty when text tag is missing', () => {
+      const xml = `<collection>
+  <document>
+    <id>12345</id>
+    <passage>
+      <infon key="type">title</infon>
+      <text>Test</text>
+      <offset>0</offset>
+      <annotation>
+        <infon key="type">Gene</infon>
+        <infon key="identifier">672</infon>
+        <location offset="0" length="5" />
+      </annotation>
+    </passage>
+  </document>
+</collection>`;
+      const result = parseBioC(xml);
+      expect(result.documents[0]?.passages[0]?.annotations[0]?.text).toBe('');
+    });
+
     it('should skip infon tags without key attribute', () => {
       const xml = `<collection>
   <document>

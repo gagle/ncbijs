@@ -197,4 +197,122 @@ describe('toMarkdown', () => {
     expect(result).toContain('## Appendix A');
     expect(result).toContain('Supplementary data.');
   });
+
+  it('should include authors with foreName and lastName', () => {
+    const article = buildArticle({
+      front: {
+        journal: { title: 'Nature' },
+        article: {
+          title: 'Test',
+          authors: [{ foreName: 'John', lastName: 'Smith', affiliations: [] }],
+        },
+      },
+    });
+    const result = toMarkdown(article);
+    expect(result).toContain('**Authors:** John Smith');
+  });
+
+  it('should use collectiveName when available', () => {
+    const article = buildArticle({
+      front: {
+        journal: { title: 'Nature' },
+        article: {
+          title: 'Test',
+          authors: [{ collectiveName: 'The Consortium', affiliations: [] }],
+        },
+      },
+    });
+    const result = toMarkdown(article);
+    expect(result).toContain('**Authors:** The Consortium');
+  });
+
+  it('should render references with all optional fields', () => {
+    const article = buildArticle({
+      back: {
+        references: [
+          {
+            id: 'ref1',
+            authors: ['Smith J', 'Doe A'],
+            title: 'Study',
+            source: 'Nature',
+            year: 2024,
+            volume: '625',
+            pages: '100-105',
+            doi: '10.1038/test',
+          },
+        ],
+      },
+    });
+    const result = toMarkdown(article);
+    expect(result).toContain('Smith J, Doe A.');
+    expect(result).toContain('2024.');
+    expect(result).toContain('625.');
+    expect(result).toContain('100-105.');
+    expect(result).toContain('doi:10.1038/test');
+  });
+
+  it('should render references without optional fields', () => {
+    const article = buildArticle({
+      back: {
+        references: [
+          {
+            id: 'ref1',
+            authors: [],
+            title: 'Study',
+            source: 'Nature',
+          },
+        ],
+      },
+    });
+    const result = toMarkdown(article);
+    expect(result).not.toContain('doi:');
+    expect(result).toContain('Study. Nature.');
+  });
+
+  it('should render table without caption', () => {
+    const article = buildArticle({
+      body: [
+        {
+          title: 'Results',
+          depth: 1,
+          paragraphs: [],
+          tables: [
+            {
+              headers: ['Col1'],
+              rows: [['val1']],
+            },
+          ],
+          figures: [],
+          subsections: [],
+        },
+      ],
+    });
+    const result = toMarkdown(article);
+    expect(result).toContain('| Col1 |');
+    expect(result).not.toContain('*Table');
+  });
+
+  it('should render table without headers', () => {
+    const article = buildArticle({
+      body: [
+        {
+          title: 'Results',
+          depth: 1,
+          paragraphs: [],
+          tables: [
+            {
+              caption: 'Data',
+              headers: [],
+              rows: [['val1']],
+            },
+          ],
+          figures: [],
+          subsections: [],
+        },
+      ],
+    });
+    const result = toMarkdown(article);
+    expect(result).toContain('*Data*');
+    expect(result).toContain('| val1 |');
+  });
 });

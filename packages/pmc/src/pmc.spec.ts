@@ -265,6 +265,56 @@ describe('PMC', () => {
 
       await expect(pmc.fetch('PMC99999')).rejects.toThrow();
     });
+
+    it('should extract license from license-p when license-type attribute is missing', async () => {
+      const xmlWithLicenseP = JATS_XML.replace(
+        '<license license-type="open-access">\n        <license-p>This is open access.</license-p>\n      </license>',
+        '<license>\n        <license-p>Creative Commons <a>CC BY 4.0</a> license</license-p>\n      </license>',
+      );
+      mockEFetch.mockResolvedValue(xmlWithLicenseP);
+      const pmc = new PMC(VALID_CONFIG);
+      const article = await pmc.fetch('PMC12345');
+
+      expect(article.license).toContain('Creative Commons');
+      expect(article.license).toContain('CC BY 4.0');
+    });
+
+    it('should extract license from p tag when license-p is missing', async () => {
+      const xmlWithP = JATS_XML.replace(
+        '<license license-type="open-access">\n        <license-p>This is open access.</license-p>\n      </license>',
+        '<license>\n        <p>Free to use under <a>MIT</a></p>\n      </license>',
+      );
+      mockEFetch.mockResolvedValue(xmlWithP);
+      const pmc = new PMC(VALID_CONFIG);
+      const article = await pmc.fetch('PMC12345');
+
+      expect(article.license).toContain('Free to use under');
+      expect(article.license).toContain('MIT');
+    });
+
+    it('should extract license from raw block text when no nested elements match', async () => {
+      const xmlRawLicense = JATS_XML.replace(
+        '<license license-type="open-access">\n        <license-p>This is open access.</license-p>\n      </license>',
+        '<license>Raw license text here</license>',
+      );
+      mockEFetch.mockResolvedValue(xmlRawLicense);
+      const pmc = new PMC(VALID_CONFIG);
+      const article = await pmc.fetch('PMC12345');
+
+      expect(article.license).toBe('Raw license text here');
+    });
+
+    it('should return empty license when no license block exists', async () => {
+      const xmlNoLicense = JATS_XML.replace(
+        '<permissions>\n      <license license-type="open-access">\n        <license-p>This is open access.</license-p>\n      </license>\n    </permissions>',
+        '<permissions></permissions>',
+      );
+      mockEFetch.mockResolvedValue(xmlNoLicense);
+      const pmc = new PMC(VALID_CONFIG);
+      const article = await pmc.fetch('PMC12345');
+
+      expect(article.license).toBe('');
+    });
   });
 
   describe('oa.lookup', () => {
@@ -417,6 +467,31 @@ describe('PMC', () => {
       await expect(pmc.oa.lookup('PMC99999')).rejects.toThrow('No OA record found');
     });
 
+    it('should throw on non-403/404 HTTP error', async () => {
+      mockFetchJson({}, 500);
+      const pmc = new PMC(VALID_CONFIG);
+
+      await expect(pmc.oa.lookup('PMC12345')).rejects.toThrow(
+        'OA lookup failed for PMC12345: HTTP 500',
+      );
+    });
+
+    it('should throw on malformed JSON response', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: true,
+          status: 200,
+          json: () => Promise.reject(new SyntaxError('Unexpected token')),
+        }),
+      );
+      const pmc = new PMC(VALID_CONFIG);
+
+      await expect(pmc.oa.lookup('PMC12345')).rejects.toThrow(
+        'OA lookup returned malformed response',
+      );
+    });
+
     it('should normalize PMCID without prefix', async () => {
       mockFetchJson(S3_METADATA_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
@@ -555,6 +630,86 @@ describe('PMC', () => {
       }
 
       expect(records).toHaveLength(0);
+    });
+
+    it('should skip articles with malformed JSON from S3', async () => {
+      mockESearch.mockResolvedValue({ count: 2, idList: ['11111', '22222'] });
+
+      const successMetadata = { ...S3_METADATA_RESPONSE, pmcid: 'PMC22222' };
+      vi.stubGlobal(
+        'fetch',
+        vi
+          .fn()
+          .mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: () => Promise.reject(new SyntaxError('bad json')),
+          })
+          .mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: () => Promise.resolve(successMetadata),
+          }),
+      );
+
+      const pmc = new PMC(VALID_CONFIG);
+      const records: Array<OARecord> = [];
+
+      for await (const record of pmc.oa.since('2024-01-01')) {
+        records.push(record);
+      }
+
+      expect(records).toHaveLength(1);
+      expect(records[0]?.pmcid).toBe('PMC22222');
+    });
+
+    it('should handle PMC-prefixed IDs from eSearch', async () => {
+      mockESearch.mockResolvedValue({ count: 1, idList: ['PMC12345'] });
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve(S3_METADATA_RESPONSE),
+        }),
+      );
+
+      const pmc = new PMC(VALID_CONFIG);
+      const records: Array<OARecord> = [];
+
+      for await (const record of pmc.oa.since('2024-01-01')) {
+        records.push(record);
+      }
+
+      expect(records).toHaveLength(1);
+      const fetchCall = vi.mocked(fetch).mock.calls[0];
+      const url = fetchCall?.[0] as string;
+      expect(url).toContain('/metadata/PMC12345.1.json');
+    });
+
+    it('should paginate through multiple eSearch batches', async () => {
+      mockESearch
+        .mockResolvedValueOnce({ count: 501, idList: ['11111'] })
+        .mockResolvedValueOnce({ count: 501, idList: [] });
+
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ ...S3_METADATA_RESPONSE, pmcid: 'PMC11111' }),
+        }),
+      );
+
+      const pmc = new PMC(VALID_CONFIG);
+      const records: Array<OARecord> = [];
+
+      for await (const record of pmc.oa.since('2024-01-01')) {
+        records.push(record);
+      }
+
+      expect(records).toHaveLength(1);
+      expect(mockESearch).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -696,6 +851,33 @@ describe('PMC', () => {
 
       expect(records).toHaveLength(0);
     });
+
+    it('should throw on HTTP error response', async () => {
+      mockFetchText('Server Error', 500);
+      const pmc = new PMC(VALID_CONFIG);
+
+      await expect(async () => {
+        const records = [];
+        for await (const record of pmc.oai.listRecords({ from: '2024-01-01' })) {
+          records.push(record);
+        }
+      }).rejects.toThrow('OAI-PMH ListRecords failed: HTTP 500');
+    });
+
+    it('should stop when response has no ListRecords block', async () => {
+      mockFetchText(`<?xml version="1.0"?>
+<OAI-PMH>
+  <responseDate>2024-01-01T00:00:00Z</responseDate>
+</OAI-PMH>`);
+      const pmc = new PMC(VALID_CONFIG);
+      const records: Array<unknown> = [];
+
+      for await (const record of pmc.oai.listRecords({ from: '2024-01-01' })) {
+        records.push(record);
+      }
+
+      expect(records).toHaveLength(0);
+    });
   });
 
   describe('oai.getRecord', () => {
@@ -733,6 +915,55 @@ describe('PMC', () => {
       const pmc = new PMC(VALID_CONFIG);
 
       await expect(pmc.oai.getRecord('PMC99999')).rejects.toThrow('OAI-PMH error');
+    });
+
+    it('should throw on HTTP error response', async () => {
+      mockFetchText('Server Error', 500);
+      const pmc = new PMC(VALID_CONFIG);
+
+      await expect(pmc.oai.getRecord('PMC12345')).rejects.toThrow(
+        'OAI-PMH GetRecord failed for PMC12345: HTTP 500',
+      );
+    });
+
+    it('should throw when GetRecord block is missing from response', async () => {
+      mockFetchText(`<?xml version="1.0"?>
+<OAI-PMH>
+  <responseDate>2024-01-01T00:00:00Z</responseDate>
+</OAI-PMH>`);
+      const pmc = new PMC(VALID_CONFIG);
+
+      await expect(pmc.oai.getRecord('PMC12345')).rejects.toThrow('No record found for PMC12345');
+    });
+
+    it('should throw when record block is missing inside GetRecord', async () => {
+      mockFetchText(`<?xml version="1.0"?>
+<OAI-PMH>
+  <GetRecord></GetRecord>
+</OAI-PMH>`);
+      const pmc = new PMC(VALID_CONFIG);
+
+      await expect(pmc.oai.getRecord('PMC12345')).rejects.toThrow('No record found for PMC12345');
+    });
+
+    it('should strip PMC prefix when constructing OAI identifier', async () => {
+      mockFetchText(OAI_GET_RECORD_RESPONSE);
+      const pmc = new PMC(VALID_CONFIG);
+      await pmc.oai.getRecord('PMC12345');
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0];
+      const url = fetchCall?.[0] as string;
+      expect(url).toContain('identifier=oai%3Apubmedcentral.nih.gov%3A12345');
+    });
+
+    it('should handle numeric-only PMCID', async () => {
+      mockFetchText(OAI_GET_RECORD_RESPONSE);
+      const pmc = new PMC(VALID_CONFIG);
+      await pmc.oai.getRecord('12345');
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0];
+      const url = fetchCall?.[0] as string;
+      expect(url).toContain('identifier=oai%3Apubmedcentral.nih.gov%3A12345');
     });
   });
 });

@@ -168,4 +168,43 @@ describe('toPlainText', () => {
     expect(result).toContain('Abstract:');
     expect(result).toContain('Abstract text here.');
   });
+
+  it('should render references without authors', () => {
+    const article = buildArticle({
+      back: {
+        references: [{ id: 'ref1', authors: [], title: 'Study', source: 'Nature' }],
+      },
+    });
+    const result = toPlainText(article);
+    expect(result).toContain('1. Study. Nature');
+  });
+
+  it('should render references without year', () => {
+    const article = buildArticle({
+      back: {
+        references: [{ id: 'ref1', authors: ['Smith J'], title: 'Study', source: 'Nature' }],
+      },
+    });
+    const result = toPlainText(article);
+    expect(result).toContain('1. Smith J. Study. Nature');
+    expect(result).not.toMatch(/\d{4}$/m);
+  });
+
+  it('should render table without caption', () => {
+    const article = buildArticle({
+      body: [
+        {
+          title: 'Results',
+          depth: 1,
+          paragraphs: [],
+          tables: [{ headers: ['A'], rows: [['1']] }],
+          figures: [],
+          subsections: [],
+        },
+      ],
+    });
+    const result = toPlainText(article);
+    expect(result).not.toContain('Table:');
+    expect(result).toContain('1');
+  });
 });

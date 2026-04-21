@@ -161,5 +161,24 @@ describe('toChunks', () => {
         expect(prevLast).not.toBe(currFirst);
       }
     });
+
+    it('should skip sections with empty paragraphs', () => {
+      const article = buildArticle({
+        body: [
+          {
+            title: 'Empty Section',
+            depth: 1,
+            paragraphs: [],
+            tables: [],
+            figures: [],
+            subsections: [],
+          },
+          buildSection('Content Section', 50),
+        ],
+      });
+      const chunks = toChunks(article);
+      expect(chunks.every((c) => c.section !== 'Empty Section')).toBe(true);
+      expect(chunks.some((c) => c.section === 'Content Section')).toBe(true);
+    });
   });
 });
