@@ -1,12 +1,13 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { PMC, pmcToMarkdown, pmcToPlainText, pmcToChunks } from './pmc';
-import type { FullTextArticle } from './interfaces/pmc.interface';
+import type { FullTextArticle, OARecord } from './interfaces/pmc.interface';
 
 const mockEFetch = vi.fn();
+const mockESearch = vi.fn();
 
 vi.mock('@ncbijs/eutils', () => ({
   EUtils: vi.fn(function () {
-    return { efetch: mockEFetch };
+    return { efetch: mockEFetch, esearch: mockESearch };
   }),
 }));
 
@@ -64,7 +65,55 @@ function buildFullTextArticle(overrides: Partial<FullTextArticle> = {}): FullTex
   };
 }
 
-function mockFetch(body: string, status = 200): void {
+const S3_METADATA_RESPONSE = {
+  pmcid: 'PMC12345',
+  version: 1,
+  pmid: 12345678,
+  doi: '10.1234/test.2024',
+  mid: null,
+  title: 'Test Article Title',
+  citation: 'Smith J. Test. 2024.',
+  is_pmc_openaccess: true,
+  is_manuscript: false,
+  is_historical_ocr: false,
+  is_retracted: false,
+  license_code: 'CC BY',
+  xml_url: 's3://pmc-oa-opendata/PMC12345.1/PMC12345.1.xml?md5=abc123',
+  text_url: 's3://pmc-oa-opendata/PMC12345.1/PMC12345.1.txt?md5=def456',
+  pdf_url: 's3://pmc-oa-opendata/PMC12345.1/PMC12345.1.pdf?md5=ghi789',
+  media_urls: ['s3://pmc-oa-opendata/PMC12345.1/figure1.jpg?md5=jkl012'],
+};
+
+const S3_MANUSCRIPT_RESPONSE = {
+  pmcid: 'PMC99999',
+  version: 1,
+  pmid: 99999999,
+  doi: '10.1234/manuscript.2024',
+  mid: 'NIHMS1234567',
+  title: 'Manuscript Title',
+  citation: 'Author manuscript; Available in PMC 2024.',
+  is_pmc_openaccess: false,
+  is_manuscript: true,
+  is_historical_ocr: false,
+  is_retracted: false,
+  license_code: 'TDM',
+  xml_url: 's3://pmc-oa-opendata/PMC99999.1/PMC99999.1.xml?md5=aaa',
+  text_url: 's3://pmc-oa-opendata/PMC99999.1/PMC99999.1.txt?md5=bbb',
+};
+
+function mockFetchJson(body: unknown, status = 200): void {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue({
+      ok: status >= 200 && status < 300,
+      status,
+      json: () => Promise.resolve(body),
+      text: () => Promise.resolve(JSON.stringify(body)),
+    }),
+  );
+}
+
+function mockFetchText(body: string, status = 200): void {
   vi.stubGlobal(
     'fetch',
     vi.fn().mockResolvedValue({
@@ -74,51 +123,6 @@ function mockFetch(body: string, status = 200): void {
     }),
   );
 }
-
-const OA_LOOKUP_RESPONSE = `<?xml version="1.0"?>
-<OA>
-  <records returned-count="1" total-count="1">
-    <record id="PMC12345" citation="Smith J. Test. 2024." license="CC BY" retracted="no">
-      <link format="tgz" href="https://ftp.ncbi.nlm.nih.gov/pub/pmc/oa_package/PMC12345.tar.gz" updated="2024-01-15 00:00:00"/>
-      <link format="pdf" href="https://ftp.ncbi.nlm.nih.gov/pub/pmc/oa_pdf/PMC12345.pdf" updated="2024-01-15 00:00:00"/>
-    </record>
-  </records>
-</OA>`;
-
-const OA_ERROR_RESPONSE = `<?xml version="1.0"?>
-<OA>
-  <error code="idIsNotOpenAccess">PMC99999 is not Open Access</error>
-</OA>`;
-
-const OA_SINCE_RESPONSE = `<?xml version="1.0"?>
-<OA>
-  <records returned-count="1" total-count="1">
-    <record id="PMC11111" citation="Doe J. Study. 2024." license="CC0" retracted="no">
-      <link format="tgz" href="https://ftp.ncbi.nlm.nih.gov/pub/pmc/oa_package/PMC11111.tar.gz" updated="2024-06-01 00:00:00"/>
-    </record>
-  </records>
-</OA>`;
-
-const OA_SINCE_PAGE2_RESPONSE = `<?xml version="1.0"?>
-<OA>
-  <records returned-count="1" total-count="2">
-    <record id="PMC22222" citation="Lee K. Research. 2024." license="CC BY" retracted="no">
-      <link format="tgz" href="https://example.com/PMC22222.tar.gz" updated="2024-06-02 00:00:00"/>
-    </record>
-  </records>
-</OA>`;
-
-const OA_SINCE_WITH_RESUMPTION = `<?xml version="1.0"?>
-<OA>
-  <records returned-count="1" total-count="2">
-    <record id="PMC11111" citation="Doe J. Study. 2024." license="CC0" retracted="no">
-      <link format="tgz" href="https://example.com/PMC11111.tar.gz" updated="2024-06-01 00:00:00"/>
-    </record>
-  </records>
-  <resumption offset="1" count="1" total="2">
-    <link href="https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?resumptionToken=abc123"/>
-  </resumption>
-</OA>`;
 
 const OAI_LIST_RESPONSE = `<?xml version="1.0"?>
 <OAI-PMH>
@@ -264,16 +268,36 @@ describe('PMC', () => {
   });
 
   describe('oa.lookup', () => {
-    it('should fetch OA record for PMCID', async () => {
-      mockFetch(OA_LOOKUP_RESPONSE);
+    it('should fetch OA record from S3 metadata', async () => {
+      mockFetchJson(S3_METADATA_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
       const record = await pmc.oa.lookup('PMC12345');
 
       expect(record.pmcid).toBe('PMC12345');
     });
 
+    it('should request version 1 by default', async () => {
+      mockFetchJson(S3_METADATA_RESPONSE);
+      const pmc = new PMC(VALID_CONFIG);
+      await pmc.oa.lookup('PMC12345');
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0];
+      const url = fetchCall?.[0] as string;
+      expect(url).toContain('/metadata/PMC12345.1.json');
+    });
+
+    it('should support custom version via options', async () => {
+      mockFetchJson({ ...S3_METADATA_RESPONSE, version: 2 });
+      const pmc = new PMC(VALID_CONFIG);
+      await pmc.oa.lookup('PMC12345', { version: 2 });
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0];
+      const url = fetchCall?.[0] as string;
+      expect(url).toContain('/metadata/PMC12345.2.json');
+    });
+
     it('should parse citation and license', async () => {
-      mockFetch(OA_LOOKUP_RESPONSE);
+      mockFetchJson(S3_METADATA_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
       const record = await pmc.oa.lookup('PMC12345');
 
@@ -282,103 +306,190 @@ describe('PMC', () => {
     });
 
     it('should parse retracted flag', async () => {
-      const retractedXml = OA_LOOKUP_RESPONSE.replace('retracted="no"', 'retracted="yes"');
-      mockFetch(retractedXml);
+      mockFetchJson({ ...S3_METADATA_RESPONSE, is_retracted: true });
       const pmc = new PMC(VALID_CONFIG);
       const record = await pmc.oa.lookup('PMC12345');
 
       expect(record.retracted).toBe(true);
     });
 
-    it('should parse links with format and href', async () => {
-      mockFetch(OA_LOOKUP_RESPONSE);
+    it('should parse pmid, doi, and version', async () => {
+      mockFetchJson(S3_METADATA_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
       const record = await pmc.oa.lookup('PMC12345');
 
-      expect(record.links).toHaveLength(2);
-      expect(record.links[0]?.format).toBe('tgz');
-      expect(record.links[1]?.format).toBe('pdf');
-      expect(record.links[0]?.href).toContain('tar.gz');
+      expect(record.pmid).toBe(12345678);
+      expect(record.doi).toBe('10.1234/test.2024');
+      expect(record.version).toBe(1);
     });
 
-    it('should parse updated timestamp on links', async () => {
-      mockFetch(OA_LOOKUP_RESPONSE);
+    it('should parse openAccess, manuscript, and historicalOcr flags', async () => {
+      mockFetchJson(S3_METADATA_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
       const record = await pmc.oa.lookup('PMC12345');
 
-      expect(record.links[0]?.updated).toBe('2024-01-15 00:00:00');
+      expect(record.openAccess).toBe(true);
+      expect(record.manuscript).toBe(false);
+      expect(record.historicalOcr).toBe(false);
     });
 
-    it('should handle FTP URLs', async () => {
-      mockFetch(OA_LOOKUP_RESPONSE);
+    it('should convert S3 URLs to HTTPS', async () => {
+      mockFetchJson(S3_METADATA_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
       const record = await pmc.oa.lookup('PMC12345');
 
-      expect(record.links[0]?.href).toContain('ftp.ncbi.nlm.nih.gov');
-    });
-
-    it('should handle S3 URLs', async () => {
-      const s3Xml = OA_LOOKUP_RESPONSE.replace(
-        'https://ftp.ncbi.nlm.nih.gov/pub/pmc/oa_package/PMC12345.tar.gz',
-        'https://pmc-oa-opendata.s3.amazonaws.com/oa_comm/PMC12345.tar.gz',
+      expect(record.xmlUrl).toBe(
+        'https://pmc-oa-opendata.s3.amazonaws.com/PMC12345.1/PMC12345.1.xml',
       );
-      mockFetch(s3Xml);
+      expect(record.textUrl).toBe(
+        'https://pmc-oa-opendata.s3.amazonaws.com/PMC12345.1/PMC12345.1.txt',
+      );
+      expect(record.pdfUrl).toBe(
+        'https://pmc-oa-opendata.s3.amazonaws.com/PMC12345.1/PMC12345.1.pdf',
+      );
+    });
+
+    it('should convert media S3 URLs to HTTPS', async () => {
+      mockFetchJson(S3_METADATA_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
       const record = await pmc.oa.lookup('PMC12345');
 
-      expect(record.links[0]?.href).toContain('s3.amazonaws.com');
+      expect(record.mediaUrls).toHaveLength(1);
+      expect(record.mediaUrls?.[0]).toBe(
+        'https://pmc-oa-opendata.s3.amazonaws.com/PMC12345.1/figure1.jpg',
+      );
     });
 
-    it('should throw on non-OA article', async () => {
-      mockFetch(OA_ERROR_RESPONSE);
+    it('should omit pdfUrl when not present in metadata', async () => {
+      mockFetchJson(S3_MANUSCRIPT_RESPONSE);
+      const pmc = new PMC(VALID_CONFIG);
+      const record = await pmc.oa.lookup('PMC99999');
+
+      expect(record.pdfUrl).toBeUndefined();
+    });
+
+    it('should omit mediaUrls when not present in metadata', async () => {
+      mockFetchJson(S3_MANUSCRIPT_RESPONSE);
+      const pmc = new PMC(VALID_CONFIG);
+      const record = await pmc.oa.lookup('PMC99999');
+
+      expect(record.mediaUrls).toBeUndefined();
+    });
+
+    it('should handle manuscript records with mid', async () => {
+      mockFetchJson(S3_MANUSCRIPT_RESPONSE);
+      const pmc = new PMC(VALID_CONFIG);
+      const record = await pmc.oa.lookup('PMC99999');
+
+      expect(record.mid).toBe('NIHMS1234567');
+      expect(record.manuscript).toBe(true);
+      expect(record.openAccess).toBe(false);
+      expect(record.license).toBe('TDM');
+    });
+
+    it('should handle null license_code as undefined', async () => {
+      mockFetchJson({ ...S3_METADATA_RESPONSE, license_code: null });
+      const pmc = new PMC(VALID_CONFIG);
+      const record = await pmc.oa.lookup('PMC12345');
+
+      expect(record.license).toBeUndefined();
+    });
+
+    it('should handle null mid as undefined', async () => {
+      mockFetchJson(S3_METADATA_RESPONSE);
+      const pmc = new PMC(VALID_CONFIG);
+      const record = await pmc.oa.lookup('PMC12345');
+
+      expect(record.mid).toBeUndefined();
+    });
+
+    it('should throw on non-existent article', async () => {
+      mockFetchJson({}, 404);
       const pmc = new PMC(VALID_CONFIG);
 
-      await expect(pmc.oa.lookup('PMC99999')).rejects.toThrow('OA Service error');
+      await expect(pmc.oa.lookup('PMC99999')).rejects.toThrow('No OA record found');
+    });
+
+    it('should throw on S3 403 forbidden', async () => {
+      mockFetchJson({}, 403);
+      const pmc = new PMC(VALID_CONFIG);
+
+      await expect(pmc.oa.lookup('PMC99999')).rejects.toThrow('No OA record found');
+    });
+
+    it('should normalize PMCID without prefix', async () => {
+      mockFetchJson(S3_METADATA_RESPONSE);
+      const pmc = new PMC(VALID_CONFIG);
+      await pmc.oa.lookup('12345');
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0];
+      const url = fetchCall?.[0] as string;
+      expect(url).toContain('/metadata/PMC12345.1.json');
     });
   });
 
   describe('oa.since', () => {
-    it('should yield OARecords since given date', async () => {
-      mockFetch(OA_SINCE_RESPONSE);
+    it('should yield OARecords since given date via eSearch + S3', async () => {
+      mockESearch.mockResolvedValue({ count: 1, idList: ['12345'] });
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve(S3_METADATA_RESPONSE),
+        }),
+      );
+
       const pmc = new PMC(VALID_CONFIG);
-      const records: Array<unknown> = [];
+      const records: Array<OARecord> = [];
 
       for await (const record of pmc.oa.since('2024-01-01')) {
         records.push(record);
       }
 
       expect(records).toHaveLength(1);
+      expect(records[0]?.pmcid).toBe('PMC12345');
+    });
+
+    it('should use eSearch with date range and OA filter', async () => {
+      mockESearch.mockResolvedValue({ count: 0, idList: [] });
+
+      const pmc = new PMC(VALID_CONFIG);
+      const records: Array<OARecord> = [];
+
+      for await (const record of pmc.oa.since('2024-01-01')) {
+        records.push(record);
+      }
+
+      expect(mockESearch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          db: 'pmc',
+          term: expect.stringContaining('2024-01-01'),
+        }),
+      );
+      expect(mockESearch.mock.calls[0]?.[0].term).toContain('open_access[filter]');
+      expect(mockESearch.mock.calls[0]?.[0].term).toContain('author_manuscript[filter]');
     });
 
     it('should support until option', async () => {
-      mockFetch(OA_SINCE_RESPONSE);
+      mockESearch.mockResolvedValue({ count: 0, idList: [] });
+
       const pmc = new PMC(VALID_CONFIG);
-      const records: Array<unknown> = [];
+      const records: Array<OARecord> = [];
 
       for await (const record of pmc.oa.since('2024-01-01', { until: '2024-06-30' })) {
         records.push(record);
       }
 
-      const fetchCall = vi.mocked(fetch).mock.calls[0];
-      const url = fetchCall?.[0] as string;
-      expect(url).toContain('until=2024-06-30');
+      expect(mockESearch.mock.calls[0]?.[0].term).toContain('2024-01-01:2024-06-30[pmcrdat]');
     });
 
-    it('should support format filter', async () => {
-      mockFetch(OA_SINCE_RESPONSE);
-      const pmc = new PMC(VALID_CONFIG);
-      const records: Array<unknown> = [];
+    it('should fetch S3 metadata for all eSearch results', async () => {
+      mockESearch.mockResolvedValue({ count: 2, idList: ['11111', '22222'] });
 
-      for await (const record of pmc.oa.since('2024-01-01', { format: 'pdf' })) {
-        records.push(record);
-      }
+      const metadata11111 = { ...S3_METADATA_RESPONSE, pmcid: 'PMC11111' };
+      const metadata22222 = { ...S3_METADATA_RESPONSE, pmcid: 'PMC22222' };
 
-      const fetchCall = vi.mocked(fetch).mock.calls[0];
-      const url = fetchCall?.[0] as string;
-      expect(url).toContain('format=pdf');
-    });
-
-    it('should paginate with resumptionToken', async () => {
       vi.stubGlobal(
         'fetch',
         vi
@@ -386,17 +497,17 @@ describe('PMC', () => {
           .mockResolvedValueOnce({
             ok: true,
             status: 200,
-            text: () => Promise.resolve(OA_SINCE_WITH_RESUMPTION),
+            json: () => Promise.resolve(metadata11111),
           })
           .mockResolvedValueOnce({
             ok: true,
             status: 200,
-            text: () => Promise.resolve(OA_SINCE_PAGE2_RESPONSE),
+            json: () => Promise.resolve(metadata22222),
           }),
       );
 
       const pmc = new PMC(VALID_CONFIG);
-      const records: Array<unknown> = [];
+      const records: Array<OARecord> = [];
 
       for await (const record of pmc.oa.since('2024-01-01')) {
         records.push(record);
@@ -406,22 +517,38 @@ describe('PMC', () => {
       expect(vi.mocked(fetch)).toHaveBeenCalledTimes(2);
     });
 
-    it('should stop when no more results', async () => {
-      mockFetch(OA_SINCE_RESPONSE);
+    it('should skip articles that fail S3 fetch', async () => {
+      mockESearch.mockResolvedValue({ count: 2, idList: ['11111', '22222'] });
+
+      const successMetadata = { ...S3_METADATA_RESPONSE, pmcid: 'PMC22222' };
+      vi.stubGlobal(
+        'fetch',
+        vi
+          .fn()
+          .mockResolvedValueOnce({ ok: false, status: 404, json: () => Promise.resolve({}) })
+          .mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: () => Promise.resolve(successMetadata),
+          }),
+      );
+
       const pmc = new PMC(VALID_CONFIG);
-      const records: Array<unknown> = [];
+      const records: Array<OARecord> = [];
 
       for await (const record of pmc.oa.since('2024-01-01')) {
         records.push(record);
       }
 
-      expect(vi.mocked(fetch)).toHaveBeenCalledTimes(1);
+      expect(records).toHaveLength(1);
+      expect(records[0]?.pmcid).toBe('PMC22222');
     });
 
     it('should handle empty result set', async () => {
-      mockFetch('<OA><records returned-count="0" total-count="0"></records></OA>');
+      mockESearch.mockResolvedValue({ count: 0, idList: [] });
+
       const pmc = new PMC(VALID_CONFIG);
-      const records: Array<unknown> = [];
+      const records: Array<OARecord> = [];
 
       for await (const record of pmc.oa.since('2099-01-01')) {
         records.push(record);
@@ -433,7 +560,7 @@ describe('PMC', () => {
 
   describe('oai.listRecords', () => {
     it('should yield OAIRecords with identifier and metadata', async () => {
-      mockFetch(OAI_LIST_RESPONSE);
+      mockFetchText(OAI_LIST_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
       const records: Array<unknown> = [];
 
@@ -445,7 +572,7 @@ describe('PMC', () => {
     });
 
     it('should support from option', async () => {
-      mockFetch(OAI_LIST_RESPONSE);
+      mockFetchText(OAI_LIST_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
 
       const records = [];
@@ -459,7 +586,7 @@ describe('PMC', () => {
     });
 
     it('should support until option', async () => {
-      mockFetch(OAI_LIST_RESPONSE);
+      mockFetchText(OAI_LIST_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
 
       const records = [];
@@ -473,7 +600,7 @@ describe('PMC', () => {
     });
 
     it('should support set option', async () => {
-      mockFetch(OAI_LIST_RESPONSE);
+      mockFetchText(OAI_LIST_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
 
       const records = [];
@@ -487,7 +614,7 @@ describe('PMC', () => {
     });
 
     it('should support metadataPrefix option', async () => {
-      mockFetch(OAI_LIST_RESPONSE);
+      mockFetchText(OAI_LIST_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
 
       const records = [];
@@ -529,7 +656,7 @@ describe('PMC', () => {
     });
 
     it('should stop when no more results', async () => {
-      mockFetch(OAI_LIST_RESPONSE);
+      mockFetchText(OAI_LIST_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
       const records: Array<unknown> = [];
 
@@ -541,7 +668,7 @@ describe('PMC', () => {
     });
 
     it('should use correct OAI-PMH URL', async () => {
-      mockFetch(OAI_LIST_RESPONSE);
+      mockFetchText(OAI_LIST_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
 
       const records = [];
@@ -556,7 +683,7 @@ describe('PMC', () => {
     });
 
     it('should handle empty result set', async () => {
-      mockFetch(`<?xml version="1.0"?>
+      mockFetchText(`<?xml version="1.0"?>
 <OAI-PMH>
   <error code="noRecordsMatch">No records match the request</error>
 </OAI-PMH>`);
@@ -573,7 +700,7 @@ describe('PMC', () => {
 
   describe('oai.getRecord', () => {
     it('should fetch single OAI record by PMCID', async () => {
-      mockFetch(OAI_GET_RECORD_RESPONSE);
+      mockFetchText(OAI_GET_RECORD_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
       const record = await pmc.oai.getRecord('PMC12345');
 
@@ -581,7 +708,7 @@ describe('PMC', () => {
     });
 
     it('should return identifier, datestamp, setSpec, metadata', async () => {
-      mockFetch(OAI_GET_RECORD_RESPONSE);
+      mockFetchText(OAI_GET_RECORD_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
       const record = await pmc.oai.getRecord('PMC12345');
 
@@ -592,7 +719,7 @@ describe('PMC', () => {
     });
 
     it('should support custom metadataPrefix', async () => {
-      mockFetch(OAI_GET_RECORD_RESPONSE);
+      mockFetchText(OAI_GET_RECORD_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
       await pmc.oai.getRecord('PMC12345', 'oai_dc');
 
@@ -602,7 +729,7 @@ describe('PMC', () => {
     });
 
     it('should throw on non-existent record', async () => {
-      mockFetch(OAI_ERROR_RESPONSE);
+      mockFetchText(OAI_ERROR_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
 
       await expect(pmc.oai.getRecord('PMC99999')).rejects.toThrow('OAI-PMH error');

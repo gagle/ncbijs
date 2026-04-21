@@ -10,23 +10,31 @@ export interface FullTextArticle {
 
 export type { Chunk, ChunkOptions };
 
-export interface OALink {
-  readonly format: 'tgz' | 'pdf';
-  readonly href: string;
-  readonly updated: string;
-}
-
 export interface OARecord {
   readonly pmcid: string;
+  readonly version: number;
+  readonly pmid: number | undefined;
+  readonly doi: string | undefined;
+  readonly mid: string | undefined;
+  readonly title: string;
   readonly citation: string;
-  readonly license: string;
+  readonly openAccess: boolean;
+  readonly manuscript: boolean;
+  readonly historicalOcr: boolean;
   readonly retracted: boolean;
-  readonly links: ReadonlyArray<Readonly<OALink>>;
+  readonly license: string | undefined;
+  readonly xmlUrl: string;
+  readonly textUrl: string;
+  readonly pdfUrl?: string | undefined;
+  readonly mediaUrls?: ReadonlyArray<string> | undefined;
+}
+
+export interface OALookupOptions {
+  readonly version?: number | undefined;
 }
 
 export interface OAListOptions {
   readonly until?: string | undefined;
-  readonly format?: 'tgz' | 'pdf' | undefined;
 }
 
 export interface OAIRecord {

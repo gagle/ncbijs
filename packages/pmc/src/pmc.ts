@@ -6,21 +6,16 @@ import type {
   FullTextArticle,
   OAIListOptions,
   OAIRecord,
-  OALink,
   OAListOptions,
+  OALookupOptions,
   OARecord,
   PMCConfig,
 } from './interfaces/pmc.interface';
-import {
-  readAllBlocks,
-  readAllBlocksWithAttributes,
-  readAttribute,
-  readBlock,
-  readTag,
-} from '@ncbijs/xml';
+import { readAllBlocks, readBlock, readTag } from '@ncbijs/xml';
 
-const OA_BASE_URL = 'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi';
+const S3_BASE_URL = 'https://pmc-oa-opendata.s3.amazonaws.com';
 const OAI_BASE_URL = 'https://www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi';
+const ESEARCH_BATCH_SIZE = 500;
 
 function normalizePmcid(pmcid: string): string {
   return pmcid.startsWith('PMC') ? pmcid : `PMC${pmcid}`;
@@ -28,6 +23,11 @@ function normalizePmcid(pmcid: string): string {
 
 function numericPmcid(pmcid: string): string {
   return pmcid.startsWith('PMC') ? pmcid.slice(3) : pmcid;
+}
+
+function s3ToHttpsUrl(s3Url: string): string {
+  const withoutQuery = s3Url.split('?')[0] ?? s3Url;
+  return withoutQuery.replace('s3://pmc-oa-opendata/', `${S3_BASE_URL}/`);
 }
 
 function toJATSArticle(article: FullTextArticle): JATSArticle {
@@ -74,20 +74,50 @@ function extractLicense(xml: string): string {
     .trim();
 }
 
-function parseOARecord(recordXml: string, attributes: Readonly<Record<string, string>>): OARecord {
-  const pmcid = attributes['id'] ?? '';
-  const citation = attributes['citation'] ?? '';
-  const license = attributes['license'] ?? '';
-  const retracted = attributes['retracted'] === 'yes';
+function readAttribute(xml: string, tagName: string, attrName: string): string {
+  const pattern = new RegExp(`<${tagName}[^>]*\\s${attrName}="([^"]*)"`, 'i');
+  const match = pattern.exec(xml);
+  return match?.[1] ?? '';
+}
 
-  const linkEntries = readAllBlocksWithAttributes(recordXml, 'link');
-  const links: Array<OALink> = linkEntries.map((entry) => ({
-    format: (entry.attributes['format'] as 'tgz' | 'pdf') ?? 'tgz',
-    href: entry.attributes['href'] ?? '',
-    updated: entry.attributes['updated'] ?? '',
-  }));
+interface S3Metadata {
+  readonly pmcid: string;
+  readonly version: number;
+  readonly pmid: number | null;
+  readonly doi: string | null;
+  readonly mid: string | null;
+  readonly title: string;
+  readonly citation: string;
+  readonly is_pmc_openaccess: boolean;
+  readonly is_manuscript: boolean;
+  readonly is_historical_ocr: boolean;
+  readonly is_retracted: boolean;
+  readonly license_code: string | null;
+  readonly xml_url: string;
+  readonly text_url: string;
+  readonly pdf_url?: string;
+  readonly media_urls?: ReadonlyArray<string>;
+}
 
-  return { pmcid, citation, license, retracted, links };
+function mapS3MetadataToOARecord(data: S3Metadata): OARecord {
+  return {
+    pmcid: data.pmcid,
+    version: data.version,
+    pmid: data.pmid ?? undefined,
+    doi: data.doi ?? undefined,
+    mid: data.mid ?? undefined,
+    title: data.title,
+    citation: data.citation,
+    openAccess: data.is_pmc_openaccess,
+    manuscript: data.is_manuscript,
+    historicalOcr: data.is_historical_ocr,
+    retracted: data.is_retracted,
+    license: data.license_code ?? undefined,
+    xmlUrl: s3ToHttpsUrl(data.xml_url),
+    textUrl: s3ToHttpsUrl(data.text_url),
+    ...(data.pdf_url !== undefined ? { pdfUrl: s3ToHttpsUrl(data.pdf_url) } : {}),
+    ...(data.media_urls !== undefined ? { mediaUrls: data.media_urls.map(s3ToHttpsUrl) } : {}),
+  };
 }
 
 function parseOAIRecordXml(recordXml: string): OAIRecord {
@@ -140,66 +170,70 @@ export class PMC {
   }
 
   readonly oa = {
-    lookup: async (pmcid: string): Promise<OARecord> => {
+    lookup: async (pmcid: string, options?: OALookupOptions): Promise<OARecord> => {
       const normalized = normalizePmcid(pmcid);
-      const params = new URLSearchParams({
-        id: normalized,
-        tool: this.config.tool,
-        email: this.config.email,
-      });
-      const response = await fetch(`${OA_BASE_URL}?${params.toString()}`);
+      const version = options?.version ?? 1;
+      const url = `${S3_BASE_URL}/metadata/${normalized}.${version}.json`;
+      const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error(`OA Service lookup failed for ${normalized}: HTTP ${response.status}`);
+        if (response.status === 403 || response.status === 404) {
+          throw new Error(`No OA record found for ${normalized}`);
+        }
+        throw new Error(`OA lookup failed for ${normalized}: HTTP ${response.status}`);
       }
 
-      const xml = await response.text();
-
-      const errorBlock = readBlock(xml, 'error');
-      if (errorBlock) {
-        throw new Error(`OA Service error for ${normalized}: ${errorBlock}`);
+      let body: unknown;
+      try {
+        body = await response.json();
+      } catch {
+        throw new Error(`OA lookup returned malformed response for ${normalized}`);
       }
 
-      const recordEntries = readAllBlocksWithAttributes(xml, 'record');
-      const entry = recordEntries[0];
-      if (!entry) {
-        throw new Error(`No OA record found for ${normalized}`);
-      }
-
-      return parseOARecord(entry.content, entry.attributes);
+      return mapS3MetadataToOARecord(body as S3Metadata);
     },
 
     since: (date: string, options?: OAListOptions): AsyncIterableIterator<OARecord> => {
-      const config = this.config;
+      const eutils = this.eutils;
       return (async function* () {
-        const params = new URLSearchParams({
-          from: date,
-          tool: config.tool,
-          email: config.email,
-        });
-        if (options?.until) params.set('until', options.until);
-        if (options?.format) params.set('format', options.format);
+        const until = options?.until ?? '3000';
+        const term = `${date}:${until}[pmcrdat] AND (open_access[filter] OR author_manuscript[filter])`;
 
-        let url: string | undefined = `${OA_BASE_URL}?${params.toString()}`;
+        let retstart = 0;
+        let totalCount = -1;
 
-        while (url) {
-          const response = await fetch(url);
-          if (!response.ok) {
-            throw new Error(`OA Service since failed: HTTP ${response.status}`);
+        while (totalCount === -1 || retstart < totalCount) {
+          const search = await eutils.esearch({
+            db: 'pmc',
+            term,
+            retstart,
+            retmax: ESEARCH_BATCH_SIZE,
+          });
+
+          if (totalCount === -1) {
+            totalCount = search.count;
           }
 
-          const xml = await response.text();
-          const recordEntries = readAllBlocksWithAttributes(xml, 'record');
+          if (search.idList.length === 0) break;
 
-          for (const entry of recordEntries) {
-            yield parseOARecord(entry.content, entry.attributes);
+          for (const id of search.idList) {
+            const pmcid = id.startsWith('PMC') ? id : `PMC${id}`;
+            const metadataUrl = `${S3_BASE_URL}/metadata/${pmcid}.1.json`;
+            const response = await fetch(metadataUrl);
+
+            if (!response.ok) continue;
+
+            let body: unknown;
+            try {
+              body = await response.json();
+            } catch {
+              continue;
+            }
+
+            yield mapS3MetadataToOARecord(body as S3Metadata);
           }
 
-          const resumptionBlock = readBlock(xml, 'resumption');
-          if (!resumptionBlock) break;
-
-          const resumptionLink = readAttribute(resumptionBlock, 'link', 'href');
-          url = resumptionLink;
+          retstart += ESEARCH_BATCH_SIZE;
         }
       })();
     },

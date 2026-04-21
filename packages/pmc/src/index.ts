@@ -4,8 +4,8 @@ export type {
   FullTextArticle,
   OAIListOptions,
   OAIRecord,
-  OALink,
   OAListOptions,
+  OALookupOptions,
   OARecord,
   PMCConfig,
 } from './interfaces/pmc.interface';

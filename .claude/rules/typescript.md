@@ -7,7 +7,7 @@
 - NEVER: **`any`** -- no `any`, `as any`, `as unknown`, `as unknown as T`. Use typed alternatives.
 - DO: **Explicit types on external returns** -- when a function from an external dependency returns `any`, add an explicit type annotation to the variable.
 - PREFER: **String union types over `enum`** -- use `type Foo = 'a' | 'b'` always.
-- DO: **Always `async`/`await`** -- never use `.then()`/`.catch()` chains. Always `await` in an `async` function. Never ignore a `Promise`.
+- DO: **Always `async`/`await`** -- never use `.then()`/`.catch()` chains. Always `await` in an `async` function. Never ignore a `Promise`. Any function that returns a `Promise` must be declared `async` -- never return a bare `Promise<T>` without the `async` modifier.
 - PREFER: **`undefined` over `null` for absent return values** -- use `T | undefined` when a function may not produce a result. `undefined` is idiomatic in this codebase.
 - DO: **Readability over cleverness** -- no one-liner clever solutions (chained `reduce` + `??`, nested ternaries, etc.). Prefer explicit control flow (`if`, `for`, early returns) that reads top-to-bottom.
 - DO: **Early returns first** -- handle fast/error/empty cases at the top with early returns. The main logic follows unindented.
