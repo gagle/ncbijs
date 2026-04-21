@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/nlm-catalog",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Typed client for NCBI NLM Catalog (journal and serial records)",
   "author": "Gabriel Llamas",
   "license": "MIT",

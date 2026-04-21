@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/clinvar",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Typed client for NCBI ClinVar clinical variant data",
   "author": "Gabriel Llamas",
   "license": "MIT",

@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/datasets",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Typed client for the NCBI Datasets API v2 (genes, genomes, taxonomy)",
   "author": "Gabriel Llamas",
   "license": "MIT",

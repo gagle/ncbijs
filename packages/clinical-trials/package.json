@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/clinical-trials",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Typed client for the ClinicalTrials.gov v2 API — search, retrieve, and analyze clinical trial data",
   "author": "Gabriel Llamas",
   "license": "MIT",

@@ -55,225 +55,151 @@
   "packages": {
     "packages/eutils": {
       "release-type": "node",
-      "component": "@ncbijs/eutils",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/eutils"
     },
     "packages/pubmed-xml": {
       "release-type": "node",
-      "component": "@ncbijs/pubmed-xml",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/pubmed-xml"
     },
     "packages/pubmed": {
       "release-type": "node",
-      "component": "@ncbijs/pubmed",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/pubmed"
     },
     "packages/jats": {
       "release-type": "node",
-      "component": "@ncbijs/jats",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/jats"
     },
     "packages/pmc": {
       "release-type": "node",
-      "component": "@ncbijs/pmc",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/pmc"
     },
     "packages/id-converter": {
       "release-type": "node",
-      "component": "@ncbijs/id-converter",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/id-converter"
     },
     "packages/pubtator": {
       "release-type": "node",
-      "component": "@ncbijs/pubtator",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/pubtator"
     },
     "packages/mesh": {
       "release-type": "node",
-      "component": "@ncbijs/mesh",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/mesh"
     },
     "packages/cite": {
       "release-type": "node",
-      "component": "@ncbijs/cite",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/cite"
     },
     "packages/mcp": {
       "release-type": "node",
-      "component": "@ncbijs/mcp",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/mcp"
     },
     "packages/rate-limiter": {
       "release-type": "node",
-      "component": "@ncbijs/rate-limiter",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/rate-limiter"
     },
     "packages/xml": {
       "release-type": "node",
-      "component": "@ncbijs/xml",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/xml"
     },
     "packages/fasta": {
       "release-type": "node",
-      "component": "@ncbijs/fasta",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/fasta"
     },
     "packages/datasets": {
       "release-type": "node",
-      "component": "@ncbijs/datasets",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/datasets"
     },
     "packages/blast": {
       "release-type": "node",
-      "component": "@ncbijs/blast",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/blast"
     },
     "packages/snp": {
       "release-type": "node",
-      "component": "@ncbijs/snp",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/snp"
     },
     "packages/clinvar": {
       "release-type": "node",
-      "component": "@ncbijs/clinvar",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/clinvar"
     },
     "packages/pubchem": {
       "release-type": "node",
-      "component": "@ncbijs/pubchem",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/pubchem"
     },
     "packages/genbank": {
       "release-type": "node",
-      "component": "@ncbijs/genbank",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/genbank"
     },
     "packages/protein": {
       "release-type": "node",
-      "component": "@ncbijs/protein",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/protein"
     },
     "packages/nucleotide": {
       "release-type": "node",
-      "component": "@ncbijs/nucleotide",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/nucleotide"
     },
     "packages/omim": {
       "release-type": "node",
-      "component": "@ncbijs/omim",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/omim"
     },
     "packages/medgen": {
       "release-type": "node",
-      "component": "@ncbijs/medgen",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/medgen"
     },
     "packages/gtr": {
       "release-type": "node",
-      "component": "@ncbijs/gtr",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/gtr"
     },
     "packages/geo": {
       "release-type": "node",
-      "component": "@ncbijs/geo",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/geo"
     },
     "packages/dbvar": {
       "release-type": "node",
-      "component": "@ncbijs/dbvar",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/dbvar"
     },
     "packages/sra": {
       "release-type": "node",
-      "component": "@ncbijs/sra",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/sra"
     },
     "packages/structure": {
       "release-type": "node",
-      "component": "@ncbijs/structure",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/structure"
     },
     "packages/cdd": {
       "release-type": "node",
-      "component": "@ncbijs/cdd",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/cdd"
     },
     "packages/books": {
       "release-type": "node",
-      "component": "@ncbijs/books",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/books"
     },
     "packages/nlm-catalog": {
       "release-type": "node",
-      "component": "@ncbijs/nlm-catalog",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/nlm-catalog"
     },
     "packages/rxnorm": {
       "release-type": "node",
-      "component": "@ncbijs/rxnorm",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/rxnorm"
     },
     "packages/litvar": {
       "release-type": "node",
-      "component": "@ncbijs/litvar",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/litvar"
     },
     "packages/clinical-trials": {
       "release-type": "node",
-      "component": "@ncbijs/clinical-trials",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/clinical-trials"
     },
     "packages/icite": {
       "release-type": "node",
-      "component": "@ncbijs/icite",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/icite"
     },
     "packages/bioc": {
       "release-type": "node",
-      "component": "@ncbijs/bioc",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/bioc"
     },
     "packages/clinical-tables": {
       "release-type": "node",
-      "component": "@ncbijs/clinical-tables",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "component": "@ncbijs/clinical-tables"
     }
   }
 }

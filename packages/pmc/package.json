@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/pmc",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "PMC full-text article retrieval via E-utilities, OA Service, and OAI-PMH",
   "author": "Gabriel Llamas",
   "license": "MIT",

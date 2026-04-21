@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/pubmed-xml",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Spec-compliant parser for PubMed/MEDLINE XML format",
   "author": "Gabriel Llamas",
   "license": "MIT",

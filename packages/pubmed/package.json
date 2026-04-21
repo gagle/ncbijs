@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/pubmed",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "High-level PubMed article search and retrieval client",
   "author": "Gabriel Llamas",
   "license": "MIT",

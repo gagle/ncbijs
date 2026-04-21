@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/eutils",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Spec-compliant HTTP client for all 9 NCBI E-utilities",
   "author": "Gabriel Llamas",
   "license": "MIT",

@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/jats",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Parser for JATS XML full-text articles with RAG chunking",
   "author": "Gabriel Llamas",
   "license": "MIT",

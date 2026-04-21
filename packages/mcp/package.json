@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/mcp",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "MCP server exposing NCBI biomedical tools for LLM agents",
   "author": "Gabriel Llamas",
   "license": "MIT",
