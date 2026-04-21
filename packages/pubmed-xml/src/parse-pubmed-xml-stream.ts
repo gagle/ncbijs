@@ -4,6 +4,7 @@ import { parsePubmedXml } from './parse-pubmed-xml';
 const ARTICLE_CLOSE_TAG = '</PubmedArticle>';
 const ARTICLE_CLOSE_TAG_LENGTH = ARTICLE_CLOSE_TAG.length;
 
+/** Stream-parse PubMed XML, yielding articles as they become complete in the input stream. */
 export async function* createPubmedXmlStream(
   input: ReadableStream<string>,
 ): AsyncIterableIterator<PubmedArticle> {

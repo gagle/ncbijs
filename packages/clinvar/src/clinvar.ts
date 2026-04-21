@@ -17,6 +17,7 @@ import type {
   VariantReport,
 } from './interfaces/clinvar.interface';
 
+/** ClinVar variant database client for searching and fetching variant reports. */
 export class ClinVar {
   private readonly _config: ClinVarClientConfig;
 
@@ -34,6 +35,7 @@ export class ClinVar {
     };
   }
 
+  /** Search ClinVar by term and return matching variant IDs. */
   public async search(
     term: string,
     options?: { readonly retmax?: number },
@@ -59,6 +61,7 @@ export class ClinVar {
     };
   }
 
+  /** Search ClinVar by term and fetch full variant reports for all matches. */
   public async searchAndFetch(
     term: string,
     options?: { readonly retmax?: number },
@@ -72,6 +75,7 @@ export class ClinVar {
     return this.fetch(searchResult.ids);
   }
 
+  /** Fetch full variant reports by ClinVar UIDs. */
   public async fetch(ids: ReadonlyArray<string>): Promise<ReadonlyArray<VariantReport>> {
     if (ids.length === 0) {
       return [];

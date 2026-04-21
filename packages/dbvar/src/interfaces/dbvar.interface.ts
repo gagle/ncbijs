@@ -1,3 +1,4 @@
+/** Configuration options for the dbVar client. */
 export interface DbVarConfig {
   readonly apiKey?: string | undefined;
   readonly tool?: string;
@@ -5,11 +6,13 @@ export interface DbVarConfig {
   readonly maxRetries?: number;
 }
 
+/** dbVar search result containing matched record IDs and total count. */
 export interface DbVarSearchResult {
   readonly total: number;
   readonly ids: ReadonlyArray<string>;
 }
 
+/** A dbVar structural variant or study record. */
 export interface DbVarRecord {
   readonly uid: string;
   readonly objectType: string;
@@ -27,6 +30,7 @@ export interface DbVarRecord {
   readonly variantCallCount: number;
 }
 
+/** Chromosomal placement of a dbVar structural variant. */
 export interface DbVarPlacement {
   readonly chromosome: string;
   readonly start: number;
@@ -34,6 +38,7 @@ export interface DbVarPlacement {
   readonly assembly: string;
 }
 
+/** A gene overlapping a dbVar structural variant. */
 export interface DbVarGene {
   readonly id: number;
   readonly name: string;

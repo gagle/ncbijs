@@ -1,3 +1,4 @@
+/** Configuration options for the CDD client. */
 export interface CddConfig {
   readonly apiKey?: string | undefined;
   readonly tool?: string;
@@ -5,11 +6,13 @@ export interface CddConfig {
   readonly maxRetries?: number;
 }
 
+/** CDD search result containing matched domain IDs and total count. */
 export interface CddSearchResult {
   readonly total: number;
   readonly ids: ReadonlyArray<string>;
 }
 
+/** A conserved domain record with PSSM and structure metadata. */
 export interface CddRecord {
   readonly uid: string;
   readonly accession: string;

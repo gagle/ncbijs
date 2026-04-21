@@ -4,6 +4,7 @@ import { convert } from '@ncbijs/id-converter';
 import { MeSH } from '@ncbijs/mesh';
 import { z } from 'zod';
 
+/** Register ID conversion, citation, and MeSH vocabulary tools on the MCP server. */
 export function registerUtilityTools(server: McpServer): void {
   server.registerTool(
     'convert-ids',

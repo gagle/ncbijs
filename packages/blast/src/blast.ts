@@ -64,6 +64,7 @@ interface RawHsp {
   readonly score?: number;
 }
 
+/** HTTP error thrown when the BLAST API returns a non-OK status. */
 export class BlastHttpError extends HttpRetryError {
   constructor(status: number, body: string) {
     super(status, body, `BLAST API returned status ${status}`);
@@ -71,6 +72,7 @@ export class BlastHttpError extends HttpRetryError {
   }
 }
 
+/** Error thrown when a BLAST search fails on the server. */
 export class BlastSearchError extends Error {
   public readonly rid: string;
 
@@ -81,6 +83,7 @@ export class BlastSearchError extends Error {
   }
 }
 
+/** Error thrown when a BLAST search exceeds the maximum number of poll attempts. */
 export class BlastTimeoutError extends Error {
   public readonly rid: string;
   public readonly attempts: number;
@@ -93,6 +96,7 @@ export class BlastTimeoutError extends Error {
   }
 }
 
+/** NCBI BLAST sequence alignment client with submit, poll, and retrieve lifecycle. */
 export class Blast {
   private readonly _maxRetries: number;
   private readonly _submitLimiter: TokenBucket;
@@ -104,6 +108,7 @@ export class Blast {
     this._pollLimiter = new TokenBucket({ requestsPerSecond: 1 / 60 });
   }
 
+  /** Submit a BLAST search job and return the request ID and estimated time. */
   public async submit(
     query: string,
     program: BlastProgram,
@@ -145,6 +150,7 @@ export class Blast {
     return parseSubmitResponse(responseText);
   }
 
+  /** Check the status of a submitted BLAST search by request ID. */
   public async poll(rid: string): Promise<BlastPollResult> {
     const url = `${BLAST_BASE_URL}?CMD=Get&RID=${encodeURIComponent(rid)}&FORMAT_OBJECT=SearchInfo`;
 
@@ -153,6 +159,7 @@ export class Blast {
     return parsePollResponse(responseText);
   }
 
+  /** Retrieve the results of a completed BLAST search by request ID. */
   public async retrieve(rid: string): Promise<BlastResult> {
     const url = `${BLAST_BASE_URL}?CMD=Get&RID=${encodeURIComponent(rid)}&FORMAT_TYPE=JSON2`;
 
@@ -162,6 +169,7 @@ export class Blast {
     return mapBlastResult(rawResponse);
   }
 
+  /** Submit a BLAST search and poll until results are ready, then return them. */
   public async search(
     query: string,
     program: BlastProgram,

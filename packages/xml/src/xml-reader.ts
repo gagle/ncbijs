@@ -13,6 +13,7 @@ function assertTagName(tagName: string): void {
   }
 }
 
+/** Read the text content of the first occurrence of an XML tag. */
 export function readTag(xml: string, tagName: string): string | undefined {
   assertTagName(tagName);
   const regex = new RegExp(`<${tagName}(?:\\s[^>]*)?>([^<]*)</${tagName}>`);
@@ -20,6 +21,7 @@ export function readTag(xml: string, tagName: string): string | undefined {
   return match?.[1] !== undefined ? decodeEntities(match[1]) : undefined;
 }
 
+/** Read the text content of all occurrences of an XML tag. */
 export function readAllTags(xml: string, tagName: string): ReadonlyArray<string> {
   assertTagName(tagName);
   const regex = new RegExp(`<${tagName}(?:\\s[^>]*)?>([^<]*)</${tagName}>`, 'g');
@@ -33,11 +35,13 @@ export function readAllTags(xml: string, tagName: string): ReadonlyArray<string>
   return results;
 }
 
+/** Read the full inner content (including nested tags) of the first occurrence of an XML block. */
 export function readBlock(xml: string, tagName: string): string | undefined {
   assertTagName(tagName);
   return readBlockAt(xml, tagName, 0)?.[0];
 }
 
+/** Read the full inner content of all occurrences of an XML block. */
 export function readAllBlocks(xml: string, tagName: string): ReadonlyArray<string> {
   assertTagName(tagName);
   const results: Array<string> = [];
@@ -55,6 +59,7 @@ export function readAllBlocks(xml: string, tagName: string): ReadonlyArray<strin
   return results;
 }
 
+/** Read the value of a named attribute from the first occurrence of an XML tag. */
 export function readAttribute(xml: string, tagName: string, attrName: string): string | undefined {
   assertTagName(tagName);
   assertTagName(attrName);
@@ -73,6 +78,7 @@ const NAMED_ENTITIES: Readonly<Record<string, string>> = {
   'apos;': "'",
 };
 
+/** Decode XML character entities (named, decimal, and hexadecimal) in a string. */
 export function decodeEntities(text: string): string {
   if (!text.includes('&')) {
     return text;
@@ -92,20 +98,24 @@ export function decodeEntities(text: string): string {
   );
 }
 
+/** Remove all XML/HTML tags from a string, leaving only text content. */
 export function stripTags(xml: string): string {
   return xml.replace(/<[^>]+>/g, '');
 }
 
+/** An XML tag's text content paired with its parsed attributes. */
 export interface TagWithAttributes {
   readonly text: string;
   readonly attributes: Readonly<Record<string, string>>;
 }
 
+/** An XML block's inner content paired with its opening tag's parsed attributes. */
 export interface BlockWithAttributes {
   readonly content: string;
   readonly attributes: Readonly<Record<string, string>>;
 }
 
+/** Read the text content and attributes of the first occurrence of an XML tag. */
 export function readTagWithAttributes(xml: string, tagName: string): TagWithAttributes | null {
   assertTagName(tagName);
   const regex = new RegExp(`<${tagName}(\\s[^>]*)?>([^<]*)</${tagName}>`);
@@ -120,6 +130,7 @@ export function readTagWithAttributes(xml: string, tagName: string): TagWithAttr
   };
 }
 
+/** Read the text content and attributes of all occurrences of an XML tag. */
 export function readAllTagsWithAttributes(
   xml: string,
   tagName: string,
@@ -141,6 +152,7 @@ export function readAllTagsWithAttributes(
   return results;
 }
 
+/** Read the inner content and attributes of all occurrences of an XML block. */
 export function readAllBlocksWithAttributes(
   xml: string,
   tagName: string,
@@ -161,6 +173,7 @@ export function readAllBlocksWithAttributes(
   return results;
 }
 
+/** Remove all occurrences of the specified XML block (including nested content) from a string. */
 export function removeAllBlocks(xml: string, tagName: string): string {
   assertTagName(tagName);
   let result = xml;

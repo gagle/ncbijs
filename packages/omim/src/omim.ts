@@ -9,6 +9,7 @@ import { fetchJson } from './omim-client';
 import type { OmimClientConfig } from './omim-client';
 import type { OmimConfig, OmimEntry, OmimSearchResult } from './interfaces/omim.interface';
 
+/** OMIM genetic disorder and Mendelian inheritance catalog client. */
 export class Omim {
   private readonly _config: OmimClientConfig;
 
@@ -26,6 +27,7 @@ export class Omim {
     };
   }
 
+  /** Search OMIM by text query and return matching entry IDs. */
   public async search(
     term: string,
     options?: { readonly retmax?: number },
@@ -51,6 +53,7 @@ export class Omim {
     };
   }
 
+  /** Search OMIM and fetch full entry details in a single call. */
   public async searchAndFetch(
     term: string,
     options?: { readonly retmax?: number },
@@ -64,6 +67,7 @@ export class Omim {
     return this.fetch(searchResult.ids);
   }
 
+  /** Fetch OMIM entry details by their UIDs. */
   public async fetch(ids: ReadonlyArray<string>): Promise<ReadonlyArray<OmimEntry>> {
     if (ids.length === 0) {
       return [];

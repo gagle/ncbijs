@@ -32,6 +32,7 @@ export interface AcquireOptions {
   readonly timeout?: number | undefined;
 }
 
+/** Error thrown when a token bucket acquire operation exceeds its timeout. */
 export class TokenBucketTimeoutError extends Error {
   public override readonly name = 'TokenBucketTimeoutError' as const;
 
@@ -55,6 +56,7 @@ function isRateLimiterOptions(
   return 'requestsPerSecond' in options;
 }
 
+/** Token bucket rate limiter that queues callers in FIFO order with configurable burst capacity. */
 export class TokenBucket {
   private readonly capacity: number;
   private readonly tokensPerMs: number;
@@ -95,6 +97,7 @@ export class TokenBucket {
     this.lastRefillTime = Date.now();
   }
 
+  /** Acquire one or more tokens, waiting in the queue if none are available. */
   public acquire(options?: AcquireOptions): Promise<void> {
     this.assertNotDisposed();
 
@@ -154,6 +157,7 @@ export class TokenBucket {
     });
   }
 
+  /** Try to acquire tokens without waiting, returning true if successful. */
   public tryAcquire(cost = 1): boolean {
     this.assertNotDisposed();
 
@@ -171,15 +175,18 @@ export class TokenBucket {
     return false;
   }
 
+  /** Return the current number of available tokens after refilling. */
   public get availableTokens(): number {
     this.refill();
     return this.tokens;
   }
 
+  /** Return the number of callers currently waiting in the queue. */
   public get pendingCount(): number {
     return this.queue.length;
   }
 
+  /** Dispose the bucket, rejecting all pending callers and stopping the refill timer. */
   public dispose(): void {
     if (this.disposed) {
       return;
@@ -189,6 +196,7 @@ export class TokenBucket {
     this.rejectAllPending();
   }
 
+  /** Reset the bucket to full capacity, rejecting all pending callers. */
   public reset(): void {
     this.clearTimer();
     this.rejectAllPending();

@@ -2,6 +2,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
 import type { PubMed } from '@ncbijs/pubmed';
 import { z } from 'zod';
 
+/** Register PubMed search, related articles, references, and citation tools on the MCP server. */
 export function registerPubmedTools(server: McpServer, getPubmed: () => PubMed): void {
   server.registerTool(
     'search-pubmed',

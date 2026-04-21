@@ -142,6 +142,84 @@ for (const article of articles) {
 }
 ```
 
+## Which package do I need?
+
+```
+I want to...
+│
+├── Search biomedical literature
+│   ├── High-level PubMed search ──────────→ @ncbijs/pubmed
+│   ├── Low-level Entrez queries ──────────→ @ncbijs/eutils
+│   └── Find literature by genetic variant ─→ @ncbijs/litvar
+│
+├── Retrieve full-text articles
+│   ├── PMC open-access articles ──────────→ @ncbijs/pmc
+│   └── Annotated text with NER ───────────→ @ncbijs/bioc
+│
+├── Extract entities from text
+│   ├── Genes, diseases, chemicals ────────→ @ncbijs/pubtator
+│   └── Annotated passages (BioC format) ──→ @ncbijs/bioc
+│
+├── Work with citations
+│   ├── Format citations (RIS, CSL, etc.) ─→ @ncbijs/cite
+│   ├── Convert PMID/PMCID/DOI ────────────→ @ncbijs/id-converter
+│   └── Citation impact metrics (RCR) ─────→ @ncbijs/icite
+│
+├── Work with genes and sequences
+│   ├── Gene/genome metadata ──────────────→ @ncbijs/datasets
+│   ├── Protein sequences ─────────────────→ @ncbijs/protein
+│   ├── Nucleotide sequences ──────────────→ @ncbijs/nucleotide
+│   ├── Sequence alignment (BLAST) ────────→ @ncbijs/blast
+│   ├── Parse FASTA format ────────────────→ @ncbijs/fasta
+│   └── Parse GenBank format ──────────────→ @ncbijs/genbank
+│
+├── Work with variants and clinical data
+│   ├── SNP/variant lookup (dbSNP) ────────→ @ncbijs/snp
+│   ├── HGVS/SPDI/VCF conversion ─────────→ @ncbijs/snp
+│   ├── Clinical significance (ClinVar) ───→ @ncbijs/clinvar
+│   ├── Genetic disorders (OMIM) ──────────→ @ncbijs/omim
+│   └── Medical genetics (MedGen) ─────────→ @ncbijs/medgen
+│
+├── Work with drugs and chemicals
+│   ├── Compound properties ───────────────→ @ncbijs/pubchem
+│   ├── Compound annotations (GHS, etc.) ──→ @ncbijs/pubchem
+│   ├── Drug normalization (RxCUI) ────────→ @ncbijs/rxnorm
+│   ├── Drug interactions ─────────────────→ @ncbijs/rxnorm
+│   └── NDC code lookup ───────────────────→ @ncbijs/rxnorm
+│
+├── Autocomplete medical codes
+│   ├── ICD-10, LOINC, SNOMED ─────────────→ @ncbijs/clinical-tables
+│   └── RxTerms drug names ────────────────→ @ncbijs/clinical-tables
+│
+├── Search clinical trials ────────────────→ @ncbijs/clinical-trials
+│
+├── Work with vocabularies
+│   └── MeSH term expansion ───────────────→ @ncbijs/mesh
+│
+├── Search other NCBI databases
+│   ├── Gene expression (GEO) ─────────────→ @ncbijs/geo
+│   ├── Structural variants (dbVar) ───────→ @ncbijs/dbvar
+│   ├── Sequencing data (SRA) ─────────────→ @ncbijs/sra
+│   ├── 3D structures (MMDB/PDB) ──────────→ @ncbijs/structure
+│   ├── Protein domains (CDD) ─────────────→ @ncbijs/cdd
+│   ├── Genetic tests (GTR) ───────────────→ @ncbijs/gtr
+│   ├── Books/textbooks ───────────────────→ @ncbijs/books
+│   └── Journal records (NLM Catalog) ─────→ @ncbijs/nlm-catalog
+│
+└── Expose tools to LLM agents ────────────→ @ncbijs/mcp
+```
+
+### Package capabilities
+
+| Capability        | Packages                                                                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Needs API key     | `eutils`, `pubmed`, `pmc`, `clinvar`, `snp`, `datasets` (optional, for rate limit)                                                    |
+| No API key        | All others                                                                                                                            |
+| Rate-limited      | `eutils`, `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `clinical-trials`, `icite`, `rxnorm`, + all that depend on `rate-limiter` |
+| Zero dependencies | `cite`, `id-converter`, `mesh`, `fasta`, `genbank`, `litvar`, `bioc`, `clinical-tables`                                               |
+| Async iterators   | `eutils` (efetchBatches, searchAndFetch, searchAndSummarize), `pubmed` (batch), `clinical-trials` (searchStudies), `cite` (citeMany)  |
+| XML parsing       | `eutils`, `pubmed-xml`, `jats`, `pubtator`, `xml`                                                                                     |
+
 ## Architecture
 
 Zero-dependency philosophy — most packages have zero runtime dependencies. `eutils` depends on `rate-limiter` + `openapi-fetch`. `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `omim`, `medgen`, `gtr`, `geo`, `dbvar`, `sra`, `structure`, `cdd`, `books`, `nlm-catalog`, `clinical-trials`, `icite`, and `rxnorm` depend on `rate-limiter`. `sra` also depends on `xml`. High-level packages (`pubmed`, `pmc`, `protein`, `nucleotide`) depend only on internal `@ncbijs/*` packages. `litvar`, `bioc`, and `clinical-tables` are zero-dep.

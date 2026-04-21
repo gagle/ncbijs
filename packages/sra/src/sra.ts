@@ -16,6 +16,7 @@ import type {
   SraSearchResult,
 } from './interfaces/sra.interface';
 
+/** Sequence Read Archive (SRA) client for searching and fetching sequencing experiments. */
 export class Sra {
   private readonly _config: SraClientConfig;
 
@@ -33,6 +34,7 @@ export class Sra {
     };
   }
 
+  /** Search SRA by text query and return matching experiment IDs. */
   public async search(
     term: string,
     options?: { readonly retmax?: number },
@@ -58,6 +60,7 @@ export class Sra {
     };
   }
 
+  /** Search SRA and fetch full experiment details in a single call. */
   public async searchAndFetch(
     term: string,
     options?: { readonly retmax?: number },
@@ -71,6 +74,7 @@ export class Sra {
     return this.fetch(searchResult.ids);
   }
 
+  /** Fetch SRA experiment details by their UIDs. */
   public async fetch(ids: ReadonlyArray<string>): Promise<ReadonlyArray<SraExperiment>> {
     if (ids.length === 0) {
       return [];

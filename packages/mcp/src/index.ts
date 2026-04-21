@@ -88,11 +88,14 @@ const server = new McpServer(
   { name: SERVER_NAME, version: SERVER_VERSION },
   {
     instructions:
-      'NCBI biomedical tools. Search PubMed (37M+ articles), fetch PMC full text, ' +
+      'NCBI biomedical literature and data tools. Search PubMed (37M+ articles), fetch PMC full text, ' +
       'extract named entities via PubTator3, convert article IDs, get formatted citations, ' +
       'query the MeSH vocabulary, look up genes and genomes via NCBI Datasets API v2, ' +
-      'run BLAST sequence alignments, look up SNP variants from dbSNP, search ClinVar ' +
-      'for clinical variant data, and search PubChem for chemical compounds. ' +
+      'run BLAST sequence alignments, look up SNP variants from dbSNP (with HGVS/SPDI/VCF conversion), ' +
+      'search ClinVar for clinical variant data, and search PubChem for chemical compounds and annotations. ' +
+      'The broader ncbijs ecosystem also includes packages for ClinicalTrials.gov, NIH iCite citation metrics, ' +
+      'RxNorm drug normalization, LitVar variant-literature linking, BioC annotated text, ' +
+      'and Clinical Table Search (ICD-10, LOINC, SNOMED autocomplete). ' +
       'Set NCBI_API_KEY env var for higher rate limits.',
   },
 );

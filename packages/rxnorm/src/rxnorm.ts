@@ -14,6 +14,7 @@ import type {
 const BASE_URL = 'https://rxnav.nlm.nih.gov/REST';
 const REQUESTS_PER_SECOND = 2;
 
+/** RxNorm REST API client for drug concept lookups, interactions, and NDC codes. */
 export class RxNorm {
   private readonly _config: RxNormClientConfig;
 
@@ -24,6 +25,7 @@ export class RxNorm {
     };
   }
 
+  /** Look up the RxCUI for a drug by exact name match. */
   public async rxcui(name: string): Promise<RxConcept | undefined> {
     const url = `${BASE_URL}/rxcui.json?name=${encodeURIComponent(name)}`;
     const raw = await fetchJson<RawRxcuiResponse>(url, this._config);
@@ -40,6 +42,7 @@ export class RxNorm {
     };
   }
 
+  /** Fetch detailed properties for an RxNorm concept by RxCUI. */
   public async properties(rxcui: string): Promise<RxConceptProperties> {
     const url = `${BASE_URL}/rxcui/${encodeURIComponent(rxcui)}/properties.json`;
     const raw = await fetchJson<RawPropertiesResponse>(url, this._config);
@@ -55,6 +58,11 @@ export class RxNorm {
     };
   }
 
+  /**
+   * Fetch related concepts filtered by term type (TTY).
+   * @param rxcui - The RxCUI to find related concepts for.
+   * @param types - Term types to filter by (e.g., 'SBD', 'SCD', 'IN').
+   */
   public async relatedByType(
     rxcui: string,
     types: ReadonlyArray<string>,
@@ -78,6 +86,7 @@ export class RxNorm {
     return concepts;
   }
 
+  /** Fetch drug concepts associated with a drug name. */
   public async drugs(name: string): Promise<DrugGroup> {
     const url = `${BASE_URL}/drugs.json?name=${encodeURIComponent(name)}`;
     const raw = await fetchJson<RawDrugsResponse>(url, this._config);
@@ -89,6 +98,7 @@ export class RxNorm {
     };
   }
 
+  /** Fetch spelling suggestions for a drug name. */
   public async spelling(name: string): Promise<ReadonlyArray<string>> {
     const url = `${BASE_URL}/spellingsuggestions.json?name=${encodeURIComponent(name)}`;
     const raw = await fetchJson<RawSpellingResponse>(url, this._config);
@@ -96,6 +106,7 @@ export class RxNorm {
     return raw.suggestionGroup?.suggestionList?.suggestion ?? [];
   }
 
+  /** Fetch known drug-drug interactions for an RxCUI. */
   public async interaction(rxcui: string): Promise<ReadonlyArray<DrugInteraction>> {
     const url = `${BASE_URL}/interaction/interaction.json?rxcui=${encodeURIComponent(rxcui)}`;
     const raw = await fetchJson<RawInteractionResponse>(url, this._config);
@@ -117,6 +128,7 @@ export class RxNorm {
     return interactions;
   }
 
+  /** Fetch NDC (National Drug Code) identifiers for an RxCUI. */
   public async ndcByRxcui(rxcui: string): Promise<ReadonlyArray<string>> {
     const url = `${BASE_URL}/rxcui/${encodeURIComponent(rxcui)}/ndcs.json`;
     const raw = await fetchJson<RawNdcResponse>(url, this._config);

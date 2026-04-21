@@ -1,3 +1,4 @@
+/** Parsed PubMed article with structured metadata. */
 export interface Article {
   readonly pmid: string;
   readonly title: string;
@@ -44,12 +45,15 @@ export interface Article {
   readonly keywords: ReadonlyArray<string>;
 }
 
+/** PubMed article with an associated relevancy score from a related-articles query. */
 export interface RelatedArticle extends Article {
   readonly relevancyScore: number;
 }
 
+/** Sort order for PubMed search results. */
 export type PubMedSort = 'relevance' | 'pub_date' | 'Author' | 'JournalName';
 
+/** Publication type filter values supported by PubMed. */
 export type PublicationType =
   | 'Review'
   | 'Clinical Trial'

@@ -1,15 +1,18 @@
+/** A labeled section within a structured abstract. */
 export interface AbstractSection {
   readonly label: string;
   readonly nlmCategory?: string;
   readonly text: string;
 }
 
+/** Article abstract content, either plain text or structured with labeled sections. */
 export interface AbstractContent {
   readonly structured: boolean;
   readonly text: string;
   readonly sections?: ReadonlyArray<Readonly<AbstractSection>>;
 }
 
+/** An article author with name components and institutional affiliations. */
 export interface Author {
   readonly lastName?: string;
   readonly foreName?: string;
@@ -18,6 +21,7 @@ export interface Author {
   readonly affiliations: ReadonlyArray<string>;
 }
 
+/** Journal publication metadata for a PubMed article. */
 export interface JournalInfo {
   readonly title: string;
   readonly isoAbbrev: string;
@@ -26,6 +30,7 @@ export interface JournalInfo {
   readonly issue?: string;
 }
 
+/** A date that may have only year, year-month, or full year-month-day precision. */
 export interface PartialDate {
   readonly year: number;
   readonly month?: number;
@@ -34,12 +39,14 @@ export interface PartialDate {
   readonly raw?: string;
 }
 
+/** A MeSH subheading qualifier attached to a heading in a PubMed article. */
 export interface MeshQualifier {
   readonly name: string;
   readonly ui: string;
   readonly majorTopic: boolean;
 }
 
+/** A MeSH subject heading assigned to a PubMed article. */
 export interface MeshHeading {
   readonly descriptor: string;
   readonly descriptorUI: string;
@@ -47,6 +54,7 @@ export interface MeshHeading {
   readonly qualifiers: ReadonlyArray<Readonly<MeshQualifier>>;
 }
 
+/** Collection of article identifiers (PMID, DOI, PMC, etc.) for a PubMed article. */
 export interface ArticleIds {
   readonly pmid: string;
   readonly doi?: string;
@@ -55,6 +63,7 @@ export interface ArticleIds {
   readonly mid?: string;
 }
 
+/** A funding grant associated with a PubMed article. */
 export interface Grant {
   readonly grantId: string;
   readonly acronym?: string;
@@ -62,23 +71,27 @@ export interface Grant {
   readonly country: string;
 }
 
+/** A keyword or key phrase assigned to a PubMed article. */
 export interface Keyword {
   readonly text: string;
   readonly majorTopic: boolean;
   readonly owner: 'NLM' | 'NOTNLM';
 }
 
+/** A comment, correction, or retraction linked to a PubMed article. */
 export interface CommentCorrection {
   readonly refType: string;
   readonly refSource: string;
   readonly pmid?: string;
 }
 
+/** A data bank submission (e.g., GenBank, ClinicalTrials.gov) referenced by a PubMed article. */
 export interface DataBank {
   readonly name: string;
   readonly accessionNumbers: ReadonlyArray<string>;
 }
 
+/** A fully parsed PubMed article with metadata, abstract, authors, and indexing terms. */
 export interface PubmedArticle {
   readonly pmid: string;
   readonly title: string;

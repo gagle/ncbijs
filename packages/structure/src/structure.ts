@@ -13,6 +13,7 @@ import type {
   StructureSearchResult,
 } from './interfaces/structure.interface';
 
+/** NCBI Structure (MMDB) macromolecular 3D structure database client. */
 export class Structure {
   private readonly _config: StructureClientConfig;
 
@@ -30,6 +31,7 @@ export class Structure {
     };
   }
 
+  /** Search the Structure database by text query and return matching record IDs. */
   public async search(
     term: string,
     options?: { readonly retmax?: number },
@@ -55,6 +57,7 @@ export class Structure {
     };
   }
 
+  /** Search the Structure database and fetch full record details in a single call. */
   public async searchAndFetch(
     term: string,
     options?: { readonly retmax?: number },
@@ -68,6 +71,7 @@ export class Structure {
     return this.fetch(searchResult.ids);
   }
 
+  /** Fetch Structure record details by their UIDs. */
   public async fetch(ids: ReadonlyArray<string>): Promise<ReadonlyArray<StructureRecord>> {
     if (ids.length === 0) {
       return [];

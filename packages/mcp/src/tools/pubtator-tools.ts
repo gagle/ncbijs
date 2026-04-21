@@ -2,6 +2,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
 import { PubTator } from '@ncbijs/pubtator';
 import { z } from 'zod';
 
+/** Register PubTator3 entity recognition and annotation tools on the MCP server. */
 export function registerPubtatorTools(server: McpServer): void {
   const pubtator = new PubTator();
 

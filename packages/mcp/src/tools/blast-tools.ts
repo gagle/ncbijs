@@ -2,6 +2,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
 import type { Blast } from '@ncbijs/blast';
 import { z } from 'zod';
 
+/** Register BLAST sequence alignment tools on the MCP server. */
 export function registerBlastTools(server: McpServer, getBlast: () => Blast): void {
   server.registerTool(
     'blast-search',

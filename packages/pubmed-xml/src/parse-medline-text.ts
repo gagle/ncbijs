@@ -14,6 +14,7 @@ type MedlineTagMap = Map<string, Array<string>>;
 
 const TAG_LINE_REGEX = /^([A-Z]{2,4})\s*-\s(.*)$/;
 
+/** Parse MEDLINE-format text records into structured PubMed article objects. */
 export function parseMedlineText(text: string): ReadonlyArray<PubmedArticle> {
   if (!text.trim()) {
     return [];

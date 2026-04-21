@@ -44,6 +44,7 @@ function unwrapResponse<T>(response: { data?: T; error?: unknown }): T {
   return response.data;
 }
 
+/** NCBI E-utilities API client with rate limiting and retry support. */
 export class EUtils {
   private readonly client: Client<paths>;
 

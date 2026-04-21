@@ -10,6 +10,7 @@ import type { NucleotideConfig } from './interfaces/nucleotide.interface';
 
 const EFETCH_URL = `${EUTILS_BASE_URL}/efetch.fcgi`;
 
+/** Nucleotide sequence retrieval client supporting FASTA and GenBank formats. */
 export class Nucleotide {
   private readonly _config: NucleotideClientConfig;
 
@@ -21,6 +22,7 @@ export class Nucleotide {
     };
   }
 
+  /** Fetch a nucleotide sequence in FASTA format by accession. */
   public async fetchFasta(accession: string): Promise<FastaRecord> {
     const url = buildEfetchUrl(accession, 'fasta', 'text');
     const text = await fetchText(url, this._config);
@@ -34,6 +36,7 @@ export class Nucleotide {
     return record;
   }
 
+  /** Fetch multiple nucleotide sequences in FASTA format by accessions. */
   public async fetchFastaBatch(
     accessions: ReadonlyArray<string>,
   ): Promise<ReadonlyArray<FastaRecord>> {
@@ -43,6 +46,7 @@ export class Nucleotide {
     return parseFasta(text);
   }
 
+  /** Fetch a nucleotide record in GenBank format by accession. */
   public async fetchGenBank(accession: string): Promise<GenBankRecord> {
     const url = buildEfetchUrl(accession, 'gb', 'text');
     const text = await fetchText(url, this._config);
@@ -56,6 +60,7 @@ export class Nucleotide {
     return record;
   }
 
+  /** Fetch multiple nucleotide records in GenBank format by accessions. */
   public async fetchGenBankBatch(
     accessions: ReadonlyArray<string>,
   ): Promise<ReadonlyArray<GenBankRecord>> {

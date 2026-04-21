@@ -1,3 +1,4 @@
+/** Variant details returned by the LitVar API. */
 export interface LitVarVariant {
   readonly rsid: string;
   readonly hgvs: ReadonlyArray<string>;
@@ -5,6 +6,7 @@ export interface LitVarVariant {
   readonly publicationCount: number;
 }
 
+/** A publication mentioning a genetic variant. */
 export interface LitVarPublication {
   readonly pmid: number;
   readonly title: string;

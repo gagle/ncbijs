@@ -17,6 +17,7 @@ import type {
 const BASE_URL = 'https://api.ncbi.nlm.nih.gov/variation/v0';
 const REQUESTS_PER_SECOND = 5;
 
+/** dbSNP Variation Services API client for RefSNP reports and notation conversion. */
 export class Snp {
   private readonly _config: SnpClientConfig;
 
@@ -28,6 +29,7 @@ export class Snp {
     };
   }
 
+  /** Fetch a RefSNP report by rs ID. */
   public async refsnp(rsId: number): Promise<RefSnpReport> {
     const url = `${BASE_URL}/refsnp/${encodeURIComponent(String(rsId))}`;
     const raw = await fetchJson<RawRefSnpResponse>(url, this._config);
@@ -35,6 +37,7 @@ export class Snp {
     return mapRefSnpReport(raw);
   }
 
+  /** Fetch RefSNP reports for multiple rs IDs sequentially. */
   public async refsnpBatch(rsIds: ReadonlyArray<number>): Promise<ReadonlyArray<RefSnpReport>> {
     const reports: Array<RefSnpReport> = [];
     for (const rsId of rsIds) {
@@ -44,6 +47,7 @@ export class Snp {
     return reports;
   }
 
+  /** Convert an SPDI notation to HGVS. */
   public async spdiToHgvs(spdi: string): Promise<HgvsResult> {
     const url = `${BASE_URL}/spdi/${encodeURIComponent(spdi)}/hgvs`;
     const raw = await fetchJson<RawHgvsResponse>(url, this._config);
@@ -51,6 +55,7 @@ export class Snp {
     return { hgvs: raw.data?.hgvs ?? '' };
   }
 
+  /** Convert an HGVS expression to contextual SPDI alleles. */
   public async hgvsToSpdi(hgvs: string): Promise<ReadonlyArray<SpdiContextual>> {
     const url = `${BASE_URL}/hgvs/${encodeURIComponent(hgvs)}/contextuals`;
     const raw = await fetchJson<RawContextualsResponse>(url, this._config);
@@ -58,6 +63,7 @@ export class Snp {
     return (raw.data?.spdis ?? []).map(mapSpdiContextual);
   }
 
+  /** Convert VCF fields (chrom, pos, ref, alt) to contextual SPDI alleles. */
   public async vcfToSpdi(
     chrom: string,
     pos: number,
@@ -70,6 +76,7 @@ export class Snp {
     return (raw.data?.spdis ?? []).map(mapSpdiContextual);
   }
 
+  /** Convert an SPDI notation to VCF-style fields. */
   public async spdiToVcfFields(spdi: string): Promise<VcfFields> {
     const url = `${BASE_URL}/spdi/${encodeURIComponent(spdi)}/vcf_fields`;
     const raw = await fetchJson<RawVcfFieldsResponse>(url, this._config);

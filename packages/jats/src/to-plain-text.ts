@@ -1,5 +1,6 @@
 import type { JATSArticle, Section } from './interfaces/jats.interface';
 
+/** Convert a parsed JATS article into a plain text string. */
 export function toPlainText(article: JATSArticle): string {
   const lines: Array<string> = [];
 

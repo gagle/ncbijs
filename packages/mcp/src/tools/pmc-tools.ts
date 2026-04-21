@@ -3,6 +3,7 @@ import type { PMC } from '@ncbijs/pmc';
 import { pmcToChunks, pmcToMarkdown } from '@ncbijs/pmc';
 import { z } from 'zod';
 
+/** Register PMC full-text retrieval and chunking tools on the MCP server. */
 export function registerPmcTools(server: McpServer, getPmc: () => PMC): void {
   server.registerTool(
     'get-full-text',

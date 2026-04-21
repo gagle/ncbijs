@@ -3,6 +3,7 @@ import type { Chunk, ChunkOptions, JATSArticle, Section } from './interfaces/jat
 const DEFAULT_MAX_TOKENS = 512;
 const DEFAULT_OVERLAP = 50;
 
+/** Split a parsed JATS article body into overlapping text chunks for embedding or retrieval. */
 export function toChunks(article: JATSArticle, options?: ChunkOptions): ReadonlyArray<Chunk> {
   const maxTokens = options?.maxTokens ?? DEFAULT_MAX_TOKENS;
   const overlap = options?.overlap ?? DEFAULT_OVERLAP;

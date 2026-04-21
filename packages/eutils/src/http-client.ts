@@ -1,3 +1,4 @@
+/** HTTP error thrown when an E-utilities request returns a non-OK status. */
 export class EUtilsHttpError extends Error {
   public readonly statusCode: number;
   public readonly responseBody: string;

@@ -19,6 +19,7 @@ import type {
   GtrTest,
 } from './interfaces/gtr.interface';
 
+/** Genetic Testing Registry (GTR) client for searching and fetching genetic tests. */
 export class Gtr {
   private readonly _config: GtrClientConfig;
 
@@ -36,6 +37,7 @@ export class Gtr {
     };
   }
 
+  /** Search GTR by text query and return matching test IDs. */
   public async search(
     term: string,
     options?: { readonly retmax?: number },
@@ -61,6 +63,7 @@ export class Gtr {
     };
   }
 
+  /** Search GTR and fetch full test details in a single call. */
   public async searchAndFetch(
     term: string,
     options?: { readonly retmax?: number },
@@ -74,6 +77,7 @@ export class Gtr {
     return this.fetch(searchResult.ids);
   }
 
+  /** Fetch GTR test details by their UIDs. */
   public async fetch(ids: ReadonlyArray<string>): Promise<ReadonlyArray<GtrTest>> {
     if (ids.length === 0) {
       return [];

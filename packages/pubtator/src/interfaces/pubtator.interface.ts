@@ -1,3 +1,4 @@
+/** Mapping of entity type names to their PubTator3 API identifiers. */
 export const ENTITY_TYPES = {
   Gene: 'gene',
   Disease: 'disease',
@@ -7,8 +8,10 @@ export const ENTITY_TYPES = {
   CellLine: 'cell_line',
 } as const satisfies Record<string, string>;
 
+/** Biomedical entity type identifier used by the PubTator3 API. */
 export type EntityType = (typeof ENTITY_TYPES)[keyof typeof ENTITY_TYPES];
 
+/** Mapping of concept type names to their PubTator3 annotation concept identifiers. */
 export const CONCEPT_TYPES = {
   Gene: 'Gene',
   Disease: 'Disease',
@@ -18,14 +21,17 @@ export const CONCEPT_TYPES = {
   BioConcept: 'BioConcept',
 } as const satisfies Record<string, string>;
 
+/** Concept type identifier used for PubTator3 annotation filtering. */
 export type ConceptType = (typeof CONCEPT_TYPES)[keyof typeof CONCEPT_TYPES];
 
+/** A biomedical entity matched by the PubTator3 autocomplete search. */
 export interface EntityMatch {
   readonly id: string;
   readonly name: string;
   readonly type: EntityType;
 }
 
+/** Paginated search results from the PubTator3 search API. */
 export interface SearchResult {
   readonly total: number;
   readonly page: number;
@@ -41,16 +47,19 @@ export interface SearchResult {
   >;
 }
 
+/** Pagination options for a PubTator3 search request. */
 export interface SearchOptions {
   readonly page?: number | undefined;
   readonly pageSize?: number | undefined;
 }
 
+/** Options for exporting annotated documents from PubTator3. */
 export interface ExportOptions {
   readonly format?: 'json' | 'xml' | undefined;
   readonly full?: boolean | undefined;
 }
 
+/** A named entity annotation within a BioC passage. */
 export interface Annotation {
   readonly text: string;
   readonly type: string;
@@ -59,6 +68,7 @@ export interface Annotation {
   readonly length: number;
 }
 
+/** A passage (title, abstract, or body section) within a BioC document. */
 export interface BioPassage {
   readonly type: string;
   readonly text: string;
@@ -66,6 +76,7 @@ export interface BioPassage {
   readonly annotations: ReadonlyArray<Readonly<Annotation>>;
 }
 
+/** A BioC document collection containing annotated passages. */
 export interface BioDocument {
   readonly documents: ReadonlyArray<
     Readonly<{

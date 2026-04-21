@@ -113,11 +113,19 @@ packages/{name}/
 
 ### Adding a new package
 
+See **[docs/adding-a-package.md](./docs/adding-a-package.md)** for the full checklist. Summary:
+
 1. Create `packages/{name}/` with `src/`, `package.json`, `project.json`, tsconfigs, vitest, eslint
-2. Add path alias to `tsconfig.base.json`
-3. Add to `release-please-config.json` packages + linked-versions components
-4. Add scope to `commitlint.config.ts`
-5. Run `pnpm install`
+2. Write source, interfaces, and tests (100% coverage)
+3. Add JSDoc on all exported functions, classes, and interfaces
+4. Add E2E tests in `e2e/`
+5. Create `README.md` for the package
+6. Update root `README.md` (workflow table, packages table, decision tree, architecture)
+7. Create example in `examples/` and update `examples/README.md`
+8. Update `docs/README.md` with the new package
+9. Register MCP tools if applicable (tool file, register, descriptions, README)
+10. Update global configs: `tsconfig.base.json`, `release-please-config.json`, `commitlint.config.ts`
+11. Run `pnpm install && pnpm lint && pnpm build && pnpm test`
 
 ## Verification
 

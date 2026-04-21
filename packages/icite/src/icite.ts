@@ -7,6 +7,7 @@ const BASE_URL = 'https://icite.od.nih.gov/api/pubs';
 const REQUESTS_PER_SECOND = 2;
 const MAX_PMIDS_PER_REQUEST = 1000;
 
+/** NIH iCite API client for retrieving citation metrics and influence data. */
 export class ICite {
   private readonly _config: ICiteClientConfig;
 
@@ -17,6 +18,10 @@ export class ICite {
     };
   }
 
+  /**
+   * Fetch citation metrics for one or more publications by PMID.
+   * @param pmids - Array of PubMed IDs (maximum 1000 per request).
+   */
   public async publications(
     pmids: ReadonlyArray<number>,
   ): Promise<ReadonlyArray<ICitePublication>> {

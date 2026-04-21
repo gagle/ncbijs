@@ -1,5 +1,6 @@
 import type { Back, Chunk, ChunkOptions, Front, Section } from '@ncbijs/jats';
 
+/** Full-text PMC article with JATS-parsed front matter, body, back matter, and license. */
 export interface FullTextArticle {
   readonly pmcid: string;
   readonly front: Readonly<Front>;
@@ -10,6 +11,7 @@ export interface FullTextArticle {
 
 export type { Chunk, ChunkOptions };
 
+/** Open Access record metadata from the PMC OA Service. */
 export interface OARecord {
   readonly pmcid: string;
   readonly version: number;
@@ -29,14 +31,17 @@ export interface OARecord {
   readonly mediaUrls?: ReadonlyArray<string> | undefined;
 }
 
+/** Options for looking up a specific OA record version. */
 export interface OALookupOptions {
   readonly version?: number | undefined;
 }
 
+/** Options for listing OA records updated since a given date. */
 export interface OAListOptions {
   readonly until?: string | undefined;
 }
 
+/** OAI-PMH harvested record with header metadata and XML payload. */
 export interface OAIRecord {
   readonly identifier: string;
   readonly datestamp: string;
@@ -44,6 +49,7 @@ export interface OAIRecord {
   readonly metadata: string;
 }
 
+/** Options for OAI-PMH ListRecords harvesting. */
 export interface OAIListOptions {
   readonly from?: string | undefined;
   readonly until?: string | undefined;
@@ -51,6 +57,7 @@ export interface OAIListOptions {
   readonly metadataPrefix?: string | undefined;
 }
 
+/** Configuration for the PMC client. */
 export interface PMCConfig {
   readonly apiKey?: string | undefined;
   readonly tool: string;

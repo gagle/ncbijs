@@ -14,6 +14,7 @@ import type {
   NlmCatalogSearchResult,
 } from './interfaces/nlm-catalog.interface';
 
+/** NLM Catalog client for searching and fetching journal and resource records. */
 export class NlmCatalog {
   private readonly _config: NlmCatalogClientConfig;
 
@@ -31,6 +32,7 @@ export class NlmCatalog {
     };
   }
 
+  /** Search NLM Catalog by text query and return matching record IDs. */
   public async search(
     term: string,
     options?: { readonly retmax?: number },
@@ -56,6 +58,7 @@ export class NlmCatalog {
     };
   }
 
+  /** Search NLM Catalog and fetch full record details in a single call. */
   public async searchAndFetch(
     term: string,
     options?: { readonly retmax?: number },
@@ -69,6 +72,7 @@ export class NlmCatalog {
     return this.fetch(searchResult.ids);
   }
 
+  /** Fetch NLM Catalog record details by their UIDs. */
   public async fetch(ids: ReadonlyArray<string>): Promise<ReadonlyArray<NlmCatalogRecord>> {
     if (ids.length === 0) {
       return [];

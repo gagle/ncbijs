@@ -7,6 +7,7 @@ type ApiRecord =
 const BASE_URL = 'https://pmc.ncbi.nlm.nih.gov/tools/idconv/api/v1/articles/';
 const MAX_IDS_PER_REQUEST = 200;
 
+/** Convert article identifiers between PMID, PMCID, DOI, and Manuscript ID formats. */
 export async function convert(
   ids: ReadonlyArray<string>,
   options?: Omit<ConvertParams, 'ids'>,

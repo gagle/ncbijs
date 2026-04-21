@@ -15,6 +15,7 @@ import {
 } from './article-field-parsers';
 import { decodeEntities, readAllBlocks, readBlock, readTag, stripTags } from '@ncbijs/xml';
 
+/** Parse PubMed XML (PubmedArticleSet format) into structured article records. */
 export function parsePubmedXml(xml: string): ReadonlyArray<PubmedArticle> {
   const articleBlocks = readAllBlocks(xml, 'PubmedArticle');
   if (articleBlocks.length === 0) {

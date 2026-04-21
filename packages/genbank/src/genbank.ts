@@ -29,6 +29,7 @@ const GENBANK_DIVISION_CODES = new Set([
   'TSA',
 ]);
 
+/** Create a GenBank record with default empty values for the given accession. */
 export function createEmptyGenBankRecord(accession: string): GenBankRecord {
   return {
     locus: { name: accession, length: 0, moleculeType: '', topology: '', division: '', date: '' },
@@ -46,6 +47,7 @@ export function createEmptyGenBankRecord(accession: string): GenBankRecord {
   };
 }
 
+/** Parse GenBank flat file text into structured records. */
 export function parseGenBank(text: string): ReadonlyArray<GenBankRecord> {
   return text
     .split(/\n\/\/\s*\n?/)

@@ -12,6 +12,11 @@ type RawSearchResponse = [
   ReadonlyArray<ReadonlyArray<string>>,
 ];
 
+/**
+ * Search an NLM Clinical Tables resource by term with optional pagination and extra fields.
+ * @param table - The Clinical Tables resource name (e.g., 'conditions', 'drug_ingredients').
+ * @param term - The search term to match against.
+ */
 export async function search(
   table: string,
   term: string,

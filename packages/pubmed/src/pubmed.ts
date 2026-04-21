@@ -8,6 +8,7 @@ import { PubMedQueryBuilder } from './query-builder';
 
 const EFETCH_ID_BATCH_SIZE = 200;
 
+/** High-level PubMed search and retrieval client. */
 export class PubMed {
   private readonly eutils: EUtils;
 
@@ -15,10 +16,12 @@ export class PubMed {
     this.eutils = new EUtils(config);
   }
 
+  /** Start a PubMed search query with the fluent builder. */
   public search(term: string): PubMedQueryBuilder {
     return new PubMedQueryBuilder(this.eutils, term);
   }
 
+  /** Fetch articles related to a given PMID, ranked by relevancy score. */
   public async related(pmid: string): Promise<ReadonlyArray<RelatedArticle>> {
     const linkResult = await this.eutils.elink({
       db: 'pubmed',
@@ -53,10 +56,12 @@ export class PubMed {
     return relatedArticles.sort((a, b) => b.relevancyScore - a.relevancyScore);
   }
 
+  /** Fetch articles that cite the given PMID. */
   public async citedBy(pmid: string): Promise<ReadonlyArray<Article>> {
     return this.fetchLinkedArticles(pmid, 'pubmed_pubmed_citedin');
   }
 
+  /** Fetch articles referenced by the given PMID. */
   public async references(pmid: string): Promise<ReadonlyArray<Article>> {
     return this.fetchLinkedArticles(pmid, 'pubmed_pubmed_refs');
   }

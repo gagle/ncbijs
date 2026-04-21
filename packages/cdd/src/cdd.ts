@@ -9,6 +9,7 @@ import { fetchJson } from './cdd-client';
 import type { CddClientConfig } from './cdd-client';
 import type { CddConfig, CddRecord, CddSearchResult } from './interfaces/cdd.interface';
 
+/** Conserved Domain Database (CDD) client for searching and fetching domain records. */
 export class Cdd {
   private readonly _config: CddClientConfig;
 
@@ -26,6 +27,7 @@ export class Cdd {
     };
   }
 
+  /** Search CDD by text query and return matching domain IDs. */
   public async search(
     term: string,
     options?: { readonly retmax?: number },
@@ -51,6 +53,7 @@ export class Cdd {
     };
   }
 
+  /** Search CDD and fetch full domain details in a single call. */
   public async searchAndFetch(
     term: string,
     options?: { readonly retmax?: number },
@@ -64,6 +67,7 @@ export class Cdd {
     return this.fetch(searchResult.ids);
   }
 
+  /** Fetch CDD domain record details by their UIDs. */
   public async fetch(ids: ReadonlyArray<string>): Promise<ReadonlyArray<CddRecord>> {
     if (ids.length === 0) {
       return [];

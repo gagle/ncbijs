@@ -2,6 +2,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
 import type { PubChem } from '@ncbijs/pubchem';
 import { z } from 'zod';
 
+/** Register PubChem compound lookup tools on the MCP server. */
 export function registerPubChemTools(server: McpServer, getPubChem: () => PubChem): void {
   server.registerTool(
     'search-compound',

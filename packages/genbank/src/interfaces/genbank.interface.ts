@@ -1,3 +1,4 @@
+/** A parsed GenBank flat file record with all standard sections. */
 export interface GenBankRecord {
   readonly locus: GenBankLocus;
   readonly definition: string;
@@ -13,6 +14,7 @@ export interface GenBankRecord {
   readonly sequence: string;
 }
 
+/** Parsed LOCUS line of a GenBank record with sequence metadata. */
 export interface GenBankLocus {
   readonly name: string;
   readonly length: number;
@@ -22,6 +24,7 @@ export interface GenBankLocus {
   readonly date: string;
 }
 
+/** A bibliographic reference cited in a GenBank record. */
 export interface GenBankReference {
   readonly number: number;
   readonly range: string;
@@ -31,12 +34,14 @@ export interface GenBankReference {
   readonly pubmedId: string;
 }
 
+/** A sequence feature annotation from the FEATURES table of a GenBank record. */
 export interface GenBankFeature {
   readonly key: string;
   readonly location: string;
   readonly qualifiers: ReadonlyArray<GenBankQualifier>;
 }
 
+/** A key-value qualifier attached to a GenBank feature. */
 export interface GenBankQualifier {
   readonly name: string;
   readonly value: string;

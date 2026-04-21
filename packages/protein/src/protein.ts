@@ -10,6 +10,7 @@ import type { ProteinConfig } from './interfaces/protein.interface';
 
 const EFETCH_URL = `${EUTILS_BASE_URL}/efetch.fcgi`;
 
+/** Protein sequence retrieval client supporting FASTA and GenBank formats. */
 export class Protein {
   private readonly _config: ProteinClientConfig;
 
@@ -21,6 +22,7 @@ export class Protein {
     };
   }
 
+  /** Fetch a protein sequence in FASTA format by accession. */
   public async fetchFasta(accession: string): Promise<FastaRecord> {
     const url = buildEfetchUrl(accession, 'fasta', 'text');
     const text = await fetchText(url, this._config);
@@ -34,6 +36,7 @@ export class Protein {
     return record;
   }
 
+  /** Fetch multiple protein sequences in FASTA format by accessions. */
   public async fetchFastaBatch(
     accessions: ReadonlyArray<string>,
   ): Promise<ReadonlyArray<FastaRecord>> {
@@ -43,6 +46,7 @@ export class Protein {
     return parseFasta(text);
   }
 
+  /** Fetch a protein record in GenPept format by accession. */
   public async fetchGenBank(accession: string): Promise<GenBankRecord> {
     const url = buildEfetchUrl(accession, 'gp', 'text');
     const text = await fetchText(url, this._config);
@@ -56,6 +60,7 @@ export class Protein {
     return record;
   }
 
+  /** Fetch multiple protein records in GenPept format by accessions. */
   public async fetchGenBankBatch(
     accessions: ReadonlyArray<string>,
   ): Promise<ReadonlyArray<GenBankRecord>> {

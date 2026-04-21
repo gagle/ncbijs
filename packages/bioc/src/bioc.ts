@@ -32,12 +32,14 @@ interface RawBioCLocation {
   readonly length: number;
 }
 
+/** Fetch BioC annotations for a PubMed article by PMID. */
 export function pubmed(pmid: string, format?: 'json'): Promise<BioCDocument>;
 export function pubmed(pmid: string, format: 'xml'): Promise<string>;
 export function pubmed(pmid: string, format: BioCFormat = 'json'): Promise<BioCDocument | string> {
   return fetchBioC('pmid', pmid, format);
 }
 
+/** Fetch BioC annotations for a PMC article by PMCID. */
 export function pmc(pmcid: string, format?: 'json'): Promise<BioCDocument>;
 export function pmc(pmcid: string, format: 'xml'): Promise<string>;
 export function pmc(pmcid: string, format: BioCFormat = 'json'): Promise<BioCDocument | string> {

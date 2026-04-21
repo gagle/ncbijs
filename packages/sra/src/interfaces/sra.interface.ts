@@ -1,3 +1,4 @@
+/** Configuration options for the SRA client. */
 export interface SraConfig {
   readonly apiKey?: string | undefined;
   readonly tool?: string;
@@ -5,11 +6,13 @@ export interface SraConfig {
   readonly maxRetries?: number;
 }
 
+/** SRA search result containing matched experiment IDs and total count. */
 export interface SraSearchResult {
   readonly total: number;
   readonly ids: ReadonlyArray<string>;
 }
 
+/** An SRA sequencing experiment with library and run metadata. */
 export interface SraExperiment {
   readonly uid: string;
   readonly title: string;
@@ -30,11 +33,13 @@ export interface SraExperiment {
   readonly updateDate: string;
 }
 
+/** Organism associated with an SRA experiment. */
 export interface SraOrganism {
   readonly taxId: number;
   readonly scientificName: string;
 }
 
+/** A sequencing run within an SRA experiment. */
 export interface SraRun {
   readonly accession: string;
   readonly totalSpots: number;

@@ -38,14 +38,17 @@ function toJATSArticle(article: FullTextArticle): JATSArticle {
   };
 }
 
+/** Convert a PMC full-text article to Markdown. */
 export function pmcToMarkdown(article: FullTextArticle): string {
   return toMarkdown(toJATSArticle(article));
 }
 
+/** Convert a PMC full-text article to plain text. */
 export function pmcToPlainText(article: FullTextArticle): string {
   return toPlainText(toJATSArticle(article));
 }
 
+/** Split a PMC full-text article into semantic chunks for embedding or processing. */
 export function pmcToChunks(
   article: FullTextArticle,
   options?: ChunkOptions,
@@ -130,6 +133,7 @@ function parseOAIRecordXml(recordXml: string): OAIRecord {
   return { identifier, datestamp, setSpec, metadata };
 }
 
+/** PMC full-text article retrieval via E-utilities, OA Service, and OAI-PMH. */
 export class PMC {
   private readonly eutils: EUtils;
   private readonly config: PMCConfig;
@@ -144,6 +148,7 @@ export class PMC {
     });
   }
 
+  /** Fetch a full-text article by PMC ID via E-utilities. */
   public async fetch(pmcid: string): Promise<FullTextArticle> {
     const normalized = normalizePmcid(pmcid);
 

@@ -1,12 +1,16 @@
+/** Citation output format identifier. */
 export type CitationFormat = 'ris' | 'medline' | 'csl' | 'citation';
 
+/** NCBI source database for citation retrieval. */
 export type CitationSource = 'pubmed' | 'pmc' | 'books';
 
+/** A citation rendered in a specific bibliographic style. */
 export interface CitationStyle {
   readonly orig: string;
   readonly format: string;
 }
 
+/** Pre-formatted citation data containing multiple bibliographic styles. */
 export interface CitationData {
   readonly id: string;
   readonly ama: CitationStyle;
@@ -15,6 +19,7 @@ export interface CitationData {
   readonly nlm: CitationStyle;
 }
 
+/** Citation data in Citation Style Language (CSL) JSON format. */
 export interface CSLData {
   readonly type: string;
   readonly id: string;

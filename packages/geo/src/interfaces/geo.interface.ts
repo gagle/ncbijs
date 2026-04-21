@@ -1,3 +1,4 @@
+/** Configuration options for the GEO client. */
 export interface GeoConfig {
   readonly apiKey?: string | undefined;
   readonly tool?: string;
@@ -5,11 +6,13 @@ export interface GeoConfig {
   readonly maxRetries?: number;
 }
 
+/** GEO search result containing matched record IDs and total count. */
 export interface GeoSearchResult {
   readonly total: number;
   readonly ids: ReadonlyArray<string>;
 }
 
+/** A GEO dataset or series record with sample and platform metadata. */
 export interface GeoRecord {
   readonly uid: string;
   readonly accession: string;
@@ -30,6 +33,7 @@ export interface GeoRecord {
   readonly seriesId: string;
 }
 
+/** A sample within a GEO dataset or series. */
 export interface GeoSample {
   readonly accession: string;
   readonly title: string;

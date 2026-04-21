@@ -2,6 +2,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
 import type { Snp } from '@ncbijs/snp';
 import { z } from 'zod';
 
+/** Register dbSNP variant lookup tools on the MCP server. */
 export function registerSnpTools(server: McpServer, getSnp: () => Snp): void {
   server.registerTool(
     'lookup-variant',

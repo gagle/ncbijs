@@ -15,6 +15,7 @@ import type {
   DbVarSearchResult,
 } from './interfaces/dbvar.interface';
 
+/** dbVar structural variation database client. */
 export class DbVar {
   private readonly _config: DbVarClientConfig;
 
@@ -32,6 +33,7 @@ export class DbVar {
     };
   }
 
+  /** Search dbVar by text query and return matching record IDs. */
   public async search(
     term: string,
     options?: { readonly retmax?: number },
@@ -57,6 +59,7 @@ export class DbVar {
     };
   }
 
+  /** Search dbVar and fetch full record details in a single call. */
   public async searchAndFetch(
     term: string,
     options?: { readonly retmax?: number },
@@ -70,6 +73,7 @@ export class DbVar {
     return this.fetch(searchResult.ids);
   }
 
+  /** Fetch dbVar record details by their UIDs. */
   public async fetch(ids: ReadonlyArray<string>): Promise<ReadonlyArray<DbVarRecord>> {
     if (ids.length === 0) {
       return [];

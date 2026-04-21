@@ -1,5 +1,6 @@
 import type { JATSArticle, Section, Table } from './interfaces/jats.interface';
 
+/** Convert a parsed JATS article into a Markdown-formatted string. */
 export function toMarkdown(article: JATSArticle): string {
   const lines: Array<string> = [];
 

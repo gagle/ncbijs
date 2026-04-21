@@ -20,6 +20,7 @@ import {
   removeAllBlocks,
 } from '@ncbijs/xml';
 
+/** Parse JATS XML into a structured article with front matter, body sections, and back matter. */
 export function parseJATS(xml: string): JATSArticle {
   if (!xml.trim()) {
     throw new Error('Empty input');

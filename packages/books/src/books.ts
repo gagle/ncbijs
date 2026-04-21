@@ -9,6 +9,7 @@ import { fetchJson } from './books-client';
 import type { BooksClientConfig } from './books-client';
 import type { BooksConfig, BooksRecord, BooksSearchResult } from './interfaces/books.interface';
 
+/** NCBI Bookshelf client for searching and fetching biomedical book records. */
 export class Books {
   private readonly _config: BooksClientConfig;
 
@@ -26,6 +27,7 @@ export class Books {
     };
   }
 
+  /** Search NCBI Bookshelf by text query and return matching record IDs. */
   public async search(
     term: string,
     options?: { readonly retmax?: number },
@@ -51,6 +53,7 @@ export class Books {
     };
   }
 
+  /** Search NCBI Bookshelf and fetch full record details in a single call. */
   public async searchAndFetch(
     term: string,
     options?: { readonly retmax?: number },
@@ -64,6 +67,7 @@ export class Books {
     return this.fetch(searchResult.ids);
   }
 
+  /** Fetch NCBI Bookshelf record details by their UIDs. */
   public async fetch(ids: ReadonlyArray<string>): Promise<ReadonlyArray<BooksRecord>> {
     if (ids.length === 0) {
       return [];

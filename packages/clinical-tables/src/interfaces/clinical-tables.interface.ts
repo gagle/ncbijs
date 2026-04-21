@@ -1,3 +1,4 @@
+/** Options for searching a Clinical Tables resource. */
 export interface ClinicalTablesSearchOptions {
   readonly maxList?: number;
   readonly count?: number;
@@ -5,6 +6,7 @@ export interface ClinicalTablesSearchOptions {
   readonly extraFields?: ReadonlyArray<string>;
 }
 
+/** Search result from the Clinical Tables API. */
 export interface ClinicalTablesResult {
   readonly totalCount: number;
   readonly codes: ReadonlyArray<string>;

@@ -2,6 +2,7 @@ import { readAllBlocks, readAllTagsWithAttributes, readAttribute, readTag } from
 
 import type { Annotation, BioDocument, BioPassage } from './interfaces/pubtator.interface';
 
+/** Parse a BioC document from either JSON or XML format into a structured BioDocument. */
 export function parseBioC(input: string): BioDocument {
   const trimmed = input.trim();
   if (!trimmed) {

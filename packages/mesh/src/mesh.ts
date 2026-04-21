@@ -3,6 +3,7 @@ import type { MeshDescriptor, MeshTreeData, SparqlResult } from './interfaces/me
 const SPARQL_URL = 'https://id.nlm.nih.gov/mesh/sparql';
 const LOOKUP_URL = 'https://id.nlm.nih.gov/mesh/lookup/descriptor';
 
+/** Client for navigating and querying the NLM Medical Subject Headings (MeSH) vocabulary. */
 export class MeSH {
   private readonly descriptorById: ReadonlyMap<string, MeshDescriptor>;
   private readonly descriptorByLowercaseName: ReadonlyMap<string, MeshDescriptor>;
@@ -28,6 +29,7 @@ export class MeSH {
     this.sortedTreeNumbers = [...byTree.keys()].sort();
   }
 
+  /** Find a MeSH descriptor by its unique ID or name. */
   public lookup(descriptorIdOrName: string): MeshDescriptor | null {
     return (
       this.descriptorById.get(descriptorIdOrName) ??
@@ -36,6 +38,7 @@ export class MeSH {
     );
   }
 
+  /** Return the names of a descriptor and all its descendant terms in the MeSH tree. */
   public expand(term: string): ReadonlyArray<string> {
     const descriptor = this.resolveDescriptor(term);
     const names = new Set<string>([descriptor.name]);
@@ -55,6 +58,7 @@ export class MeSH {
     return [...names];
   }
 
+  /** Return the names of all ancestor terms above the given descriptor in the MeSH tree. */
   public ancestors(term: string): ReadonlyArray<string> {
     const descriptor = this.resolveDescriptor(term);
     const names = new Set<string>();
@@ -73,6 +77,7 @@ export class MeSH {
     return [...names];
   }
 
+  /** Return the names of the immediate child terms below the given descriptor in the MeSH tree. */
   public children(term: string): ReadonlyArray<string> {
     const descriptor = this.resolveDescriptor(term);
     const names = new Set<string>();
@@ -92,6 +97,7 @@ export class MeSH {
     return [...names];
   }
 
+  /** Return the full path from root to the given descriptor through the MeSH tree hierarchy. */
   public treePath(term: string): ReadonlyArray<string> {
     const descriptor = this.resolveDescriptor(term);
     const allPaths: Array<string> = [];
@@ -110,6 +116,7 @@ export class MeSH {
     return allPaths;
   }
 
+  /** Convert a MeSH term (with optional qualifier) into a PubMed MeSH search query string. */
   public toQuery(term: string): string {
     const slashIndex = term.indexOf('/');
 
@@ -128,6 +135,7 @@ export class MeSH {
     return `"${descriptor.name}"[Mesh]`;
   }
 
+  /** Execute a SPARQL query against the NLM MeSH SPARQL endpoint. */
   public async sparql(query: string): Promise<SparqlResult> {
     const url = new URL(SPARQL_URL);
     url.searchParams.set('query', query);
@@ -142,6 +150,7 @@ export class MeSH {
     return (await response.json()) as SparqlResult;
   }
 
+  /** Search for MeSH descriptors online via the NLM lookup API. */
   public async lookupOnline(query: string): Promise<ReadonlyArray<MeshDescriptor>> {
     const url = new URL(LOOKUP_URL);
     url.searchParams.set('label', query);

@@ -22,6 +22,7 @@ const BASE_URL = 'https://api.ncbi.nlm.nih.gov/datasets/v2';
 const REQUESTS_PER_SECOND_DEFAULT = 5;
 const REQUESTS_PER_SECOND_WITH_KEY = 10;
 
+/** NCBI Datasets v2 API client for genes, genomes, taxonomy, and biosamples. */
 export class Datasets {
   private readonly _config: DatasetsClientConfig;
 
@@ -37,6 +38,7 @@ export class Datasets {
     };
   }
 
+  /** Fetch gene reports by NCBI Gene IDs. */
   public async geneById(geneIds: ReadonlyArray<number>): Promise<ReadonlyArray<GeneReport>> {
     if (geneIds.length === 0) {
       throw new Error('geneIds must not be empty');
@@ -49,6 +51,7 @@ export class Datasets {
     return (raw.reports ?? []).map(mapGeneReport);
   }
 
+  /** Fetch gene reports by gene symbols within a specific taxon. */
   public async geneBySymbol(
     symbols: ReadonlyArray<string>,
     taxon: number | string,
@@ -64,6 +67,7 @@ export class Datasets {
     return (raw.reports ?? []).map(mapGeneReport);
   }
 
+  /** Fetch taxonomy reports by taxon IDs or names. */
   public async taxonomy(
     taxons: ReadonlyArray<number | string>,
   ): Promise<ReadonlyArray<TaxonomyReport>> {
@@ -78,6 +82,7 @@ export class Datasets {
     return (raw.taxonomy_nodes ?? []).map(mapTaxonomyReport);
   }
 
+  /** Fetch genome assembly reports by accession numbers. */
   public async genomeByAccession(
     accessions: ReadonlyArray<string>,
   ): Promise<ReadonlyArray<GenomeReport>> {
@@ -92,6 +97,7 @@ export class Datasets {
     return (raw.reports ?? []).map(mapGenomeReport);
   }
 
+  /** Fetch genome assembly reports for a given taxon. */
   public async genomeByTaxon(taxon: number | string): Promise<ReadonlyArray<GenomeReport>> {
     const url = `${BASE_URL}/genome/taxon/${encodeURIComponent(String(taxon))}/dataset_report`;
     const raw = await fetchJson<RawGenomeResponse>(url, this._config);
@@ -99,6 +105,7 @@ export class Datasets {
     return (raw.reports ?? []).map(mapGenomeReport);
   }
 
+  /** Fetch virus genome reports by accession numbers. */
   public async virusByAccession(
     accessions: ReadonlyArray<string>,
   ): Promise<ReadonlyArray<VirusReport>> {
@@ -113,6 +120,7 @@ export class Datasets {
     return (raw.reports ?? []).map(mapVirusReport);
   }
 
+  /** Fetch virus genome reports for a given taxon. */
   public async virusByTaxon(taxon: number | string): Promise<ReadonlyArray<VirusReport>> {
     const url = `${BASE_URL}/virus/taxon/${encodeURIComponent(String(taxon))}/dataset_report`;
     const raw = await fetchJson<RawVirusResponse>(url, this._config);
@@ -120,6 +128,7 @@ export class Datasets {
     return (raw.reports ?? []).map(mapVirusReport);
   }
 
+  /** Fetch BioProject reports by accession numbers. */
   public async bioproject(
     accessions: ReadonlyArray<string>,
   ): Promise<ReadonlyArray<BioProjectReport>> {
@@ -134,6 +143,7 @@ export class Datasets {
     return (raw.reports ?? []).map(mapBioProjectReport);
   }
 
+  /** Fetch BioSample reports by accession numbers. */
   public async biosample(
     accessions: ReadonlyArray<string>,
   ): Promise<ReadonlyArray<BioSampleReport>> {

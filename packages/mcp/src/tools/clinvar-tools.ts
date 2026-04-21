@@ -2,6 +2,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
 import type { ClinVar } from '@ncbijs/clinvar';
 import { z } from 'zod';
 
+/** Register ClinVar clinical variant search tools on the MCP server. */
 export function registerClinVarTools(server: McpServer, getClinVar: () => ClinVar): void {
   server.registerTool(
     'search-clinvar',

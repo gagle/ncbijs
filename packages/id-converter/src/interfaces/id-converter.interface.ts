@@ -1,7 +1,10 @@
+/** Supported article identifier type. */
 export type IdType = 'pmid' | 'pmcid' | 'doi' | 'mid';
 
+/** Response format for the ID Converter API. */
 export type OutputFormat = 'json' | 'xml' | 'csv' | 'html';
 
+/** Parameters for an ID conversion request. */
 export interface ConvertParams {
   readonly ids: ReadonlyArray<string>;
   readonly idtype?: IdType;
@@ -12,11 +15,13 @@ export interface ConvertParams {
   readonly email?: string;
 }
 
+/** A PMCID version entry with its currency flag. */
 export interface VersionedId {
   readonly pmcid: string;
   readonly current: boolean;
 }
 
+/** Result of converting an article identifier across PMID, PMCID, DOI, and MID. */
 export interface ConvertedId {
   readonly pmid: string | null;
   readonly pmcid: string | null;

@@ -2,6 +2,7 @@ import type { PubTatorAnnotation } from './interfaces/pubtator.interface';
 
 const ANNOTATION_REGEX = /^(\d+)\t(\d+)\t(\d+)\t([^\t]*)\t([^\t]*)\t(.*)$/;
 
+/** Parse PubTator TSV-format annotations into structured annotation records. */
 export function parsePubTatorTsv(input: string): ReadonlyArray<PubTatorAnnotation> {
   if (!input.trim()) {
     return [];

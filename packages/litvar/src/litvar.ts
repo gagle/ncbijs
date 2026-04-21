@@ -13,6 +13,7 @@ interface RawVariantResponse {
   readonly results: ReadonlyArray<RawVariantResult>;
 }
 
+/** Fetch variant details and publication count for an rsID. */
 export async function variant(rsid: string): Promise<LitVarVariant> {
   if (!rsid) {
     throw new Error('rsid must not be empty');
@@ -41,6 +42,7 @@ export async function variant(rsid: string): Promise<LitVarVariant> {
   };
 }
 
+/** Fetch publications mentioning a variant by rsID. */
 export async function publications(rsid: string): Promise<ReadonlyArray<LitVarPublication>> {
   if (!rsid) {
     throw new Error('rsid must not be empty');

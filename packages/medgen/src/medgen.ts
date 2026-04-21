@@ -24,6 +24,7 @@ import type {
   MedGenSearchResult,
 } from './interfaces/medgen.interface';
 
+/** MedGen medical genetics concept lookup client. */
 export class MedGen {
   private readonly _config: MedGenClientConfig;
 
@@ -41,6 +42,7 @@ export class MedGen {
     };
   }
 
+  /** Search MedGen by text query and return matching concept IDs. */
   public async search(
     term: string,
     options?: { readonly retmax?: number },
@@ -66,6 +68,7 @@ export class MedGen {
     };
   }
 
+  /** Search MedGen and fetch full concept details in a single call. */
   public async searchAndFetch(
     term: string,
     options?: { readonly retmax?: number },
@@ -79,6 +82,7 @@ export class MedGen {
     return this.fetch(searchResult.ids);
   }
 
+  /** Fetch MedGen concept details by their UIDs. */
   public async fetch(ids: ReadonlyArray<string>): Promise<ReadonlyArray<MedGenConcept>> {
     if (ids.length === 0) {
       return [];

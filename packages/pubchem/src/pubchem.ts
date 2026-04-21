@@ -38,6 +38,7 @@ const COMPOUND_PROPERTIES = [
   'HeavyAtomCount',
 ].join(',');
 
+/** PubChem PUG REST and PUG View API client with automatic rate limiting. */
 export class PubChem {
   private readonly _config: PubChemClientConfig;
 
@@ -48,6 +49,7 @@ export class PubChem {
     };
   }
 
+  /** Fetch compound properties by PubChem CID. */
   public async compoundByCid(cid: number): Promise<CompoundProperty> {
     const url = `${BASE_URL}/compound/cid/${encodeURIComponent(cid)}/property/${COMPOUND_PROPERTIES}/JSON`;
     const raw = await fetchJson<RawPropertyResponse>(url, this._config);
@@ -55,6 +57,7 @@ export class PubChem {
     return mapCompoundProperty(raw);
   }
 
+  /** Fetch compound properties by chemical name. */
   public async compoundByName(name: string): Promise<CompoundProperty> {
     const url = `${BASE_URL}/compound/name/${encodeURIComponent(name)}/property/${COMPOUND_PROPERTIES}/JSON`;
     const raw = await fetchJson<RawPropertyResponse>(url, this._config);
@@ -62,6 +65,7 @@ export class PubChem {
     return mapCompoundProperty(raw);
   }
 
+  /** Fetch compound properties for multiple CIDs in a single request. */
   public async compoundByCidBatch(
     cids: ReadonlyArray<number>,
   ): Promise<ReadonlyArray<CompoundProperty>> {
@@ -76,6 +80,7 @@ export class PubChem {
     return (raw.PropertyTable?.Properties ?? []).map(mapCompoundPropertyEntry);
   }
 
+  /** Fetch compound properties by SMILES notation. */
   public async compoundBySmiles(smiles: string): Promise<CompoundProperty> {
     const url = `${BASE_URL}/compound/smiles/${encodeURIComponent(smiles)}/property/${COMPOUND_PROPERTIES}/JSON`;
     const raw = await fetchJson<RawPropertyResponse>(url, this._config);
@@ -83,6 +88,7 @@ export class PubChem {
     return mapCompoundProperty(raw);
   }
 
+  /** Fetch compound properties by InChIKey. */
   public async compoundByInchiKey(inchiKey: string): Promise<CompoundProperty> {
     const url = `${BASE_URL}/compound/inchikey/${encodeURIComponent(inchiKey)}/property/${COMPOUND_PROPERTIES}/JSON`;
     const raw = await fetchJson<RawPropertyResponse>(url, this._config);
@@ -90,6 +96,7 @@ export class PubChem {
     return mapCompoundProperty(raw);
   }
 
+  /** Look up PubChem CIDs matching a chemical name. */
   public async cidsByName(name: string): Promise<ReadonlyArray<number>> {
     const url = `${BASE_URL}/compound/name/${encodeURIComponent(name)}/cids/JSON`;
     const raw = await fetchJson<RawCidResponse>(url, this._config);
@@ -97,6 +104,7 @@ export class PubChem {
     return raw.IdentifierList?.CID ?? [];
   }
 
+  /** Fetch synonyms for a compound by CID. */
   public async synonyms(cid: number): Promise<CompoundSynonyms> {
     const url = `${BASE_URL}/compound/cid/${encodeURIComponent(cid)}/synonyms/JSON`;
     const raw = await fetchJson<RawSynonymsResponse>(url, this._config);
@@ -108,6 +116,7 @@ export class PubChem {
     };
   }
 
+  /** Fetch the description and title for a compound by CID. */
   public async description(cid: number): Promise<CompoundDescription> {
     const url = `${BASE_URL}/compound/cid/${encodeURIComponent(cid)}/description/JSON`;
     const raw = await fetchJson<RawDescriptionResponse>(url, this._config);
@@ -120,6 +129,7 @@ export class PubChem {
     };
   }
 
+  /** Fetch a substance record by SID. */
   public async substanceBySid(sid: number): Promise<SubstanceRecord> {
     const url = `${BASE_URL}/substance/sid/${encodeURIComponent(sid)}/description/JSON`;
     const raw = await fetchJson<RawSubstanceDescriptionResponse>(url, this._config);
@@ -127,6 +137,7 @@ export class PubChem {
     return mapSubstanceRecord(raw.InformationList?.Information?.[0]);
   }
 
+  /** Fetch substance records for multiple SIDs in a single request. */
   public async substanceBySidBatch(
     sids: ReadonlyArray<number>,
   ): Promise<ReadonlyArray<SubstanceRecord>> {
@@ -141,6 +152,7 @@ export class PubChem {
     return (raw.InformationList?.Information ?? []).map(mapSubstanceRecord);
   }
 
+  /** Fetch a substance record by name. */
   public async substanceByName(name: string): Promise<SubstanceRecord> {
     const url = `${BASE_URL}/substance/name/${encodeURIComponent(name)}/description/JSON`;
     const raw = await fetchJson<RawSubstanceDescriptionResponse>(url, this._config);
@@ -148,6 +160,7 @@ export class PubChem {
     return mapSubstanceRecord(raw.InformationList?.Information?.[0]);
   }
 
+  /** Fetch synonyms for a substance by SID. */
   public async substanceSynonyms(sid: number): Promise<SubstanceSynonyms> {
     const url = `${BASE_URL}/substance/sid/${encodeURIComponent(sid)}/synonyms/JSON`;
     const raw = await fetchJson<RawSubstanceSynonymsResponse>(url, this._config);
@@ -159,6 +172,7 @@ export class PubChem {
     };
   }
 
+  /** Look up PubChem SIDs matching a substance name. */
   public async sidsByName(name: string): Promise<ReadonlyArray<number>> {
     const url = `${BASE_URL}/substance/name/${encodeURIComponent(name)}/sids/JSON`;
     const raw = await fetchJson<RawSidResponse>(url, this._config);
@@ -166,6 +180,7 @@ export class PubChem {
     return raw.IdentifierList?.SID ?? [];
   }
 
+  /** Fetch a bioassay record by AID. */
   public async assayByAid(aid: number): Promise<AssayRecord> {
     const url = `${BASE_URL}/assay/aid/${encodeURIComponent(aid)}/description/JSON`;
     const raw = await fetchJson<RawAssayDescriptionResponse>(url, this._config);
@@ -173,6 +188,7 @@ export class PubChem {
     return mapAssayRecord(raw.PC_AssayContainer?.[0]);
   }
 
+  /** Fetch bioassay records for multiple AIDs in a single request. */
   public async assayByAidBatch(aids: ReadonlyArray<number>): Promise<ReadonlyArray<AssayRecord>> {
     if (aids.length === 0) {
       return [];
@@ -185,6 +201,7 @@ export class PubChem {
     return (raw.PC_AssayContainer ?? []).map(mapAssayRecord);
   }
 
+  /** Fetch a summary of substance and compound counts for a bioassay. */
   public async assaySummary(aid: number): Promise<AssaySummary> {
     const url = `${BASE_URL}/assay/aid/${encodeURIComponent(aid)}/sids/JSON`;
     const raw = await fetchJson<RawAssaySidsResponse>(url, this._config);
@@ -198,6 +215,7 @@ export class PubChem {
     };
   }
 
+  /** Fetch full compound annotations from PUG View, optionally filtered by heading. */
   public async compoundAnnotations(cid: number, heading?: string): Promise<AnnotationRecord> {
     let url = `${PUG_VIEW_BASE_URL}/data/compound/${encodeURIComponent(cid)}/JSON`;
     if (heading !== undefined) {
@@ -208,6 +226,7 @@ export class PubChem {
     return mapAnnotationRecord(raw.Record);
   }
 
+  /** Fetch full substance annotations from PUG View, optionally filtered by heading. */
   public async substanceAnnotations(sid: number, heading?: string): Promise<AnnotationRecord> {
     let url = `${PUG_VIEW_BASE_URL}/data/substance/${encodeURIComponent(sid)}/JSON`;
     if (heading !== undefined) {
@@ -218,6 +237,7 @@ export class PubChem {
     return mapAnnotationRecord(raw.Record);
   }
 
+  /** Fetch full bioassay annotations from PUG View, optionally filtered by heading. */
   public async assayAnnotations(aid: number, heading?: string): Promise<AnnotationRecord> {
     let url = `${PUG_VIEW_BASE_URL}/data/bioassay/${encodeURIComponent(aid)}/JSON`;
     if (heading !== undefined) {

@@ -62,7 +62,9 @@ function appendParam(params: URLSearchParams, key: string, value: string | undef
   }
 }
 
+/** Client for the PubTator3 API providing biomedical named entity recognition and search. */
 export class PubTator {
+  /** Search for biomedical entities by name with optional type filtering. */
   public async findEntity(
     query: string,
     entityType?: EntityType,
@@ -82,6 +84,7 @@ export class PubTator {
     }));
   }
 
+  /** Search PubTator3 for articles matching a free-text query. */
   public async search(query: string, options?: SearchOptions): Promise<SearchResult> {
     const params = new URLSearchParams({ text: query });
     if (options?.page !== undefined) params.set('page', String(options.page));
@@ -106,6 +109,7 @@ export class PubTator {
     };
   }
 
+  /** Export annotated BioC documents for the given PubMed IDs. */
   public async export(pmids: ReadonlyArray<string>, options?: ExportOptions): Promise<BioDocument> {
     const format = options?.format ?? 'json';
     const params = new URLSearchParams({ pmids: pmids.join(',') });
@@ -120,6 +124,7 @@ export class PubTator {
     return parseBioC(text);
   }
 
+  /** Retrieve pre-computed annotations for the given PubMed IDs. */
   public async annotateByPmid(
     pmids: ReadonlyArray<string>,
     options?: AnnotateOptions,
@@ -134,6 +139,7 @@ export class PubTator {
     );
   }
 
+  /** Submit free text to PubTator3 for biomedical entity annotation. */
   public async annotateText(text: string, options?: AnnotateOptions): Promise<string> {
     const params = new URLSearchParams();
     appendParam(params, 'concepts', options?.concept);

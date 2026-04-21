@@ -1,8 +1,10 @@
+/** Configuration for the NCBI Datasets client. */
 export interface DatasetsConfig {
   readonly apiKey?: string | undefined;
   readonly maxRetries?: number;
 }
 
+/** NCBI gene report with annotations, ontology, and cross-references. */
 export interface GeneReport {
   readonly geneId: number;
   readonly symbol: string;
@@ -22,17 +24,20 @@ export interface GeneReport {
   readonly geneOntology: GeneOntology;
 }
 
+/** Gene Ontology annotations grouped by category. */
 export interface GeneOntology {
   readonly molecularFunctions: ReadonlyArray<GoTerm>;
   readonly biologicalProcesses: ReadonlyArray<GoTerm>;
   readonly cellularComponents: ReadonlyArray<GoTerm>;
 }
 
+/** A single Gene Ontology term with its identifier. */
 export interface GoTerm {
   readonly name: string;
   readonly goId: string;
 }
 
+/** NCBI taxonomy node with lineage, children, and dataset counts. */
 export interface TaxonomyReport {
   readonly taxId: number;
   readonly organismName: string;
@@ -43,11 +48,13 @@ export interface TaxonomyReport {
   readonly counts: ReadonlyArray<TaxonomyCount>;
 }
 
+/** Count of datasets of a given type for a taxonomy node. */
 export interface TaxonomyCount {
   readonly type: string;
   readonly count: number;
 }
 
+/** Genome assembly report with organism info and assembly statistics. */
 export interface GenomeReport {
   readonly accession: string;
   readonly currentAccession: string;
@@ -57,12 +64,14 @@ export interface GenomeReport {
   readonly assemblyStats: AssemblyStats;
 }
 
+/** Organism metadata associated with a genome assembly. */
 export interface GenomeOrganism {
   readonly taxId: number;
   readonly organismName: string;
   readonly commonName: string;
 }
 
+/** Metadata about a genome assembly submission and release. */
 export interface AssemblyInfo {
   readonly assemblyLevel: string;
   readonly assemblyStatus: string;
@@ -75,6 +84,7 @@ export interface AssemblyInfo {
   readonly description: string;
 }
 
+/** Assembly-level statistics including contig/scaffold metrics and GC content. */
 export interface AssemblyStats {
   readonly totalNumberOfChromosomes: number;
   readonly totalSequenceLength: string;
@@ -88,6 +98,7 @@ export interface AssemblyStats {
   readonly gcPercent: number;
 }
 
+/** Virus genome report with host, collection, and completeness metadata. */
 export interface VirusReport {
   readonly accession: string;
   readonly taxId: number;
@@ -102,6 +113,7 @@ export interface VirusReport {
   readonly biosampleAccession: string;
 }
 
+/** NCBI BioProject report with project metadata. */
 export interface BioProjectReport {
   readonly accession: string;
   readonly title: string;
@@ -112,6 +124,7 @@ export interface BioProjectReport {
   readonly registrationDate: string;
 }
 
+/** NCBI BioSample report with sample attributes. */
 export interface BioSampleReport {
   readonly accession: string;
   readonly title: string;
@@ -124,6 +137,7 @@ export interface BioSampleReport {
   readonly attributes: ReadonlyArray<BioSampleAttribute>;
 }
 
+/** A single key-value attribute from a BioSample record. */
 export interface BioSampleAttribute {
   readonly name: string;
   readonly value: string;

@@ -17,6 +17,7 @@ import { registerPubtatorTools } from './tools/pubtator-tools';
 import { registerSnpTools } from './tools/snp-tools';
 import { registerUtilityTools } from './tools/utility-tools';
 
+/** Factory functions that lazily create NCBI client instances for MCP tools. */
 export interface ToolFactories {
   readonly getPubmed: () => PubMed;
   readonly getPmc: () => PMC;
@@ -27,6 +28,7 @@ export interface ToolFactories {
   readonly getPubChem: () => PubChem;
 }
 
+/** Register all ncbijs tools on the given MCP server. */
 export function registerAllTools(server: McpServer, factories: ToolFactories): void {
   registerPubmedTools(server, factories.getPubmed);
   registerPmcTools(server, factories.getPmc);

@@ -1,3 +1,4 @@
+/** Configuration options for the Books client. */
 export interface BooksConfig {
   readonly apiKey?: string;
   readonly tool?: string;
@@ -5,11 +6,13 @@ export interface BooksConfig {
   readonly maxRetries?: number;
 }
 
+/** Books search result containing matched record IDs and total count. */
 export interface BooksSearchResult {
   readonly total: number;
   readonly ids: ReadonlyArray<string>;
 }
 
+/** A record from the NCBI Bookshelf representing a book or chapter. */
 export interface BooksRecord {
   readonly uid: string;
   readonly title: string;

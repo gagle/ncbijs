@@ -15,6 +15,7 @@ function extractHistoryParams(result: ESearchResult): { webEnv: string; queryKey
   return { webEnv: result.webEnv, queryKey: result.queryKey };
 }
 
+/** Fluent query builder for constructing and executing PubMed searches. */
 export class PubMedQueryBuilder {
   private readonly eutils: EUtils;
   private readonly baseTerm: string;
@@ -27,51 +28,61 @@ export class PubMedQueryBuilder {
     this.baseTerm = term;
   }
 
+  /** Filter results by author name. */
   public author(name: string): this {
     this.filters.push(`${name}[au]`);
     return this;
   }
 
+  /** Filter results by journal ISO abbreviation. */
   public journal(isoAbbrev: string): this {
     this.filters.push(`"${isoAbbrev}"[ta]`);
     return this;
   }
 
+  /** Filter results by MeSH descriptor term. */
   public meshTerm(descriptor: string): this {
     this.filters.push(`"${descriptor}"[mesh]`);
     return this;
   }
 
+  /** Restrict results to a publication date range (YYYY/MM/DD). */
   public dateRange(from: string, to: string): this {
     this.filters.push(`("${from}"[dp] : "${to}"[dp])`);
     return this;
   }
 
+  /** Filter results by publication type. */
   public publicationType(type: PublicationType): this {
     this.filters.push(`"${type}"[pt]`);
     return this;
   }
 
+  /** Restrict results to free full-text articles only. */
   public freeFullText(): this {
     this.filters.push('free full text[sb]');
     return this;
   }
 
+  /** Set the sort order for results. */
   public sort(field: PubMedSort): this {
     this.sortField = field;
     return this;
   }
 
+  /** Add a proximity search constraint for terms within a given distance. */
   public proximity(terms: string, field: string, distance: number): this {
     this.filters.push(`"${terms}"[${field}:~${distance}]`);
     return this;
   }
 
+  /** Limit the maximum number of results to retrieve. */
   public limit(n: number): this {
     this.maxResults = n;
     return this;
   }
 
+  /** Build the final PubMed query string with all applied filters. */
   public buildQuery(): string {
     if (this.filters.length === 0) {
       return this.baseTerm;
@@ -79,6 +90,7 @@ export class PubMedQueryBuilder {
     return `${this.baseTerm} AND ${this.filters.join(' AND ')}`;
   }
 
+  /** Execute the query and return all matching articles. */
   public async fetchAll(): Promise<ReadonlyArray<Article>> {
     const query = this.buildQuery();
 
@@ -107,6 +119,7 @@ export class PubMedQueryBuilder {
     return this.fetchFromHistory(webEnv, queryKey, totalCount);
   }
 
+  /** Execute the query and yield articles in batches via an async iterator. */
   public async *batches(
     size: number = DEFAULT_BATCH_SIZE,
   ): AsyncIterableIterator<ReadonlyArray<Article>> {

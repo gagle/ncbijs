@@ -15,6 +15,7 @@ import type {
 const BASE_URL = 'https://clinicaltrials.gov/api/v2';
 const REQUESTS_PER_SECOND = 2;
 
+/** ClinicalTrials.gov v2 API client with automatic rate limiting and retry. */
 export class ClinicalTrials {
   private readonly _config: ClinicalTrialsClientConfig;
 
@@ -25,6 +26,7 @@ export class ClinicalTrials {
     };
   }
 
+  /** Fetch a single study by NCT ID. */
   public async study(nctId: string): Promise<StudyReport> {
     const url = `${BASE_URL}/studies/${encodeURIComponent(nctId)}`;
     const raw = await fetchJson<RawStudyResponse>(url, this._config);
@@ -32,6 +34,7 @@ export class ClinicalTrials {
     return mapStudyReport(raw);
   }
 
+  /** Search studies with cursor-based pagination. */
   public async *searchStudies(
     query: string,
     options?: StudySearchOptions,
@@ -89,6 +92,7 @@ export class ClinicalTrials {
     }
   }
 
+  /** Fetch aggregate statistics about the study database. */
   public async studyStats(): Promise<StudyStats> {
     const url = `${BASE_URL}/stats/size`;
     const raw = await fetchJson<RawStatsResponse>(url, this._config);
@@ -96,6 +100,7 @@ export class ClinicalTrials {
     return { totalStudies: raw.totalStudies ?? 0 };
   }
 
+  /** Fetch distinct values and their counts for a study field. */
   public async studyFieldValues(field: string): Promise<ReadonlyArray<FieldValueCount>> {
     const url = `${BASE_URL}/stats/field/values?field=${encodeURIComponent(field)}`;
     const raw = await fetchJson<RawFieldValuesResponse>(url, this._config);

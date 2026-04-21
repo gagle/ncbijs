@@ -2,6 +2,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
 import type { Datasets } from '@ncbijs/datasets';
 import { z } from 'zod';
 
+/** Register NCBI Datasets gene, taxonomy, and genome tools on the MCP server. */
 export function registerDatasetsTools(server: McpServer, getDatasets: () => Datasets): void {
   server.registerTool(
     'search-gene',

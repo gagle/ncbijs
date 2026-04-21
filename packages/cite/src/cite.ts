@@ -8,6 +8,7 @@ import type {
 const BASE_URL = 'https://pmc.ncbi.nlm.nih.gov/api/ctxp/v1';
 const REQUEST_DELAY_MS = 334;
 
+/** Fetch a formatted citation for a PubMed, PMC, or Books article. */
 export function cite(id: string, format: 'csl', source?: CitationSource): Promise<CSLData>;
 export function cite(
   id: string,
@@ -27,6 +28,7 @@ export function cite(
   return fetchCitation(id, format, source);
 }
 
+/** Fetch formatted citations for multiple articles, yielding results one at a time. */
 export async function* citeMany(
   ids: ReadonlyArray<string>,
   format: CitationFormat,

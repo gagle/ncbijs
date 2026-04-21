@@ -4,6 +4,7 @@ const RETRYABLE_STATUSES = new Set([429, 500, 502, 503]);
 const INITIAL_BACKOFF_MS = 500;
 const MAX_JITTER_MS = 500;
 
+/** Error thrown when an HTTP request fails after exhausting all retry attempts. */
 export class HttpRetryError extends Error {
   public readonly status: number;
   public readonly body: string;
@@ -16,6 +17,7 @@ export class HttpRetryError extends Error {
   }
 }
 
+/** Fetch a URL with rate limiting and exponential backoff retry on transient failures. */
 export async function fetchWithRetry(
   input: string | Request,
   config: RetryConfig,
