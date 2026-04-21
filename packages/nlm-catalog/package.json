@@ -32,7 +32,7 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "import": "./dist/index.js"
     },
     "./package.json": "./package.json"
   },
@@ -40,7 +40,6 @@
     "access": "public",
     "provenance": true
   },
-  "prepublishOnly": "echo 'Use CI to publish' && exit 1",
   "dependencies": {
     "@ncbijs/eutils": "workspace:*",
     "@ncbijs/rate-limiter": "workspace:*"
@@ -48,5 +47,11 @@
   "sideEffects": false,
   "files": [
     "dist"
-  ]
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "prepublishOnly": "echo 'Use CI to publish' && exit 1"
+  }
 }

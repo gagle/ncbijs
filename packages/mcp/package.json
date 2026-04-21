@@ -42,7 +42,6 @@
     "access": "public",
     "provenance": true
   },
-  "prepublishOnly": "echo 'Use CI to publish' && exit 1",
   "sideEffects": false,
   "files": [
     "dist"
@@ -61,5 +60,8 @@
     "@ncbijs/clinvar": "workspace:*",
     "@ncbijs/pubchem": "workspace:*",
     "zod": "^3.24.0"
+  },
+  "scripts": {
+    "prepublishOnly": "echo 'Use CI to publish' && exit 1"
   }
 }

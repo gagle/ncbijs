@@ -10,19 +10,11 @@ function isRelative(specifier) {
   return specifier.startsWith('.');
 }
 
-function hasBareSubpath(specifier) {
-  if (specifier.startsWith('@')) {
-    const segments = specifier.split('/');
-    return segments.length > 2;
-  }
-  return specifier.includes('/');
-}
-
 function needsExtension(specifier) {
-  if (/\.\w+$/.test(specifier)) {
+  if (/\.(m?[jt]sx?|cjs|cts|json)$/.test(specifier)) {
     return false;
   }
-  return isRelative(specifier) || hasBareSubpath(specifier);
+  return isRelative(specifier);
 }
 
 function addJsExtensions(source) {
