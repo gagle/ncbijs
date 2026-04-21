@@ -219,6 +219,276 @@ describe('parseMedlineText', () => {
     });
   });
 
+  describe('date parsing', () => {
+    it('should parse date with year only', () => {
+      const record = ['PMID- 11111111', 'TA  - J', 'JT  - Journal', 'DP  - 2020', 'LA  - eng'].join(
+        '\n',
+      );
+
+      const articles = parseMedlineText(record);
+
+      expect(articles[0]?.publicationDate.year).toBe(2020);
+      expect(articles[0]?.publicationDate.month).toBeUndefined();
+      expect(articles[0]?.publicationDate.day).toBeUndefined();
+    });
+
+    it('should parse date with season instead of month', () => {
+      const record = [
+        'PMID- 11111111',
+        'TA  - J',
+        'JT  - Journal',
+        'DP  - 2020 Winter',
+        'LA  - eng',
+      ].join('\n');
+
+      const articles = parseMedlineText(record);
+
+      expect(articles[0]?.publicationDate.year).toBe(2020);
+      expect(articles[0]?.publicationDate.season).toBe('Winter');
+    });
+
+    it('should handle empty date string', () => {
+      const record = ['PMID- 11111111', 'TA  - J', 'JT  - Journal', 'LA  - eng'].join('\n');
+
+      const articles = parseMedlineText(record);
+
+      expect(articles[0]?.publicationDate.year).toBe(0);
+    });
+
+    it('should parse date with year and month but no day', () => {
+      const record = [
+        'PMID- 11111111',
+        'TA  - J',
+        'JT  - Journal',
+        'DP  - 2020 Jun',
+        'LA  - eng',
+      ].join('\n');
+
+      const articles = parseMedlineText(record);
+
+      expect(articles[0]?.publicationDate.year).toBe(2020);
+      expect(articles[0]?.publicationDate.month).toBe(6);
+      expect(articles[0]?.publicationDate.day).toBeUndefined();
+    });
+  });
+
+  describe('author parsing', () => {
+    it('should prefer FAU over AU for author parsing', () => {
+      const record = [
+        'PMID- 11111111',
+        'AU  - Doe JB',
+        'FAU - Doe, Jane B',
+        'TA  - J',
+        'JT  - Journal',
+        'DP  - 2024',
+        'LA  - eng',
+      ].join('\n');
+
+      const articles = parseMedlineText(record);
+
+      expect(articles[0]?.authors).toHaveLength(1);
+      expect(articles[0]?.authors[0]?.lastName).toBe('Doe');
+      expect(articles[0]?.authors[0]?.foreName).toBe('Jane B');
+    });
+
+    it('should parse full author name without comma', () => {
+      const record = [
+        'PMID- 11111111',
+        'FAU - Consortium',
+        'TA  - J',
+        'JT  - Journal',
+        'DP  - 2024',
+        'LA  - eng',
+      ].join('\n');
+
+      const articles = parseMedlineText(record);
+
+      expect(articles[0]?.authors[0]?.lastName).toBe('Consortium');
+      expect(articles[0]?.authors[0]?.foreName).toBeUndefined();
+    });
+
+    it('should parse short author name without space', () => {
+      const record = [
+        'PMID- 11111111',
+        'AU  - Consortium',
+        'TA  - J',
+        'JT  - Journal',
+        'DP  - 2024',
+        'LA  - eng',
+      ].join('\n');
+
+      const articles = parseMedlineText(record);
+
+      expect(articles[0]?.authors[0]?.lastName).toBe('Consortium');
+      expect(articles[0]?.authors[0]?.initials).toBeUndefined();
+    });
+  });
+
+  describe('tag map parsing', () => {
+    it('should accumulate multiple values for the same tag', () => {
+      const record = [
+        'PMID- 11111111',
+        'MH  - Humans',
+        'MH  - Brain',
+        'TA  - J',
+        'JT  - Journal',
+        'DP  - 2024',
+        'LA  - eng',
+      ].join('\n');
+
+      const articles = parseMedlineText(record);
+
+      expect(articles[0]?.mesh).toHaveLength(2);
+      expect(articles[0]?.mesh[0]?.descriptor).toBe('Humans');
+      expect(articles[0]?.mesh[1]?.descriptor).toBe('Brain');
+    });
+  });
+
+  describe('MeSH entry parsing', () => {
+    it('should parse MeSH descriptor with major topic marker', () => {
+      const record = [
+        'PMID- 11111111',
+        'MH  - Neoplasms*',
+        'TA  - J',
+        'JT  - Journal',
+        'DP  - 2024',
+        'LA  - eng',
+      ].join('\n');
+
+      const articles = parseMedlineText(record);
+
+      expect(articles[0]?.mesh[0]?.descriptor).toBe('Neoplasms');
+      expect(articles[0]?.mesh[0]?.majorTopic).toBe(true);
+    });
+
+    it('should parse MeSH descriptor without qualifiers', () => {
+      const record = [
+        'PMID- 11111111',
+        'MH  - Humans',
+        'TA  - J',
+        'JT  - Journal',
+        'DP  - 2024',
+        'LA  - eng',
+      ].join('\n');
+
+      const articles = parseMedlineText(record);
+
+      expect(articles[0]?.mesh[0]?.descriptor).toBe('Humans');
+      expect(articles[0]?.mesh[0]?.qualifiers).toHaveLength(0);
+    });
+
+    it('should parse MeSH descriptor with non-major qualifier', () => {
+      const record = [
+        'PMID- 11111111',
+        'MH  - Brain/pathology',
+        'TA  - J',
+        'JT  - Journal',
+        'DP  - 2024',
+        'LA  - eng',
+      ].join('\n');
+
+      const articles = parseMedlineText(record);
+
+      expect(articles[0]?.mesh[0]?.qualifiers[0]?.name).toBe('pathology');
+      expect(articles[0]?.mesh[0]?.qualifiers[0]?.majorTopic).toBe(false);
+    });
+  });
+
+  describe('article ID parsing', () => {
+    it('should parse PII article ID', () => {
+      const record = [
+        'PMID- 11111111',
+        'AID - S0001-0001(24)00001 [pii]',
+        'TA  - J',
+        'JT  - Journal',
+        'DP  - 2024',
+        'LA  - eng',
+      ].join('\n');
+
+      const articles = parseMedlineText(record);
+
+      expect(articles[0]?.articleIds.pii).toBe('S0001-0001(24)00001');
+    });
+
+    it('should skip malformed AID values', () => {
+      const record = [
+        'PMID- 11111111',
+        'AID - malformed-no-brackets',
+        'TA  - J',
+        'JT  - Journal',
+        'DP  - 2024',
+        'LA  - eng',
+      ].join('\n');
+
+      const articles = parseMedlineText(record);
+
+      expect(articles[0]?.articleIds.doi).toBeUndefined();
+      expect(articles[0]?.articleIds.pii).toBeUndefined();
+    });
+  });
+
+  describe('grant parsing', () => {
+    it('should parse grant without acronym (3-part format)', () => {
+      const record = [
+        'PMID- 11111111',
+        'GR  - 123456/MRC/United Kingdom',
+        'TA  - J',
+        'JT  - Journal',
+        'DP  - 2024',
+        'LA  - eng',
+      ].join('\n');
+
+      const articles = parseMedlineText(record);
+
+      expect(articles[0]?.grants[0]?.grantId).toBe('123456');
+      expect(articles[0]?.grants[0]?.acronym).toBeUndefined();
+      expect(articles[0]?.grants[0]?.agency).toBe('MRC');
+      expect(articles[0]?.grants[0]?.country).toBe('United Kingdom');
+    });
+
+    it('should skip grant with fewer than 3 parts', () => {
+      const record = [
+        'PMID- 11111111',
+        'GR  - incomplete/grant',
+        'TA  - J',
+        'JT  - Journal',
+        'DP  - 2024',
+        'LA  - eng',
+      ].join('\n');
+
+      const articles = parseMedlineText(record);
+
+      expect(articles[0]?.grants).toHaveLength(0);
+    });
+  });
+
+  describe('journal fields', () => {
+    it('should include ISSN when IS tag is present', () => {
+      const record = [
+        'PMID- 11111111',
+        'IS  - 0028-0836',
+        'TA  - Nature',
+        'JT  - Nature',
+        'DP  - 2024',
+        'LA  - eng',
+      ].join('\n');
+
+      const articles = parseMedlineText(record);
+
+      expect(articles[0]?.journal.issn).toBe('0028-0836');
+    });
+
+    it('should omit ISSN when IS tag is not present', () => {
+      const record = ['PMID- 11111111', 'TA  - J', 'JT  - Journal', 'DP  - 2024', 'LA  - eng'].join(
+        '\n',
+      );
+
+      const articles = parseMedlineText(record);
+
+      expect(articles[0]?.journal.issn).toBeUndefined();
+    });
+  });
+
   describe('edge cases', () => {
     it('should handle missing optional fields', () => {
       const record = ['PMID- 44444444', 'TA  - J', 'JT  - Journal', 'DP  - 2024', 'LA  - eng'].join(

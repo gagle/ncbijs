@@ -373,6 +373,87 @@ ACCESSION   PLASMID1
     expect(records[0]!.locus.topology).toBe('circular');
     expect(records[0]!.locus.division).toBe('BCT');
   });
+
+  it('should handle locus line with extra unknown parts after moleculeType', () => {
+    const text = `LOCUS       TEST1                   100 bp    DNA     extra   linear   PRI 01-JAN-2024
+ACCESSION   TEST1
+//
+`;
+    const records = parseGenBank(text);
+    expect(records[0]!.locus.moleculeType).toBe('DNA');
+    expect(records[0]!.locus.topology).toBe('linear');
+  });
+
+  it('should handle SOURCE section with no ORGANISM line', () => {
+    const text = `LOCUS       TEST1                   100 aa            linear   PRI 01-JAN-2024
+ACCESSION   TEST1
+SOURCE      Homo sapiens (human)
+//
+`;
+    const records = parseGenBank(text);
+    expect(records[0]!.source).toBe('Homo sapiens (human)');
+    expect(records[0]!.organism).toBe('');
+    expect(records[0]!.lineage).toBe('');
+  });
+
+  it('should handle locus line with non-standard 3-letter molecule type', () => {
+    const text = `LOCUS       TEST1                   100 bp    XYZ     linear   PRI 01-JAN-2024
+ACCESSION   TEST1
+//
+`;
+    const records = parseGenBank(text);
+    expect(records[0]!.locus.moleculeType).toBe('XYZ');
+    expect(records[0]!.locus.division).toBe('PRI');
+  });
+
+  it('should handle section line that is bare keyword without content', () => {
+    const text = `LOCUS       TEST1                   100 aa            linear   PRI 01-JAN-2024
+ACCESSION   TEST1
+ORIGIN
+        1 meepqsdpsv
+//
+`;
+    const records = parseGenBank(text);
+    expect(records[0]!.sequence).toBe('meepqsdpsv');
+  });
+
+  it('should handle reference with no fields after first line', () => {
+    const text = `LOCUS       TEST1                   100 aa            linear   PRI 01-JAN-2024
+ACCESSION   TEST1
+REFERENCE   1  (residues 1 to 100)
+//
+`;
+    const records = parseGenBank(text);
+    expect(records[0]!.references[0]!.number).toBe(1);
+    expect(records[0]!.references[0]!.authors).toBe('');
+    expect(records[0]!.references[0]!.title).toBe('');
+  });
+
+  it('should handle lineage section with empty lines between taxa', () => {
+    const text = `LOCUS       TEST1                   100 aa            linear   PRI 01-JAN-2024
+ACCESSION   TEST1
+SOURCE      Homo sapiens (human)
+  ORGANISM  Homo sapiens
+            Eukaryota; Metazoa;
+
+            Chordata.
+//
+`;
+    const records = parseGenBank(text);
+    expect(records[0]!.lineage).toBe('Eukaryota; Metazoa; Chordata');
+  });
+
+  it('should handle ORIGIN section with non-sequence header line', () => {
+    const text = `LOCUS       TEST1                   100 aa            linear   PRI 01-JAN-2024
+ACCESSION   TEST1
+ORIGIN
+  This is a comment line
+        1 meepqsdpsv
+//
+`;
+    const records = parseGenBank(text);
+    expect(records[0]!.sequence).toBe('meepqsdpsv');
+  });
 });
 
 describe('createEmptyGenBankRecord', () => {

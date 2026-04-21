@@ -151,6 +151,19 @@ describe('createPubmedXmlStream', () => {
     expect(yieldedPmids).toEqual(['30001', '30002', '30003']);
   });
 
+  it('should skip chunk that has close tag without matching open tag', async () => {
+    const orphanClose = 'some junk</PubmedArticle>';
+    const stream = createStringStream([
+      orphanClose,
+      '<PubmedArticle><MedlineCitation><PMID>77777</PMID><Article><ArticleTitle>After Skip</ArticleTitle><Journal><Title>J</Title><ISOAbbreviation>J</ISOAbbreviation><JournalIssue><PubDate><Year>2024</Year></PubDate></JournalIssue></Journal><Language>eng</Language></Article></MedlineCitation></PubmedArticle>',
+    ]);
+
+    const articles = await collectArticles(stream);
+
+    expect(articles).toHaveLength(1);
+    expect(articles[0]?.pmid).toBe('77777');
+  });
+
   it('should throw on malformed XML in stream', async () => {
     const incompleteXml =
       '<PubmedArticleSet><PubmedArticle><MedlineCitation><PMID>12345</PMID>' +
