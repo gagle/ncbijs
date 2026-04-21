@@ -24,6 +24,7 @@
     "skipLibCheck": true,
     "paths": {
       "@ncbijs/eutils": ["./packages/eutils/src/index.ts"],
+      "@ncbijs/eutils/config": ["./packages/eutils/src/config.ts"],
       "@ncbijs/pubmed-xml": ["./packages/pubmed-xml/src/index.ts"],
       "@ncbijs/pubmed": ["./packages/pubmed/src/index.ts"],
       "@ncbijs/jats": ["./packages/jats/src/index.ts"],

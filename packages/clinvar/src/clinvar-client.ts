@@ -1,11 +1,8 @@
+import type { EUtilsCredentials } from '@ncbijs/eutils/config';
 import { HttpRetryError, fetchWithRetry } from '@ncbijs/rate-limiter';
 import type { RetryConfig } from '@ncbijs/rate-limiter';
 
-export interface ClinVarClientConfig extends RetryConfig {
-  readonly apiKey?: string;
-  readonly tool?: string;
-  readonly email?: string;
-}
+export interface ClinVarClientConfig extends RetryConfig, EUtilsCredentials {}
 
 export class ClinVarHttpError extends HttpRetryError {
   constructor(status: number, body: string) {

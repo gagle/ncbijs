@@ -42,6 +42,7 @@
   },
   "prepublishOnly": "echo 'Use CI to publish' && exit 1",
   "dependencies": {
+    "@ncbijs/eutils": "workspace:*",
     "@ncbijs/rate-limiter": "workspace:*",
     "@ncbijs/xml": "workspace:*"
   },

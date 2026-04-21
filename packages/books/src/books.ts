@@ -1,19 +1,21 @@
+import {
+  EUTILS_BASE_URL,
+  EUTILS_REQUESTS_PER_SECOND,
+  EUTILS_REQUESTS_PER_SECOND_WITH_KEY,
+  appendEUtilsCredentials,
+} from '@ncbijs/eutils/config';
 import { TokenBucket } from '@ncbijs/rate-limiter';
 import { fetchJson } from './books-client';
 import type { BooksClientConfig } from './books-client';
 import type { BooksConfig, BooksRecord, BooksSearchResult } from './interfaces/books.interface';
-
-const BASE_URL = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils';
-const REQUESTS_PER_SECOND_DEFAULT = 3;
-const REQUESTS_PER_SECOND_WITH_KEY = 10;
 
 export class Books {
   private readonly _config: BooksClientConfig;
 
   constructor(config?: BooksConfig) {
     const requestsPerSecond = config?.apiKey
-      ? REQUESTS_PER_SECOND_WITH_KEY
-      : REQUESTS_PER_SECOND_DEFAULT;
+      ? EUTILS_REQUESTS_PER_SECOND_WITH_KEY
+      : EUTILS_REQUESTS_PER_SECOND;
 
     this._config = {
       ...(config?.apiKey !== undefined && { apiKey: config.apiKey }),
@@ -38,9 +40,9 @@ export class Books {
       params.set('retmax', String(options.retmax));
     }
 
-    appendCredentials(params, this._config);
+    appendEUtilsCredentials(params, this._config);
 
-    const url = `${BASE_URL}/esearch.fcgi?${params.toString()}`;
+    const url = `${EUTILS_BASE_URL}/esearch.fcgi?${params.toString()}`;
     const raw = await fetchJson<RawESearchResponse>(url, this._config);
 
     return {
@@ -73,9 +75,9 @@ export class Books {
       retmode: 'json',
     });
 
-    appendCredentials(params, this._config);
+    appendEUtilsCredentials(params, this._config);
 
-    const url = `${BASE_URL}/esummary.fcgi?${params.toString()}`;
+    const url = `${EUTILS_BASE_URL}/esummary.fcgi?${params.toString()}`;
     const raw = await fetchJson<RawESummaryResponse>(url, this._config);
 
     const result = raw.result ?? {};
@@ -105,20 +107,6 @@ function getBooksEntry(result: RawESummaryResult, uid: string): RawBooksEntry | 
   }
 
   return entry as RawBooksEntry;
-}
-
-function appendCredentials(params: URLSearchParams, config: BooksClientConfig): void {
-  if (config.apiKey !== undefined) {
-    params.set('api_key', config.apiKey);
-  }
-
-  if (config.tool !== undefined) {
-    params.set('tool', config.tool);
-  }
-
-  if (config.email !== undefined) {
-    params.set('email', config.email);
-  }
 }
 
 interface RawESearchResponse {

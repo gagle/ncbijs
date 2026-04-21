@@ -1,5 +1,6 @@
 import type { Client } from 'openapi-fetch';
 import { TokenBucket } from '@ncbijs/rate-limiter';
+import { EUTILS_REQUESTS_PER_SECOND, EUTILS_REQUESTS_PER_SECOND_WITH_KEY } from './config';
 import { createNcbiClient } from './ncbi-client';
 import type { paths } from './schema';
 import { parseECitMatchText } from './parsers/ecitmatch-parser';
@@ -52,7 +53,9 @@ export class EUtils {
       throw new Error('EUtilsConfig.email is required');
     }
 
-    const requestsPerSecond = config.apiKey ? 10 : 3;
+    const requestsPerSecond = config.apiKey
+      ? EUTILS_REQUESTS_PER_SECOND_WITH_KEY
+      : EUTILS_REQUESTS_PER_SECOND;
     const rateLimiter = new TokenBucket({ requestsPerSecond });
 
     this.client = createNcbiClient({

@@ -1,3 +1,9 @@
+import {
+  EUTILS_BASE_URL,
+  EUTILS_REQUESTS_PER_SECOND,
+  EUTILS_REQUESTS_PER_SECOND_WITH_KEY,
+  appendEUtilsCredentials,
+} from '@ncbijs/eutils/config';
 import { TokenBucket } from '@ncbijs/rate-limiter';
 import { fetchJson } from './clinvar-client';
 import type { ClinVarClientConfig } from './clinvar-client';
@@ -11,17 +17,13 @@ import type {
   VariantReport,
 } from './interfaces/clinvar.interface';
 
-const BASE_URL = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils';
-const REQUESTS_PER_SECOND_DEFAULT = 3;
-const REQUESTS_PER_SECOND_WITH_KEY = 10;
-
 export class ClinVar {
   private readonly _config: ClinVarClientConfig;
 
   constructor(config?: ClinVarConfig) {
     const requestsPerSecond = config?.apiKey
-      ? REQUESTS_PER_SECOND_WITH_KEY
-      : REQUESTS_PER_SECOND_DEFAULT;
+      ? EUTILS_REQUESTS_PER_SECOND_WITH_KEY
+      : EUTILS_REQUESTS_PER_SECOND;
 
     this._config = {
       ...(config?.apiKey !== undefined && { apiKey: config.apiKey }),
@@ -46,9 +48,9 @@ export class ClinVar {
       params.set('retmax', String(options.retmax));
     }
 
-    appendCredentials(params, this._config);
+    appendEUtilsCredentials(params, this._config);
 
-    const url = `${BASE_URL}/esearch.fcgi?${params.toString()}`;
+    const url = `${EUTILS_BASE_URL}/esearch.fcgi?${params.toString()}`;
     const raw = await fetchJson<RawESearchResponse>(url, this._config);
 
     return {
@@ -81,9 +83,9 @@ export class ClinVar {
       retmode: 'json',
     });
 
-    appendCredentials(params, this._config);
+    appendEUtilsCredentials(params, this._config);
 
-    const url = `${BASE_URL}/esummary.fcgi?${params.toString()}`;
+    const url = `${EUTILS_BASE_URL}/esummary.fcgi?${params.toString()}`;
     const raw = await fetchJson<RawESummaryResponse>(url, this._config);
 
     const result = raw.result ?? {};
@@ -113,20 +115,6 @@ function getVariantEntry(result: RawESummaryResult, uid: string): RawVariantEntr
   }
 
   return entry as RawVariantEntry;
-}
-
-function appendCredentials(params: URLSearchParams, config: ClinVarClientConfig): void {
-  if (config.apiKey !== undefined) {
-    params.set('api_key', config.apiKey);
-  }
-
-  if (config.tool !== undefined) {
-    params.set('tool', config.tool);
-  }
-
-  if (config.email !== undefined) {
-    params.set('email', config.email);
-  }
 }
 
 interface RawESearchResponse {

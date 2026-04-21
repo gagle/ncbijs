@@ -1,3 +1,4 @@
+import { EUTILS_BASE_URL, EUTILS_REQUESTS_PER_SECOND } from '@ncbijs/eutils/config';
 import type { FastaRecord } from '@ncbijs/fasta';
 import { parseFasta } from '@ncbijs/fasta';
 import type { GenBankRecord } from '@ncbijs/genbank';
@@ -7,8 +8,7 @@ import { fetchText } from './protein-client';
 import type { ProteinClientConfig } from './protein-client';
 import type { ProteinConfig } from './interfaces/protein.interface';
 
-const EFETCH_BASE = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi';
-const REQUESTS_PER_SECOND = 3;
+const EFETCH_URL = `${EUTILS_BASE_URL}/efetch.fcgi`;
 
 export class Protein {
   private readonly _config: ProteinClientConfig;
@@ -17,7 +17,7 @@ export class Protein {
     this._config = {
       ...(config?.apiKey !== undefined && { apiKey: config.apiKey }),
       maxRetries: config?.maxRetries ?? 3,
-      rateLimiter: new TokenBucket({ requestsPerSecond: REQUESTS_PER_SECOND }),
+      rateLimiter: new TokenBucket({ requestsPerSecond: EUTILS_REQUESTS_PER_SECOND }),
     };
   }
 
@@ -67,5 +67,5 @@ export class Protein {
 }
 
 function buildEfetchUrl(id: string, rettype: string, retmode: string): string {
-  return `${EFETCH_BASE}?db=protein&id=${encodeURIComponent(id)}&rettype=${rettype}&retmode=${retmode}`;
+  return `${EFETCH_URL}?db=protein&id=${encodeURIComponent(id)}&rettype=${rettype}&retmode=${retmode}`;
 }

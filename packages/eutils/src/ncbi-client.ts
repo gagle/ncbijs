@@ -2,6 +2,7 @@ import createClient from 'openapi-fetch';
 import type { Client, Middleware } from 'openapi-fetch';
 import type { TokenBucket } from '@ncbijs/rate-limiter';
 import { fetchWithRetry } from '@ncbijs/rate-limiter';
+import { EUTILS_BASE_URL } from './config';
 import { EUtilsHttpError } from './http-client';
 import type { paths } from './schema';
 
@@ -13,14 +14,13 @@ export interface NcbiClientConfig {
   readonly rateLimiter: TokenBucket;
 }
 
-const BASE_URL = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils';
 const POST_ID_THRESHOLD = 200;
 const POST_TERM_THRESHOLD = 300;
 const FORCE_POST_PATHS = new Set(['/epost.fcgi']);
 
 export function createNcbiClient(config: NcbiClientConfig): Client<paths> {
   const client = createClient<paths>({
-    baseUrl: BASE_URL,
+    baseUrl: EUTILS_BASE_URL,
     fetch: createRetryFetch(config.rateLimiter, config.maxRetries),
   });
 

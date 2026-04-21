@@ -1,3 +1,9 @@
+import {
+  EUTILS_BASE_URL,
+  EUTILS_REQUESTS_PER_SECOND,
+  EUTILS_REQUESTS_PER_SECOND_WITH_KEY,
+  appendEUtilsCredentials,
+} from '@ncbijs/eutils/config';
 import { TokenBucket } from '@ncbijs/rate-limiter';
 import {
   readAllTags,
@@ -18,17 +24,13 @@ import type {
   MedGenSearchResult,
 } from './interfaces/medgen.interface';
 
-const BASE_URL = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils';
-const REQUESTS_PER_SECOND_DEFAULT = 3;
-const REQUESTS_PER_SECOND_WITH_KEY = 10;
-
 export class MedGen {
   private readonly _config: MedGenClientConfig;
 
   constructor(config?: MedGenConfig) {
     const requestsPerSecond = config?.apiKey
-      ? REQUESTS_PER_SECOND_WITH_KEY
-      : REQUESTS_PER_SECOND_DEFAULT;
+      ? EUTILS_REQUESTS_PER_SECOND_WITH_KEY
+      : EUTILS_REQUESTS_PER_SECOND;
 
     this._config = {
       ...(config?.apiKey !== undefined && { apiKey: config.apiKey }),
@@ -53,9 +55,9 @@ export class MedGen {
       params.set('retmax', String(options.retmax));
     }
 
-    appendCredentials(params, this._config);
+    appendEUtilsCredentials(params, this._config);
 
-    const url = `${BASE_URL}/esearch.fcgi?${params.toString()}`;
+    const url = `${EUTILS_BASE_URL}/esearch.fcgi?${params.toString()}`;
     const raw = await fetchJson<RawESearchResponse>(url, this._config);
 
     return {
@@ -88,9 +90,9 @@ export class MedGen {
       retmode: 'json',
     });
 
-    appendCredentials(params, this._config);
+    appendEUtilsCredentials(params, this._config);
 
-    const url = `${BASE_URL}/esummary.fcgi?${params.toString()}`;
+    const url = `${EUTILS_BASE_URL}/esummary.fcgi?${params.toString()}`;
     const raw = await fetchJson<RawESummaryResponse>(url, this._config);
 
     const result = raw.result ?? {};
@@ -120,20 +122,6 @@ function getMedGenEntry(result: RawESummaryResult, uid: string): RawMedGenEntry 
   }
 
   return entry as RawMedGenEntry;
-}
-
-function appendCredentials(params: URLSearchParams, config: MedGenClientConfig): void {
-  if (config.apiKey !== undefined) {
-    params.set('api_key', config.apiKey);
-  }
-
-  if (config.tool !== undefined) {
-    params.set('tool', config.tool);
-  }
-
-  if (config.email !== undefined) {
-    params.set('email', config.email);
-  }
 }
 
 interface RawESearchResponse {

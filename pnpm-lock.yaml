@@ -243,12 +243,18 @@ importers:
 
   packages/books:
     dependencies:
+      '@ncbijs/eutils':
+        specifier: workspace:*
+        version: link:../eutils
       '@ncbijs/rate-limiter':
         specifier: workspace:*
         version: link:../rate-limiter
 
   packages/cdd:
     dependencies:
+      '@ncbijs/eutils':
+        specifier: workspace:*
+        version: link:../eutils
       '@ncbijs/rate-limiter':
         specifier: workspace:*
         version: link:../rate-limiter
@@ -257,6 +263,9 @@ importers:
 
   packages/clinvar:
     dependencies:
+      '@ncbijs/eutils':
+        specifier: workspace:*
+        version: link:../eutils
       '@ncbijs/rate-limiter':
         specifier: workspace:*
         version: link:../rate-limiter
@@ -269,6 +278,9 @@ importers:
 
   packages/dbvar:
     dependencies:
+      '@ncbijs/eutils':
+        specifier: workspace:*
+        version: link:../eutils
       '@ncbijs/rate-limiter':
         specifier: workspace:*
         version: link:../rate-limiter
@@ -291,12 +303,18 @@ importers:
 
   packages/geo:
     dependencies:
+      '@ncbijs/eutils':
+        specifier: workspace:*
+        version: link:../eutils
       '@ncbijs/rate-limiter':
         specifier: workspace:*
         version: link:../rate-limiter
 
   packages/gtr:
     dependencies:
+      '@ncbijs/eutils':
+        specifier: workspace:*
+        version: link:../eutils
       '@ncbijs/rate-limiter':
         specifier: workspace:*
         version: link:../rate-limiter
@@ -353,6 +371,9 @@ importers:
 
   packages/medgen:
     dependencies:
+      '@ncbijs/eutils':
+        specifier: workspace:*
+        version: link:../eutils
       '@ncbijs/rate-limiter':
         specifier: workspace:*
         version: link:../rate-limiter
@@ -364,12 +385,18 @@ importers:
 
   packages/nlm-catalog:
     dependencies:
+      '@ncbijs/eutils':
+        specifier: workspace:*
+        version: link:../eutils
       '@ncbijs/rate-limiter':
         specifier: workspace:*
         version: link:../rate-limiter
 
   packages/nucleotide:
     dependencies:
+      '@ncbijs/eutils':
+        specifier: workspace:*
+        version: link:../eutils
       '@ncbijs/fasta':
         specifier: workspace:*
         version: link:../fasta
@@ -382,6 +409,9 @@ importers:
 
   packages/omim:
     dependencies:
+      '@ncbijs/eutils':
+        specifier: workspace:*
+        version: link:../eutils
       '@ncbijs/rate-limiter':
         specifier: workspace:*
         version: link:../rate-limiter
@@ -400,6 +430,9 @@ importers:
 
   packages/protein:
     dependencies:
+      '@ncbijs/eutils':
+        specifier: workspace:*
+        version: link:../eutils
       '@ncbijs/fasta':
         specifier: workspace:*
         version: link:../fasta
@@ -447,6 +480,9 @@ importers:
 
   packages/sra:
     dependencies:
+      '@ncbijs/eutils':
+        specifier: workspace:*
+        version: link:../eutils
       '@ncbijs/rate-limiter':
         specifier: workspace:*
         version: link:../rate-limiter
@@ -456,6 +492,9 @@ importers:
 
   packages/structure:
     dependencies:
+      '@ncbijs/eutils':
+        specifier: workspace:*
+        version: link:../eutils
       '@ncbijs/rate-limiter':
         specifier: workspace:*
         version: link:../rate-limiter

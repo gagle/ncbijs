@@ -1,11 +1,8 @@
+import type { EUtilsCredentials } from '@ncbijs/eutils/config';
 import { HttpRetryError, fetchWithRetry } from '@ncbijs/rate-limiter';
 import type { RetryConfig } from '@ncbijs/rate-limiter';
 
-export interface SraClientConfig extends RetryConfig {
-  readonly apiKey?: string;
-  readonly tool?: string;
-  readonly email?: string;
-}
+export interface SraClientConfig extends RetryConfig, EUtilsCredentials {}
 
 export class SraHttpError extends HttpRetryError {
   constructor(status: number, body: string) {
