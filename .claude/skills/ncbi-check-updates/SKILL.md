@@ -1,11 +1,11 @@
 ---
-name: ncbi-watch
+name: ncbi-check-updates
 description: Check for NCBI API changes, deprecations, and new releases that affect ncbijs
 ---
 
 ## NCBI API Change Monitor
 
-Checks all known NCBI change signals and reports what's new or different since the last check. State is stored in `.ncbi-watch/` (committed to git) so the baseline survives clone/pull.
+Checks all known NCBI change signals and reports what's new or different since the last check. State is stored in `.ncbi-check-updates/` (committed to git) so the baseline survives clone/pull.
 
 ### Steps
 
@@ -13,19 +13,19 @@ Checks all known NCBI change signals and reports what's new or different since t
    - Fetch `https://www.ncbi.nlm.nih.gov/datasets/docs/v2/openapi3/openapi3.docs.yaml`
    - Fetch `https://api.ncbi.nlm.nih.gov/variation/v0/var_service.yaml`
    - Compute SHA-256 hashes of the response bodies
-   - Compare against stored values in `.ncbi-watch/spec-hashes.json`
+   - Compare against stored values in `.ncbi-check-updates/spec-hashes.json`
    - Report any changes (new hash != stored hash)
    - If a spec changed, diff the `info.version` field and summarize key structural differences
 
 2. **Check EInfo for database changes**
    - Fetch EInfo (JSON) for key databases: pubmed, pmc, snp, clinvar, gene, protein, nucleotide
    - URL pattern: `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/einfo.fcgi?db=<name>&retmode=json`
-   - Compare `lastupdate` and `dbbuild` against stored values in `.ncbi-watch/einfo-state.json`
+   - Compare `lastupdate` and `dbbuild` against stored values in `.ncbi-check-updates/einfo-state.json`
    - Report databases that have updated since last check
 
 3. **Check NCBI Insights RSS for API announcements**
    - Fetch `https://ncbiinsights.ncbi.nlm.nih.gov/feed/`
-   - Filter entries newer than the last check date stored in `.ncbi-watch/last-check.json`
+   - Filter entries newer than the last check date stored in `.ncbi-check-updates/last-check.json`
    - Filter for keywords: "API", "E-utilities", "deprecated", "sunset", "breaking", "update", "change", "new", "PMC", "PubMed", "Datasets"
    - Report matching entries with title, date, and link
 
@@ -41,7 +41,7 @@ Checks all known NCBI change signals and reports what's new or different since t
      - `https://api.ncbi.nlm.nih.gov/datasets/v2/gene/id/1`
      - `https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/334`
      - `https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC1`
-     - `https://www.ncbi.nlm.nih.gov/pmc/utils/idconv/v1.0/?ids=PMC3531190&format=json`
+     - `https://pmc.ncbi.nlm.nih.gov/tools/idconv/api/v1/articles/?ids=PMC3531190&format=json`
      - `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/2244/property/MolecularFormula/JSON`
      - `https://www.ncbi.nlm.nih.gov/research/pubtator3-api/publications/export/pubtator?pmids=33533846`
      - `https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi?CMD=Info`
@@ -49,7 +49,7 @@ Checks all known NCBI change signals and reports what's new or different since t
      - `https://api.ncbi.nlm.nih.gov/lit/ctxp/v1/pubmed/?id=33533846&format=csl`
    - Report any deprecation/sunset headers found
 
-6. **Update stored state** in `.ncbi-watch/` with new hashes, timestamps, and last-check date
+6. **Update stored state** in `.ncbi-check-updates/` with new hashes, timestamps, and last-check date
 
 7. **Output report** summarizing:
    - Spec changes (if any) with hash diff

@@ -4,7 +4,7 @@ import type { paths } from './schema';
 type ApiRecord =
   paths['/']['get']['responses'][200]['content']['application/json']['records'][number];
 
-const BASE_URL = 'https://www.ncbi.nlm.nih.gov/pmc/utils/idconv/v1.0/';
+const BASE_URL = 'https://pmc.ncbi.nlm.nih.gov/tools/idconv/api/v1/articles/';
 const MAX_IDS_PER_REQUEST = 200;
 
 export async function convert(

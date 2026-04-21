@@ -97,7 +97,7 @@ Create the hook script at `~/.claude/hooks/rtk-rewrite.sh` (run `rtk hook instal
 
 ### 3. Configure MCP servers
 
-MCP servers give Claude access to external tools (Figma designs, Jira tickets, GitLab MRs, browser DevTools, codebase graph). Create a single `.mcp.json` in the **parent directory** of your repos (e.g., `~/projects/.mcp.json`) so all projects inherit the same servers:
+MCP servers give Claude access to external tools. Create a single `.mcp.json` in the **parent directory** of your repos (e.g., `~/projects/.mcp.json`) so all projects inherit the same servers:
 
 ```bash
 brew install uv  # required for code-review-graph
@@ -110,44 +110,16 @@ brew install uv  # required for code-review-graph
       "command": "uvx",
       "args": ["code-review-graph", "serve"],
       "type": "stdio"
-    },
-    "figma": {
-      "type": "http",
-      "url": "https://mcp.figma.com/mcp"
-    },
-    "atlassian": {
-      "type": "sse",
-      "url": "https://mcp.atlassian.com/v1/sse"
-    },
-    "gitlab": {
-      "type": "http",
-      "url": "https://gitlab.com/api/v4/mcp"
-    },
-    "chrome-devtools": {
-      "command": "npx",
-      "args": ["chrome-devtools-mcp@latest", "--autoConnect", "--channel=beta"]
     }
   }
 }
 ```
 
-| Server                | Purpose                                                      | Auth                                          |
-| --------------------- | ------------------------------------------------------------ | --------------------------------------------- |
-| **code-review-graph** | Structural codebase analysis, impact detection, code review  | None (local)                                  |
-| **figma**             | Read Figma designs, extract design tokens, design-to-code    | Authenticates via browser on first use        |
-| **atlassian**         | Read/write Jira issues, Confluence pages                     | Authenticates via browser on first use        |
-| **gitlab**            | Read MRs, diffs, pipelines, create issues                    | Authenticates via browser on first use        |
-| **chrome-devtools**   | Browser automation, screenshots, console, network inspection | Requires Chrome with remote debugging enabled |
+| Server                | Purpose                                                     | Auth         |
+| --------------------- | ----------------------------------------------------------- | ------------ |
+| **code-review-graph** | Structural codebase analysis, impact detection, code review | None (local) |
 
 **code-review-graph** builds automatically on first use and updates via PostToolUse hooks after file changes.
-
-**chrome-devtools** requires Chrome to be running with remote debugging. Launch Chrome with:
-
-```bash
-/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222
-```
-
-Or use Chrome Beta/Canary if `--channel=beta` is configured (as shown above).
 
 ### 4. Enable agent-skills plugin
 

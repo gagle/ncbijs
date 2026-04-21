@@ -237,6 +237,19 @@ Rate limiting is automatic. The built-in token bucket enforces:
 
 Concurrent calls from the same `EUtils` instance are queued in FIFO order. No manual throttling needed.
 
+## Known limitations
+
+### PMC ESearch/EPost 10K record cap (February 2026)
+
+As of early February 2026, NCBI restricts ESearch and EPost for the PMC database (`db=pmc`):
+
+- **ESearch**: `retmax` must be &le; 10,000, and `retstart + retmax` must be &le; 10,000
+- **EPost**: accepts a maximum of 10,000 PMCIDs per request
+
+This only affects PMC (`db=pmc`). PubMed and all other databases are unaffected.
+
+For queries that return more than 10,000 PMC results, break your search into smaller batches or use more specific search terms. See [NCBI's announcement](https://ncbiinsights.ncbi.nlm.nih.gov/2026/01/06/updated-pmc-e-utilities/) for details.
+
 ## Spec compliance
 
 Every method maps directly to an [NCBI E-utility endpoint](https://www.ncbi.nlm.nih.gov/books/NBK25499/):

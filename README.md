@@ -20,7 +20,9 @@
 
 The [National Center for Biotechnology Information](https://www.ncbi.nlm.nih.gov/) (NCBI), part of the U.S. National Library of Medicine (NLM), maintains the world's largest collection of biomedical databases. These include **PubMed** (37M+ article citations), **PubMed Central** (PMC, 9M+ full-text articles), **MeSH** (controlled medical vocabulary), **BLAST** (sequence alignment), **dbSNP** (genetic variation), **ClinVar** (clinical variants), **PubChem** (chemical compounds), and many more. Researchers, clinicians, and developers rely on NCBI's public APIs to search, retrieve, and analyze biomedical data programmatically.
 
-**ncbijs** provides typed, zero-dependency TypeScript clients for these APIs. It is designed for two audiences:
+**ncbijs** provides typed, zero-dependency TypeScript clients for these APIs. **This entire project is built and maintained by AI** using [Claude Code](https://docs.anthropic.com/en/docs/claude-code) — no human-written code is accepted. See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
+
+It is designed for two audiences:
 
 - **Developers and researchers** building biomedical applications, literature review tools, or clinical decision support systems.
 - **LLM and AI agents** that need structured, programmatic access to biomedical literature for retrieval-augmented generation (RAG), entity extraction, and citation management.
