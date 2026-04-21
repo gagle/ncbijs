@@ -43,7 +43,7 @@ export class Datasets {
     }
 
     const joined = geneIds.join(',');
-    const url = `${BASE_URL}/gene/id/${encodeURIComponent(joined)}`;
+    const url = `${BASE_URL}/gene/id/${encodeURIComponent(joined)}/dataset_report`;
     const raw = await fetchJson<RawGeneResponse>(url, this._config);
 
     return (raw.reports ?? []).map(mapGeneReport);
@@ -58,7 +58,7 @@ export class Datasets {
     }
 
     const joined = symbols.join(',');
-    const url = `${BASE_URL}/gene/symbol/${encodeURIComponent(joined)}/taxon/${encodeURIComponent(String(taxon))}`;
+    const url = `${BASE_URL}/gene/symbol/${encodeURIComponent(joined)}/taxon/${encodeURIComponent(String(taxon))}/dataset_report`;
     const raw = await fetchJson<RawGeneResponse>(url, this._config);
 
     return (raw.reports ?? []).map(mapGeneReport);
@@ -72,7 +72,7 @@ export class Datasets {
     }
 
     const joined = taxons.join(',');
-    const url = `${BASE_URL}/taxonomy/taxon/${encodeURIComponent(joined)}`;
+    const url = `${BASE_URL}/taxonomy/taxon/${encodeURIComponent(joined)}/dataset_report`;
     const raw = await fetchJson<RawTaxonomyResponse>(url, this._config);
 
     return (raw.taxonomy_nodes ?? []).map(mapTaxonomyReport);
