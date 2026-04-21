@@ -86,6 +86,7 @@ export interface BioDocument {
   >;
 }
 
+/** A single annotation record parsed from PubTator TSV format. */
 export interface PubTatorAnnotation {
   readonly pmid: string;
   readonly start: number;
@@ -95,6 +96,7 @@ export interface PubTatorAnnotation {
   readonly id: string;
 }
 
+/** Options for controlling annotation output format and concept filtering. */
 export interface AnnotateOptions {
   readonly concept?: ConceptType | undefined;
   readonly format?: 'PubTator' | 'BioC' | 'JSON' | undefined;
