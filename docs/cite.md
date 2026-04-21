@@ -4,7 +4,7 @@
 
 Citation generation via NCBI's Literature Citation Exporter API. Zero dependencies.
 
-**Base URL:** `https://api.ncbi.nlm.nih.gov/lit/ctxp/`
+**Base URL:** `https://pmc.ncbi.nlm.nih.gov/api/ctxp/`
 **Docs:** https://pmc.ncbi.nlm.nih.gov/api/ctxp/
 
 ## Rate Limit

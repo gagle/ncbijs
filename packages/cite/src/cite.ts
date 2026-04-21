@@ -5,7 +5,7 @@ import type {
   CSLData,
 } from './interfaces/cite.interface';
 
-const BASE_URL = 'https://api.ncbi.nlm.nih.gov/lit/ctxp/v1';
+const BASE_URL = 'https://pmc.ncbi.nlm.nih.gov/api/ctxp/v1';
 const REQUEST_DELAY_MS = 334;
 
 export function cite(id: string, format: 'csl', source?: CitationSource): Promise<CSLData>;

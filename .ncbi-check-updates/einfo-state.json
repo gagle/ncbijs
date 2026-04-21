@@ -1,1 +1,30 @@
-{}
+{
+  "pubmed": {
+    "lastupdate": "2026/04/21 01:18",
+    "dbbuild": "Build-2026.04.21.01.18"
+  },
+  "pmc": {
+    "lastupdate": "2026/04/21 04:19",
+    "dbbuild": "Build-2026.04.21.04.19"
+  },
+  "snp": {
+    "lastupdate": "2025/03/11 08:22",
+    "dbbuild": "Build250306-1408.1"
+  },
+  "clinvar": {
+    "lastupdate": "2026/04/20 13:40",
+    "dbbuild": "Build260420-0940.1"
+  },
+  "gene": {
+    "lastupdate": "2026/04/18 07:43",
+    "dbbuild": "Build260417-2215m.1"
+  },
+  "protein": {
+    "lastupdate": "2026/04/19 21:04",
+    "dbbuild": "Build260418-1916m.1"
+  },
+  "nucleotide": {
+    "lastupdate": "2026/04/20 22:29",
+    "dbbuild": "Build260419-1730m.1"
+  }
+}

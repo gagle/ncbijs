@@ -46,7 +46,7 @@ Checks all known NCBI change signals and reports what's new or different since t
      - `https://www.ncbi.nlm.nih.gov/research/pubtator3-api/publications/export/pubtator?pmids=33533846`
      - `https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi?CMD=Info`
      - `https://id.nlm.nih.gov/mesh/lookup/descriptor?label=Neoplasms&match=exact&limit=1`
-     - `https://api.ncbi.nlm.nih.gov/lit/ctxp/v1/pubmed/?id=33533846&format=csl`
+     - `https://pmc.ncbi.nlm.nih.gov/api/ctxp/v1/pubmed/?id=33533846&format=csl`
    - Report any deprecation/sunset headers found
 
 6. **Update stored state** in `.ncbi-check-updates/` with new hashes, timestamps, and last-check date

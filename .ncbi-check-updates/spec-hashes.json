@@ -1,1 +1,10 @@
-{}
+{
+  "datasets": {
+    "hash": "ed5f0eabb2c70d6832401eaee852c5e2932410619d400f3594188694b56cacb1",
+    "version": "v2"
+  },
+  "variation": {
+    "hash": "158526bcc6644ba1970ffe51e30e6838eb4a62132a6e75a37c735fb86d43a02c",
+    "version": "v0"
+  }
+}
