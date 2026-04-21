@@ -252,6 +252,14 @@ describe('PubTator', () => {
         'PubTator3 entity search failed: HTTP 500: Internal Server Error',
       );
     });
+
+    it('should throw on HTTP error with empty body', async () => {
+      mockFetchError(503);
+      const client = new PubTator();
+      await expect(client.findEntity('BRCA1')).rejects.toThrow(
+        'PubTator3 entity search failed: HTTP 503',
+      );
+    });
   });
 
   describe('search', () => {
@@ -320,6 +328,26 @@ describe('PubTator', () => {
       const result = await client.search('nonexistent');
       expect(result.total).toBe(0);
       expect(result.results).toEqual([]);
+    });
+
+    it('should default year to 0 when result has no date', async () => {
+      mockFetchJson({
+        count: 1,
+        current: 1,
+        page_size: 10,
+        results: [
+          {
+            pmid: 12345,
+            title: 'No Date Article',
+            journal: 'Nature',
+            date: '',
+            authors: ['Smith J'],
+          },
+        ],
+      });
+      const client = new PubTator();
+      const result = await client.search('test');
+      expect(result.results[0]?.year).toBe(0);
     });
   });
 
@@ -484,6 +512,14 @@ describe('PubTator', () => {
       await expect(client.annotateText('test')).rejects.toThrow(
         'PubTator3 text annotation failed: HTTP 429: Rate limit exceeded',
       );
+    });
+
+    it('should use base URL without query string when no options', async () => {
+      mockFetchText('result');
+      const client = new PubTator();
+      await client.annotateText('BRCA1');
+      const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(fetchUrl).toBe('https://www.ncbi.nlm.nih.gov/research/pubtator3-api/annotate/text/');
     });
   });
 });

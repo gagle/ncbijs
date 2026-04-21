@@ -147,6 +147,77 @@ describe('ClinicalTrials', () => {
       expect(study.phase).toBe('');
       expect(study.enrollment).toBe(0);
     });
+
+    it('should default missing intervention fields to empty strings', async () => {
+      mockFetchJson(
+        buildStudyResponse({
+          armsInterventionsModule: {
+            interventions: [{}],
+          },
+        }),
+      );
+      const ct = new ClinicalTrials();
+
+      const study = await ct.study('NCT00000001');
+
+      expect(study.interventions).toHaveLength(1);
+      expect(study.interventions[0]!.type).toBe('');
+      expect(study.interventions[0]!.name).toBe('');
+      expect(study.interventions[0]!.description).toBe('');
+    });
+
+    it('should default missing location fields to empty strings', async () => {
+      mockFetchJson(
+        buildStudyResponse({
+          contactsLocationsModule: {
+            locations: [{}],
+          },
+        }),
+      );
+      const ct = new ClinicalTrials();
+
+      const study = await ct.study('NCT00000001');
+
+      expect(study.locations).toHaveLength(1);
+      expect(study.locations[0]!.facility).toBe('');
+      expect(study.locations[0]!.city).toBe('');
+      expect(study.locations[0]!.state).toBe('');
+      expect(study.locations[0]!.country).toBe('');
+    });
+
+    it('should handle collaborator with missing name', async () => {
+      mockFetchJson(
+        buildStudyResponse({
+          sponsorCollaboratorsModule: {
+            leadSponsor: { name: 'NIH' },
+            collaborators: [{ name: 'FDA' }, {}],
+          },
+        }),
+      );
+      const ct = new ClinicalTrials();
+
+      const study = await ct.study('NCT00000001');
+
+      expect(study.sponsors).toHaveLength(2);
+      expect(study.sponsors[0]!.name).toBe('NIH');
+      expect(study.sponsors[1]!.name).toBe('FDA');
+    });
+
+    it('should handle missing lead sponsor name', async () => {
+      mockFetchJson(
+        buildStudyResponse({
+          sponsorCollaboratorsModule: {
+            leadSponsor: {},
+            collaborators: [],
+          },
+        }),
+      );
+      const ct = new ClinicalTrials();
+
+      const study = await ct.study('NCT00000001');
+
+      expect(study.sponsors).toHaveLength(0);
+    });
   });
 
   describe('searchStudies', () => {
@@ -228,6 +299,139 @@ describe('ClinicalTrials', () => {
       }
 
       expect(studies).toHaveLength(0);
+    });
+
+    it('should set pageSize parameter', async () => {
+      mockFetchJson({ studies: [] });
+      const ct = new ClinicalTrials();
+
+      const studies: Array<unknown> = [];
+      for await (const study of ct.searchStudies('diabetes', { pageSize: 10 })) {
+        studies.push(study);
+      }
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('pageSize=10');
+    });
+
+    it('should set sort parameter', async () => {
+      mockFetchJson({ studies: [] });
+      const ct = new ClinicalTrials();
+
+      const studies: Array<unknown> = [];
+      for await (const study of ct.searchStudies('diabetes', { sort: '@relevance' })) {
+        studies.push(study);
+      }
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('sort=%40relevance');
+    });
+
+    it('should set fields parameter', async () => {
+      mockFetchJson({ studies: [] });
+      const ct = new ClinicalTrials();
+
+      const studies: Array<unknown> = [];
+      for await (const study of ct.searchStudies('diabetes', {
+        fields: ['NCTId', 'BriefTitle'],
+      })) {
+        studies.push(study);
+      }
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('fields=NCTId%2CBriefTitle');
+    });
+
+    it('should set filter.overallStatus parameter', async () => {
+      mockFetchJson({ studies: [] });
+      const ct = new ClinicalTrials();
+
+      const studies: Array<unknown> = [];
+      for await (const study of ct.searchStudies('diabetes', {
+        filter: { overallStatus: ['RECRUITING', 'COMPLETED'] },
+      })) {
+        studies.push(study);
+      }
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('filter.overallStatus=RECRUITING%2CCOMPLETED');
+    });
+
+    it('should append filter.condition parameters', async () => {
+      mockFetchJson({ studies: [] });
+      const ct = new ClinicalTrials();
+
+      const studies: Array<unknown> = [];
+      for await (const study of ct.searchStudies('diabetes', {
+        filter: { condition: ['Diabetes', 'Obesity'] },
+      })) {
+        studies.push(study);
+      }
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('query.cond=Diabetes');
+      expect(url).toContain('query.cond=Obesity');
+    });
+
+    it('should append filter.intervention parameters', async () => {
+      mockFetchJson({ studies: [] });
+      const ct = new ClinicalTrials();
+
+      const studies: Array<unknown> = [];
+      for await (const study of ct.searchStudies('diabetes', {
+        filter: { intervention: ['Metformin', 'Insulin'] },
+      })) {
+        studies.push(study);
+      }
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('query.intr=Metformin');
+      expect(url).toContain('query.intr=Insulin');
+    });
+
+    it('should set filter.sponsor parameter', async () => {
+      mockFetchJson({ studies: [] });
+      const ct = new ClinicalTrials();
+
+      const studies: Array<unknown> = [];
+      for await (const study of ct.searchStudies('diabetes', {
+        filter: { sponsor: 'NIH' },
+      })) {
+        studies.push(study);
+      }
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('query.spons=NIH');
+    });
+
+    it('should set filter.phase parameter', async () => {
+      mockFetchJson({ studies: [] });
+      const ct = new ClinicalTrials();
+
+      const studies: Array<unknown> = [];
+      for await (const study of ct.searchStudies('diabetes', {
+        filter: { phase: ['PHASE1', 'PHASE2'] },
+      })) {
+        studies.push(study);
+      }
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('filter.phase=PHASE1%2CPHASE2');
+    });
+
+    it('should set filter.studyType parameter', async () => {
+      mockFetchJson({ studies: [] });
+      const ct = new ClinicalTrials();
+
+      const studies: Array<unknown> = [];
+      for await (const study of ct.searchStudies('diabetes', {
+        filter: { studyType: 'INTERVENTIONAL' },
+      })) {
+        studies.push(study);
+      }
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('filter.studyType=INTERVENTIONAL');
     });
   });
 

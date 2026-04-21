@@ -602,6 +602,11 @@ describe('readAllTagsWithAttributes', () => {
       attributes: { UI: 'Q000188', MajorTopicYN: 'Y' },
     });
   });
+
+  it('should return empty array for tags with no text content capture', () => {
+    const results = readAllTagsWithAttributes('<Other>text</Other>', 'Missing');
+    expect(results).toEqual([]);
+  });
 });
 
 describe('readAllBlocksWithAttributes', () => {
@@ -650,6 +655,13 @@ describe('readAllBlocksWithAttributes', () => {
     expect(results).toHaveLength(1);
     expect(results[0]?.attributes['xlink:href']).toBe('http://doi.org/10.1');
     expect(results[0]?.attributes['xlink:type']).toBe('simple');
+  });
+
+  it('should stop collecting when encountering an unclosed block', () => {
+    const xml = '<Item Name="a">closed</Item><Item Name="b">unclosed';
+    const results = readAllBlocksWithAttributes(xml, 'Item');
+    expect(results).toHaveLength(1);
+    expect(results[0]?.attributes['Name']).toBe('a');
   });
 });
 

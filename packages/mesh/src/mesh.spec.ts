@@ -229,6 +229,24 @@ describe('MeSH', () => {
     it('should throw on unknown term', () => {
       expect(() => mesh.expand('Unknown')).toThrow('Unknown MeSH term');
     });
+
+    it('should skip tree numbers that do not map to a descriptor', () => {
+      const sparseData: MeshTreeData = {
+        descriptors: [
+          {
+            id: 'D001',
+            name: 'Parent',
+            treeNumbers: ['A01'],
+            qualifiers: [],
+            pharmacologicalActions: [],
+            supplementaryConcepts: [],
+          },
+        ],
+      };
+      const sparseMesh = new MeSH(sparseData);
+      const result = sparseMesh.expand('Parent');
+      expect(result).toEqual(['Parent']);
+    });
   });
 
   describe('ancestors', () => {
@@ -253,6 +271,24 @@ describe('MeSH', () => {
     it('should throw on unknown term', () => {
       expect(() => mesh.ancestors('Unknown')).toThrow('Unknown MeSH term');
     });
+
+    it('should skip ancestor tree numbers that have no descriptor', () => {
+      const sparseData: MeshTreeData = {
+        descriptors: [
+          {
+            id: 'D001',
+            name: 'Leaf',
+            treeNumbers: ['X01.002.003'],
+            qualifiers: [],
+            pharmacologicalActions: [],
+            supplementaryConcepts: [],
+          },
+        ],
+      };
+      const sparseMesh = new MeSH(sparseData);
+      const result = sparseMesh.ancestors('Leaf');
+      expect(result).toEqual([]);
+    });
   });
 
   describe('children', () => {
@@ -276,6 +312,24 @@ describe('MeSH', () => {
     it('should throw on unknown term', () => {
       expect(() => mesh.children('Unknown')).toThrow('Unknown MeSH term');
     });
+
+    it('should skip child tree numbers that have no descriptor', () => {
+      const sparseData: MeshTreeData = {
+        descriptors: [
+          {
+            id: 'D001',
+            name: 'Parent',
+            treeNumbers: ['X01'],
+            qualifiers: [],
+            pharmacologicalActions: [],
+            supplementaryConcepts: [],
+          },
+        ],
+      };
+      const sparseMesh = new MeSH(sparseData);
+      const result = sparseMesh.children('Parent');
+      expect(result).toEqual([]);
+    });
   });
 
   describe('treePath', () => {
@@ -293,6 +347,24 @@ describe('MeSH', () => {
 
     it('should throw on unknown term', () => {
       expect(() => mesh.treePath('Unknown')).toThrow('Unknown MeSH term');
+    });
+
+    it('should skip path segments that have no descriptor', () => {
+      const sparseData: MeshTreeData = {
+        descriptors: [
+          {
+            id: 'D001',
+            name: 'Leaf',
+            treeNumbers: ['X01.002.003'],
+            qualifiers: [],
+            pharmacologicalActions: [],
+            supplementaryConcepts: [],
+          },
+        ],
+      };
+      const sparseMesh = new MeSH(sparseData);
+      const result = sparseMesh.treePath('Leaf');
+      expect(result).toEqual(['Leaf']);
     });
   });
 
@@ -312,6 +384,11 @@ describe('MeSH', () => {
 
     it('should throw on unknown term', () => {
       expect(() => mesh.toQuery('Unknown')).toThrow('Unknown MeSH term');
+    });
+
+    it('should use raw qualifier abbreviation when qualifier is not found', () => {
+      const result = mesh.toQuery('Head/ZZ');
+      expect(result).toBe('"Head/ZZ"[Mesh]');
     });
   });
 
@@ -386,6 +463,12 @@ describe('MeSH', () => {
     it('should throw on network error', async () => {
       mockFetchFailure('Failed to fetch');
       await expect(mesh.lookupOnline('test')).rejects.toThrow('Failed to fetch');
+    });
+
+    it('should extract descriptor id from resource URI without slashes', async () => {
+      mockFetchJson([{ resource: 'D001241', label: 'Aspirin' }]);
+      const result = await mesh.lookupOnline('Aspirin');
+      expect(result[0]!.id).toBe('D001241');
     });
   });
 });

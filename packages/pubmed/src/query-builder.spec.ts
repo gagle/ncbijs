@@ -452,5 +452,209 @@ describe('PubMedQueryBuilder', () => {
 
       expect(batches).toHaveLength(0);
     });
+
+    it('should throw when results exceed 10K', async () => {
+      const esearchMock = vi.fn().mockResolvedValue({
+        count: 15000,
+        idList: [],
+        retMax: 0,
+        retStart: 0,
+        translationSet: [],
+        queryTranslation: 'cancer',
+        webEnv: 'WEBENV_123',
+        queryKey: 1,
+      });
+      const mockEUtils = createMockEUtils({ esearch: esearchMock });
+
+      const builder = new PubMedQueryBuilder(mockEUtils as never, 'cancer');
+      await expect(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        for await (const _batch of builder.batches(10)) {
+          // noop
+        }
+      }).rejects.toThrow('exceeding the 10000 limit');
+    });
+
+    it('should respect limit when used with batches', async () => {
+      const esearchMock = vi.fn().mockResolvedValue({
+        count: 500,
+        idList: [],
+        retMax: 0,
+        retStart: 0,
+        translationSet: [],
+        queryTranslation: 'cancer',
+        webEnv: 'WEBENV_123',
+        queryKey: 1,
+      });
+      const efetchMock = vi.fn().mockResolvedValue(SINGLE_ARTICLE_XML);
+      const mockEUtils = createMockEUtils({ esearch: esearchMock, efetch: efetchMock });
+
+      const builder = new PubMedQueryBuilder(mockEUtils as never, 'cancer');
+      builder.limit(1);
+      const batches: Array<ReadonlyArray<unknown>> = [];
+
+      for await (const batch of builder.batches(10)) {
+        batches.push(batch);
+      }
+
+      expect(batches).toHaveLength(1);
+    });
+
+    it('should stop when efetch returns empty articles', async () => {
+      const emptyXml = '<?xml version="1.0"?><PubmedArticleSet></PubmedArticleSet>';
+      const esearchMock = vi.fn().mockResolvedValue({
+        count: 5,
+        idList: [],
+        retMax: 0,
+        retStart: 0,
+        translationSet: [],
+        queryTranslation: 'cancer',
+        webEnv: 'WEBENV_123',
+        queryKey: 1,
+      });
+      const efetchMock = vi.fn().mockResolvedValue(emptyXml);
+      const mockEUtils = createMockEUtils({ esearch: esearchMock, efetch: efetchMock });
+
+      const builder = new PubMedQueryBuilder(mockEUtils as never, 'cancer');
+      const batches: Array<ReadonlyArray<unknown>> = [];
+
+      for await (const batch of builder.batches(10)) {
+        batches.push(batch);
+      }
+
+      expect(batches).toHaveLength(0);
+    });
+  });
+
+  describe('fetchFromHistory edge cases', () => {
+    it('should stop when fetchFromHistory receives empty XML batch', async () => {
+      const emptyXml = '<?xml version="1.0"?><PubmedArticleSet></PubmedArticleSet>';
+      const esearchMock = vi.fn().mockResolvedValue({
+        count: 5,
+        idList: [],
+        retMax: 0,
+        retStart: 0,
+        translationSet: [],
+        queryTranslation: 'cancer',
+        webEnv: 'WEBENV_123',
+        queryKey: 1,
+      });
+      const efetchMock = vi.fn().mockResolvedValue(emptyXml);
+      const mockEUtils = createMockEUtils({ esearch: esearchMock, efetch: efetchMock });
+
+      const builder = new PubMedQueryBuilder(mockEUtils as never, 'cancer');
+      const results = await builder.fetchAll();
+
+      expect(results).toHaveLength(0);
+    });
+  });
+
+  describe('extractHistoryParams', () => {
+    it('should throw when ESearch does not return History Server params', async () => {
+      const esearchMock = vi.fn().mockResolvedValue({
+        count: 1,
+        idList: ['12345'],
+        retMax: 1,
+        retStart: 0,
+        translationSet: [],
+        queryTranslation: 'cancer',
+      });
+      const mockEUtils = createMockEUtils({ esearch: esearchMock });
+
+      const builder = new PubMedQueryBuilder(mockEUtils as never, 'cancer');
+      await expect(builder.fetchAll()).rejects.toThrow('History Server parameters');
+    });
+  });
+
+  describe('fetchWithDateSegmentation', () => {
+    it('should collect articles from year-segmented searches', async () => {
+      const currentYear = new Date().getFullYear();
+      const esearchMock = vi
+        .fn()
+        .mockResolvedValueOnce({
+          count: 15000,
+          idList: [],
+          retMax: 0,
+          retStart: 0,
+          translationSet: [],
+          queryTranslation: 'cancer',
+          webEnv: 'WEBENV_MAIN',
+          queryKey: 1,
+        })
+        .mockImplementation((params: Record<string, unknown>) => {
+          const term = params['term'] as string;
+          if (term.includes(`${currentYear}/01/01`)) {
+            return Promise.resolve({
+              count: 1,
+              idList: [],
+              retMax: 0,
+              retStart: 0,
+              translationSet: [],
+              queryTranslation: '',
+              webEnv: 'WEBENV_YEAR',
+              queryKey: 2,
+            });
+          }
+          return Promise.resolve({
+            count: 0,
+            idList: [],
+            retMax: 0,
+            retStart: 0,
+            translationSet: [],
+            queryTranslation: '',
+            webEnv: 'WEBENV_EMPTY',
+            queryKey: 3,
+          });
+        });
+      const efetchMock = vi.fn().mockResolvedValue(SINGLE_ARTICLE_XML);
+      const mockEUtils = createMockEUtils({ esearch: esearchMock, efetch: efetchMock });
+
+      const builder = new PubMedQueryBuilder(mockEUtils as never, 'cancer');
+      const results = await builder.fetchAll();
+
+      expect(results.length).toBeGreaterThanOrEqual(1);
+      expect(results[0]?.pmid).toBe('12345');
+    });
+
+    it('should stop date segmentation when enough articles are collected', async () => {
+      const currentYear = new Date().getFullYear();
+      const esearchMock = vi
+        .fn()
+        .mockResolvedValueOnce({
+          count: 15000,
+          idList: [],
+          retMax: 0,
+          retStart: 0,
+          translationSet: [],
+          queryTranslation: 'cancer',
+          webEnv: 'WEBENV_MAIN',
+          queryKey: 1,
+        })
+        .mockImplementation(() =>
+          Promise.resolve({
+            count: 1,
+            idList: [],
+            retMax: 0,
+            retStart: 0,
+            translationSet: [],
+            queryTranslation: '',
+            webEnv: 'WEBENV_YEAR',
+            queryKey: 2,
+          }),
+        );
+      const efetchMock = vi.fn().mockResolvedValue(SINGLE_ARTICLE_XML);
+      const mockEUtils = createMockEUtils({ esearch: esearchMock, efetch: efetchMock });
+
+      const builder = new PubMedQueryBuilder(mockEUtils as never, 'cancer');
+      builder.limit(1);
+      const results = await builder.fetchAll();
+
+      expect(results).toHaveLength(1);
+      const yearSearches = esearchMock.mock.calls.filter((call: Array<Record<string, unknown>>) => {
+        const term = call[0]?.['term'] as string;
+        return term.includes('[dp]');
+      });
+      expect(yearSearches.length).toBeLessThan(currentYear - 1900);
+    });
   });
 });

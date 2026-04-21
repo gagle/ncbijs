@@ -1248,6 +1248,84 @@ describe('EUtils', () => {
       expect((calls[2]![0] as Request).url).toContain('retstart=1');
       expect((calls[3]![0] as Request).url).toContain('retstart=2');
     });
+
+    it('should throw when neither WebEnv+query_key nor id is provided', async () => {
+      const client = createClient();
+      await expect(drainAsyncIterator(client.efetchBatches({ db: 'pubmed' }))).rejects.toThrow(
+        'efetchBatches requires WebEnv+query_key or id',
+      );
+    });
+
+    it('should use WebEnv and query_key directly when both are provided', async () => {
+      mockFetchSequence([
+        { body: '<batch1>data</batch1>', status: 200 },
+        { body: '', status: 200 },
+      ]);
+      const client = createClient();
+      const batches = await drainAsyncIterator(
+        client.efetchBatches({
+          db: 'pubmed',
+          WebEnv: 'MCID_direct',
+          query_key: 2,
+        }),
+      );
+      expect(batches).toHaveLength(1);
+      const calls = (fetch as ReturnType<typeof vi.fn>).mock.calls;
+      const efetchUrl = (calls[0]![0] as Request).url;
+      expect(efetchUrl).toContain('WebEnv=MCID_direct');
+      expect(efetchUrl).toContain('query_key=2');
+    });
+
+    it('should handle whitespace-only response as empty', async () => {
+      mockFetchSequence([
+        { body: EPOST_XML, status: 200 },
+        { body: '   \n  ', status: 200 },
+      ]);
+      const client = createClient();
+      const batches = await drainAsyncIterator(client.efetchBatches({ db: 'pubmed', id: '12345' }));
+      expect(batches).toHaveLength(0);
+    });
+
+    it('should respect custom retstart', async () => {
+      mockFetchSequence([
+        { body: '<data />', status: 200 },
+        { body: '', status: 200 },
+      ]);
+      const client = createClient();
+      await drainAsyncIterator(
+        client.efetchBatches({
+          db: 'pubmed',
+          WebEnv: 'MCID_test',
+          query_key: 1,
+          retstart: 100,
+        }),
+      );
+      const calls = (fetch as ReturnType<typeof vi.fn>).mock.calls;
+      const efetchUrl = (calls[0]![0] as Request).url;
+      expect(efetchUrl).toContain('retstart=100');
+    });
+
+    it('should pass rettype and idtype to efetch calls', async () => {
+      mockFetchSequence([
+        { body: EPOST_XML, status: 200 },
+        { body: '<data />', status: 200 },
+      ]);
+      const client = createClient();
+      await drainAsyncIterator(
+        client.efetchBatches({
+          db: 'pubmed',
+          id: '12345',
+          rettype: 'abstract',
+          retmode: 'xml',
+          idtype: 'acc',
+        }),
+      );
+      const calls = (fetch as ReturnType<typeof vi.fn>).mock.calls;
+      const efetchUrl = (calls[1]![0] as Request).url;
+      expect(efetchUrl).toContain('rettype=abstract');
+      expect(efetchUrl).toContain('retmode=xml');
+      expect(efetchUrl).toContain('idtype=acc');
+    });
   });
 
   // NCBI E-utilities §General: shared request parameters
@@ -1441,6 +1519,53 @@ describe('EUtils', () => {
       expect(batches).toHaveLength(0);
     });
 
+    it('should yield nothing when esearch returns webEnv but no queryKey', async () => {
+      const noQueryKeyXml = `<?xml version="1.0" encoding="UTF-8"?>
+<eSearchResult>
+  <Count>5</Count>
+  <RetMax>0</RetMax>
+  <RetStart>0</RetStart>
+  <IdList />
+  <TranslationSet />
+  <QueryTranslation>test</QueryTranslation>
+  <WebEnv>MCID_test_webenv</WebEnv>
+</eSearchResult>`;
+      mockFetch(noQueryKeyXml);
+      const client = createClient();
+
+      const batches = await drainAsyncIterator(
+        client.searchAndFetch({ db: 'pubmed', term: 'test' }),
+      );
+
+      expect(batches).toHaveLength(0);
+    });
+
+    it('should pass date parameters to esearch', async () => {
+      mockFetchSequence([
+        { body: ESEARCH_HISTORY_XML, status: 200 },
+        { body: '<data />', status: 200 },
+        { body: '', status: 200 },
+      ]);
+      const client = createClient();
+
+      await drainAsyncIterator(
+        client.searchAndFetch({
+          db: 'pubmed',
+          term: 'test',
+          datetype: 'pdat',
+          mindate: '2020/01/01',
+          maxdate: '2024/12/31',
+          reldate: 365,
+          sort: 'pub_date',
+        }),
+      );
+
+      const calls = (fetch as ReturnType<typeof vi.fn>).mock.calls;
+      const esearchUrl = (calls[0]![0] as Request).url;
+      expect(esearchUrl).toContain('datetype=pdat');
+      expect(esearchUrl).toContain('sort=pub_date');
+    });
+
     it('should send usehistory=y and retmax=0 to esearch', async () => {
       mockFetchSequence([
         { body: ESEARCH_HISTORY_XML, status: 200 },
@@ -1522,6 +1647,594 @@ describe('EUtils', () => {
       );
 
       expect(results).toHaveLength(0);
+    });
+
+    it('should yield nothing when esearch returns webEnv but no queryKey', async () => {
+      const noQueryKeyXml = `<?xml version="1.0" encoding="UTF-8"?>
+<eSearchResult>
+  <Count>5</Count>
+  <RetMax>0</RetMax>
+  <RetStart>0</RetStart>
+  <IdList />
+  <TranslationSet />
+  <QueryTranslation>test</QueryTranslation>
+  <WebEnv>MCID_test_webenv</WebEnv>
+</eSearchResult>`;
+      mockFetch(noQueryKeyXml);
+      const client = createClient();
+
+      const results = await drainAsyncIterator(
+        client.searchAndSummarize({ db: 'pubmed', term: 'test' }),
+      );
+
+      expect(results).toHaveLength(0);
+    });
+
+    it('should pass retmode and version to esummary', async () => {
+      mockFetchSequence([
+        { body: ESEARCH_HISTORY_XML, status: 200 },
+        { body: ESUMMARY_JSON, status: 200 },
+      ]);
+      const client = createClient();
+
+      await drainAsyncIterator(
+        client.searchAndSummarize({
+          db: 'pubmed',
+          term: 'test',
+          retmode: 'json',
+          version: '2.0',
+        }),
+      );
+
+      const calls = (fetch as ReturnType<typeof vi.fn>).mock.calls;
+      const esummaryUrl = (calls[1]![0] as Request).url;
+      expect(esummaryUrl).toContain('retmode=json');
+      expect(esummaryUrl).toContain('version=2.0');
+    });
+
+    it('should paginate esummary batches when count exceeds batchSize', async () => {
+      const largeSearch = `<?xml version="1.0" encoding="UTF-8"?>
+<eSearchResult>
+  <Count>3</Count>
+  <RetMax>0</RetMax>
+  <RetStart>0</RetStart>
+  <IdList />
+  <TranslationSet />
+  <QueryTranslation>test</QueryTranslation>
+  <WebEnv>MCID_test_webenv</WebEnv>
+  <QueryKey>1</QueryKey>
+</eSearchResult>`;
+      mockFetchSequence([
+        { body: largeSearch, status: 200 },
+        { body: ESUMMARY_XML, status: 200 },
+        { body: ESUMMARY_XML, status: 200 },
+        { body: ESUMMARY_XML, status: 200 },
+      ]);
+      const client = createClient();
+
+      const results = await drainAsyncIterator(
+        client.searchAndSummarize({ db: 'pubmed', term: 'test', batchSize: 1 }),
+      );
+
+      expect(results).toHaveLength(3);
+    });
+  });
+
+  describe('parser edge cases', () => {
+    it('should parse esearch XML with errorList', async () => {
+      const errorXml = `<?xml version="1.0" encoding="UTF-8"?>
+<eSearchResult>
+  <Count>0</Count>
+  <RetMax>0</RetMax>
+  <RetStart>0</RetStart>
+  <IdList />
+  <TranslationSet />
+  <QueryTranslation />
+  <ErrorList>
+    <FieldNotFound>badfield</FieldNotFound>
+  </ErrorList>
+</eSearchResult>`;
+      mockFetch(errorXml);
+      const client = createClient();
+      const result = await client.esearch({ db: 'pubmed', term: 'test' });
+      expect(result.errorList).toEqual(['badfield']);
+    });
+
+    it('should parse esearch JSON with errorList', async () => {
+      const errorJson = JSON.stringify({
+        esearchresult: {
+          count: '0',
+          retmax: '0',
+          retstart: '0',
+          idlist: [],
+          translationset: [],
+          querytranslation: '',
+          errorlist: { fieldnotfound: ['badfield'] },
+        },
+      });
+      mockFetch(errorJson);
+      const client = createClient();
+      const result = await client.esearch({ db: 'pubmed', term: 'test', retmode: 'json' });
+      expect(result.errorList).toEqual(['badfield']);
+    });
+
+    it('should throw on esearch JSON with missing esearchresult', async () => {
+      mockFetch(JSON.stringify({}));
+      const client = createClient();
+      await expect(client.esearch({ db: 'pubmed', term: 'test', retmode: 'json' })).rejects.toThrow(
+        'Invalid ESearch JSON',
+      );
+    });
+
+    it('should parse esearch JSON with webEnv and queryKey', async () => {
+      const historyJson = JSON.stringify({
+        esearchresult: {
+          count: '10',
+          retmax: '10',
+          retstart: '0',
+          idlist: ['1'],
+          translationset: [],
+          querytranslation: 'test',
+          webenv: 'MCID_json_webenv',
+          querykey: '1',
+        },
+      });
+      mockFetch(historyJson);
+      const client = createClient();
+      const result = await client.esearch({
+        db: 'pubmed',
+        term: 'test',
+        retmode: 'json',
+        usehistory: 'y',
+      });
+      expect(result.webEnv).toBe('MCID_json_webenv');
+      expect(result.queryKey).toBe(1);
+    });
+
+    it('should throw on esummary JSON with missing result', async () => {
+      mockFetch(JSON.stringify({}));
+      const client = createClient();
+      await expect(client.esummary({ db: 'pubmed', id: '12345', retmode: 'json' })).rejects.toThrow(
+        'Invalid ESummary JSON',
+      );
+    });
+
+    it('should handle esummary JSON where uid record is not an object', async () => {
+      const jsonWithNonObject = JSON.stringify({
+        result: {
+          uids: ['12345'],
+          '12345': 'not-an-object',
+        },
+      });
+      mockFetch(jsonWithNonObject);
+      const client = createClient();
+      const result = await client.esummary({ db: 'pubmed', id: '12345', retmode: 'json' });
+      expect(result.docSums).toHaveLength(0);
+    });
+
+    it('should handle esummary JSON with no uids key', async () => {
+      const jsonNoUids = JSON.stringify({ result: {} });
+      mockFetch(jsonNoUids);
+      const client = createClient();
+      const result = await client.esummary({ db: 'pubmed', id: '12345', retmode: 'json' });
+      expect(result.docSums).toHaveLength(0);
+      expect(result.uid).toBe('');
+    });
+
+    it('should skip esummary XML items with empty name or undefined content', async () => {
+      const xmlWithBadItems = `<?xml version="1.0" encoding="UTF-8"?>
+<eSummaryResult>
+  <DocSum>
+    <Id>12345</Id>
+    <Item Name="" Type="String">empty name</Item>
+    <Item Name="Title" Type="String">Good Title</Item>
+  </DocSum>
+</eSummaryResult>`;
+      mockFetch(xmlWithBadItems);
+      const client = createClient();
+      const result = await client.esummary({ db: 'pubmed', id: '12345' });
+      expect(result.docSums[0]!['Title']).toBe('Good Title');
+    });
+
+    it('should throw on einfo XML with neither DbList nor DbInfo', async () => {
+      mockFetch('<eInfoResult></eInfoResult>');
+      const client = createClient();
+      await expect(client.einfo({ db: 'baddb' })).rejects.toThrow('Invalid EInfo response');
+    });
+
+    it('should throw on einfo JSON with neither dblist nor dbinfo', async () => {
+      mockFetch(JSON.stringify({}));
+      const client = createClient();
+      await expect(client.einfo({ db: 'baddb', retmode: 'json' })).rejects.toThrow(
+        'Invalid EInfo JSON',
+      );
+    });
+
+    it('should parse einfo JSON with dblist', async () => {
+      const dblistJson = JSON.stringify({ dblist: ['pubmed', 'pmc'] });
+      mockFetch(dblistJson);
+      const client = createClient();
+      const result = await client.einfo({ retmode: 'json' });
+      expect(result.dbList).toEqual(['pubmed', 'pmc']);
+    });
+
+    it('should skip einfo XML fields missing name or fullName', async () => {
+      const xmlMissingFieldName = `<?xml version="1.0" encoding="UTF-8"?>
+<eInfoResult>
+  <DbInfo>
+    <DbName>pubmed</DbName>
+    <Description>test</Description>
+    <Count>100</Count>
+    <LastUpdate>2024/01/01</LastUpdate>
+    <FieldList>
+      <Field>
+        <FullName>Missing Name Field</FullName>
+      </Field>
+      <Field>
+        <Name>TIAB</Name>
+      </Field>
+      <Field>
+        <Name>ALL</Name>
+        <FullName>All Fields</FullName>
+        <Description>All terms</Description>
+        <TermCount>100</TermCount>
+        <IsDate>N</IsDate>
+        <IsNumerical>N</IsNumerical>
+      </Field>
+    </FieldList>
+    <LinkList>
+      <Link>
+        <Name>pubmed_pubmed</Name>
+      </Link>
+      <Link>
+        <Menu>Similar</Menu>
+      </Link>
+      <Link>
+        <Name>pubmed_pmc</Name>
+        <Menu>PMC Links</Menu>
+        <Description>Links to PMC</Description>
+        <DbTo>pmc</DbTo>
+      </Link>
+    </LinkList>
+  </DbInfo>
+</eInfoResult>`;
+      mockFetch(xmlMissingFieldName);
+      const client = createClient();
+      const result = await client.einfo({ db: 'pubmed' });
+      expect(result.dbInfo!.fieldList).toHaveLength(1);
+      expect(result.dbInfo!.fieldList[0]!.name).toBe('ALL');
+      expect(result.dbInfo!.linkList).toHaveLength(1);
+      expect(result.dbInfo!.linkList[0]!.name).toBe('pubmed_pmc');
+    });
+
+    it('should parse einfo XML fields without optional boolean attributes', async () => {
+      const xmlNoOptional = `<?xml version="1.0" encoding="UTF-8"?>
+<eInfoResult>
+  <DbInfo>
+    <DbName>pubmed</DbName>
+    <Description>test</Description>
+    <Count>100</Count>
+    <LastUpdate>2024/01/01</LastUpdate>
+    <FieldList>
+      <Field>
+        <Name>ALL</Name>
+        <FullName>All Fields</FullName>
+        <Description>All terms</Description>
+        <TermCount>100</TermCount>
+        <IsDate>Y</IsDate>
+        <IsNumerical>Y</IsNumerical>
+      </Field>
+    </FieldList>
+    <LinkList />
+  </DbInfo>
+</eInfoResult>`;
+      mockFetch(xmlNoOptional);
+      const client = createClient();
+      const result = await client.einfo({ db: 'pubmed' });
+      const field = result.dbInfo!.fieldList[0]!;
+      expect(field.isDate).toBe(true);
+      expect(field.isNumerical).toBe(true);
+      expect(field).not.toHaveProperty('isTruncatable');
+      expect(field).not.toHaveProperty('isRangeable');
+      expect(field).not.toHaveProperty('isHidden');
+    });
+
+    it('should parse elink XML with empty link id (skipped)', async () => {
+      const xmlEmptyLinkId = `<?xml version="1.0" encoding="UTF-8"?>
+<eLinkResult>
+  <LinkSet>
+    <DbFrom>pubmed</DbFrom>
+    <IdList><Id>123</Id></IdList>
+    <LinkSetDb>
+      <DbTo>pubmed</DbTo>
+      <LinkName>pubmed_pubmed</LinkName>
+      <Link><Id></Id></Link>
+      <Link><Id>456</Id></Link>
+    </LinkSetDb>
+  </LinkSet>
+</eLinkResult>`;
+      mockFetch(xmlEmptyLinkId);
+      const client = createClient();
+      const result = await client.elink({ db: 'pubmed', dbfrom: 'pubmed', id: '123' });
+      expect(result.linkSets[0]!.linkSetDbs![0]!.links).toHaveLength(1);
+      expect(result.linkSets[0]!.linkSetDbs![0]!.links[0]!.id).toBe('456');
+    });
+
+    it('should parse elink XML with IdUrlList but no ObjUrl blocks', async () => {
+      const xmlEmptyObjUrl = `<?xml version="1.0" encoding="UTF-8"?>
+<eLinkResult>
+  <LinkSet>
+    <DbFrom>pubmed</DbFrom>
+    <IdList><Id>123</Id></IdList>
+    <IdUrlList>
+      <IdUrlSet><Id>123</Id></IdUrlSet>
+    </IdUrlList>
+  </LinkSet>
+</eLinkResult>`;
+      mockFetch(xmlEmptyObjUrl);
+      const client = createClient();
+      const result = await client.elink({
+        db: 'pubmed',
+        dbfrom: 'pubmed',
+        id: '123',
+        cmd: 'llinks',
+      });
+      expect(result.linkSets[0]!.linkOutUrls).toBeUndefined();
+    });
+
+    it('should skip elink XML ObjUrl entries without a URL', async () => {
+      const xmlNoUrl = `<?xml version="1.0" encoding="UTF-8"?>
+<eLinkResult>
+  <LinkSet>
+    <DbFrom>pubmed</DbFrom>
+    <IdList><Id>123</Id></IdList>
+    <IdUrlList>
+      <IdUrlSet>
+        <Id>123</Id>
+        <ObjUrl>
+          <Provider><Name>NoUrl Provider</Name></Provider>
+        </ObjUrl>
+        <ObjUrl>
+          <Url>https://example.com</Url>
+          <Provider><Name>Good Provider</Name></Provider>
+        </ObjUrl>
+      </IdUrlSet>
+    </IdUrlList>
+  </LinkSet>
+</eLinkResult>`;
+      mockFetch(xmlNoUrl);
+      const client = createClient();
+      const result = await client.elink({
+        db: 'pubmed',
+        dbfrom: 'pubmed',
+        id: '123',
+        cmd: 'llinks',
+      });
+      expect(result.linkSets[0]!.linkOutUrls).toHaveLength(1);
+      expect(result.linkSets[0]!.linkOutUrls![0]!.provider).toBe('Good Provider');
+    });
+
+    it('should parse elink XML IdCheckList with no matching Id elements', async () => {
+      const xmlEmptyCheckList = `<?xml version="1.0" encoding="UTF-8"?>
+<eLinkResult>
+  <LinkSet>
+    <DbFrom>pubmed</DbFrom>
+    <IdList><Id>123</Id></IdList>
+    <IdCheckList>
+    </IdCheckList>
+  </LinkSet>
+</eLinkResult>`;
+      mockFetch(xmlEmptyCheckList);
+      const client = createClient();
+      const result = await client.elink({
+        db: 'pubmed',
+        dbfrom: 'pubmed',
+        id: '123',
+        cmd: 'acheck',
+      });
+      expect(result.linkSets[0]!.idCheckResults).toBeUndefined();
+    });
+
+    it('should parse elink JSON with webenv and querykey', async () => {
+      const jsonWithHistory = JSON.stringify({
+        linksets: [
+          {
+            dbfrom: 'pubmed',
+            ids: [{ value: '123' }],
+            webenv: 'MCID_link_webenv',
+            querykey: '1',
+          },
+        ],
+      });
+      mockFetch(jsonWithHistory);
+      const client = createClient();
+      const result = await client.elink({
+        db: 'pubmed',
+        dbfrom: 'pubmed',
+        id: '123',
+        retmode: 'json',
+      });
+      expect(result.linkSets[0]!.webEnv).toBe('MCID_link_webenv');
+      expect(result.linkSets[0]!.queryKey).toBe(1);
+    });
+
+    it('should parse elink JSON with score in links', async () => {
+      const jsonWithScore = JSON.stringify({
+        linksets: [
+          {
+            dbfrom: 'pubmed',
+            ids: [{ id: '123' }],
+            linksetdbs: [
+              {
+                dbto: 'pubmed',
+                linkname: 'pubmed_pubmed',
+                links: [{ id: { value: '456' }, score: '100' }],
+              },
+            ],
+          },
+        ],
+      });
+      mockFetch(jsonWithScore);
+      const client = createClient();
+      const result = await client.elink({
+        db: 'pubmed',
+        dbfrom: 'pubmed',
+        id: '123',
+        retmode: 'json',
+      });
+      expect(result.linkSets[0]!.idList).toEqual(['123']);
+      expect(result.linkSets[0]!.linkSetDbs![0]!.links[0]!.score).toBe(100);
+    });
+
+    it('should parse ecitmatch text with empty lines', async () => {
+      const textWithBlanks = `Ann Intern Med|1998|129|103|Feigelson HS|Art1|9652966\n\n\nN Engl J Med|1990|322|1405|Smith J|Art2|\n`;
+      mockFetch(textWithBlanks);
+      const client = createClient();
+      const result = await client.ecitmatch({ bdata: 'test' });
+      expect(result.citations).toHaveLength(2);
+    });
+
+    it('should parse egquery XML skipping non-Ok entries', async () => {
+      const xmlAllFailed = `<?xml version="1.0" encoding="UTF-8"?>
+<Result>
+  <Term>test</Term>
+  <eGQueryResult>
+    <ResultItem>
+      <DbName>baddb</DbName>
+      <MenuName>Bad DB</MenuName>
+      <Count>0</Count>
+      <Status>Term or Database is not found</Status>
+    </ResultItem>
+  </eGQueryResult>
+</Result>`;
+      mockFetch(xmlAllFailed);
+      const client = createClient();
+      const result = await client.egquery({ term: 'test' });
+      expect(result.eGQueryResultItems).toHaveLength(0);
+    });
+
+    it('should handle elink XML ObjUrl without provider block', async () => {
+      const xmlNoProvider = `<?xml version="1.0" encoding="UTF-8"?>
+<eLinkResult>
+  <LinkSet>
+    <DbFrom>pubmed</DbFrom>
+    <IdList><Id>123</Id></IdList>
+    <IdUrlList>
+      <IdUrlSet>
+        <Id>123</Id>
+        <ObjUrl>
+          <Url>https://example.com/article</Url>
+        </ObjUrl>
+      </IdUrlSet>
+    </IdUrlList>
+  </LinkSet>
+</eLinkResult>`;
+      mockFetch(xmlNoProvider);
+      const client = createClient();
+      const result = await client.elink({
+        db: 'pubmed',
+        dbfrom: 'pubmed',
+        id: '123',
+        cmd: 'llinks',
+      });
+      expect(result.linkSets[0]!.linkOutUrls![0]!.provider).toBe('');
+      expect(result.linkSets[0]!.linkOutUrls![0]!.url).toBe('https://example.com/article');
+    });
+
+    it('should parse einfo JSON fields with optional boolean attributes', async () => {
+      const jsonWithOptionals = JSON.stringify({
+        dbinfo: {
+          dbname: 'pubmed',
+          description: 'test',
+          count: '100',
+          lastupdate: '2024/01/01',
+          fieldlist: [
+            {
+              name: 'ALL',
+              fullname: 'All Fields',
+              description: 'All terms',
+              termcount: '100',
+              isdate: 'N',
+              isnumerical: 'N',
+              istruncatable: 'Y',
+              israngeable: 'N',
+              ishidden: 'N',
+            },
+          ],
+          linklist: [],
+        },
+      });
+      mockFetch(jsonWithOptionals);
+      const client = createClient();
+      const result = await client.einfo({ db: 'pubmed', retmode: 'json' });
+      const field = result.dbInfo!.fieldList[0]!;
+      expect(field.isTruncatable).toBe(true);
+      expect(field.isRangeable).toBe(false);
+      expect(field.isHidden).toBe(false);
+    });
+
+    it('should parse einfo XML fields with IsHidden attribute', async () => {
+      const xmlWithHidden = `<?xml version="1.0" encoding="UTF-8"?>
+<eInfoResult>
+  <DbInfo>
+    <DbName>pubmed</DbName>
+    <Description>test</Description>
+    <Count>100</Count>
+    <LastUpdate>2024/01/01</LastUpdate>
+    <FieldList>
+      <Field>
+        <Name>ALL</Name>
+        <FullName>All Fields</FullName>
+        <Description>All terms</Description>
+        <TermCount>100</TermCount>
+        <IsDate>N</IsDate>
+        <IsNumerical>N</IsNumerical>
+        <IsTruncatable>Y</IsTruncatable>
+        <IsRangeable>Y</IsRangeable>
+        <IsHidden>Y</IsHidden>
+      </Field>
+    </FieldList>
+    <LinkList />
+  </DbInfo>
+</eInfoResult>`;
+      mockFetch(xmlWithHidden);
+      const client = createClient();
+      const result = await client.einfo({ db: 'pubmed' });
+      const field = result.dbInfo!.fieldList[0]!;
+      expect(field.isHidden).toBe(true);
+      expect(field.isRangeable).toBe(true);
+    });
+
+    it('should handle elink XML ObjUrl with provider but no NameAbbr', async () => {
+      const xmlNoNameAbbr = `<?xml version="1.0" encoding="UTF-8"?>
+<eLinkResult>
+  <LinkSet>
+    <DbFrom>pubmed</DbFrom>
+    <IdList><Id>123</Id></IdList>
+    <IdUrlList>
+      <IdUrlSet>
+        <Id>123</Id>
+        <ObjUrl>
+          <Url>https://example.com/article</Url>
+          <Provider>
+            <Name>Full Name Only</Name>
+          </Provider>
+        </ObjUrl>
+      </IdUrlSet>
+    </IdUrlList>
+  </LinkSet>
+</eLinkResult>`;
+      mockFetch(xmlNoNameAbbr);
+      const client = createClient();
+      const result = await client.elink({
+        db: 'pubmed',
+        dbfrom: 'pubmed',
+        id: '123',
+        cmd: 'llinks',
+      });
+      const linkOut = result.linkSets[0]!.linkOutUrls![0]!;
+      expect(linkOut.provider).toBe('Full Name Only');
+      expect(linkOut.providerAbbr).toBeUndefined();
     });
   });
 });

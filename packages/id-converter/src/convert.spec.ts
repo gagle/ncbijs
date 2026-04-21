@@ -116,16 +116,40 @@ describe('convert', () => {
       expect(firstResult.mid).toBeNull();
     });
 
-    it('should return live flag', async () => {
+    it('should return live flag as true when boolean true', async () => {
       mockFetchJson(buildApiResponse([buildRecord({ live: true })]));
       const results = await convert(['12345678']);
       expect(results[0]!.live).toBe(true);
+    });
+
+    it('should return live flag as true when string "true"', async () => {
+      mockFetchJson(buildApiResponse([buildRecord({ live: 'true' })]));
+      const results = await convert(['12345678']);
+      expect(results[0]!.live).toBe(true);
+    });
+
+    it('should return live flag as false when not true', async () => {
+      mockFetchJson(buildApiResponse([buildRecord({ live: false })]));
+      const results = await convert(['12345678']);
+      expect(results[0]!.live).toBe(false);
     });
 
     it('should return releaseDate', async () => {
       mockFetchJson(buildApiResponse([buildRecord({ 'release-date': '2024/06/01' })]));
       const results = await convert(['12345678']);
       expect(results[0]!.releaseDate).toBe('2024/06/01');
+    });
+
+    it('should return empty releaseDate when not provided', async () => {
+      mockFetchJson(buildApiResponse([buildRecord({ 'release-date': undefined })]));
+      const results = await convert(['12345678']);
+      expect(results[0]!.releaseDate).toBe('');
+    });
+
+    it('should return null pmid when pmid is not in record', async () => {
+      mockFetchJson(buildApiResponse([buildRecord({ pmid: undefined })]));
+      const results = await convert(['PMC1234567']);
+      expect(results[0]!.pmid).toBeNull();
     });
 
     it('should return versions when requested', async () => {
@@ -273,6 +297,28 @@ describe('convert', () => {
 
     it('should throw on malformed response', async () => {
       mockFetchJson('not an object');
+      await expect(convert(['12345678'])).rejects.toThrow('malformed response');
+    });
+
+    it('should throw on HTTP error status', async () => {
+      mockFetchJson(null, 500);
+      await expect(convert(['12345678'])).rejects.toThrow('ID Converter API returned status 500');
+    });
+
+    it('should throw when response JSON parse fails', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: true,
+          status: 200,
+          json: () => Promise.reject(new Error('Unexpected token')),
+        }),
+      );
+      await expect(convert(['12345678'])).rejects.toThrow('malformed response');
+    });
+
+    it('should throw when records field is not an array', async () => {
+      mockFetchJson({ records: 'not-an-array' });
       await expect(convert(['12345678'])).rejects.toThrow('malformed response');
     });
   });

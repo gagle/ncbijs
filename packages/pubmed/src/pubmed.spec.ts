@@ -155,6 +155,112 @@ describe('PubMed', () => {
 
       expect(results).toHaveLength(0);
     });
+
+    it('should sort related articles by relevancy score descending', async () => {
+      const twoArticleXml = `<?xml version="1.0"?>
+<PubmedArticleSet>
+  <PubmedArticle>
+    <MedlineCitation>
+      <PMID>11111</PMID>
+      <Article>
+        <ArticleTitle>Low Score</ArticleTitle>
+        <Abstract><AbstractText>Abstract.</AbstractText></Abstract>
+        <AuthorList><Author><LastName>A</LastName></Author></AuthorList>
+        <Journal><Title>J</Title><ISOAbbreviation>J</ISOAbbreviation><JournalIssue><PubDate><Year>2024</Year></PubDate></JournalIssue></Journal>
+        <PublicationTypeList><PublicationType>Journal Article</PublicationType></PublicationTypeList>
+        <Language>eng</Language>
+      </Article>
+      <MeshHeadingList></MeshHeadingList>
+      <KeywordList></KeywordList>
+    </MedlineCitation>
+    <PubmedData><ArticleIdList><ArticleId IdType="pubmed">11111</ArticleId></ArticleIdList></PubmedData>
+  </PubmedArticle>
+  <PubmedArticle>
+    <MedlineCitation>
+      <PMID>22222</PMID>
+      <Article>
+        <ArticleTitle>High Score</ArticleTitle>
+        <Abstract><AbstractText>Abstract.</AbstractText></Abstract>
+        <AuthorList><Author><LastName>B</LastName></Author></AuthorList>
+        <Journal><Title>J</Title><ISOAbbreviation>J</ISOAbbreviation><JournalIssue><PubDate><Year>2024</Year></PubDate></JournalIssue></Journal>
+        <PublicationTypeList><PublicationType>Journal Article</PublicationType></PublicationTypeList>
+        <Language>eng</Language>
+      </Article>
+      <MeshHeadingList></MeshHeadingList>
+      <KeywordList></KeywordList>
+    </MedlineCitation>
+    <PubmedData><ArticleIdList><ArticleId IdType="pubmed">22222</ArticleId></ArticleIdList></PubmedData>
+  </PubmedArticle>
+</PubmedArticleSet>`;
+
+      mockELink.mockResolvedValue({
+        linkSets: [
+          {
+            linkSetDbs: [
+              {
+                links: [
+                  { id: '11111', score: 50 },
+                  { id: '22222', score: 99 },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+      mockEFetch.mockResolvedValue(twoArticleXml);
+
+      const pubmed = new PubMed(VALID_CONFIG);
+      const results = await pubmed.related('99999');
+
+      expect(results).toHaveLength(2);
+      expect(results[0]?.pmid).toBe('22222');
+      expect(results[0]?.relevancyScore).toBe(99);
+      expect(results[1]?.pmid).toBe('11111');
+      expect(results[1]?.relevancyScore).toBe(50);
+    });
+
+    it('should default score to 0 when link has no score', async () => {
+      mockELink.mockResolvedValue({
+        linkSets: [
+          {
+            linkSetDbs: [
+              {
+                links: [{ id: '12345' }],
+              },
+            ],
+          },
+        ],
+      });
+      mockEFetch.mockResolvedValue(SINGLE_ARTICLE_XML);
+
+      const pubmed = new PubMed(VALID_CONFIG);
+      const results = await pubmed.related('99999');
+
+      expect(results).toHaveLength(1);
+      expect(results[0]?.relevancyScore).toBe(0);
+    });
+
+    it('should return empty when linkSetDbs has empty links', async () => {
+      mockELink.mockResolvedValue({
+        linkSets: [{ linkSetDbs: [{ links: [] }] }],
+      });
+
+      const pubmed = new PubMed(VALID_CONFIG);
+      const results = await pubmed.related('12345');
+
+      expect(results).toHaveLength(0);
+    });
+
+    it('should return empty when linkSetDbs first entry has no links', async () => {
+      mockELink.mockResolvedValue({
+        linkSets: [{ linkSetDbs: [{}] }],
+      });
+
+      const pubmed = new PubMed(VALID_CONFIG);
+      const results = await pubmed.related('12345');
+
+      expect(results).toHaveLength(0);
+    });
   });
 
   describe('citedBy', () => {
@@ -198,6 +304,28 @@ describe('PubMed', () => {
     it('should handle article with no citations', async () => {
       mockELink.mockResolvedValue({
         linkSets: [{ linkSetDbs: [] }],
+      });
+
+      const pubmed = new PubMed(VALID_CONFIG);
+      const results = await pubmed.citedBy('12345');
+
+      expect(results).toHaveLength(0);
+    });
+
+    it('should return empty when linkSetDbs first entry has empty links', async () => {
+      mockELink.mockResolvedValue({
+        linkSets: [{ linkSetDbs: [{ links: [] }] }],
+      });
+
+      const pubmed = new PubMed(VALID_CONFIG);
+      const results = await pubmed.citedBy('12345');
+
+      expect(results).toHaveLength(0);
+    });
+
+    it('should return empty when linkSetDbs first entry has no links property', async () => {
+      mockELink.mockResolvedValue({
+        linkSets: [{ linkSetDbs: [{}] }],
       });
 
       const pubmed = new PubMed(VALID_CONFIG);

@@ -229,6 +229,23 @@ describe('cite', () => {
       mockFetchText('not valid json');
       await expect(cite('12345', 'csl')).rejects.toThrow('malformed JSON');
     });
+
+    it('should throw on non-404 HTTP error status', async () => {
+      mockFetchText('Server Error', 500);
+      await expect(cite('12345', 'ris')).rejects.toThrow(
+        'Citation Exporter API returned status 500',
+      );
+    });
+
+    it('should throw on valid JSON missing required key for CSL format', async () => {
+      mockFetchText(JSON.stringify({ irrelevant: 'data' }));
+      await expect(cite('12345', 'csl')).rejects.toThrow('malformed JSON');
+    });
+
+    it('should throw on valid JSON missing required key for citation format', async () => {
+      mockFetchText(JSON.stringify({ irrelevant: 'data' }));
+      await expect(cite('12345', 'citation')).rejects.toThrow('malformed JSON');
+    });
   });
 });
 

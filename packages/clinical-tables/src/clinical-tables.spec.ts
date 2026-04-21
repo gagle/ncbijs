@@ -211,6 +211,32 @@ describe('search', () => {
       });
       expect(result.extras).toEqual([['Diabetes type 2', '']]);
     });
+
+    it('should return empty extras when extras object has no matching fields', async () => {
+      const responseWithEmptyExtras: [
+        number,
+        Array<string>,
+        Record<string, Array<string>>,
+        Array<Array<string>>,
+      ] = [0, [], {}, [[]]];
+      mockFetchJson(responseWithEmptyExtras);
+      const result = await search('icd10cm', 'diabetes', {
+        extraFields: ['nonexistent_field'],
+      });
+      expect(result.extras).toEqual([]);
+    });
+
+    it('should return empty extras when extraFields is empty and raw extras is non-null', async () => {
+      const responseWithNonNullExtras: [
+        number,
+        Array<string>,
+        Record<string, Array<string>>,
+        Array<Array<string>>,
+      ] = [1, ['E11'], { consumer_name: ['Diabetes type 2'] }, [['Type 2 diabetes mellitus']]];
+      mockFetchJson(responseWithNonNullExtras);
+      const result = await search('icd10cm', 'diabetes', { extraFields: [] });
+      expect(result.extras).toEqual([]);
+    });
   });
 
   describe('edge cases', () => {
