@@ -298,6 +298,15 @@ describe('parsePubmedXml', () => {
       expect(firstArticle.journal.volume).toBeUndefined();
       expect(firstArticle.journal.issue).toBeUndefined();
     });
+
+    it('should default Title and ISOAbbreviation to empty when missing from Journal block', () => {
+      const xml = buildArticleXml(
+        '<PMID>1</PMID><Article><ArticleTitle>T</ArticleTitle><Journal><JournalIssue><PubDate><Year>2024</Year></PubDate></JournalIssue></Journal><Language>eng</Language></Article>',
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.journal.title).toBe('');
+      expect(firstArticle.journal.isoAbbrev).toBe('');
+    });
   });
 
   describe('date handling', () => {
@@ -525,6 +534,16 @@ describe('parsePubmedXml', () => {
       expect(firstArticle.articleIds.pmc).toBeUndefined();
       expect(firstArticle.articleIds.pii).toBeUndefined();
       expect(firstArticle.articleIds.mid).toBeUndefined();
+    });
+
+    it('should handle PubmedData without ArticleIdList', () => {
+      const xml = buildArticleXml(
+        buildMinimalCitation('1', ''),
+        '<History><PubMedPubDate PubStatus="pubmed"><Year>2024</Year></PubMedPubDate></History>',
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.articleIds.pmid).toBe('1');
+      expect(firstArticle.articleIds.doi).toBeUndefined();
     });
   });
 
@@ -782,13 +801,315 @@ describe('parsePubmedXml', () => {
     });
   });
 
+  describe('DOI fallback from ELocationID', () => {
+    it('should extract DOI from ELocationID when not in ArticleIdList', () => {
+      const xml = buildArticleXml(
+        buildMinimalCitation(
+          '1',
+          '<ELocationID EIdType="doi" ValidYN="Y">10.1234/test</ELocationID>',
+        ),
+        '<ArticleIdList><ArticleId IdType="pubmed">1</ArticleId></ArticleIdList>',
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.articleIds.doi).toBe('10.1234/test');
+    });
+
+    it('should skip ELocationID with non-doi EIdType', () => {
+      const xml = buildArticleXml(
+        buildMinimalCitation('1', '<ELocationID EIdType="pii" ValidYN="Y">S0001</ELocationID>'),
+        '<ArticleIdList><ArticleId IdType="pubmed">1</ArticleId></ArticleIdList>',
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.articleIds.doi).toBeUndefined();
+    });
+
+    it('should not use ELocationID when DOI already found in ArticleIdList', () => {
+      const xml = buildArticleXml(
+        buildMinimalCitation(
+          '1',
+          '<ELocationID EIdType="doi" ValidYN="Y">10.1234/elocation</ELocationID>',
+        ),
+        '<ArticleIdList><ArticleId IdType="doi">10.1234/aidlist</ArticleId></ArticleIdList>',
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.articleIds.doi).toBe('10.1234/aidlist');
+    });
+  });
+
+  describe('missing field fallbacks', () => {
+    it('should default PMID to empty string when missing', () => {
+      const xml = buildArticleXml(
+        '<Article><ArticleTitle>T</ArticleTitle><Journal><Title>J</Title><ISOAbbreviation>J</ISOAbbreviation><JournalIssue><PubDate><Year>2024</Year></PubDate></JournalIssue></Journal><Language>eng</Language></Article>',
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.pmid).toBe('');
+    });
+
+    it('should default title to empty string when ArticleTitle block is missing', () => {
+      const xml = buildArticleXml(
+        '<PMID>1</PMID><Article><Journal><Title>J</Title><ISOAbbreviation>J</ISOAbbreviation><JournalIssue><PubDate><Year>2024</Year></PubDate></JournalIssue></Journal><Language>eng</Language></Article>',
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.title).toBe('');
+    });
+
+    it('should default language to empty string when missing', () => {
+      const xml = buildArticleXml(
+        '<PMID>1</PMID><Article><ArticleTitle>T</ArticleTitle><Journal><Title>J</Title><ISOAbbreviation>J</ISOAbbreviation><JournalIssue><PubDate><Year>2024</Year></PubDate></JournalIssue></Journal></Article>',
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.language).toBe('');
+    });
+
+    it('should handle missing Journal block', () => {
+      const xml = buildArticleXml(
+        '<PMID>1</PMID><Article><ArticleTitle>T</ArticleTitle><Language>eng</Language></Article>',
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.journal.title).toBe('');
+      expect(firstArticle.journal.isoAbbrev).toBe('');
+      expect(firstArticle.publicationDate.year).toBe(0);
+    });
+
+    it('should handle Journal without JournalIssue block', () => {
+      const xml = buildArticleXml(
+        '<PMID>1</PMID><Article><ArticleTitle>T</ArticleTitle><Journal><Title>Nature</Title><ISOAbbreviation>Nat</ISOAbbreviation></Journal><Language>eng</Language></Article>',
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.journal.title).toBe('Nature');
+      expect(firstArticle.journal.volume).toBeUndefined();
+      expect(firstArticle.journal.issue).toBeUndefined();
+      expect(firstArticle.publicationDate.year).toBe(0);
+    });
+
+    it('should handle JournalIssue without PubDate', () => {
+      const xml = buildArticleXml(
+        '<PMID>1</PMID><Article><ArticleTitle>T</ArticleTitle><Journal><Title>J</Title><ISOAbbreviation>J</ISOAbbreviation><JournalIssue><Volume>1</Volume></JournalIssue></Journal><Language>eng</Language></Article>',
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.publicationDate.year).toBe(0);
+    });
+
+    it('should handle empty PubmedData', () => {
+      const xml = buildArticleXml(buildMinimalCitation('1', ''));
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.articleIds.pmid).toBe('1');
+      expect(firstArticle.articleIds.doi).toBeUndefined();
+    });
+  });
+
+  describe('abstract edge cases', () => {
+    it('should handle Abstract block with no AbstractText children', () => {
+      const xml = buildArticleXml(
+        buildMinimalCitation(
+          '1',
+          '<Abstract><CopyrightInformation>2024</CopyrightInformation></Abstract>',
+        ),
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.abstract.structured).toBe(false);
+      expect(firstArticle.abstract.text).toBe('');
+    });
+
+    it('should handle structured abstract section without Label', () => {
+      const xml = buildArticleXml(
+        buildMinimalCitation(
+          '1',
+          '<Abstract><AbstractText Label="INTRO">Intro text.</AbstractText><AbstractText>Unlabeled text.</AbstractText></Abstract>',
+        ),
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.abstract.structured).toBe(true);
+      expect(firstArticle.abstract.sections).toHaveLength(2);
+      expect(firstArticle.abstract.sections![1]!.label).toBe('');
+    });
+  });
+
+  describe('author edge cases', () => {
+    it('should handle author without lastName and foreName', () => {
+      const xml = buildArticleXml(
+        buildMinimalCitation(
+          '1',
+          '<AuthorList><Author><Initials>JA</Initials></Author></AuthorList>',
+        ),
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.authors).toHaveLength(1);
+      expect(firstArticle.authors[0]!.lastName).toBeUndefined();
+      expect(firstArticle.authors[0]!.foreName).toBeUndefined();
+      expect(firstArticle.authors[0]!.initials).toBe('JA');
+    });
+
+    it('should handle AffiliationInfo block without Affiliation tag', () => {
+      const xml = buildArticleXml(
+        buildMinimalCitation(
+          '1',
+          '<AuthorList><Author><LastName>Kim</LastName><ForeName>Bob</ForeName><Initials>B</Initials><AffiliationInfo><Identifier Source="ISNI">0000000123</Identifier></AffiliationInfo></Author></AuthorList>',
+        ),
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.authors[0]!.affiliations).toEqual([]);
+    });
+  });
+
+  describe('MeSH edge cases', () => {
+    it('should skip MeshHeading without DescriptorName', () => {
+      const xml = buildArticleXml(
+        buildMinimalCitation(
+          '1',
+          '',
+          '<MeshHeadingList><MeshHeading><QualifierName UI="Q001" MajorTopicYN="N">pathology</QualifierName></MeshHeading></MeshHeadingList>',
+        ),
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.mesh).toHaveLength(0);
+    });
+
+    it('should handle DescriptorName without UI attribute', () => {
+      const xml = buildArticleXml(
+        buildMinimalCitation(
+          '1',
+          '',
+          '<MeshHeadingList><MeshHeading><DescriptorName MajorTopicYN="N">Humans</DescriptorName></MeshHeading></MeshHeadingList>',
+        ),
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.mesh[0]!.descriptorUI).toBe('');
+    });
+
+    it('should handle DescriptorName without MajorTopicYN attribute', () => {
+      const xml = buildArticleXml(
+        buildMinimalCitation(
+          '1',
+          '',
+          '<MeshHeadingList><MeshHeading><DescriptorName UI="D001">Adult</DescriptorName></MeshHeading></MeshHeadingList>',
+        ),
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.mesh[0]!.majorTopic).toBe(false);
+    });
+
+    it('should handle QualifierName without UI attribute', () => {
+      const xml = buildArticleXml(
+        buildMinimalCitation(
+          '1',
+          '',
+          '<MeshHeadingList><MeshHeading><DescriptorName UI="D001" MajorTopicYN="N">Brain</DescriptorName><QualifierName MajorTopicYN="N">pathology</QualifierName></MeshHeading></MeshHeadingList>',
+        ),
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.mesh[0]!.qualifiers[0]!.ui).toBe('');
+    });
+  });
+
+  describe('grant edge cases', () => {
+    it('should handle grant without optional fields', () => {
+      const xml = buildArticleXml(
+        buildMinimalCitation('1', '<GrantList><Grant></Grant></GrantList>'),
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.grants).toHaveLength(1);
+      expect(firstArticle.grants[0]!.grantId).toBe('');
+      expect(firstArticle.grants[0]!.acronym).toBeUndefined();
+      expect(firstArticle.grants[0]!.agency).toBe('');
+      expect(firstArticle.grants[0]!.country).toBe('');
+    });
+  });
+
+  describe('comments corrections edge cases', () => {
+    it('should handle CommentsCorrections without RefType and RefSource', () => {
+      const xml = buildArticleXml(
+        buildMinimalCitation(
+          '1',
+          '',
+          '<CommentsCorrectionsList><CommentsCorrections></CommentsCorrections></CommentsCorrectionsList>',
+        ),
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.commentsCorrections).toHaveLength(1);
+      expect(firstArticle.commentsCorrections[0]!.refType).toBe('');
+      expect(firstArticle.commentsCorrections[0]!.refSource).toBe('');
+    });
+  });
+
+  describe('data bank edge cases', () => {
+    it('should handle DataBank without AccessionNumberList', () => {
+      const xml = buildArticleXml(
+        buildMinimalCitation(
+          '1',
+          '<DataBankList><DataBank><DataBankName>GEO</DataBankName></DataBank></DataBankList>',
+        ),
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.dataBanks).toHaveLength(1);
+      expect(firstArticle.dataBanks[0]!.name).toBe('GEO');
+      expect(firstArticle.dataBanks[0]!.accessionNumbers).toEqual([]);
+    });
+
+    it('should handle DataBank without DataBankName', () => {
+      const xml = buildArticleXml(
+        buildMinimalCitation(
+          '1',
+          '<DataBankList><DataBank><AccessionNumberList><AccessionNumber>AB001</AccessionNumber></AccessionNumberList></DataBank></DataBankList>',
+        ),
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.dataBanks[0]!.name).toBe('');
+    });
+  });
+
+  describe('date edge cases', () => {
+    it('should handle MedlineDate without numeric year', () => {
+      const xml = buildArticleXml(
+        '<PMID>1</PMID><Article><ArticleTitle>T</ArticleTitle><Journal><Title>J</Title><ISOAbbreviation>J</ISOAbbreviation><JournalIssue><PubDate><MedlineDate>Spring</MedlineDate></PubDate></JournalIssue></Journal><Language>eng</Language></Article>',
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.publicationDate.year).toBe(0);
+      expect(firstArticle.publicationDate.raw).toBe('Spring');
+    });
+
+    it('should handle PubDate with Year tag but no Month', () => {
+      const xml = buildArticleXml(
+        '<PMID>1</PMID><Article><ArticleTitle>T</ArticleTitle><Journal><Title>J</Title><ISOAbbreviation>J</ISOAbbreviation><JournalIssue><PubDate><Year>2020</Year></PubDate></JournalIssue></Journal><Language>eng</Language></Article>',
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.publicationDate.year).toBe(2020);
+      expect(firstArticle.publicationDate.month).toBeUndefined();
+    });
+
+    it('should handle PubDate without Year tag', () => {
+      const xml = buildArticleXml(
+        '<PMID>1</PMID><Article><ArticleTitle>T</ArticleTitle><Journal><Title>J</Title><ISOAbbreviation>J</ISOAbbreviation><JournalIssue><PubDate><Month>Jun</Month></PubDate></JournalIssue></Journal><Language>eng</Language></Article>',
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.publicationDate.year).toBe(0);
+      expect(firstArticle.publicationDate.month).toBe(6);
+    });
+
+    it('should handle unrecognized month name', () => {
+      const xml = buildArticleXml(
+        '<PMID>1</PMID><Article><ArticleTitle>T</ArticleTitle><Journal><Title>J</Title><ISOAbbreviation>J</ISOAbbreviation><JournalIssue><PubDate><Year>2020</Year><Month>xyz</Month></PubDate></JournalIssue></Journal><Language>eng</Language></Article>',
+      );
+      const firstArticle = parsePubmedXml(xml)[0] as PubmedArticle;
+      expect(firstArticle.publicationDate.month).toBeUndefined();
+    });
+  });
+
   describe('error handling', () => {
-    it('should throw on invalid XML', () => {
+    it('should throw when MedlineCitation is empty', () => {
       expect(() =>
         parsePubmedXml(
           '<PubmedArticleSet><PubmedArticle><MedlineCitation></MedlineCitation></PubmedArticle></PubmedArticleSet>',
         ),
-      ).toThrow();
+      ).toThrow('PubmedArticle is missing MedlineCitation');
+    });
+
+    it('should throw when MedlineCitation has no Article child', () => {
+      expect(() =>
+        parsePubmedXml(
+          '<PubmedArticleSet><PubmedArticle><MedlineCitation><PMID>1</PMID></MedlineCitation></PubmedArticle></PubmedArticleSet>',
+        ),
+      ).toThrow('MedlineCitation is missing Article');
     });
 
     it('should return empty array on empty input', () => {

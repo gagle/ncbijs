@@ -453,6 +453,29 @@ describe('PMC', () => {
       expect(record.mid).toBeUndefined();
     });
 
+    it('should handle null pmid and doi as undefined', async () => {
+      mockFetchJson({ ...S3_METADATA_RESPONSE, pmid: null, doi: null });
+      const pmc = new PMC(VALID_CONFIG);
+      const record = await pmc.oa.lookup('PMC12345');
+
+      expect(record.pmid).toBeUndefined();
+      expect(record.doi).toBeUndefined();
+    });
+
+    it('should handle S3 URLs without query strings', async () => {
+      mockFetchJson({
+        ...S3_METADATA_RESPONSE,
+        xml_url: 's3://pmc-oa-opendata/PMC12345.1/PMC12345.1.xml',
+        text_url: 's3://pmc-oa-opendata/PMC12345.1/PMC12345.1.txt',
+      });
+      const pmc = new PMC(VALID_CONFIG);
+      const record = await pmc.oa.lookup('PMC12345');
+
+      expect(record.xmlUrl).toBe(
+        'https://pmc-oa-opendata.s3.amazonaws.com/PMC12345.1/PMC12345.1.xml',
+      );
+    });
+
     it('should throw on non-existent article', async () => {
       mockFetchJson({}, 404);
       const pmc = new PMC(VALID_CONFIG);
@@ -768,6 +791,35 @@ describe('PMC', () => {
       expect(url).toContain('set=pmc-open');
     });
 
+    it('should handle records with missing header and metadata blocks', async () => {
+      mockFetchText(`<?xml version="1.0"?>
+<OAI-PMH>
+  <ListRecords>
+    <record>
+      <someOther>content</someOther>
+    </record>
+  </ListRecords>
+</OAI-PMH>`);
+      const pmc = new PMC(VALID_CONFIG);
+      const records: Array<unknown> = [];
+
+      for await (const record of pmc.oai.listRecords({ from: '2024-01-01' })) {
+        records.push(record);
+      }
+
+      expect(records).toHaveLength(1);
+      const oaiRecord = records[0] as {
+        identifier: string;
+        datestamp: string;
+        setSpec: string;
+        metadata: string;
+      };
+      expect(oaiRecord.identifier).toBe('');
+      expect(oaiRecord.datestamp).toBe('');
+      expect(oaiRecord.setSpec).toBe('');
+      expect(oaiRecord.metadata).toBe('');
+    });
+
     it('should support metadataPrefix option', async () => {
       mockFetchText(OAI_LIST_RESPONSE);
       const pmc = new PMC(VALID_CONFIG);
@@ -939,7 +991,9 @@ describe('PMC', () => {
     it('should throw when record block is missing inside GetRecord', async () => {
       mockFetchText(`<?xml version="1.0"?>
 <OAI-PMH>
-  <GetRecord></GetRecord>
+  <GetRecord>
+    <someOtherElement>data</someOtherElement>
+  </GetRecord>
 </OAI-PMH>`);
       const pmc = new PMC(VALID_CONFIG);
 

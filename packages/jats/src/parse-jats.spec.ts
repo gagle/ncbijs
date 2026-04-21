@@ -649,6 +649,125 @@ describe('parseJATS', () => {
     });
   });
 
+  describe('edge cases', () => {
+    it('should include authors without contrib-type attribute', () => {
+      const xml = wrap(
+        wrapFront(
+          '',
+          `<title-group><article-title>T</article-title></title-group>
+          <contrib-group><contrib><name><surname>Doe</surname></name></contrib></contrib-group>`,
+        ),
+      );
+      const result = parseJATS(xml);
+      expect(result.front.article.authors).toHaveLength(1);
+      expect(result.front.article.authors[0]!.lastName).toBe('Doe');
+    });
+
+    it('should handle author without name block', () => {
+      const xml = wrap(
+        wrapFront(
+          '',
+          `<title-group><article-title>T</article-title></title-group>
+          <contrib-group><contrib contrib-type="author"></contrib></contrib-group>`,
+        ),
+      );
+      const result = parseJATS(xml);
+      expect(result.front.article.authors).toHaveLength(1);
+    });
+
+    it('should handle pub-date with no year', () => {
+      const xml = wrap(
+        wrapFront(
+          '',
+          '<title-group><article-title>T</article-title></title-group><pub-date><month>03</month></pub-date>',
+        ),
+      );
+      const result = parseJATS(xml);
+      expect(result.front.article.publicationDate).toBeUndefined();
+    });
+
+    it('should fall back to first pub-date when no preferred type', () => {
+      const xml = wrap(
+        wrapFront(
+          '',
+          `<title-group><article-title>T</article-title></title-group>
+          <pub-date date-type="collection"><year>2023</year></pub-date>`,
+        ),
+      );
+      const result = parseJATS(xml);
+      expect(result.front.article.publicationDate?.year).toBe(2023);
+    });
+
+    it('should handle section with no title', () => {
+      const xml = wrap(MINIMAL_FRONT, '<body><sec><p>Paragraph.</p></sec></body>');
+      const result = parseJATS(xml);
+      expect(result.body[0]!.title).toBe('');
+      expect(result.body[0]!.paragraphs).toEqual(['Paragraph.']);
+    });
+
+    it('should handle figure without id, label, or caption', () => {
+      const xml = wrap(
+        MINIMAL_FRONT,
+        '<body><sec><title>R</title><fig><graphic /></fig></sec></body>',
+      );
+      const result = parseJATS(xml);
+      expect(result.body[0]!.figures[0]!.id).toBe('');
+      expect(result.body[0]!.figures[0]!.label).toBe('');
+      expect(result.body[0]!.figures[0]!.caption).toBe('');
+    });
+
+    it('should handle reference without id attribute', () => {
+      const xml = wrap(
+        MINIMAL_FRONT,
+        '',
+        '<back><ref-list><ref><element-citation><article-title>Title</article-title><source>Src</source></element-citation></ref></ref-list></back>',
+      );
+      const result = parseJATS(xml);
+      expect(result.back.references[0]!.id).toBe('');
+    });
+
+    it('should handle reference author with surname only', () => {
+      const xml = wrap(
+        MINIMAL_FRONT,
+        '',
+        '<back><ref-list><ref id="ref1"><element-citation><person-group><name><surname>Smith</surname></name></person-group><article-title>T</article-title><source>S</source></element-citation></ref></ref-list></back>',
+      );
+      const result = parseJATS(xml);
+      expect(result.back.references[0]!.authors).toEqual(['Smith']);
+    });
+
+    it('should handle reference with mixed-citation', () => {
+      const xml = wrap(
+        MINIMAL_FRONT,
+        '',
+        '<back><ref-list><ref id="ref1"><mixed-citation><person-group><name><surname>Doe</surname><given-names>J</given-names></name></person-group><article-title>Study</article-title><source>J</source><year>2020</year></mixed-citation></ref></ref-list></back>',
+      );
+      const result = parseJATS(xml);
+      expect(result.back.references[0]!.authors).toEqual(['Doe J']);
+      expect(result.back.references[0]!.year).toBe(2020);
+    });
+
+    it('should handle reference with fpage only', () => {
+      const xml = wrap(
+        MINIMAL_FRONT,
+        '',
+        '<back><ref-list><ref id="ref1"><element-citation><article-title>T</article-title><source>S</source><fpage>100</fpage></element-citation></ref></ref-list></back>',
+      );
+      const result = parseJATS(xml);
+      expect(result.back.references[0]!.pages).toBe('100');
+    });
+
+    it('should handle table without thead using tbody as fallback', () => {
+      const xml = wrap(
+        MINIMAL_FRONT,
+        '<body><sec><title>R</title><table-wrap><table><tbody><tr><td>A</td></tr></tbody></table></table-wrap></sec></body>',
+      );
+      const result = parseJATS(xml);
+      expect(result.body[0]!.tables[0]!.headers).toEqual([]);
+      expect(result.body[0]!.tables[0]!.rows).toEqual([['A']]);
+    });
+  });
+
   describe('supplementary materials', () => {
     it('should handle supplementary material elements', () => {
       const xml = wrap(
