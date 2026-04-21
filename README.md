@@ -14,6 +14,8 @@
 
 ---
 
+> **Disclaimer**: This is an **unofficial**, community-maintained SDK. It is not affiliated with, endorsed by, or related to the [National Center for Biotechnology Information (NCBI)](https://www.ncbi.nlm.nih.gov/) or the [NCBI GitHub organization](https://github.com/ncbi). For official NCBI tools and resources, visit [ncbi.nlm.nih.gov/home/develop](https://www.ncbi.nlm.nih.gov/home/develop/).
+
 ## What is NCBI?
 
 The [National Center for Biotechnology Information](https://www.ncbi.nlm.nih.gov/) (NCBI), part of the U.S. National Library of Medicine (NLM), maintains the world's largest collection of biomedical databases. These include **PubMed** (37M+ article citations), **PubMed Central** (PMC, 9M+ full-text articles), **MeSH** (controlled medical vocabulary), **BLAST** (sequence alignment), **dbSNP** (genetic variation), **ClinVar** (clinical variants), **PubChem** (chemical compounds), and many more. Researchers, clinicians, and developers rely on NCBI's public APIs to search, retrieve, and analyze biomedical data programmatically.
