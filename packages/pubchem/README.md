@@ -114,6 +114,29 @@ Fetch details for multiple bioassays by AID in a single request.
 
 Fetch a summary of substance and compound counts for a bioassay.
 
+### PUG View Annotations
+
+#### `compoundAnnotations(cid: number, heading?: string): Promise<AnnotationRecord>`
+
+Fetch full compound annotations (GHS classification, patents, pharmacology). Pass `heading` to filter to a specific section.
+
+#### `substanceAnnotations(sid: number, heading?: string): Promise<AnnotationRecord>`
+
+Fetch full substance annotations.
+
+#### `assayAnnotations(aid: number, heading?: string): Promise<AnnotationRecord>`
+
+Fetch full bioassay annotations.
+
+```ts
+const annotations = await pubchem.compoundAnnotations(2244);
+console.log(annotations.recordTitle); // 'Aspirin'
+console.log(annotations.sections.length);
+
+const ghs = await pubchem.compoundAnnotations(2244, 'GHS Classification');
+console.log(ghs.sections[0].tocHeading);
+```
+
 ## Error handling
 
 ```ts
@@ -216,5 +239,38 @@ interface AssaySummary {
   name: string;
   sidCount: number;
   cidCount: number;
+}
+```
+
+### `AnnotationRecord`
+
+```ts
+interface AnnotationRecord {
+  recordType: string;
+  recordNumber: number;
+  recordTitle: string;
+  sections: Array<AnnotationSection>;
+}
+```
+
+### `AnnotationSection`
+
+```ts
+interface AnnotationSection {
+  tocHeading: string;
+  description: string;
+  sections: Array<AnnotationSection>;
+  information: Array<AnnotationData>;
+}
+```
+
+### `AnnotationData`
+
+```ts
+interface AnnotationData {
+  referenceNumber: number;
+  name: string;
+  value: string;
+  url: string;
 }
 ```

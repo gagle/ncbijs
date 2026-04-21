@@ -2,6 +2,9 @@ import { TokenBucket } from '@ncbijs/rate-limiter';
 import { fetchJson } from './pubchem-client';
 import type { PubChemClientConfig } from './pubchem-client';
 import type {
+  AnnotationData,
+  AnnotationRecord,
+  AnnotationSection,
   AssayRecord,
   AssaySummary,
   CompoundDescription,
@@ -13,6 +16,7 @@ import type {
 } from './interfaces/pubchem.interface';
 
 const BASE_URL = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug';
+const PUG_VIEW_BASE_URL = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug_view';
 const REQUESTS_PER_SECOND = 5;
 
 const COMPOUND_PROPERTIES = [
@@ -193,6 +197,36 @@ export class PubChem {
       cidCount: information?.CID?.length ?? 0,
     };
   }
+
+  public async compoundAnnotations(cid: number, heading?: string): Promise<AnnotationRecord> {
+    let url = `${PUG_VIEW_BASE_URL}/data/compound/${encodeURIComponent(cid)}/JSON`;
+    if (heading !== undefined) {
+      url += `?heading=${encodeURIComponent(heading)}`;
+    }
+    const raw = await fetchJson<RawPugViewResponse>(url, this._config);
+
+    return mapAnnotationRecord(raw.Record);
+  }
+
+  public async substanceAnnotations(sid: number, heading?: string): Promise<AnnotationRecord> {
+    let url = `${PUG_VIEW_BASE_URL}/data/substance/${encodeURIComponent(sid)}/JSON`;
+    if (heading !== undefined) {
+      url += `?heading=${encodeURIComponent(heading)}`;
+    }
+    const raw = await fetchJson<RawPugViewResponse>(url, this._config);
+
+    return mapAnnotationRecord(raw.Record);
+  }
+
+  public async assayAnnotations(aid: number, heading?: string): Promise<AnnotationRecord> {
+    let url = `${PUG_VIEW_BASE_URL}/data/bioassay/${encodeURIComponent(aid)}/JSON`;
+    if (heading !== undefined) {
+      url += `?heading=${encodeURIComponent(heading)}`;
+    }
+    const raw = await fetchJson<RawPugViewResponse>(url, this._config);
+
+    return mapAnnotationRecord(raw.Record);
+  }
 }
 
 interface RawPropertyResponse {
@@ -351,5 +385,66 @@ function mapCompoundPropertyEntry(property: RawCompoundProperty): CompoundProper
     hBondAcceptorCount: property.HBondAcceptorCount ?? 0,
     rotatableBondCount: property.RotatableBondCount ?? 0,
     heavyAtomCount: property.HeavyAtomCount ?? 0,
+  };
+}
+
+interface RawPugViewResponse {
+  readonly Record?: RawPugViewRecord;
+}
+
+interface RawPugViewRecord {
+  readonly RecordType?: string;
+  readonly RecordNumber?: number;
+  readonly RecordTitle?: string;
+  readonly Section?: ReadonlyArray<RawPugViewSection>;
+}
+
+interface RawPugViewSection {
+  readonly TOCHeading?: string;
+  readonly Description?: string;
+  readonly Section?: ReadonlyArray<RawPugViewSection>;
+  readonly Information?: ReadonlyArray<RawPugViewInformation>;
+}
+
+interface RawPugViewInformation {
+  readonly ReferenceNumber?: number;
+  readonly Name?: string;
+  readonly Value?: RawPugViewValue;
+  readonly URL?: string;
+}
+
+interface RawPugViewValue {
+  readonly StringWithMarkup?: ReadonlyArray<{ readonly String?: string }>;
+  readonly Number?: ReadonlyArray<number>;
+}
+
+function mapAnnotationRecord(raw?: RawPugViewRecord): AnnotationRecord {
+  return {
+    recordType: raw?.RecordType ?? '',
+    recordNumber: raw?.RecordNumber ?? 0,
+    recordTitle: raw?.RecordTitle ?? '',
+    sections: (raw?.Section ?? []).map(mapAnnotationSection),
+  };
+}
+
+function mapAnnotationSection(raw: RawPugViewSection): AnnotationSection {
+  return {
+    tocHeading: raw.TOCHeading ?? '',
+    description: raw.Description ?? '',
+    sections: (raw.Section ?? []).map(mapAnnotationSection),
+    information: (raw.Information ?? []).map(mapAnnotationData),
+  };
+}
+
+function mapAnnotationData(raw: RawPugViewInformation): AnnotationData {
+  const stringValue = raw.Value?.StringWithMarkup?.[0]?.String ?? '';
+  const numberValue = raw.Value?.Number?.[0];
+  const value = stringValue || (numberValue !== undefined ? String(numberValue) : '');
+
+  return {
+    referenceNumber: raw.ReferenceNumber ?? 0,
+    name: raw.Name ?? '',
+    value,
+    url: raw.URL ?? '',
   };
 }

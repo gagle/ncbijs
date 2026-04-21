@@ -60,3 +60,24 @@ export interface AssaySummary {
   readonly sidCount: number;
   readonly cidCount: number;
 }
+
+export interface AnnotationRecord {
+  readonly recordType: string;
+  readonly recordNumber: number;
+  readonly recordTitle: string;
+  readonly sections: ReadonlyArray<AnnotationSection>;
+}
+
+export interface AnnotationSection {
+  readonly tocHeading: string;
+  readonly description: string;
+  readonly sections: ReadonlyArray<AnnotationSection>;
+  readonly information: ReadonlyArray<AnnotationData>;
+}
+
+export interface AnnotationData {
+  readonly referenceNumber: number;
+  readonly name: string;
+  readonly value: string;
+  readonly url: string;
+}

@@ -474,6 +474,157 @@ describe('Snp', () => {
     });
   });
 
+  describe('spdiToHgvs', () => {
+    it('should convert SPDI to HGVS notation', async () => {
+      mockFetchJson({ data: { hgvs: 'NC_000019.10:g.44908822C>T' } });
+      const snp = new Snp();
+
+      const result = await snp.spdiToHgvs('NC_000019.10:44908821:C:T');
+
+      expect(result.hgvs).toBe('NC_000019.10:g.44908822C>T');
+    });
+
+    it('should build correct URL with encoded SPDI', async () => {
+      mockFetchJson({ data: { hgvs: 'NC_000019.10:g.44908822C>T' } });
+      const snp = new Snp();
+
+      await snp.spdiToHgvs('NC_000019.10:44908821:C:T');
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0]!;
+      const url = fetchCall[0] as string;
+      expect(url).toBe(
+        'https://api.ncbi.nlm.nih.gov/variation/v0/spdi/NC_000019.10%3A44908821%3AC%3AT/hgvs',
+      );
+    });
+
+    it('should handle missing data', async () => {
+      mockFetchJson({});
+      const snp = new Snp();
+
+      const result = await snp.spdiToHgvs('NC_000019.10:44908821:C:T');
+
+      expect(result.hgvs).toBe('');
+    });
+  });
+
+  describe('hgvsToSpdi', () => {
+    it('should convert HGVS to SPDI contextual alleles', async () => {
+      mockFetchJson({
+        data: {
+          spdis: [
+            {
+              seq_id: 'NC_000019.10',
+              position: 44908821,
+              deleted_sequence: 'C',
+              inserted_sequence: 'T',
+            },
+          ],
+        },
+      });
+      const snp = new Snp();
+
+      const results = await snp.hgvsToSpdi('NC_000019.10:g.44908822C>T');
+
+      expect(results).toHaveLength(1);
+      expect(results[0]!.seqId).toBe('NC_000019.10');
+      expect(results[0]!.position).toBe(44908821);
+      expect(results[0]!.deletedSequence).toBe('C');
+      expect(results[0]!.insertedSequence).toBe('T');
+    });
+
+    it('should handle missing data', async () => {
+      mockFetchJson({});
+      const snp = new Snp();
+
+      const results = await snp.hgvsToSpdi('NC_000019.10:g.44908822C>T');
+
+      expect(results).toEqual([]);
+    });
+
+    it('should handle missing spdi fields', async () => {
+      mockFetchJson({ data: { spdis: [{}] } });
+      const snp = new Snp();
+
+      const results = await snp.hgvsToSpdi('NC_000019.10:g.44908822C>T');
+
+      expect(results[0]!.seqId).toBe('');
+      expect(results[0]!.position).toBe(0);
+      expect(results[0]!.deletedSequence).toBe('');
+      expect(results[0]!.insertedSequence).toBe('');
+    });
+  });
+
+  describe('vcfToSpdi', () => {
+    it('should convert VCF to SPDI contextual alleles', async () => {
+      mockFetchJson({
+        data: {
+          spdis: [
+            {
+              seq_id: 'NC_000019.10',
+              position: 44908821,
+              deleted_sequence: 'C',
+              inserted_sequence: 'T',
+            },
+          ],
+        },
+      });
+      const snp = new Snp();
+
+      const results = await snp.vcfToSpdi('19', 44908822, 'C', 'T');
+
+      expect(results).toHaveLength(1);
+      expect(results[0]!.seqId).toBe('NC_000019.10');
+    });
+
+    it('should build correct URL with VCF components', async () => {
+      mockFetchJson({ data: { spdis: [] } });
+      const snp = new Snp();
+
+      await snp.vcfToSpdi('19', 44908822, 'C', 'T');
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0]!;
+      const url = fetchCall[0] as string;
+      expect(url).toBe('https://api.ncbi.nlm.nih.gov/variation/v0/vcf/19/44908822/C/T/contextuals');
+    });
+
+    it('should handle missing data', async () => {
+      mockFetchJson({});
+      const snp = new Snp();
+
+      const results = await snp.vcfToSpdi('19', 44908822, 'C', 'T');
+
+      expect(results).toEqual([]);
+    });
+  });
+
+  describe('spdiToVcfFields', () => {
+    it('should convert SPDI to VCF fields', async () => {
+      mockFetchJson({
+        data: { chrom: '19', pos: 44908822, ref: 'C', alt: 'T' },
+      });
+      const snp = new Snp();
+
+      const result = await snp.spdiToVcfFields('NC_000019.10:44908821:C:T');
+
+      expect(result.chrom).toBe('19');
+      expect(result.pos).toBe(44908822);
+      expect(result.ref).toBe('C');
+      expect(result.alt).toBe('T');
+    });
+
+    it('should handle missing data', async () => {
+      mockFetchJson({});
+      const snp = new Snp();
+
+      const result = await snp.spdiToVcfFields('NC_000019.10:44908821:C:T');
+
+      expect(result.chrom).toBe('');
+      expect(result.pos).toBe(0);
+      expect(result.ref).toBe('');
+      expect(result.alt).toBe('');
+    });
+  });
+
   describe('configuration', () => {
     it('should accept API key in config', async () => {
       mockFetchJson(buildRefSnpResponse());

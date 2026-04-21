@@ -1018,6 +1018,164 @@ describe('PubChem', () => {
     });
   });
 
+  describe('compoundAnnotations', () => {
+    it('should fetch compound annotations and map fields', async () => {
+      mockFetchJson({
+        Record: {
+          RecordType: 'CID',
+          RecordNumber: 2244,
+          RecordTitle: 'Aspirin',
+          Section: [
+            {
+              TOCHeading: 'Names and Identifiers',
+              Description: 'Chemical names',
+              Section: [],
+              Information: [
+                {
+                  ReferenceNumber: 1,
+                  Name: 'IUPAC Name',
+                  Value: { StringWithMarkup: [{ String: '2-acetyloxybenzoic acid' }] },
+                  URL: 'https://example.com',
+                },
+              ],
+            },
+          ],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const record = await pubchem.compoundAnnotations(2244);
+
+      expect(record.recordType).toBe('CID');
+      expect(record.recordNumber).toBe(2244);
+      expect(record.recordTitle).toBe('Aspirin');
+      expect(record.sections).toHaveLength(1);
+      expect(record.sections[0]!.tocHeading).toBe('Names and Identifiers');
+      expect(record.sections[0]!.information[0]!.name).toBe('IUPAC Name');
+      expect(record.sections[0]!.information[0]!.value).toBe('2-acetyloxybenzoic acid');
+    });
+
+    it('should build correct URL without heading', async () => {
+      mockFetchJson({ Record: {} });
+      const pubchem = new PubChem();
+
+      await pubchem.compoundAnnotations(2244);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe('https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/2244/JSON');
+    });
+
+    it('should build correct URL with heading filter', async () => {
+      mockFetchJson({ Record: {} });
+      const pubchem = new PubChem();
+
+      await pubchem.compoundAnnotations(2244, 'GHS Classification');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe(
+        'https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/2244/JSON?heading=GHS%20Classification',
+      );
+    });
+
+    it('should handle missing Record', async () => {
+      mockFetchJson({});
+      const pubchem = new PubChem();
+
+      const record = await pubchem.compoundAnnotations(1);
+
+      expect(record.recordType).toBe('');
+      expect(record.recordNumber).toBe(0);
+      expect(record.recordTitle).toBe('');
+      expect(record.sections).toEqual([]);
+    });
+
+    it('should handle numeric annotation values', async () => {
+      mockFetchJson({
+        Record: {
+          Section: [
+            {
+              TOCHeading: 'Properties',
+              Information: [
+                {
+                  ReferenceNumber: 1,
+                  Name: 'Molecular Weight',
+                  Value: { Number: [180.16] },
+                },
+              ],
+            },
+          ],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const record = await pubchem.compoundAnnotations(2244);
+
+      expect(record.sections[0]!.information[0]!.value).toBe('180.16');
+    });
+
+    it('should handle nested sections', async () => {
+      mockFetchJson({
+        Record: {
+          Section: [
+            {
+              TOCHeading: 'Parent',
+              Section: [{ TOCHeading: 'Child', Information: [] }],
+            },
+          ],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const record = await pubchem.compoundAnnotations(2244);
+
+      expect(record.sections[0]!.sections[0]!.tocHeading).toBe('Child');
+    });
+  });
+
+  describe('substanceAnnotations', () => {
+    it('should build correct URL', async () => {
+      mockFetchJson({ Record: {} });
+      const pubchem = new PubChem();
+
+      await pubchem.substanceAnnotations(175);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe('https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/substance/175/JSON');
+    });
+
+    it('should build correct URL with heading', async () => {
+      mockFetchJson({ Record: {} });
+      const pubchem = new PubChem();
+
+      await pubchem.substanceAnnotations(175, 'Depositor Comments');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('?heading=Depositor%20Comments');
+    });
+  });
+
+  describe('assayAnnotations', () => {
+    it('should build correct URL', async () => {
+      mockFetchJson({ Record: {} });
+      const pubchem = new PubChem();
+
+      await pubchem.assayAnnotations(1000);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe('https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/bioassay/1000/JSON');
+    });
+
+    it('should build correct URL with heading', async () => {
+      mockFetchJson({ Record: {} });
+      const pubchem = new PubChem();
+
+      await pubchem.assayAnnotations(1000, 'Protocol');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('?heading=Protocol');
+    });
+  });
+
   describe('configuration', () => {
     it('should work without any config', async () => {
       mockFetchJson(buildPropertyResponse());

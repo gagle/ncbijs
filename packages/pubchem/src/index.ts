@@ -1,4 +1,7 @@
 export type {
+  AnnotationData,
+  AnnotationRecord,
+  AnnotationSection,
   AssayRecord,
   AssaySummary,
   CompoundDescription,

@@ -24,7 +24,7 @@ pnpm nx run ncbijs-e2e:e2e
 - **Language**: TypeScript 6, ES2022 target, `strict: true`
 - **Module**: ESM-only (`"type": "module"`), `moduleResolution: "bundler"`, no `.js` in source imports
 - **Build**: `tsc` + post-build script (`scripts/add-import-extensions.mjs`) adds `.js` to compiled output
-- **Zero-dep philosophy**: Most packages have zero runtime dependencies. `eutils` depends on `rate-limiter` + `openapi-fetch`. `datasets`, `blast`, `snp`, `clinvar`, `pubchem` depend on `rate-limiter`. `pubmed` and `pmc` depend only on internal `@ncbijs/*` packages.
+- **Zero-dep philosophy**: Most packages have zero runtime dependencies. `eutils` depends on `rate-limiter` + `openapi-fetch`. `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `clinical-trials`, `icite`, `rxnorm` depend on `rate-limiter`. `pubmed` and `pmc` depend only on internal `@ncbijs/*` packages. `litvar`, `bioc`, `clinical-tables` are zero-dep.
 
 ### Package dependency graph
 
@@ -39,14 +39,17 @@ rate-limiter ─────┤               │
                   ├─ datasets
                   ├─ blast
                   ├─ snp
-                  └─ pubchem
-fasta, id-converter, mesh, cite  (all zero-dep, independent)
+                  ├─ pubchem
+                  ├─ clinical-trials
+                  ├─ icite
+                  └─ rxnorm
+fasta, id-converter, mesh, cite, litvar, bioc, clinical-tables  (all zero-dep, independent)
 ```
 
 ### Build order (Nx topological)
 
-1. Zero-dep parallel: `rate-limiter`, `xml`, `id-converter`, `mesh`, `cite`, `fasta`
-2. `eutils` (after `rate-limiter` + `xml`), `datasets` (after `rate-limiter`), `blast` (after `rate-limiter`), `snp` (after `rate-limiter`), `pubchem` (after `rate-limiter`), `pubmed-xml` (after `xml`), `jats` (after `xml`), `pubtator` (after `xml`), `clinvar` (after `rate-limiter`)
+1. Zero-dep parallel: `rate-limiter`, `xml`, `id-converter`, `mesh`, `cite`, `fasta`, `litvar`, `bioc`, `clinical-tables`
+2. `eutils`, `datasets`, `blast`, `snp`, `pubchem`, `pubmed-xml`, `jats`, `pubtator`, `clinvar`, `clinical-trials`, `icite`, `rxnorm`
 3. `pubmed` (after `eutils` + `pubmed-xml`), `pmc` (after `eutils` + `jats`)
 
 ## Rules and Skills
@@ -106,7 +109,7 @@ packages/{name}/
 
 - Prettier: 100 width, single quotes, trailing commas, 2-space indent, LF
 - Commit: `{type}({scope}): {subject}` (conventional commits via commitlint)
-- Scopes: `eutils`, `pubmed-xml`, `pubmed`, `jats`, `pmc`, `id-converter`, `pubtator`, `mesh`, `cite`, `rate-limiter`, `xml`, `fasta`, `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `workspace`
+- Scopes: `eutils`, `pubmed-xml`, `pubmed`, `jats`, `pmc`, `id-converter`, `pubtator`, `mesh`, `cite`, `rate-limiter`, `xml`, `fasta`, `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `clinical-trials`, `icite`, `rxnorm`, `litvar`, `bioc`, `clinical-tables`, `workspace`
 
 ### Adding a new package
 

@@ -1377,4 +1377,151 @@ describe('EUtils', () => {
       await expect(client.esearch({ db: 'pubmed', term: 'test' })).rejects.toThrow(EUtilsHttpError);
     });
   });
+
+  describe('searchAndFetch', () => {
+    it('should chain esearch with usehistory and efetchBatches', async () => {
+      mockFetchSequence([
+        { body: ESEARCH_HISTORY_XML, status: 200 },
+        { body: '<articles>batch1</articles>', status: 200 },
+        { body: '', status: 200 },
+      ]);
+      const client = createClient();
+
+      const batches = await drainAsyncIterator(
+        client.searchAndFetch({ db: 'pubmed', term: 'test' }),
+      );
+
+      expect(batches).toHaveLength(1);
+      expect(batches[0]).toContain('batch1');
+    });
+
+    it('should pass rettype and retmode to efetch', async () => {
+      mockFetchSequence([
+        { body: ESEARCH_HISTORY_XML, status: 200 },
+        { body: '<data />', status: 200 },
+        { body: '', status: 200 },
+      ]);
+      const client = createClient();
+
+      await drainAsyncIterator(
+        client.searchAndFetch({ db: 'pubmed', term: 'test', rettype: 'abstract', retmode: 'xml' }),
+      );
+
+      const calls = (fetch as ReturnType<typeof vi.fn>).mock.calls;
+      const efetchUrl = (calls[1]![0] as Request).url;
+      expect(efetchUrl).toContain('rettype=abstract');
+      expect(efetchUrl).toContain('retmode=xml');
+    });
+
+    it('should pass batchSize to efetchBatches', async () => {
+      mockFetchSequence([
+        { body: ESEARCH_HISTORY_XML, status: 200 },
+        { body: '<data />', status: 200 },
+        { body: '', status: 200 },
+      ]);
+      const client = createClient();
+
+      await drainAsyncIterator(
+        client.searchAndFetch({ db: 'pubmed', term: 'test', batchSize: 100 }),
+      );
+
+      const calls = (fetch as ReturnType<typeof vi.fn>).mock.calls;
+      const efetchUrl = (calls[1]![0] as Request).url;
+      expect(efetchUrl).toContain('retmax=100');
+    });
+
+    it('should yield nothing when esearch returns no webEnv', async () => {
+      mockFetch(ESEARCH_XML);
+      const client = createClient();
+
+      const batches = await drainAsyncIterator(
+        client.searchAndFetch({ db: 'pubmed', term: 'test' }),
+      );
+
+      expect(batches).toHaveLength(0);
+    });
+
+    it('should send usehistory=y and retmax=0 to esearch', async () => {
+      mockFetchSequence([
+        { body: ESEARCH_HISTORY_XML, status: 200 },
+        { body: '<data />', status: 200 },
+        { body: '', status: 200 },
+      ]);
+      const client = createClient();
+
+      await drainAsyncIterator(client.searchAndFetch({ db: 'pubmed', term: 'test' }));
+
+      const calls = (fetch as ReturnType<typeof vi.fn>).mock.calls;
+      const esearchUrl = (calls[0]![0] as Request).url;
+      expect(esearchUrl).toContain('usehistory=y');
+      expect(esearchUrl).toContain('retmax=0');
+    });
+  });
+
+  describe('searchAndSummarize', () => {
+    it('should chain esearch with usehistory and esummary batches', async () => {
+      mockFetchSequence([
+        { body: ESEARCH_HISTORY_XML, status: 200 },
+        { body: ESUMMARY_XML, status: 200 },
+      ]);
+      const client = createClient();
+
+      const results = await drainAsyncIterator(
+        client.searchAndSummarize({ db: 'pubmed', term: 'test' }),
+      );
+
+      expect(results).toHaveLength(1);
+      expect(results[0]!.docSums).toHaveLength(1);
+      expect(results[0]!.docSums[0]!.uid).toBe('12345');
+    });
+
+    it('should yield nothing when esearch returns count=0', async () => {
+      const emptySearch = `<?xml version="1.0" encoding="UTF-8"?>
+<eSearchResult>
+  <Count>0</Count>
+  <RetMax>0</RetMax>
+  <RetStart>0</RetStart>
+  <IdList />
+  <TranslationSet />
+  <QueryTranslation>test</QueryTranslation>
+  <WebEnv>MCID_test_webenv</WebEnv>
+  <QueryKey>1</QueryKey>
+</eSearchResult>`;
+      mockFetch(emptySearch);
+      const client = createClient();
+
+      const results = await drainAsyncIterator(
+        client.searchAndSummarize({ db: 'pubmed', term: 'nomatch' }),
+      );
+
+      expect(results).toHaveLength(0);
+    });
+
+    it('should respect custom batchSize', async () => {
+      mockFetchSequence([
+        { body: ESEARCH_HISTORY_XML, status: 200 },
+        { body: ESUMMARY_XML, status: 200 },
+      ]);
+      const client = createClient();
+
+      await drainAsyncIterator(
+        client.searchAndSummarize({ db: 'pubmed', term: 'test', batchSize: 50 }),
+      );
+
+      const calls = (fetch as ReturnType<typeof vi.fn>).mock.calls;
+      const esummaryUrl = (calls[1]![0] as Request).url;
+      expect(esummaryUrl).toContain('retmax=50');
+    });
+
+    it('should yield nothing when esearch returns no webEnv', async () => {
+      mockFetch(ESEARCH_XML);
+      const client = createClient();
+
+      const results = await drainAsyncIterator(
+        client.searchAndSummarize({ db: 'pubmed', term: 'test' }),
+      );
+
+      expect(results).toHaveLength(0);
+    });
+  });
 });

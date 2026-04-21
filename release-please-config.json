@@ -39,7 +39,13 @@
         "@ncbijs/structure",
         "@ncbijs/cdd",
         "@ncbijs/books",
-        "@ncbijs/nlm-catalog"
+        "@ncbijs/nlm-catalog",
+        "@ncbijs/rxnorm",
+        "@ncbijs/litvar",
+        "@ncbijs/clinical-trials",
+        "@ncbijs/icite",
+        "@ncbijs/bioc",
+        "@ncbijs/clinical-tables"
       ]
     },
     {
@@ -230,6 +236,42 @@
     "packages/nlm-catalog": {
       "release-type": "node",
       "component": "@ncbijs/nlm-catalog",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/rxnorm": {
+      "release-type": "node",
+      "component": "@ncbijs/rxnorm",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/litvar": {
+      "release-type": "node",
+      "component": "@ncbijs/litvar",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/clinical-trials": {
+      "release-type": "node",
+      "component": "@ncbijs/clinical-trials",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/icite": {
+      "release-type": "node",
+      "component": "@ncbijs/icite",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/bioc": {
+      "release-type": "node",
+      "component": "@ncbijs/bioc",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/clinical-tables": {
+      "release-type": "node",
+      "component": "@ncbijs/clinical-tables",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true
     }

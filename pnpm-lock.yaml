@@ -235,6 +235,8 @@ importers:
         specifier: ^4.19.0
         version: 4.21.0
 
+  packages/bioc: {}
+
   packages/blast:
     dependencies:
       '@ncbijs/rate-limiter':
@@ -260,6 +262,14 @@ importers:
         version: link:../rate-limiter
 
   packages/cite: {}
+
+  packages/clinical-tables: {}
+
+  packages/clinical-trials:
+    dependencies:
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
 
   packages/clinvar:
     dependencies:
@@ -319,6 +329,12 @@ importers:
         specifier: workspace:*
         version: link:../rate-limiter
 
+  packages/icite:
+    dependencies:
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
+
   packages/id-converter: {}
 
   packages/jats:
@@ -326,6 +342,8 @@ importers:
       '@ncbijs/xml':
         specifier: workspace:*
         version: link:../xml
+
+  packages/litvar: {}
 
   packages/mcp:
     dependencies:
@@ -471,6 +489,12 @@ importers:
         version: link:../xml
 
   packages/rate-limiter: {}
+
+  packages/rxnorm:
+    dependencies:
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
 
   packages/snp:
     dependencies:

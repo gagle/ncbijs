@@ -54,7 +54,13 @@
       "@ncbijs/structure": ["./packages/structure/src/index.ts"],
       "@ncbijs/cdd": ["./packages/cdd/src/index.ts"],
       "@ncbijs/books": ["./packages/books/src/index.ts"],
-      "@ncbijs/nlm-catalog": ["./packages/nlm-catalog/src/index.ts"]
+      "@ncbijs/nlm-catalog": ["./packages/nlm-catalog/src/index.ts"],
+      "@ncbijs/rxnorm": ["./packages/rxnorm/src/index.ts"],
+      "@ncbijs/litvar": ["./packages/litvar/src/index.ts"],
+      "@ncbijs/clinical-trials": ["./packages/clinical-trials/src/index.ts"],
+      "@ncbijs/icite": ["./packages/icite/src/index.ts"],
+      "@ncbijs/bioc": ["./packages/bioc/src/index.ts"],
+      "@ncbijs/clinical-tables": ["./packages/clinical-tables/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "dist"]

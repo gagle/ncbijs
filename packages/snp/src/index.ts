@@ -1,6 +1,7 @@
 export { Snp } from './snp';
 export { SnpHttpError } from './snp-client';
 export type {
+  HgvsResult,
   RefSnpReport,
   SnpAllele,
   SnpAlleleAnnotation,
@@ -8,4 +9,6 @@ export type {
   SnpConfig,
   SnpFrequency,
   SnpPlacement,
+  SpdiContextual,
+  VcfFields,
 } from './interfaces/snp.interface';

@@ -22,6 +22,8 @@ import type {
   ESpellParams,
   ESummaryParams,
   EUtilsConfig,
+  SearchAndFetchParams,
+  SearchAndSummarizeParams,
 } from './types/params';
 import type {
   ECitMatchResult,
@@ -255,6 +257,71 @@ export class EUtils {
         break;
       }
       yield response;
+      retstart += batchSize;
+    }
+  }
+
+  public async *searchAndFetch(params: SearchAndFetchParams): AsyncIterableIterator<string> {
+    const search = await this.esearch({
+      db: params.db,
+      term: params.term,
+      usehistory: 'y',
+      retmax: 0,
+      datetype: params.datetype,
+      reldate: params.reldate,
+      mindate: params.mindate,
+      maxdate: params.maxdate,
+      sort: params.sort,
+    });
+
+    if (!search.webEnv || search.queryKey === undefined) {
+      return;
+    }
+
+    yield* this.efetchBatches({
+      db: params.db,
+      WebEnv: search.webEnv,
+      query_key: search.queryKey,
+      rettype: params.rettype,
+      retmode: params.retmode,
+      ...(params.batchSize !== undefined && { batchSize: params.batchSize }),
+    });
+  }
+
+  public async *searchAndSummarize(
+    params: SearchAndSummarizeParams,
+  ): AsyncIterableIterator<ESummaryResult> {
+    const batchSize = params.batchSize ?? 500;
+
+    const search = await this.esearch({
+      db: params.db,
+      term: params.term,
+      usehistory: 'y',
+      retmax: 0,
+      datetype: params.datetype,
+      reldate: params.reldate,
+      mindate: params.mindate,
+      maxdate: params.maxdate,
+      sort: params.sort,
+    });
+
+    if (!search.webEnv || search.queryKey === undefined || search.count === 0) {
+      return;
+    }
+
+    let retstart = 0;
+    while (retstart < search.count) {
+      const result = await this.esummary({
+        db: params.db,
+        WebEnv: search.webEnv,
+        query_key: search.queryKey,
+        retstart,
+        retmax: batchSize,
+        retmode: params.retmode,
+        version: params.version,
+      });
+
+      yield result;
       retstart += batchSize;
     }
   }

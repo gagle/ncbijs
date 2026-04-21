@@ -42,3 +42,21 @@ export interface SnpClinicalSignificance {
   readonly diseaseNames: ReadonlyArray<string>;
   readonly reviewStatus: string;
 }
+
+export interface HgvsResult {
+  readonly hgvs: string;
+}
+
+export interface SpdiContextual {
+  readonly seqId: string;
+  readonly position: number;
+  readonly deletedSequence: string;
+  readonly insertedSequence: string;
+}
+
+export interface VcfFields {
+  readonly chrom: string;
+  readonly pos: number;
+  readonly ref: string;
+  readonly alt: string;
+}

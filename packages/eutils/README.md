@@ -212,6 +212,39 @@ for await (const batch of eutils.efetchBatches({
 }
 ```
 
+#### `searchAndFetch(params)` &rarr; `AsyncIterableIterator<string>`
+
+Convenience pipeline: ESearch with History Server &rarr; stream EFetch batches. Combines `esearch` + `efetchBatches` in a single call.
+
+```typescript
+for await (const batch of eutils.searchAndFetch({
+  db: 'pubmed',
+  term: 'CRISPR gene therapy',
+  rettype: 'abstract',
+  retmode: 'xml',
+  batchSize: 500,
+})) {
+  processBatch(batch);
+}
+```
+
+#### `searchAndSummarize(params)` &rarr; `AsyncIterableIterator<ESummaryResult>`
+
+Convenience pipeline: ESearch with History Server &rarr; stream ESummary batches.
+
+```typescript
+for await (const batch of eutils.searchAndSummarize({
+  db: 'pubmed',
+  term: 'COVID-19 vaccine',
+  retmode: 'json',
+  batchSize: 100,
+})) {
+  for (const docSum of batch.docSums) {
+    console.log(docSum.uid, docSum['Title']);
+  }
+}
+```
+
 ## Error handling
 
 ```typescript

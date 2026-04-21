@@ -175,6 +175,34 @@ export interface EGQueryParams {
   readonly term: string;
 }
 
+/** Parameters for searchAndFetch (History Server pipeline). */
+export interface SearchAndFetchParams {
+  readonly db: string;
+  readonly term: string;
+  readonly rettype?: string | undefined;
+  readonly retmode?: string | undefined;
+  readonly batchSize?: number | undefined;
+  readonly datetype?: DateType | undefined;
+  readonly reldate?: number | undefined;
+  readonly mindate?: string | undefined;
+  readonly maxdate?: string | undefined;
+  readonly sort?: ESearchSort | undefined;
+}
+
+/** Parameters for searchAndSummarize (History Server pipeline). */
+export interface SearchAndSummarizeParams {
+  readonly db: string;
+  readonly term: string;
+  readonly retmode?: RetMode | undefined;
+  readonly version?: '2.0' | undefined;
+  readonly batchSize?: number | undefined;
+  readonly datetype?: DateType | undefined;
+  readonly reldate?: number | undefined;
+  readonly mindate?: string | undefined;
+  readonly maxdate?: string | undefined;
+  readonly sort?: ESearchSort | undefined;
+}
+
 /** Parameters for ECitMatch (`ecitmatch.cgi`). */
 export interface ECitMatchParams {
   /** Entrez database (default `'pubmed'`). */

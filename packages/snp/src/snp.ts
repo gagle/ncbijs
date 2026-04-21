@@ -2,6 +2,7 @@ import { TokenBucket } from '@ncbijs/rate-limiter';
 import { fetchJson } from './snp-client';
 import type { SnpClientConfig } from './snp-client';
 import type {
+  HgvsResult,
   RefSnpReport,
   SnpAllele,
   SnpAlleleAnnotation,
@@ -9,6 +10,8 @@ import type {
   SnpConfig,
   SnpFrequency,
   SnpPlacement,
+  SpdiContextual,
+  VcfFields,
 } from './interfaces/snp.interface';
 
 const BASE_URL = 'https://api.ncbi.nlm.nih.gov/variation/v0';
@@ -39,6 +42,44 @@ export class Snp {
       reports.push(report);
     }
     return reports;
+  }
+
+  public async spdiToHgvs(spdi: string): Promise<HgvsResult> {
+    const url = `${BASE_URL}/spdi/${encodeURIComponent(spdi)}/hgvs`;
+    const raw = await fetchJson<RawHgvsResponse>(url, this._config);
+
+    return { hgvs: raw.data?.hgvs ?? '' };
+  }
+
+  public async hgvsToSpdi(hgvs: string): Promise<ReadonlyArray<SpdiContextual>> {
+    const url = `${BASE_URL}/hgvs/${encodeURIComponent(hgvs)}/contextuals`;
+    const raw = await fetchJson<RawContextualsResponse>(url, this._config);
+
+    return (raw.data?.spdis ?? []).map(mapSpdiContextual);
+  }
+
+  public async vcfToSpdi(
+    chrom: string,
+    pos: number,
+    ref: string,
+    alt: string,
+  ): Promise<ReadonlyArray<SpdiContextual>> {
+    const url = `${BASE_URL}/vcf/${encodeURIComponent(chrom)}/${encodeURIComponent(String(pos))}/${encodeURIComponent(ref)}/${encodeURIComponent(alt)}/contextuals`;
+    const raw = await fetchJson<RawContextualsResponse>(url, this._config);
+
+    return (raw.data?.spdis ?? []).map(mapSpdiContextual);
+  }
+
+  public async spdiToVcfFields(spdi: string): Promise<VcfFields> {
+    const url = `${BASE_URL}/spdi/${encodeURIComponent(spdi)}/vcf_fields`;
+    const raw = await fetchJson<RawVcfFieldsResponse>(url, this._config);
+
+    return {
+      chrom: raw.data?.chrom ?? '',
+      pos: raw.data?.pos ?? 0,
+      ref: raw.data?.ref ?? '',
+      alt: raw.data?.alt ?? '',
+    };
   }
 }
 
@@ -104,6 +145,32 @@ interface RawClinical {
   readonly clinical_significances?: ReadonlyArray<string>;
   readonly disease_names?: ReadonlyArray<string>;
   readonly review_status?: string;
+}
+
+interface RawHgvsResponse {
+  readonly data?: { readonly hgvs?: string };
+}
+
+interface RawContextualsResponse {
+  readonly data?: { readonly spdis?: ReadonlyArray<RawSpdi> };
+}
+
+interface RawVcfFieldsResponse {
+  readonly data?: {
+    readonly chrom?: string;
+    readonly pos?: number;
+    readonly ref?: string;
+    readonly alt?: string;
+  };
+}
+
+function mapSpdiContextual(raw: RawSpdi): SpdiContextual {
+  return {
+    seqId: raw.seq_id ?? '',
+    position: raw.position ?? 0,
+    deletedSequence: raw.deleted_sequence ?? '',
+    insertedSequence: raw.inserted_sequence ?? '',
+  };
 }
 
 function mapRefSnpReport(raw: RawRefSnpResponse): RefSnpReport {

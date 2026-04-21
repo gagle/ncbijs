@@ -54,6 +54,35 @@ Fetch a single RefSNP report by numeric RS ID (without the "rs" prefix).
 
 Fetch multiple RefSNP reports sequentially.
 
+### Variant Notation Conversion
+
+#### `spdiToHgvs(spdi: string): Promise<HgvsResult>`
+
+Convert an SPDI notation to HGVS.
+
+#### `hgvsToSpdi(hgvs: string): Promise<ReadonlyArray<SpdiContextual>>`
+
+Convert an HGVS notation to SPDI contextual alleles.
+
+#### `vcfToSpdi(chrom: string, pos: number, ref: string, alt: string): Promise<ReadonlyArray<SpdiContextual>>`
+
+Convert VCF fields to SPDI contextual alleles.
+
+#### `spdiToVcfFields(spdi: string): Promise<VcfFields>`
+
+Convert an SPDI notation to VCF fields.
+
+```ts
+const hgvs = await snp.spdiToHgvs('NC_000001.11:1014042:C:T');
+console.log(hgvs.hgvs); // 'NC_000001.11:g.1014043C>T'
+
+const spdis = await snp.hgvsToSpdi('NC_000001.11:g.1014043C>T');
+console.log(spdis[0].seqId); // 'NC_000001.11'
+
+const vcf = await snp.spdiToVcfFields('NC_000001.11:1014042:C:T');
+console.log(`${vcf.chrom}:${vcf.pos} ${vcf.ref}>${vcf.alt}`);
+```
+
 ## Error handling
 
 ```ts
@@ -133,5 +162,35 @@ interface SnpClinicalSignificance {
   significances: Array<string>;
   diseaseNames: Array<string>;
   reviewStatus: string;
+}
+```
+
+### `HgvsResult`
+
+```ts
+interface HgvsResult {
+  hgvs: string;
+}
+```
+
+### `SpdiContextual`
+
+```ts
+interface SpdiContextual {
+  seqId: string;
+  position: number;
+  deletedSequence: string;
+  insertedSequence: string;
+}
+```
+
+### `VcfFields`
+
+```ts
+interface VcfFields {
+  chrom: string;
+  pos: number;
+  ref: string;
+  alt: string;
 }
 ```

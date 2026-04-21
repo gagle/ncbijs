@@ -10,9 +10,6 @@ export type { EUtilsCredentials } from './config';
 export { TokenBucket } from '@ncbijs/rate-limiter';
 export type { AcquireOptions, RateLimiterOptions, TokenBucketOptions } from '@ncbijs/rate-limiter';
 
-/** @deprecated Use `TokenBucket` from `@ncbijs/rate-limiter` instead. */
-export { TokenBucket as RateLimiter } from '@ncbijs/rate-limiter';
-
 export type {
   DateType,
   ELinkCmd,
@@ -28,6 +25,8 @@ export type {
   ESearchParams,
   ESpellParams,
   ESummaryParams,
+  SearchAndFetchParams,
+  SearchAndSummarizeParams,
 } from './types/params';
 
 export type {
