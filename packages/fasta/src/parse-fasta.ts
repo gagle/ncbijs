@@ -1,6 +1,10 @@
 import type { FastaRecord } from './interfaces/fasta.interface';
 
-/** Parse FASTA-formatted text into an array of sequence records. */
+/**
+ * Parse FASTA-formatted text into an array of sequence records.
+ * @param text - Raw FASTA-formatted string (one or more sequences with `>` header lines).
+ * @returns Parsed records with id, description, and concatenated sequence for each entry.
+ */
 export function parseFasta(text: string): Array<FastaRecord> {
   const records: Array<FastaRecord> = [];
   const lines = text.split(/\r?\n/);

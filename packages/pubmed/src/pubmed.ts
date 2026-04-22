@@ -21,7 +21,11 @@ export class PubMed {
     return new PubMedQueryBuilder(this.eutils, term);
   }
 
-  /** Fetch articles related to a given PMID, ranked by relevancy score. */
+  /**
+   * Fetch articles related to a given PMID, ranked by relevancy score.
+   * @param pmid - PubMed identifier of the source article.
+   * @returns Related articles sorted by descending relevancy score.
+   */
   public async related(pmid: string): Promise<ReadonlyArray<RelatedArticle>> {
     const linkResult = await this.eutils.elink({
       db: 'pubmed',
@@ -56,12 +60,20 @@ export class PubMed {
     return relatedArticles.sort((a, b) => b.relevancyScore - a.relevancyScore);
   }
 
-  /** Fetch articles that cite the given PMID. */
+  /**
+   * Fetch articles that cite the given PMID.
+   * @param pmid - PubMed identifier of the cited article.
+   * @returns Articles that include the given PMID in their reference lists.
+   */
   public async citedBy(pmid: string): Promise<ReadonlyArray<Article>> {
     return this.fetchLinkedArticles(pmid, 'pubmed_pubmed_citedin');
   }
 
-  /** Fetch articles referenced by the given PMID. */
+  /**
+   * Fetch articles referenced by the given PMID.
+   * @param pmid - PubMed identifier of the article whose references to retrieve.
+   * @returns Articles listed in the reference section of the given PMID.
+   */
   public async references(pmid: string): Promise<ReadonlyArray<Article>> {
     return this.fetchLinkedArticles(pmid, 'pubmed_pubmed_refs');
   }
@@ -91,6 +103,11 @@ export class PubMed {
     return this.fetchArticlesByIds(linkedIds);
   }
 
+  /**
+   * Fetch full article data for a list of PMIDs, batching requests to respect E-utilities limits.
+   * @param ids - PubMed identifiers to fetch.
+   * @returns Parsed articles in the same order as the input IDs.
+   */
   private async fetchArticlesByIds(ids: ReadonlyArray<string>): Promise<ReadonlyArray<Article>> {
     if (ids.length === 0) {
       return [];

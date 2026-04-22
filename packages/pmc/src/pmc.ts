@@ -1,6 +1,9 @@
 import { EUtils } from '@ncbijs/eutils';
 import type { Chunk, ChunkOptions, JATSArticle } from '@ncbijs/jats';
 import { parseJATS, toChunks, toMarkdown, toPlainText } from '@ncbijs/jats';
+import { TokenBucket } from '@ncbijs/rate-limiter';
+import { fetchJson as clientFetchJson, fetchText as clientFetchText } from './pmc-client';
+import type { PMCClientConfig } from './pmc-client';
 
 import type {
   FullTextArticle,
@@ -16,6 +19,11 @@ import { readAllBlocks, readBlock, readTag } from '@ncbijs/xml';
 const S3_BASE_URL = 'https://pmc-oa-opendata.s3.amazonaws.com';
 const OAI_BASE_URL = 'https://www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi';
 const ESEARCH_BATCH_SIZE = 500;
+const REQUESTS_PER_SECOND = 3;
+
+function isHttpError(error: unknown): error is { status: number } {
+  return typeof error === 'object' && error !== null && 'status' in error;
+}
 
 function normalizePmcid(pmcid: string): string {
   return pmcid.startsWith('PMC') ? pmcid : `PMC${pmcid}`;
@@ -137,6 +145,7 @@ function parseOAIRecordXml(recordXml: string): OAIRecord {
 export class PMC {
   private readonly eutils: EUtils;
   private readonly config: PMCConfig;
+  private readonly _clientConfig: PMCClientConfig;
 
   constructor(config: PMCConfig) {
     this.config = config;
@@ -146,6 +155,10 @@ export class PMC {
       apiKey: config.apiKey,
       maxRetries: config.maxRetries,
     });
+    this._clientConfig = {
+      maxRetries: config.maxRetries ?? 3,
+      rateLimiter: new TokenBucket({ requestsPerSecond: REQUESTS_PER_SECOND }),
+    };
   }
 
   /** Fetch a full-text article by PMC ID via E-utilities. */
@@ -175,31 +188,49 @@ export class PMC {
   }
 
   readonly oa = {
+    /**
+     * Look up Open Access metadata for a PMC article via the S3 metadata endpoint.
+     * @param pmcid - PMC identifier (with or without the "PMC" prefix).
+     * @param options - Optional version number for the article record.
+     * @returns Open Access record with download URLs and license information.
+     */
     lookup: async (pmcid: string, options?: OALookupOptions): Promise<OARecord> => {
       const normalized = normalizePmcid(pmcid);
       const version = options?.version ?? 1;
       const url = `${S3_BASE_URL}/metadata/${normalized}.${version}.json`;
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        if (response.status === 403 || response.status === 404) {
-          throw new Error(`No OA record found for ${normalized}`);
-        }
-        throw new Error(`OA lookup failed for ${normalized}: HTTP ${response.status}`);
-      }
 
       let body: unknown;
       try {
-        body = await response.json();
-      } catch {
-        throw new Error(`OA lookup returned malformed response for ${normalized}`);
+        body = await clientFetchJson<unknown>(url, this._clientConfig);
+      } catch (error: unknown) {
+        if (isHttpError(error) && (error.status === 403 || error.status === 404)) {
+          throw new Error(`No OA record found for ${normalized}`, { cause: error });
+        }
+        if (isHttpError(error)) {
+          throw new Error(`OA lookup failed for ${normalized}: HTTP ${error.status}`, {
+            cause: error,
+          });
+        }
+        if (error instanceof Error && error.message.includes('Unexpected token')) {
+          throw new Error(`OA lookup returned malformed response for ${normalized}`, {
+            cause: error,
+          });
+        }
+        throw error;
       }
 
       return mapS3MetadataToOARecord(body as S3Metadata);
     },
 
+    /**
+     * Iterate over Open Access articles added or updated since a given date.
+     * @param date - Start date in YYYY/MM/DD format for the PMC release date filter.
+     * @param options - Optional end date to bound the search range.
+     * @returns Async iterator yielding Open Access records matching the date range.
+     */
     since: (date: string, options?: OAListOptions): AsyncIterableIterator<OARecord> => {
       const eutils = this.eutils;
+      const clientConfig = this._clientConfig;
       return (async function* () {
         const until = options?.until ?? '3000';
         const term = `${date}:${until}[pmcrdat] AND (open_access[filter] OR author_manuscript[filter])`;
@@ -224,13 +255,10 @@ export class PMC {
           for (const id of search.idList) {
             const pmcid = id.startsWith('PMC') ? id : `PMC${id}`;
             const metadataUrl = `${S3_BASE_URL}/metadata/${pmcid}.1.json`;
-            const response = await fetch(metadataUrl);
-
-            if (!response.ok) continue;
 
             let body: unknown;
             try {
-              body = await response.json();
+              body = await clientFetchJson<unknown>(metadataUrl, clientConfig);
             } catch {
               continue;
             }
@@ -245,8 +273,14 @@ export class PMC {
   };
 
   readonly oai = {
+    /**
+     * List OAI-PMH records from PMC, automatically following resumption tokens.
+     * @param options - Harvesting parameters including date range, set, and metadata prefix.
+     * @returns Async iterator yielding OAI-PMH records.
+     */
     listRecords: (options: OAIListOptions): AsyncIterableIterator<OAIRecord> => {
       const config = this.config;
+      const clientConfig = this._clientConfig;
       return (async function* () {
         const params = new URLSearchParams({
           verb: 'ListRecords',
@@ -261,12 +295,15 @@ export class PMC {
         let url: string | undefined = `${OAI_BASE_URL}?${params.toString()}`;
 
         while (url) {
-          const response = await fetch(url);
-          if (!response.ok) {
-            throw new Error(`OAI-PMH ListRecords failed: HTTP ${response.status}`);
+          let xml: string;
+          try {
+            xml = await clientFetchText(url, clientConfig);
+          } catch (error: unknown) {
+            if (isHttpError(error)) {
+              throw new Error(`OAI-PMH ListRecords failed: HTTP ${error.status}`, { cause: error });
+            }
+            throw error;
           }
-
-          const xml = await response.text();
 
           const errorBlock = readBlock(xml, 'error');
           if (errorBlock) break;
@@ -293,6 +330,12 @@ export class PMC {
       })();
     },
 
+    /**
+     * Fetch a single OAI-PMH record for a PMC article.
+     * @param pmcid - PMC identifier (with or without the "PMC" prefix).
+     * @param metadataPrefix - OAI-PMH metadata format (defaults to "pmc").
+     * @returns The OAI-PMH record including header and metadata XML.
+     */
     getRecord: async (pmcid: string, metadataPrefix?: string): Promise<OAIRecord> => {
       const numeric = numericPmcid(pmcid);
       const identifier = `oai:pubmedcentral.nih.gov:${numeric}`;
@@ -304,12 +347,17 @@ export class PMC {
         email: this.config.email,
       });
 
-      const response = await fetch(`${OAI_BASE_URL}?${params.toString()}`);
-      if (!response.ok) {
-        throw new Error(`OAI-PMH GetRecord failed for ${pmcid}: HTTP ${response.status}`);
+      let xml: string;
+      try {
+        xml = await clientFetchText(`${OAI_BASE_URL}?${params.toString()}`, this._clientConfig);
+      } catch (error: unknown) {
+        if (isHttpError(error)) {
+          throw new Error(`OAI-PMH GetRecord failed for ${pmcid}: HTTP ${error.status}`, {
+            cause: error,
+          });
+        }
+        throw error;
       }
-
-      const xml = await response.text();
 
       const errorBlock = readBlock(xml, 'error');
       if (errorBlock) {
