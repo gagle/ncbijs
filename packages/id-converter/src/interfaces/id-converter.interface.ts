@@ -21,6 +21,11 @@ export interface VersionedId {
   readonly current: boolean;
 }
 
+/** Configuration for the ID Converter client. */
+export interface IdConverterConfig {
+  readonly maxRetries?: number;
+}
+
 /** Result of converting an article identifier across PMID, PMCID, DOI, and MID. */
 export interface ConvertedId {
   readonly pmid: string | null;

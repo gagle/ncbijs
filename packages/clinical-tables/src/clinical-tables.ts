@@ -1,9 +1,14 @@
+import { TokenBucket } from '@ncbijs/rate-limiter';
+import { fetchJson, resolveConfig } from './clinical-tables-client';
+import type { ClinicalTablesClientConfig } from './clinical-tables-client';
 import type {
+  ClinicalTablesConfig,
   ClinicalTablesResult,
   ClinicalTablesSearchOptions,
 } from './interfaces/clinical-tables.interface';
 
 const BASE_URL = 'https://clinicaltables.nlm.nih.gov/api';
+const REQUESTS_PER_SECOND = 3;
 
 type RawSearchResponse = [
   number,
@@ -21,10 +26,18 @@ export async function search(
   table: string,
   term: string,
   options?: ClinicalTablesSearchOptions,
+  config?: ClinicalTablesConfig,
 ): Promise<ClinicalTablesResult> {
   if (!table) {
     throw new Error('table must not be empty');
   }
+
+  const clientConfig: ClinicalTablesClientConfig = config
+    ? {
+        maxRetries: config.maxRetries ?? 3,
+        rateLimiter: new TokenBucket({ requestsPerSecond: REQUESTS_PER_SECOND }),
+      }
+    : resolveConfig();
 
   const url = new URL(`${BASE_URL}/${encodeURIComponent(table)}/v3/search`);
   url.searchParams.set('terms', term);
@@ -42,13 +55,7 @@ export async function search(
     url.searchParams.set('ef', options.extraFields.join(','));
   }
 
-  const response = await fetch(url.toString());
-
-  if (!response.ok) {
-    throw new Error(`Clinical Tables API returned status ${response.status}`);
-  }
-
-  const raw: RawSearchResponse = await response.json();
+  const raw = await fetchJson<RawSearchResponse>(url.toString(), clientConfig);
 
   return {
     totalCount: raw[0],

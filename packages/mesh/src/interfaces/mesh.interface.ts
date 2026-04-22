@@ -33,3 +33,8 @@ export interface SparqlResult {
     bindings: ReadonlyArray<Readonly<Record<string, Readonly<SparqlBinding>>>>;
   }>;
 }
+
+/** Configuration for the MeSH client. */
+export interface MeSHConfig {
+  readonly maxRetries?: number;
+}

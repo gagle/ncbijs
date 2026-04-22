@@ -119,6 +119,7 @@ function mockFetchText(body: string, status = 200): void {
     vi.fn().mockResolvedValue({
       ok: status >= 200 && status < 300,
       status,
+      json: () => Promise.resolve(body),
       text: () => Promise.resolve(body),
     }),
   );
@@ -623,11 +624,17 @@ describe('PMC', () => {
         'fetch',
         vi
           .fn()
-          .mockResolvedValueOnce({ ok: false, status: 404, json: () => Promise.resolve({}) })
+          .mockResolvedValueOnce({
+            ok: false,
+            status: 404,
+            json: () => Promise.resolve({}),
+            text: () => Promise.resolve(''),
+          })
           .mockResolvedValueOnce({
             ok: true,
             status: 200,
             json: () => Promise.resolve(successMetadata),
+            text: () => Promise.resolve(JSON.stringify(successMetadata)),
           }),
       );
 

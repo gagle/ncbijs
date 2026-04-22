@@ -274,7 +274,11 @@ importers:
         specifier: workspace:*
         version: link:../rate-limiter
 
-  packages/clinical-tables: {}
+  packages/clinical-tables:
+    dependencies:
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
 
   packages/clinical-trials:
     dependencies:
@@ -346,7 +350,11 @@ importers:
         specifier: workspace:*
         version: link:../rate-limiter
 
-  packages/id-converter: {}
+  packages/id-converter:
+    dependencies:
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
 
   packages/jats:
     dependencies:
@@ -423,7 +431,11 @@ importers:
         specifier: workspace:*
         version: link:../xml
 
-  packages/mesh: {}
+  packages/mesh:
+    dependencies:
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
 
   packages/nlm-catalog:
     dependencies:
@@ -466,6 +478,9 @@ importers:
       '@ncbijs/jats':
         specifier: workspace:*
         version: link:../jats
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
       '@ncbijs/xml':
         specifier: workspace:*
         version: link:../xml
@@ -508,6 +523,9 @@ importers:
 
   packages/pubtator:
     dependencies:
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
       '@ncbijs/xml':
         specifier: workspace:*
         version: link:../xml

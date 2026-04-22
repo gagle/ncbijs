@@ -3,12 +3,14 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { PubTator } from './pubtator';
 
 function mockFetchJson(body: unknown): void {
+  const text = JSON.stringify(body);
   vi.stubGlobal(
     'fetch',
     vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
       json: () => Promise.resolve(body),
+      text: () => Promise.resolve(text),
     }),
   );
 }
@@ -19,6 +21,7 @@ function mockFetchText(body: string): void {
     vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
+      json: () => Promise.resolve(body),
       text: () => Promise.resolve(body),
     }),
   );
@@ -30,6 +33,7 @@ function mockFetchError(status: number, body = ''): void {
     vi.fn().mockResolvedValue({
       ok: false,
       status,
+      json: () => Promise.resolve(body),
       text: () => Promise.resolve(body),
     }),
   );
@@ -105,6 +109,7 @@ describe('PubTator', () => {
       expect(result).toHaveLength(1);
       expect(fetch).toHaveBeenCalledWith(
         expect.stringContaining('/entity/autocomplete/?query=BRCA1'),
+        expect.anything(),
       );
     });
 
@@ -133,7 +138,7 @@ describe('PubTator', () => {
       mockFetchJson([]);
       const client = new PubTator();
       await client.findEntity('BRCA1', 'gene');
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=gene'));
+      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=gene'), expect.anything());
     });
 
     it('should handle empty results', async () => {
@@ -157,7 +162,7 @@ describe('PubTator', () => {
       ]);
       const client = new PubTator();
       await client.findEntity('BRCA1', 'gene');
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=gene'));
+      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=gene'), expect.anything());
     });
 
     it('should search for disease entities', async () => {
@@ -174,7 +179,10 @@ describe('PubTator', () => {
       ]);
       const client = new PubTator();
       await client.findEntity('breast cancer', 'disease');
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=disease'));
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('type=disease'),
+        expect.anything(),
+      );
     });
 
     it('should search for chemical entities', async () => {
@@ -191,7 +199,10 @@ describe('PubTator', () => {
       ]);
       const client = new PubTator();
       await client.findEntity('aspirin', 'chemical');
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=chemical'));
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('type=chemical'),
+        expect.anything(),
+      );
     });
 
     it('should search for variant entities', async () => {
@@ -208,7 +219,10 @@ describe('PubTator', () => {
       ]);
       const client = new PubTator();
       await client.findEntity('V600E', 'variant');
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=variant'));
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('type=variant'),
+        expect.anything(),
+      );
     });
 
     it('should search for species entities', async () => {
@@ -225,7 +239,10 @@ describe('PubTator', () => {
       ]);
       const client = new PubTator();
       await client.findEntity('human', 'species');
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=species'));
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('type=species'),
+        expect.anything(),
+      );
     });
 
     it('should search for cell_line entities', async () => {
@@ -242,38 +259,22 @@ describe('PubTator', () => {
       ]);
       const client = new PubTator();
       await client.findEntity('HeLa', 'cell_line');
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=cell_line'));
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('type=cell_line'),
+        expect.anything(),
+      );
     });
 
     it('should throw on HTTP error', async () => {
-      mockFetchError(500, 'Internal Server Error');
+      mockFetchError(400, 'Bad Request');
       const client = new PubTator();
-      await expect(client.findEntity('BRCA1')).rejects.toThrow(
-        'PubTator3 entity search failed: HTTP 500: Internal Server Error',
-      );
+      await expect(client.findEntity('BRCA1')).rejects.toThrow('PubTator3 API returned status 400');
     });
 
     it('should throw on HTTP error with empty body', async () => {
-      mockFetchError(503);
+      mockFetchError(401);
       const client = new PubTator();
-      await expect(client.findEntity('BRCA1')).rejects.toThrow(
-        'PubTator3 entity search failed: HTTP 503',
-      );
-    });
-
-    it('should handle HTTP error when response.text() rejects', async () => {
-      vi.stubGlobal(
-        'fetch',
-        vi.fn().mockResolvedValue({
-          ok: false,
-          status: 502,
-          text: () => Promise.reject(new Error('stream error')),
-        }),
-      );
-      const client = new PubTator();
-      await expect(client.findEntity('BRCA1')).rejects.toThrow(
-        'PubTator3 entity search failed: HTTP 502',
-      );
+      await expect(client.findEntity('BRCA1')).rejects.toThrow('PubTator3 API returned status 401');
     });
   });
 
@@ -297,7 +298,7 @@ describe('PubTator', () => {
       mockFetchJson(SEARCH_RESPONSE);
       const client = new PubTator();
       await client.search('BRCA1');
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('text=BRCA1'));
+      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('text=BRCA1'), expect.anything());
     });
 
     it('should return total, page, pageSize, results', async () => {
@@ -327,14 +328,14 @@ describe('PubTator', () => {
       mockFetchJson({ ...SEARCH_RESPONSE, current: 3 });
       const client = new PubTator();
       await client.search('BRCA1', { page: 3 });
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('page=3'));
+      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('page=3'), expect.anything());
     });
 
     it('should support pageSize option', async () => {
       mockFetchJson({ ...SEARCH_RESPONSE, page_size: 25 });
       const client = new PubTator();
       await client.search('BRCA1', { pageSize: 25 });
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('pagesize=25'));
+      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('pagesize=25'), expect.anything());
     });
 
     it('should handle empty results', async () => {
@@ -371,7 +372,8 @@ describe('PubTator', () => {
       mockFetchText(BIOC_JSON);
       const client = new PubTator();
       await client.export(['12345']);
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('pmids=12345'));
+      const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(fetchUrl).toContain('pmids=12345');
     });
 
     it('should return BioDocument with documents', async () => {
@@ -386,35 +388,40 @@ describe('PubTator', () => {
       mockFetchText(BIOC_JSON);
       const client = new PubTator();
       await client.export(['12345']);
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/export/biocjson'));
+      const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(fetchUrl).toContain('/export/biocjson');
     });
 
     it('should support xml format', async () => {
       mockFetchText(BIOC_XML);
       const client = new PubTator();
       await client.export(['12345'], { format: 'xml' });
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/export/biocxml'));
+      const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(fetchUrl).toContain('/export/biocxml');
     });
 
     it('should support full text when full is true', async () => {
       mockFetchText(BIOC_JSON);
       const client = new PubTator();
       await client.export(['12345'], { full: true });
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('full=true'));
+      const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(fetchUrl).toContain('full=true');
     });
 
     it('should export abstract only when full is false', async () => {
       mockFetchText(BIOC_JSON);
       const client = new PubTator();
       await client.export(['12345'], { full: false });
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('full=false'));
+      const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(fetchUrl).toContain('full=false');
     });
 
     it('should handle multiple PMIDs', async () => {
       mockFetchText(BIOC_JSON);
       const client = new PubTator();
       await client.export(['12345', '67890']);
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('pmids=12345%2C67890'));
+      const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(fetchUrl).toContain('pmids=12345%2C67890');
     });
 
     it('should handle non-existent PMID', async () => {
@@ -431,42 +438,48 @@ describe('PubTator', () => {
       const client = new PubTator();
       const result = await client.annotateByPmid(['12345']);
       expect(result).toBe('annotation output');
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('pmids=12345'));
+      const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(fetchUrl).toContain('pmids=12345');
     });
 
     it('should support PubTator format', async () => {
       mockFetchText('pubtator format');
       const client = new PubTator();
       await client.annotateByPmid(['12345'], { format: 'PubTator' });
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=PubTator'));
+      const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(fetchUrl).toContain('type=PubTator');
     });
 
     it('should support BioC format', async () => {
       mockFetchText('bioc format');
       const client = new PubTator();
       await client.annotateByPmid(['12345'], { format: 'BioC' });
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=BioC'));
+      const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(fetchUrl).toContain('type=BioC');
     });
 
     it('should support JSON format', async () => {
       mockFetchText('json format');
       const client = new PubTator();
       await client.annotateByPmid(['12345'], { format: 'JSON' });
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('type=JSON'));
+      const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(fetchUrl).toContain('type=JSON');
     });
 
     it('should filter by concept type', async () => {
       mockFetchText('gene annotations');
       const client = new PubTator();
       await client.annotateByPmid(['12345'], { concept: 'Gene' });
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('concepts=Gene'));
+      const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(fetchUrl).toContain('concepts=Gene');
     });
 
     it('should handle multiple PMIDs', async () => {
       mockFetchText('multi result');
       const client = new PubTator();
       await client.annotateByPmid(['12345', '67890']);
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining('pmids=12345%2C67890'));
+      const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(fetchUrl).toContain('pmids=12345%2C67890');
     });
   });
 
@@ -522,10 +535,10 @@ describe('PubTator', () => {
     });
 
     it('should throw on HTTP error', async () => {
-      mockFetchError(429, 'Rate limit exceeded');
+      mockFetchError(400, 'Bad Request');
       const client = new PubTator();
       await expect(client.annotateText('test')).rejects.toThrow(
-        'PubTator3 text annotation failed: HTTP 429: Rate limit exceeded',
+        'PubTator3 API returned status 400',
       );
     });
 

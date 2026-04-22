@@ -1,15 +1,20 @@
+import { TokenBucket } from '@ncbijs/rate-limiter';
+import { fetchJson, fetchText } from './pubtator-client';
+import type { PubTatorClientConfig } from './pubtator-client';
 import type {
   AnnotateOptions,
   BioDocument,
   EntityMatch,
   EntityType,
   ExportOptions,
+  PubtatorConfig,
   SearchOptions,
   SearchResult,
 } from './interfaces/pubtator.interface';
 import { parseBioC } from './parse-bioc';
 
 const BASE_URL = 'https://www.ncbi.nlm.nih.gov/research/pubtator3-api';
+const REQUESTS_PER_SECOND = 3;
 
 interface EntityApiResponse {
   readonly _id: string;
@@ -36,26 +41,6 @@ interface SearchApiResponse {
   readonly results: ReadonlyArray<SearchApiResult>;
 }
 
-async function assertOk(response: Response, errorPrefix: string): Promise<void> {
-  if (!response.ok) {
-    const body = await response.text().catch(() => '');
-    const detail = body ? `: ${body.slice(0, 200)}` : '';
-    throw new Error(`${errorPrefix}: HTTP ${response.status}${detail}`);
-  }
-}
-
-async function fetchJson<T>(url: string, errorPrefix: string): Promise<T> {
-  const response = await fetch(url);
-  await assertOk(response, errorPrefix);
-  return response.json() as Promise<T>;
-}
-
-async function fetchText(url: string, errorPrefix: string, init?: RequestInit): Promise<string> {
-  const response = init !== undefined ? await fetch(url, init) : await fetch(url);
-  await assertOk(response, errorPrefix);
-  return response.text();
-}
-
 function appendParam(params: URLSearchParams, key: string, value: string | undefined): void {
   if (value !== undefined) {
     params.set(key, value);
@@ -64,6 +49,15 @@ function appendParam(params: URLSearchParams, key: string, value: string | undef
 
 /** Client for the PubTator3 API providing biomedical named entity recognition and search. */
 export class PubTator {
+  private readonly _config: PubTatorClientConfig;
+
+  constructor(config?: PubtatorConfig) {
+    this._config = {
+      maxRetries: config?.maxRetries ?? 3,
+      rateLimiter: new TokenBucket({ requestsPerSecond: REQUESTS_PER_SECOND }),
+    };
+  }
+
   /** Search for biomedical entities by name with optional type filtering. */
   public async findEntity(
     query: string,
@@ -74,7 +68,7 @@ export class PubTator {
 
     const data = await fetchJson<ReadonlyArray<EntityApiResponse>>(
       `${BASE_URL}/entity/autocomplete/?${params.toString()}`,
-      'PubTator3 entity search failed',
+      this._config,
     );
 
     return data.map((item) => ({
@@ -92,7 +86,7 @@ export class PubTator {
 
     const data = await fetchJson<SearchApiResponse>(
       `${BASE_URL}/search/?${params.toString()}`,
-      'PubTator3 search failed',
+      this._config,
     );
 
     return {
@@ -117,7 +111,7 @@ export class PubTator {
 
     const text = await fetchText(
       `${BASE_URL}/publications/export/bioc${format}?${params.toString()}`,
-      'PubTator3 export failed',
+      this._config,
     );
 
     if (!text.trim()) return { documents: [] };
@@ -133,10 +127,7 @@ export class PubTator {
     appendParam(params, 'concepts', options?.concept);
     appendParam(params, 'type', options?.format);
 
-    return fetchText(
-      `${BASE_URL}/publications/annotate?${params.toString()}`,
-      'PubTator3 annotate failed',
-    );
+    return fetchText(`${BASE_URL}/publications/annotate?${params.toString()}`, this._config);
   }
 
   /** Submit free text to PubTator3 for biomedical entity annotation. */
@@ -148,7 +139,7 @@ export class PubTator {
     const query = params.toString();
     const url = query ? `${BASE_URL}/annotate/text/?${query}` : `${BASE_URL}/annotate/text/`;
 
-    return fetchText(url, 'PubTator3 text annotation failed', {
+    return fetchText(url, this._config, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
       body: text,

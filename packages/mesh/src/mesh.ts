@@ -1,7 +1,16 @@
-import type { MeshDescriptor, MeshTreeData, SparqlResult } from './interfaces/mesh.interface';
+import { TokenBucket } from '@ncbijs/rate-limiter';
+import { fetchJson } from './mesh-client';
+import type { MeSHClientConfig } from './mesh-client';
+import type {
+  MeSHConfig,
+  MeshDescriptor,
+  MeshTreeData,
+  SparqlResult,
+} from './interfaces/mesh.interface';
 
 const SPARQL_URL = 'https://id.nlm.nih.gov/mesh/sparql';
 const LOOKUP_URL = 'https://id.nlm.nih.gov/mesh/lookup/descriptor';
+const REQUESTS_PER_SECOND = 3;
 
 /** Client for navigating and querying the NLM Medical Subject Headings (MeSH) vocabulary. */
 export class MeSH {
@@ -9,8 +18,13 @@ export class MeSH {
   private readonly descriptorByLowercaseName: ReadonlyMap<string, MeshDescriptor>;
   private readonly descriptorByTreeNumber: ReadonlyMap<string, MeshDescriptor>;
   private readonly sortedTreeNumbers: ReadonlyArray<string>;
+  private readonly _clientConfig: MeSHClientConfig;
 
-  constructor(treeData: MeshTreeData) {
+  constructor(treeData: MeshTreeData, config?: MeSHConfig) {
+    this._clientConfig = {
+      maxRetries: config?.maxRetries ?? 3,
+      rateLimiter: new TokenBucket({ requestsPerSecond: REQUESTS_PER_SECOND }),
+    };
     const byId = new Map<string, MeshDescriptor>();
     const byName = new Map<string, MeshDescriptor>();
     const byTree = new Map<string, MeshDescriptor>();
@@ -141,13 +155,7 @@ export class MeSH {
     url.searchParams.set('query', query);
     url.searchParams.set('format', 'JSON');
 
-    const response = await fetch(url.toString());
-
-    if (!response.ok) {
-      throw new Error(`MeSH SPARQL endpoint returned status ${response.status}`);
-    }
-
-    return (await response.json()) as SparqlResult;
+    return fetchJson<SparqlResult>(url.toString(), this._clientConfig);
   }
 
   /** Search for MeSH descriptors online via the NLM lookup API. */
@@ -157,16 +165,12 @@ export class MeSH {
     url.searchParams.set('match', 'contains');
     url.searchParams.set('limit', '10');
 
-    const response = await fetch(url.toString());
-
-    if (!response.ok) {
-      throw new Error(`MeSH lookup API returned status ${response.status}`);
-    }
-
-    const results = (await response.json()) as ReadonlyArray<{
-      resource: string;
-      label: string;
-    }>;
+    const results = await fetchJson<
+      ReadonlyArray<{
+        resource: string;
+        label: string;
+      }>
+    >(url.toString(), this._clientConfig);
 
     return results.map((result) => ({
       id: extractDescriptorId(result.resource),

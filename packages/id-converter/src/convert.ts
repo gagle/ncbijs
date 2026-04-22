@@ -1,4 +1,11 @@
-import type { ConvertedId, ConvertParams } from './interfaces/id-converter.interface';
+import { TokenBucket } from '@ncbijs/rate-limiter';
+import { fetchJson, resolveConfig } from './id-converter-client';
+import type { IdConverterClientConfig } from './id-converter-client';
+import type {
+  ConvertedId,
+  ConvertParams,
+  IdConverterConfig,
+} from './interfaces/id-converter.interface';
 import type { paths } from './schema';
 
 type ApiRecord =
@@ -6,11 +13,13 @@ type ApiRecord =
 
 const BASE_URL = 'https://pmc.ncbi.nlm.nih.gov/tools/idconv/api/v1/articles/';
 const MAX_IDS_PER_REQUEST = 200;
+const REQUESTS_PER_SECOND = 3;
 
 /** Convert article identifiers between PMID, PMCID, DOI, and Manuscript ID formats. */
 export async function convert(
   ids: ReadonlyArray<string>,
   options?: Omit<ConvertParams, 'ids'>,
+  config?: IdConverterConfig,
 ): Promise<ReadonlyArray<ConvertedId>> {
   if (ids.length === 0) {
     throw new Error('ids array must not be empty');
@@ -20,18 +29,26 @@ export async function convert(
     throw new Error(`Cannot convert more than ${MAX_IDS_PER_REQUEST} IDs per request`);
   }
 
-  const url = buildRequestUrl(ids, options);
-  const response = await fetch(url.toString());
+  const clientConfig: IdConverterClientConfig = config
+    ? {
+        maxRetries: config.maxRetries ?? 3,
+        rateLimiter: new TokenBucket({ requestsPerSecond: REQUESTS_PER_SECOND }),
+      }
+    : resolveConfig();
 
-  if (!response.ok) {
-    throw new Error(`ID Converter API returned status ${response.status}`);
-  }
+  const url = buildRequestUrl(ids, options);
 
   let body: unknown;
   try {
-    body = await response.json();
-  } catch {
-    throw new Error('ID Converter API returned malformed response');
+    body = await fetchJson<unknown>(url.toString(), clientConfig);
+  } catch (error: unknown) {
+    if (error instanceof TypeError) {
+      throw error;
+    }
+    if (error instanceof Error && error.message.startsWith('ID Converter API returned status')) {
+      throw error;
+    }
+    throw new Error('ID Converter API returned malformed response', { cause: error });
   }
 
   return parseApiResponse(body);

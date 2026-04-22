@@ -46,6 +46,7 @@
   "dependencies": {
     "@ncbijs/eutils": "workspace:*",
     "@ncbijs/jats": "workspace:*",
+    "@ncbijs/rate-limiter": "workspace:*",
     "@ncbijs/xml": "workspace:*"
   },
   "main": "./dist/index.js",

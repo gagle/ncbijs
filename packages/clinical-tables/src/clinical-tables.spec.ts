@@ -2,12 +2,14 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { search } from './clinical-tables';
 
 function mockFetchJson(data: unknown, status = 200): void {
+  const text = JSON.stringify(data);
   vi.stubGlobal(
     'fetch',
     vi.fn().mockResolvedValue({
       ok: status >= 200 && status < 300,
       status,
       json: () => Promise.resolve(data),
+      text: () => Promise.resolve(text),
     }),
   );
 }

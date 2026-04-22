@@ -2,12 +2,14 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { convert } from './convert';
 
 function mockFetchJson(data: unknown, status = 200): void {
+  const text = JSON.stringify(data);
   vi.stubGlobal(
     'fetch',
     vi.fn().mockResolvedValue({
       ok: status >= 200 && status < 300,
       status,
       json: () => Promise.resolve(data),
+      text: () => Promise.resolve(text),
     }),
   );
 }
@@ -312,6 +314,7 @@ describe('convert', () => {
           ok: true,
           status: 200,
           json: () => Promise.reject(new Error('Unexpected token')),
+          text: () => Promise.resolve('invalid'),
         }),
       );
       await expect(convert(['12345678'])).rejects.toThrow('malformed response');

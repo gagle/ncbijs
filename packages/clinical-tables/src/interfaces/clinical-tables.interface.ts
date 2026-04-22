@@ -13,3 +13,8 @@ export interface ClinicalTablesResult {
   readonly displayStrings: ReadonlyArray<string>;
   readonly extras: ReadonlyArray<ReadonlyArray<string>>;
 }
+
+/** Configuration for the Clinical Tables client. */
+export interface ClinicalTablesConfig {
+  readonly maxRetries?: number;
+}

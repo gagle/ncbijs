@@ -3,12 +3,14 @@ import { MeSH } from './mesh';
 import type { MeshTreeData, SparqlResult } from './interfaces/mesh.interface';
 
 function mockFetchJson(data: unknown, status = 200): void {
+  const text = JSON.stringify(data);
   vi.stubGlobal(
     'fetch',
     vi.fn().mockResolvedValue({
       ok: status >= 200 && status < 300,
       status,
       json: () => Promise.resolve(data),
+      text: () => Promise.resolve(text),
     }),
   );
 }
@@ -424,7 +426,7 @@ describe('MeSH', () => {
 
     it('should throw on invalid SPARQL', async () => {
       mockFetchJson({ error: 'Parse error' }, 400);
-      await expect(mesh.sparql('INVALID')).rejects.toThrow('status 400');
+      await expect(mesh.sparql('INVALID')).rejects.toThrow('MeSH API returned status 400');
     });
 
     it('should throw on network error', async () => {
@@ -457,7 +459,7 @@ describe('MeSH', () => {
 
     it('should throw on HTTP error', async () => {
       mockFetchJson({ error: 'Internal error' }, 500);
-      await expect(mesh.lookupOnline('test')).rejects.toThrow('status 500');
+      await expect(mesh.lookupOnline('test')).rejects.toThrow('MeSH API returned status 500');
     });
 
     it('should throw on network error', async () => {
