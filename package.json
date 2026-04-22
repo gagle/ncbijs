@@ -1,7 +1,7 @@
 {
   "name": "ncbijs-workspace",
   "version": "0.0.0",
-  "description": "TypeScript clients for NCBI biomedical literature APIs",
+  "description": "TypeScript clients for NCBI APIs — PubMed, PMC, BLAST, SNP, ClinVar, PubChem, Datasets, and more",
   "author": "Gabriel Llamas",
   "license": "MIT",
   "private": true,

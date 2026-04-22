@@ -68,6 +68,7 @@ jobs:
   e2e:
     needs: [setup]
     runs-on: ubuntu-latest
+    environment: dev
     strategy:
       matrix:
         node-version: [20, 22, 24]
