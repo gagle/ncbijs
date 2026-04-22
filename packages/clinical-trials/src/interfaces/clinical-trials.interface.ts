@@ -1,24 +1,24 @@
 /** Configuration for the ClinicalTrials client. */
 export interface ClinicalTrialsConfig {
-  readonly maxRetries?: number | undefined;
+  readonly maxRetries?: number;
 }
 
 /** Options for searching clinical trial studies. */
 export interface StudySearchOptions {
-  readonly filter?: StudySearchFilter | undefined;
-  readonly pageSize?: number | undefined;
-  readonly sort?: string | undefined;
-  readonly fields?: ReadonlyArray<string> | undefined;
+  readonly filter?: StudySearchFilter;
+  readonly pageSize?: number;
+  readonly sort?: string;
+  readonly fields?: ReadonlyArray<string>;
 }
 
 /** Filter criteria for study searches. */
 export interface StudySearchFilter {
-  readonly overallStatus?: ReadonlyArray<string> | undefined;
-  readonly condition?: ReadonlyArray<string> | undefined;
-  readonly intervention?: ReadonlyArray<string> | undefined;
-  readonly sponsor?: string | undefined;
-  readonly phase?: ReadonlyArray<string> | undefined;
-  readonly studyType?: string | undefined;
+  readonly overallStatus?: ReadonlyArray<string>;
+  readonly condition?: ReadonlyArray<string>;
+  readonly intervention?: ReadonlyArray<string>;
+  readonly sponsor?: string;
+  readonly phase?: ReadonlyArray<string>;
+  readonly studyType?: string;
 }
 
 /** Full report for a clinical trial study. */

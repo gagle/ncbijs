@@ -1,6 +1,6 @@
 /** Configuration for the RxNorm client. */
 export interface RxNormConfig {
-  readonly maxRetries?: number | undefined;
+  readonly maxRetries?: number;
 }
 
 /** An RxNorm concept identified by RxCUI, name, and term type. */

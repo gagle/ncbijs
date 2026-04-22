@@ -1,6 +1,6 @@
 /** Configuration for the dbSNP client. */
 export interface SnpConfig {
-  readonly apiKey?: string | undefined;
+  readonly apiKey?: string;
   readonly maxRetries?: number;
 }
 

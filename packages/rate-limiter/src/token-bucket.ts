@@ -13,7 +13,7 @@ export interface TokenBucketOptions {
   /** Tokens added per interval. */
   readonly refillRate: number;
   /** Refill interval in milliseconds. Default: `1000`. */
-  readonly interval?: number | undefined;
+  readonly interval?: number;
 }
 
 /** Shorthand that sets capacity and refillRate to the given value with a 1-second interval. */
@@ -25,11 +25,11 @@ export interface RateLimiterOptions {
 /** Options for a single `acquire()` call. */
 export interface AcquireOptions {
   /** Number of tokens to consume. Default: `1`. */
-  readonly cost?: number | undefined;
+  readonly cost?: number;
   /** Abort signal for cancellation. Rejects with `AbortError` when triggered. */
-  readonly signal?: AbortSignal | undefined;
+  readonly signal?: AbortSignal;
   /** Timeout in milliseconds. Rejects with `TokenBucketTimeoutError` if exceeded. */
-  readonly timeout?: number | undefined;
+  readonly timeout?: number;
 }
 
 /** Error thrown when a token bucket acquire operation exceeds its timeout. */

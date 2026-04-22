@@ -1,38 +1,38 @@
 /** A date that may have only year, year-month, or full year-month-day precision. */
 export interface PartialDate {
   readonly year: number;
-  readonly month?: number | undefined;
-  readonly day?: number | undefined;
+  readonly month?: number;
+  readonly day?: number;
 }
 
 /** An article author with name components, ORCID, and affiliations. */
 export interface Author {
-  readonly lastName?: string | undefined;
-  readonly foreName?: string | undefined;
-  readonly initials?: string | undefined;
-  readonly collectiveName?: string | undefined;
-  readonly orcid?: string | undefined;
+  readonly lastName?: string;
+  readonly foreName?: string;
+  readonly initials?: string;
+  readonly collectiveName?: string;
+  readonly orcid?: string;
   readonly affiliations: ReadonlyArray<string>;
 }
 
 /** Journal-level metadata from the JATS front matter. */
 export interface JournalMeta {
   readonly title: string;
-  readonly isoAbbrev?: string | undefined;
-  readonly publisher?: string | undefined;
-  readonly issn?: string | undefined;
+  readonly isoAbbrev?: string;
+  readonly publisher?: string;
+  readonly issn?: string;
 }
 
 /** Article-level metadata from the JATS front matter. */
 export interface ArticleMeta {
   readonly title: string;
   readonly authors: ReadonlyArray<Readonly<Author>>;
-  readonly abstract?: string | undefined;
-  readonly keywords?: ReadonlyArray<string> | undefined;
-  readonly doi?: string | undefined;
-  readonly pmid?: string | undefined;
-  readonly pmcid?: string | undefined;
-  readonly publicationDate?: Readonly<PartialDate> | undefined;
+  readonly abstract?: string;
+  readonly keywords?: ReadonlyArray<string>;
+  readonly doi?: string;
+  readonly pmid?: string;
+  readonly pmcid?: string;
+  readonly publicationDate?: Readonly<PartialDate>;
 }
 
 /** Combined journal and article metadata from the JATS front element. */
@@ -68,22 +68,22 @@ export interface Section {
 /** A bibliographic reference from the article's back matter. */
 export interface Reference {
   readonly id: string;
-  readonly label?: string | undefined;
+  readonly label?: string;
   readonly authors: ReadonlyArray<string>;
   readonly title: string;
   readonly source: string;
-  readonly year?: number | undefined;
-  readonly volume?: string | undefined;
-  readonly pages?: string | undefined;
-  readonly doi?: string | undefined;
-  readonly pmid?: string | undefined;
+  readonly year?: number;
+  readonly volume?: string;
+  readonly pages?: string;
+  readonly doi?: string;
+  readonly pmid?: string;
 }
 
 /** Back matter of a JATS article containing references, acknowledgements, and appendices. */
 export interface Back {
   readonly references: ReadonlyArray<Readonly<Reference>>;
-  readonly acknowledgements?: string | undefined;
-  readonly appendices?: ReadonlyArray<Readonly<Section>> | undefined;
+  readonly acknowledgements?: string;
+  readonly appendices?: ReadonlyArray<Readonly<Section>>;
 }
 
 /** A fully parsed JATS article with front matter, body sections, and back matter. */
@@ -103,7 +103,7 @@ export interface Chunk {
 
 /** Configuration options for the toChunks chunking strategy. */
 export interface ChunkOptions {
-  readonly maxTokens?: number | undefined;
-  readonly overlap?: number | undefined;
-  readonly includeSectionTitle?: boolean | undefined;
+  readonly maxTokens?: number;
+  readonly overlap?: number;
+  readonly includeSectionTitle?: boolean;
 }

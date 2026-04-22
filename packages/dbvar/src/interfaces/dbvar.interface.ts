@@ -1,6 +1,6 @@
 /** Configuration options for the dbVar client. */
 export interface DbVarConfig {
-  readonly apiKey?: string | undefined;
+  readonly apiKey?: string;
   readonly tool?: string;
   readonly email?: string;
   readonly maxRetries?: number;

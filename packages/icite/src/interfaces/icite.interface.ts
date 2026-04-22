@@ -1,6 +1,6 @@
 /** Configuration for the iCite client. */
 export interface ICiteConfig {
-  readonly maxRetries?: number | undefined;
+  readonly maxRetries?: number;
 }
 
 /** Citation metrics and bibliographic data for a publication from iCite. */

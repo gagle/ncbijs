@@ -49,14 +49,14 @@ export interface SearchResult {
 
 /** Pagination options for a PubTator3 search request. */
 export interface SearchOptions {
-  readonly page?: number | undefined;
-  readonly pageSize?: number | undefined;
+  readonly page?: number;
+  readonly pageSize?: number;
 }
 
 /** Options for exporting annotated documents from PubTator3. */
 export interface ExportOptions {
-  readonly format?: 'json' | 'xml' | undefined;
-  readonly full?: boolean | undefined;
+  readonly format?: 'json' | 'xml';
+  readonly full?: boolean;
 }
 
 /** A named entity annotation within a BioC passage. */
@@ -98,6 +98,6 @@ export interface PubTatorAnnotation {
 
 /** Options for controlling annotation output format and concept filtering. */
 export interface AnnotateOptions {
-  readonly concept?: ConceptType | undefined;
-  readonly format?: 'PubTator' | 'BioC' | 'JSON' | undefined;
+  readonly concept?: ConceptType;
+  readonly format?: 'PubTator' | 'BioC' | 'JSON';
 }

@@ -1,6 +1,6 @@
 /** Configuration options for the OMIM client. */
 export interface OmimConfig {
-  readonly apiKey?: string | undefined;
+  readonly apiKey?: string;
   readonly tool?: string;
   readonly email?: string;
   readonly maxRetries?: number;

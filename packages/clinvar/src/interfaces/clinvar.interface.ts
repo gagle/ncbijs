@@ -1,6 +1,6 @@
 /** Configuration for the ClinVar client. */
 export interface ClinVarConfig {
-  readonly apiKey?: string | undefined;
+  readonly apiKey?: string;
   readonly tool?: string;
   readonly email?: string;
   readonly maxRetries?: number;

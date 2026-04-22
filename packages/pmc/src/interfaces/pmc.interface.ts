@@ -27,18 +27,18 @@ export interface OARecord {
   readonly license: string | undefined;
   readonly xmlUrl: string;
   readonly textUrl: string;
-  readonly pdfUrl?: string | undefined;
-  readonly mediaUrls?: ReadonlyArray<string> | undefined;
+  readonly pdfUrl?: string;
+  readonly mediaUrls?: ReadonlyArray<string>;
 }
 
 /** Options for looking up a specific OA record version. */
 export interface OALookupOptions {
-  readonly version?: number | undefined;
+  readonly version?: number;
 }
 
 /** Options for listing OA records updated since a given date. */
 export interface OAListOptions {
-  readonly until?: string | undefined;
+  readonly until?: string;
 }
 
 /** OAI-PMH harvested record with header metadata and XML payload. */
@@ -51,16 +51,16 @@ export interface OAIRecord {
 
 /** Options for OAI-PMH ListRecords harvesting. */
 export interface OAIListOptions {
-  readonly from?: string | undefined;
-  readonly until?: string | undefined;
-  readonly set?: string | undefined;
-  readonly metadataPrefix?: string | undefined;
+  readonly from?: string;
+  readonly until?: string;
+  readonly set?: string;
+  readonly metadataPrefix?: string;
 }
 
 /** Configuration for the PMC client. */
 export interface PMCConfig {
-  readonly apiKey?: string | undefined;
+  readonly apiKey?: string;
   readonly tool: string;
   readonly email: string;
-  readonly maxRetries?: number | undefined;
+  readonly maxRetries?: number;
 }

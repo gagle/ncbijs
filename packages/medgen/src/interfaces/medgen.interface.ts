@@ -1,6 +1,6 @@
 /** Configuration options for the MedGen client. */
 export interface MedGenConfig {
-  readonly apiKey?: string | undefined;
+  readonly apiKey?: string;
   readonly tool?: string;
   readonly email?: string;
   readonly maxRetries?: number;

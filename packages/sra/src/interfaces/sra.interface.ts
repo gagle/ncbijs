@@ -1,6 +1,6 @@
 /** Configuration options for the SRA client. */
 export interface SraConfig {
-  readonly apiKey?: string | undefined;
+  readonly apiKey?: string;
   readonly tool?: string;
   readonly email?: string;
   readonly maxRetries?: number;

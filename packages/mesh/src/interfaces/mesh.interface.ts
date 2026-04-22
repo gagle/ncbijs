@@ -23,7 +23,7 @@ export interface MeshTreeData {
 export interface SparqlBinding {
   readonly type: string;
   readonly value: string;
-  readonly 'xml:lang'?: string | undefined;
+  readonly 'xml:lang'?: string;
 }
 
 /** Response from a SPARQL query containing variable names and result bindings. */

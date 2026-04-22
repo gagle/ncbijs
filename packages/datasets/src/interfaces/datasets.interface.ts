@@ -1,6 +1,6 @@
 /** Configuration for the NCBI Datasets client. */
 export interface DatasetsConfig {
-  readonly apiKey?: string | undefined;
+  readonly apiKey?: string;
   readonly maxRetries?: number;
 }
 

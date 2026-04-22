@@ -1,6 +1,6 @@
 /** Configuration options for the Structure database client. */
 export interface StructureConfig {
-  readonly apiKey?: string | undefined;
+  readonly apiKey?: string;
   readonly tool?: string;
   readonly email?: string;
   readonly maxRetries?: number;

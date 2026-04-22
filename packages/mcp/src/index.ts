@@ -42,7 +42,11 @@ function getPubmed(): PubMed {
 
 function getPmc(): PMC {
   if (pmc === undefined) {
-    pmc = new PMC(ncbiConfig);
+    pmc = new PMC({
+      ...(ncbiConfig.apiKey !== undefined && { apiKey: ncbiConfig.apiKey }),
+      tool: ncbiConfig.tool,
+      email: ncbiConfig.email,
+    });
   }
   return pmc;
 }
