@@ -48,7 +48,8 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@ncbijs/rate-limiter": "workspace:*"
+    "@ncbijs/rate-limiter": "workspace:*",
+    "@ncbijs/xml": "workspace:*"
   },
   "scripts": {
     "prepublishOnly": "echo 'Use CI to publish' && exit 1"

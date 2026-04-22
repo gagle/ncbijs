@@ -17,3 +17,5 @@ export type {
 } from './interfaces/pubchem.interface';
 export { PubChemHttpError } from './pubchem-client';
 export { PubChem } from './pubchem';
+export { parseCompoundExtras } from './parse-compound-extras';
+export type { CompoundExtrasInput, CompoundExtrasProperty } from './parse-compound-extras';

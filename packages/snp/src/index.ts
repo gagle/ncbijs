@@ -1,5 +1,6 @@
 export { Snp } from './snp';
 export { SnpHttpError } from './snp-client';
+export { parseRefSnpJson, parseRefSnpNdjson } from './parse-refsnp-json';
 export type {
   HgvsResult,
   RefSnpReport,

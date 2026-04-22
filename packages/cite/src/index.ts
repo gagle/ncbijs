@@ -8,3 +8,4 @@ export type {
 } from './interfaces/cite.interface';
 export { CiteHttpError } from './cite-client';
 export { Cite } from './cite';
+export { formatCitation } from './format-citation';

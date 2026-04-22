@@ -8,3 +8,4 @@ export type {
 } from './interfaces/mesh.interface';
 export { MeSHHttpError } from './mesh-client';
 export { MeSH } from './mesh';
+export { parseMeshDescriptorXml } from './parse-mesh-descriptor-xml';
