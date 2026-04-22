@@ -48,9 +48,6 @@
         "@ncbijs/bioc",
         "@ncbijs/clinical-tables"
       ]
-    },
-    {
-      "type": "node-workspace"
     }
   ],
   "packages": {
