@@ -113,14 +113,16 @@ describe('search', () => {
 
     it('should throw on non-ok HTTP status', async () => {
       mockFetchJson(null, 500);
-      await expect(search('icd10cm', 'diabetes')).rejects.toThrow(
+      await expect(search('icd10cm', 'diabetes', undefined, { maxRetries: 0 })).rejects.toThrow(
         'Clinical Tables API returned status 500',
       );
     });
 
     it('should throw on network failure', async () => {
       mockFetchFailure('Failed to fetch');
-      await expect(search('icd10cm', 'diabetes')).rejects.toThrow('Failed to fetch');
+      await expect(search('icd10cm', 'diabetes', undefined, { maxRetries: 0 })).rejects.toThrow(
+        'Failed to fetch',
+      );
     });
 
     it('should throw when response is not JSON', async () => {
