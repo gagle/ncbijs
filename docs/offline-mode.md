@@ -273,9 +273,75 @@ With ~2.5 TB of disk (RAG-relevant data only), ncbijs can run with zero internet
 
 PMC: the Open Access subset covers ~33% of all PMC articles. The rest are behind publisher paywalls — a licensing wall, not a technical one. The `pmc-oa-opendata` S3 bucket (no AWS account required) is the new official distribution method.
 
+## Storage architecture
+
+Parsed data needs a home. The `@ncbijs/store` package defines a strategy pattern with a base `Storage` interface that all consumers (loaders, MCP tools, user code) depend on. Concrete strategies handle the storage medium.
+
+```
+Storage (interface)                    Base contract — read/write/query/stats
+    ├── FileStorage (interface)        Extends Storage + path, close()
+    │   ├── DuckDbFileStorage          Single .duckdb file, columnar, indexed
+    │   └── JsonFileStorage            JSON files on disk (future)
+    ├── CloudStorage (interface)       Extends Storage + connect(), disconnect()
+    │   └── MotherDuckStorage          Cloud DuckDB via MotherDuck (future)
+    └── InMemoryStorage                For tests (future)
+```
+
+```typescript
+// @ncbijs/store — base contract, medium-agnostic
+interface Storage {
+  readonly writeRecords: (dataset: DatasetType, records: ReadonlyArray<unknown>) => Promise<void>;
+  readonly getRecord: <T>(dataset: DatasetType, key: string) => Promise<T | undefined>;
+  readonly searchRecords: <T>(
+    dataset: DatasetType,
+    query: SearchQuery,
+  ) => Promise<ReadonlyArray<T>>;
+  readonly getStats: () => Promise<ReadonlyArray<DatasetStats>>;
+}
+
+// File-based strategies add filesystem concerns
+interface FileStorage extends Storage {
+  readonly path: string;
+  readonly close: () => Promise<void>;
+}
+
+// Cloud strategies add connection/auth concerns
+interface CloudStorage extends Storage {
+  readonly connect: () => Promise<void>;
+  readonly disconnect: () => Promise<void>;
+}
+```
+
+**Why DuckDB for the first implementation:**
+
+- Columnar storage compresses ~10 GB of parsed data into ~2-3 GB
+- Indexed queries across 35M genes or 119M compounds return instantly
+- Single `.duckdb` file — no server, no config, portable
+- Can query CSV/Parquet files directly (useful for ad-hoc exploration)
+- 8x faster than SQLite for analytical workloads (scans, aggregations, filters)
+
+**Why the strategy pattern:**
+
+Parsers, loaders, and MCP tools depend only on `Storage`. Swapping `DuckDbFileStorage` for `MotherDuckStorage` (cloud) or `JsonFileStorage` (simple) requires zero changes to any consumer code.
+
+## Store MCP server
+
+The `@ncbijs/store-mcp` package exposes the stored data via MCP tools, making it queryable from Claude or any MCP client:
+
+| Tool                    | Description                                          |
+| ----------------------- | ---------------------------------------------------- |
+| `store-query-variants`  | Search ClinVar variants by gene, significance, trait |
+| `store-query-genes`     | Search genes by symbol, taxId, chromosome, type      |
+| `store-query-taxonomy`  | Look up taxonomy node, get lineage and children      |
+| `store-query-compounds` | Search compounds by CID, SMILES, InChI key           |
+| `store-convert-ids`     | PMID/PMCID/DOI lookup from stored mappings           |
+| `store-lookup-mesh`     | Query MeSH descriptors by name or tree number        |
+| `store-stats`           | Record counts, file size, last sync per dataset      |
+| `store-sql`             | Run arbitrary read-only SQL against the DuckDB file  |
+
 ## Implementation order
 
-### Phase 1: Original parsers (from initial roadmap)
+### Phase 1: Parsers
 
 | Priority | Package                                         | Effort | Impact                                       |
 | -------- | ----------------------------------------------- | ------ | -------------------------------------------- |
@@ -287,23 +353,39 @@ PMC: the Open Access subset covers ~33% of all PMC articles. The rest are behind
 | 6        | pubchem (parseCompoundExtras)                   | Medium | Medium — offline compound lookup             |
 | 7        | snp (parseRefSnpJson)                           | Small  | Low — data too large for most users          |
 
-### Phase 2: Newly identified parsers
+### Phase 2: Storage + loading
+
+| Priority | Component                                                       | Effort | Depends on    |
+| -------- | --------------------------------------------------------------- | ------ | ------------- |
+| 8        | `@ncbijs/store` interfaces (Storage, FileStorage, CloudStorage) | Small  | Phase 1 types |
+| 9        | `DuckDbFileStorage` strategy                                    | Medium | Phase 2.8     |
+| 10       | Download scripts (~4.4 GB from NCBI FTP)                        | Small  | Nothing       |
+| 11       | Load scripts (parse + store)                                    | Medium | Phase 2.9     |
+
+### Phase 3: MCP server
+
+| Priority | Component                            | Effort | Depends on |
+| -------- | ------------------------------------ | ------ | ---------- |
+| 12       | `@ncbijs/store-mcp` with query tools | Medium | Phase 2    |
+
+### Phase 4: Additional parsers
 
 | Priority | Package                                      | Effort | Impact                                       |
 | -------- | -------------------------------------------- | ------ | -------------------------------------------- |
-| 8        | datasets (gene2pubmed + gene2go + orthologs) | Medium | High — gene relationship graphs for RAG      |
-| 9        | icite (parseIciteCsv)                        | Small  | High — citation metrics for result ranking   |
-| 10       | clinical-trials (parseClinicalTrialJson)     | Small  | Medium — offline clinical trial search       |
-| 11       | litvar (parseLitVarJson)                     | Small  | Medium — variant-literature offline mapping  |
-| 12       | medgen (parseMedGenRrf)                      | Medium | Medium — medical genetics concept resolution |
-| 13       | clinvar (parseClinVarVcf)                    | Small  | Medium — VCF alternative to TSV              |
-| 14       | snp (parseDbSnpVcf)                          | Small  | High — VCF is 30x smaller than JSON (~20 GB) |
-| 15       | pubchem (parsePubchemLiteratureTsv)          | Small  | Medium — compound-literature links           |
-| 16       | cdd (parseCddDomains)                        | Medium | Low — specialized protein domain data        |
-| 17       | pmc (parsePmcS3Inventory)                    | Small  | High — enables PMC OA sync via new AWS model |
+| 13       | datasets (gene2pubmed + gene2go + orthologs) | Medium | High — gene relationship graphs for RAG      |
+| 14       | icite (parseIciteCsv)                        | Small  | High — citation metrics for result ranking   |
+| 15       | clinical-trials (parseClinicalTrialJson)     | Small  | Medium — offline clinical trial search       |
+| 16       | litvar (parseLitVarJson)                     | Small  | Medium — variant-literature offline mapping  |
+| 17       | medgen (parseMedGenRrf)                      | Medium | Medium — medical genetics concept resolution |
+| 18       | clinvar (parseClinVarVcf)                    | Small  | Medium — VCF alternative to TSV              |
+| 19       | snp (parseDbSnpVcf)                          | Small  | High — VCF is 30x smaller than JSON (~20 GB) |
+| 20       | pubchem (parsePubchemLiteratureTsv)          | Small  | Medium — compound-literature links           |
+| 21       | cdd (parseCddDomains)                        | Medium | Low — specialized protein domain data        |
+| 22       | pmc (parsePmcS3Inventory)                    | Small  | High — enables PMC OA sync via new AWS model |
 
-Phase 1: ~14 files, ~1,320 lines estimated.
-Phase 2: ~20 files, ~1,800 lines estimated.
-Total: ~34 files, ~3,120 lines estimated.
+Phase 1: ~16 files, ~1,320 lines estimated.
+Phase 2: ~20 files, ~1,500 lines estimated.
+Phase 3: ~14 files, ~800 lines estimated.
+Phase 4: ~20 files, ~1,800 lines estimated.
 
-For the full sync engine, store interface, and distribution architecture, see [offline-rag-architecture.md](./offline-rag-architecture.md).
+For the exhaustive data inventory, sync engine design, and storage schema details, see [offline-rag-architecture.md](./offline-rag-architecture.md).

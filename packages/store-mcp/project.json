@@ -1,0 +1,27 @@
+{
+  "name": "@ncbijs/store-mcp",
+  "sourceRoot": "packages/store-mcp/src",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p packages/store-mcp/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/store-mcp/dist"
+      },
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run --config packages/store-mcp/vitest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": { "lintFilePatterns": ["{projectRoot}/**/*.ts"] }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc --noEmit -p packages/store-mcp/tsconfig.json" }
+    }
+  }
+}

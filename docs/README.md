@@ -20,33 +20,35 @@ Technical guides for the ncbijs package ecosystem. Each guide covers one NCBI AP
 
 These packages have README documentation in their package directories. See each package's README for API details and usage examples.
 
-| Package                                                  | Covers                                                     |
-| -------------------------------------------------------- | ---------------------------------------------------------- |
-| [`@ncbijs/datasets`](../packages/datasets)               | Genes, genomes, taxonomy, viruses, BioProject, BioSample   |
-| [`@ncbijs/blast`](../packages/blast)                     | BLAST sequence alignment (submit/poll/retrieve)            |
-| [`@ncbijs/snp`](../packages/snp)                         | dbSNP variation data — placements, alleles, frequencies    |
-| [`@ncbijs/clinvar`](../packages/clinvar)                 | ClinVar clinical variant significance and traits           |
-| [`@ncbijs/pubchem`](../packages/pubchem)                 | PubChem compounds, substances, and bioassays               |
-| [`@ncbijs/protein`](../packages/protein)                 | Protein sequences in FASTA and GenBank formats             |
-| [`@ncbijs/nucleotide`](../packages/nucleotide)           | Nucleotide sequences in FASTA and GenBank formats          |
-| [`@ncbijs/genbank`](../packages/genbank)                 | GenBank flat file format parser (zero-dep)                 |
-| [`@ncbijs/fasta`](../packages/fasta)                     | FASTA format parser (zero-dep)                             |
-| [`@ncbijs/omim`](../packages/omim)                       | OMIM genetic disorders and Mendelian inheritance           |
-| [`@ncbijs/medgen`](../packages/medgen)                   | MedGen medical genetics concepts                           |
-| [`@ncbijs/gtr`](../packages/gtr)                         | Genetic Testing Registry                                   |
-| [`@ncbijs/geo`](../packages/geo)                         | GEO gene expression datasets                               |
-| [`@ncbijs/dbvar`](../packages/dbvar)                     | dbVar structural variants                                  |
-| [`@ncbijs/sra`](../packages/sra)                         | SRA sequencing experiment metadata                         |
-| [`@ncbijs/structure`](../packages/structure)             | 3D molecular structures from MMDB/PDB                      |
-| [`@ncbijs/cdd`](../packages/cdd)                         | Conserved Domain Database                                  |
-| [`@ncbijs/books`](../packages/books)                     | NCBI Bookshelf entries                                     |
-| [`@ncbijs/nlm-catalog`](../packages/nlm-catalog)         | NLM Catalog journal and serial records                     |
-| [`@ncbijs/clinical-trials`](../packages/clinical-trials) | ClinicalTrials.gov v2 — study search, stats, field values  |
-| [`@ncbijs/icite`](../packages/icite)                     | NIH iCite citation metrics — RCR, percentiles              |
-| [`@ncbijs/rxnorm`](../packages/rxnorm)                   | RxNorm drug normalization, interactions, NDC codes         |
-| [`@ncbijs/litvar`](../packages/litvar)                   | LitVar2 variant-literature linking by rsID                 |
-| [`@ncbijs/bioc`](../packages/bioc)                       | BioC annotated text with named entity recognition          |
-| [`@ncbijs/clinical-tables`](../packages/clinical-tables) | Clinical Table Search — ICD-10, LOINC, SNOMED autocomplete |
+| Package                                                  | Covers                                                      |
+| -------------------------------------------------------- | ----------------------------------------------------------- |
+| [`@ncbijs/datasets`](../packages/datasets)               | Genes, genomes, taxonomy, viruses, BioProject, BioSample    |
+| [`@ncbijs/blast`](../packages/blast)                     | BLAST sequence alignment (submit/poll/retrieve)             |
+| [`@ncbijs/snp`](../packages/snp)                         | dbSNP variation data — placements, alleles, frequencies     |
+| [`@ncbijs/clinvar`](../packages/clinvar)                 | ClinVar clinical variant significance and traits            |
+| [`@ncbijs/pubchem`](../packages/pubchem)                 | PubChem compounds, substances, and bioassays                |
+| [`@ncbijs/protein`](../packages/protein)                 | Protein sequences in FASTA and GenBank formats              |
+| [`@ncbijs/nucleotide`](../packages/nucleotide)           | Nucleotide sequences in FASTA and GenBank formats           |
+| [`@ncbijs/genbank`](../packages/genbank)                 | GenBank flat file format parser (zero-dep)                  |
+| [`@ncbijs/fasta`](../packages/fasta)                     | FASTA format parser (zero-dep)                              |
+| [`@ncbijs/omim`](../packages/omim)                       | OMIM genetic disorders and Mendelian inheritance            |
+| [`@ncbijs/medgen`](../packages/medgen)                   | MedGen medical genetics concepts                            |
+| [`@ncbijs/gtr`](../packages/gtr)                         | Genetic Testing Registry                                    |
+| [`@ncbijs/geo`](../packages/geo)                         | GEO gene expression datasets                                |
+| [`@ncbijs/dbvar`](../packages/dbvar)                     | dbVar structural variants                                   |
+| [`@ncbijs/sra`](../packages/sra)                         | SRA sequencing experiment metadata                          |
+| [`@ncbijs/structure`](../packages/structure)             | 3D molecular structures from MMDB/PDB                       |
+| [`@ncbijs/cdd`](../packages/cdd)                         | Conserved Domain Database                                   |
+| [`@ncbijs/books`](../packages/books)                     | NCBI Bookshelf entries                                      |
+| [`@ncbijs/nlm-catalog`](../packages/nlm-catalog)         | NLM Catalog journal and serial records                      |
+| [`@ncbijs/clinical-trials`](../packages/clinical-trials) | ClinicalTrials.gov v2 — study search, stats, field values   |
+| [`@ncbijs/icite`](../packages/icite)                     | NIH iCite citation metrics — RCR, percentiles               |
+| [`@ncbijs/rxnorm`](../packages/rxnorm)                   | RxNorm drug normalization, interactions, NDC codes          |
+| [`@ncbijs/litvar`](../packages/litvar)                   | LitVar2 variant-literature linking by rsID                  |
+| [`@ncbijs/bioc`](../packages/bioc)                       | BioC annotated text with named entity recognition           |
+| [`@ncbijs/clinical-tables`](../packages/clinical-tables) | Clinical Table Search — ICD-10, LOINC, SNOMED autocomplete  |
+| [`@ncbijs/store`](../packages/store)                     | Storage interfaces and DuckDB implementation for local data |
+| [`@ncbijs/store-mcp`](../packages/store-mcp)             | MCP server for querying locally stored NCBI data            |
 
 ## Architecture and Development
 

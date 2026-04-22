@@ -9,7 +9,7 @@
   <a href="https://github.com/gagle/ncbijs/actions"><img src="https://img.shields.io/github/actions/workflow/status/gagle/ncbijs/ci.yml" alt="CI" /></a>
   <a href="./docs/rag-integration.md"><img src="https://img.shields.io/badge/RAG-Ready-blueviolet" alt="RAG Ready" /></a>
   <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-Server-blue" alt="MCP Server" /></a>
-  <a href="./packages/mcp"><img src="https://img.shields.io/badge/LLM_Tools-18_tools-green" alt="LLM Tools" /></a>
+  <a href="./packages/http-mcp"><img src="https://img.shields.io/badge/LLM_Tools-18_tools-green" alt="LLM Tools" /></a>
 </p>
 
 ---
@@ -66,7 +66,9 @@ It is designed for two audiences:
 | Find literature linked to genetic variants            | `@ncbijs/litvar`                    |
 | Get annotated text with entity recognition            | `@ncbijs/bioc`                      |
 | Autocomplete ICD-10, LOINC, SNOMED codes              | `@ncbijs/clinical-tables`           |
-| Expose all tools to LLM agents via MCP                | `@ncbijs/mcp`                       |
+| Store NCBI data locally in DuckDB                     | `@ncbijs/store`                     |
+| Expose all tools to LLM agents via MCP                | `@ncbijs/http-mcp`                  |
+| Query local NCBI data via MCP                         | `@ncbijs/store-mcp`                 |
 
 ## Packages
 
@@ -107,12 +109,14 @@ It is designed for two audiences:
 | [`@ncbijs/clinical-tables`](./packages/clinical-tables) | Clinical Table Search — ICD-10, LOINC, SNOMED autocomplete          | [![npm](https://img.shields.io/npm/v/@ncbijs/clinical-tables)](https://www.npmjs.com/package/@ncbijs/clinical-tables) |
 | [`@ncbijs/fasta`](./packages/fasta)                     | Zero-dependency FASTA format parser for sequences                   | [![npm](https://img.shields.io/npm/v/@ncbijs/fasta)](https://www.npmjs.com/package/@ncbijs/fasta)                     |
 | [`@ncbijs/xml`](./packages/xml)                         | Zero-dependency regex-based XML reader for NCBI formats             | [![npm](https://img.shields.io/npm/v/@ncbijs/xml)](https://www.npmjs.com/package/@ncbijs/xml)                         |
-| [`@ncbijs/mcp`](./packages/mcp)                         | MCP server exposing all ncbijs tools for LLM agents                 | [![npm](https://img.shields.io/npm/v/@ncbijs/mcp)](https://www.npmjs.com/package/@ncbijs/mcp)                         |
+| [`@ncbijs/store`](./packages/store)                     | Storage interfaces and DuckDB implementation for local NCBI data    | [![npm](https://img.shields.io/npm/v/@ncbijs/store)](https://www.npmjs.com/package/@ncbijs/store)                     |
+| [`@ncbijs/http-mcp`](./packages/http-mcp)               | MCP server exposing all ncbijs tools for LLM agents                 | [![npm](https://img.shields.io/npm/v/@ncbijs/http-mcp)](https://www.npmjs.com/package/@ncbijs/http-mcp)               |
+| [`@ncbijs/store-mcp`](./packages/store-mcp)             | MCP server for querying locally stored NCBI data via DuckDB         | [![npm](https://img.shields.io/npm/v/@ncbijs/store-mcp)](https://www.npmjs.com/package/@ncbijs/store-mcp)             |
 | [`@ncbijs/rate-limiter`](./packages/rate-limiter)       | Token bucket rate limiter for browser and Node.js                   | [![npm](https://img.shields.io/npm/v/@ncbijs/rate-limiter)](https://www.npmjs.com/package/@ncbijs/rate-limiter)       |
 
 ## RAG integration
 
-ncbijs is built to power biomedical RAG (Retrieval-Augmented Generation) pipelines. Use it to enrich document chunks with named entities, normalize terminology via MeSH, validate claims against PubMed, and inject formatted citations into generated answers. The MCP server (`@ncbijs/mcp`) lets LLM agents call any ncbijs tool directly during generation with zero glue code.
+ncbijs is built to power biomedical RAG (Retrieval-Augmented Generation) pipelines. Use it to enrich document chunks with named entities, normalize terminology via MeSH, validate claims against PubMed, and inject formatted citations into generated answers. The MCP server (`@ncbijs/http-mcp`) lets LLM agents call any ncbijs tool directly during generation with zero glue code.
 
 See **[RAG Integration Guide](./docs/rag-integration.md)** for a full architecture walkthrough covering ingestion enrichment, query-time augmentation, generation-time citation, and priority assessment.
 
@@ -206,7 +210,9 @@ I want to...
 │   ├── Books/textbooks ───────────────────→ @ncbijs/books
 │   └── Journal records (NLM Catalog) ─────→ @ncbijs/nlm-catalog
 │
-└── Expose tools to LLM agents ────────────→ @ncbijs/mcp
+├── Store NCBI data locally (offline) ─────→ @ncbijs/store
+├── Expose tools to LLM agents (live API) ─→ @ncbijs/http-mcp
+└── Query local data via MCP (offline) ────→ @ncbijs/store-mcp
 ```
 
 ### Package capabilities

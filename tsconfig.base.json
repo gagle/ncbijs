@@ -33,7 +33,7 @@
       "@ncbijs/pubtator": ["./packages/pubtator/src/index.ts"],
       "@ncbijs/mesh": ["./packages/mesh/src/index.ts"],
       "@ncbijs/cite": ["./packages/cite/src/index.ts"],
-      "@ncbijs/mcp": ["./packages/mcp/src/index.ts"],
+      "@ncbijs/http-mcp": ["./packages/http-mcp/src/index.ts"],
       "@ncbijs/rate-limiter": ["./packages/rate-limiter/src/index.ts"],
       "@ncbijs/xml": ["./packages/xml/src/index.ts"],
       "@ncbijs/fasta": ["./packages/fasta/src/index.ts"],
@@ -60,7 +60,9 @@
       "@ncbijs/clinical-trials": ["./packages/clinical-trials/src/index.ts"],
       "@ncbijs/icite": ["./packages/icite/src/index.ts"],
       "@ncbijs/bioc": ["./packages/bioc/src/index.ts"],
-      "@ncbijs/clinical-tables": ["./packages/clinical-tables/src/index.ts"]
+      "@ncbijs/clinical-tables": ["./packages/clinical-tables/src/index.ts"],
+      "@ncbijs/store": ["./packages/store/src/index.ts"],
+      "@ncbijs/store-mcp": ["./packages/store-mcp/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "dist"]
