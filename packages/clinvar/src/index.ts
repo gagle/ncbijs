@@ -11,7 +11,6 @@ export type {
   RefSnpPlacement,
   RefSnpReport,
   SpdiAllele,
-  SpdiResult,
   TraitXref,
   VariantLocation,
   VariantReport,

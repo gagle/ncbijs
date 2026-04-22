@@ -73,7 +73,7 @@ console.log(report.placements[0].sequenceAccession); // 'NC_000011.10'
 console.log(report.placements[0].alleles[0].hgvs); // 'NC_000011.10:g.5227002C>T'
 ```
 
-#### `spdi(spdiExpression: string): Promise<SpdiResult>`
+#### `spdi(spdiExpression: string): Promise<SpdiAllele>`
 
 Validate and resolve an SPDI expression. Returns the parsed sequence accession, position, deleted sequence, and inserted sequence.
 
@@ -217,17 +217,6 @@ interface RefSnpPlacement {
 interface RefSnpAllele {
   spdi: string;
   hgvs: string;
-}
-```
-
-### `SpdiResult`
-
-```ts
-interface SpdiResult {
-  sequenceAccession: string;
-  position: number;
-  deletedSequence: string;
-  insertedSequence: string;
 }
 ```
 

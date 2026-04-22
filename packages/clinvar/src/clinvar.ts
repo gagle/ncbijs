@@ -18,7 +18,6 @@ import type {
   RefSnpPlacement,
   RefSnpReport,
   SpdiAllele,
-  SpdiResult,
   TraitXref,
   VariantLocation,
   VariantReport,
@@ -128,7 +127,7 @@ export class ClinVar {
   }
 
   /** Validate and resolve an SPDI expression via the Variation Services API. */
-  public async spdi(spdiExpression: string): Promise<SpdiResult> {
+  public async spdi(spdiExpression: string): Promise<SpdiAllele> {
     const url = `${VARIATION_BASE_URL}/spdi/${encodeURIComponent(spdiExpression)}`;
     const raw = await fetchJson<RawSpdiResponse>(url, this._config);
 
@@ -168,14 +167,18 @@ export class ClinVar {
   }
 }
 
+function isRawVariantEntry(value: unknown): value is RawVariantEntry {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 function getVariantEntry(result: RawESummaryResult, uid: string): RawVariantEntry | undefined {
   const entry: unknown = result[uid];
 
-  if (entry === undefined || typeof entry !== 'object' || entry === null || Array.isArray(entry)) {
+  if (!isRawVariantEntry(entry)) {
     return undefined;
   }
 
-  return entry as RawVariantEntry;
+  return entry;
 }
 
 interface RawESearchResponse {
@@ -352,7 +355,7 @@ interface RawSpdiResponse {
   };
 }
 
-function mapSpdiResult(raw: RawSpdiResponse): SpdiResult {
+function mapSpdiResult(raw: RawSpdiResponse): SpdiAllele {
   const data = raw.data;
 
   return {

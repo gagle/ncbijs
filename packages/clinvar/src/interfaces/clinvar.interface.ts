@@ -71,15 +71,7 @@ export interface RefSnpAllele {
   readonly hgvs: string;
 }
 
-/** Validated SPDI expression result from the Variation Services API. */
-export interface SpdiResult {
-  readonly sequenceAccession: string;
-  readonly position: number;
-  readonly deletedSequence: string;
-  readonly insertedSequence: string;
-}
-
-/** SPDI allele from HGVS-to-SPDI conversion. */
+/** SPDI allele from SPDI validation or HGVS-to-SPDI conversion. */
 export interface SpdiAllele {
   readonly sequenceAccession: string;
   readonly position: number;

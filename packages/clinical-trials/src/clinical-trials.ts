@@ -55,29 +55,7 @@ export class ClinicalTrials {
       params.set('fields', options.fields.join(','));
     }
 
-    const filter = options?.filter;
-    if (filter?.overallStatus !== undefined) {
-      params.set('filter.overallStatus', filter.overallStatus.join(','));
-    }
-    if (filter?.condition !== undefined) {
-      for (const condition of filter.condition) {
-        params.append('query.cond', condition);
-      }
-    }
-    if (filter?.intervention !== undefined) {
-      for (const intervention of filter.intervention) {
-        params.append('query.intr', intervention);
-      }
-    }
-    if (filter?.sponsor !== undefined) {
-      params.set('query.spons', filter.sponsor);
-    }
-    if (filter?.phase !== undefined) {
-      params.set('filter.phase', filter.phase.join(','));
-    }
-    if (filter?.studyType !== undefined) {
-      params.set('filter.studyType', filter.studyType);
-    }
+    applySearchFilters(params, options?.filter);
 
     let url: string | undefined = `${BASE_URL}/studies?${params.toString()}`;
 
@@ -142,28 +120,7 @@ export class ClinicalTrials {
       params.set('query.term', query);
     }
 
-    if (filter?.overallStatus !== undefined) {
-      params.set('filter.overallStatus', filter.overallStatus.join(','));
-    }
-    if (filter?.condition !== undefined) {
-      for (const condition of filter.condition) {
-        params.append('query.cond', condition);
-      }
-    }
-    if (filter?.intervention !== undefined) {
-      for (const intervention of filter.intervention) {
-        params.append('query.intr', intervention);
-      }
-    }
-    if (filter?.sponsor !== undefined) {
-      params.set('query.spons', filter.sponsor);
-    }
-    if (filter?.phase !== undefined) {
-      params.set('filter.phase', filter.phase.join(','));
-    }
-    if (filter?.studyType !== undefined) {
-      params.set('filter.studyType', filter.studyType);
-    }
+    applySearchFilters(params, filter);
 
     const url = `${BASE_URL}/studies?${params.toString()}`;
     const raw = await fetchJson<RawStudySizeResponse>(url, this._config);
@@ -245,6 +202,31 @@ interface RawEnumValuesResponse {
 
 interface RawStudySizeResponse {
   readonly totalCount?: number;
+}
+
+function applySearchFilters(params: URLSearchParams, filter?: StudySearchFilter): void {
+  if (filter?.overallStatus !== undefined) {
+    params.set('filter.overallStatus', filter.overallStatus.join(','));
+  }
+  if (filter?.condition !== undefined) {
+    for (const condition of filter.condition) {
+      params.append('query.cond', condition);
+    }
+  }
+  if (filter?.intervention !== undefined) {
+    for (const intervention of filter.intervention) {
+      params.append('query.intr', intervention);
+    }
+  }
+  if (filter?.sponsor !== undefined) {
+    params.set('query.spons', filter.sponsor);
+  }
+  if (filter?.phase !== undefined) {
+    params.set('filter.phase', filter.phase.join(','));
+  }
+  if (filter?.studyType !== undefined) {
+    params.set('filter.studyType', filter.studyType);
+  }
 }
 
 function mapStudyReport(raw: RawStudyResponse): StudyReport {
