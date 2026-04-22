@@ -294,7 +294,9 @@ describe('convert', () => {
 
     it('should throw on network error', async () => {
       mockFetchFailure('Failed to fetch');
-      await expect(convert(['12345678'])).rejects.toThrow('Failed to fetch');
+      await expect(convert(['12345678'], undefined, { maxRetries: 0 })).rejects.toThrow(
+        'Failed to fetch',
+      );
     });
 
     it('should throw on malformed response', async () => {
@@ -304,7 +306,9 @@ describe('convert', () => {
 
     it('should throw on HTTP error status', async () => {
       mockFetchJson(null, 500);
-      await expect(convert(['12345678'])).rejects.toThrow('ID Converter API returned status 500');
+      await expect(convert(['12345678'], undefined, { maxRetries: 0 })).rejects.toThrow(
+        'ID Converter API returned status 500',
+      );
     });
 
     it('should throw when response JSON parse fails', async () => {
