@@ -72,20 +72,14 @@ describe('PMC E2E', () => {
 
       expect(record).toBeDefined();
       expect(record.pmcid).toBe('PMC3531190');
-      expect(record.links).toBeDefined();
-      expect(record.links).toBeInstanceOf(Array);
+      expect(record.xmlUrl).toBeTruthy();
     });
 
-    it('should return download links', async () => {
+    it('should return download URLs', async () => {
       const record = await pmc.oa.lookup('PMC3531190');
 
-      expect(record.links.length).toBeGreaterThan(0);
-
-      const firstLink = record.links[0]!;
-      expect(firstLink.format).toBeDefined();
-      expect(['tgz', 'pdf']).toContain(firstLink.format);
-      expect(firstLink.href).toBeDefined();
-      expect(firstLink.href.length).toBeGreaterThan(0);
+      expect(record.xmlUrl).toBeTruthy();
+      expect(record.textUrl).toBeTruthy();
     });
   });
 });

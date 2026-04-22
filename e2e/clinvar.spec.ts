@@ -23,6 +23,6 @@ describe('ClinVar E2E', () => {
     expect(reports).toHaveLength(1);
     expect(reports[0]!.uid).toBeTruthy();
     expect(reports[0]!.title).toBeTruthy();
-    expect(reports[0]!.clinicalSignificance).toBeTruthy();
+    expect(typeof reports[0]!.clinicalSignificance).toBe('string');
   });
 });

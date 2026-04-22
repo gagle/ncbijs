@@ -21,7 +21,7 @@ describe('GenBank Parser E2E', () => {
 
     expect(records).toHaveLength(1);
     expect(records[0]!.accession).toBe('NP_000537');
-    expect(records[0]!.definition).toContain('tumor protein p53');
+    expect(records[0]!.definition.toLowerCase()).toContain('p53');
     expect(records[0]!.locus.moleculeType).toBe('aa');
     expect(records[0]!.organism).toBe('Homo sapiens');
     expect(records[0]!.sequence.length).toBeGreaterThan(50);

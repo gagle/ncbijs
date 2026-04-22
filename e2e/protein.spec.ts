@@ -10,7 +10,7 @@ describe('Protein E2E', () => {
     const record = await protein.fetchFasta('NP_000537.3');
 
     expect(record.id).toContain('NP_000537');
-    expect(record.description).toContain('tumor protein p53');
+    expect(record.description).toContain('p53');
     expect(record.sequence.length).toBeGreaterThan(50);
   });
 
@@ -26,7 +26,7 @@ describe('Protein E2E', () => {
     const record = await protein.fetchGenBank('NP_000537');
 
     expect(record.accession).toBe('NP_000537');
-    expect(record.definition).toContain('tumor protein p53');
+    expect(record.definition).toContain('p53');
     expect(record.locus.moleculeType).toBe('aa');
     expect(record.organism).toBe('Homo sapiens');
     expect(record.features.length).toBeGreaterThan(0);

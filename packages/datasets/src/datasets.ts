@@ -208,10 +208,10 @@ interface RawGeneReportWrapper {
 }
 
 interface RawGeneData {
-  readonly gene_id?: number;
+  readonly gene_id?: number | string;
   readonly symbol?: string;
   readonly description?: string;
-  readonly tax_id?: number;
+  readonly tax_id?: number | string;
   readonly taxname?: string;
   readonly common_name?: string;
   readonly type?: string;
@@ -307,10 +307,10 @@ interface RawAssemblyStats {
 function mapGeneReport(wrapper: RawGeneReportWrapper): GeneReport {
   const gene = wrapper.gene ?? {};
   return {
-    geneId: gene.gene_id ?? 0,
+    geneId: Number(gene.gene_id ?? 0),
     symbol: gene.symbol ?? '',
     description: gene.description ?? '',
-    taxId: gene.tax_id ?? 0,
+    taxId: Number(gene.tax_id ?? 0),
     taxName: gene.taxname ?? '',
     commonName: gene.common_name ?? '',
     type: gene.type ?? '',

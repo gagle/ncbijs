@@ -278,6 +278,7 @@ describe('toMarkdown', () => {
           paragraphs: [],
           tables: [
             {
+              caption: '',
               headers: ['Col1'],
               rows: [['val1']],
             },

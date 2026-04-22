@@ -3,7 +3,8 @@
   "pull-request-header": "",
   "pull-request-footer": "",
   "separate-pull-requests": false,
-  "group-pull-request-title-pattern": "chore: release ${version}",
+  "include-component-in-tag": true,
+  "group-pull-request-title-pattern": "chore: release ${component} ${version}",
   "plugins": [
     {
       "type": "linked-versions",

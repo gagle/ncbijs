@@ -197,7 +197,7 @@ describe('toPlainText', () => {
           title: 'Results',
           depth: 1,
           paragraphs: [],
-          tables: [{ headers: ['A'], rows: [['1']] }],
+          tables: [{ caption: '', headers: ['A'], rows: [['1']] }],
           figures: [],
           subsections: [],
         },

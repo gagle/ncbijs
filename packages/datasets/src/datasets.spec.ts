@@ -210,6 +210,15 @@ describe('Datasets', () => {
       expect(reports[0]!.geneOntology.molecularFunctions).toEqual([]);
     });
 
+    it('should coerce string gene_id and tax_id to numbers', async () => {
+      mockFetchJson({ reports: [{ gene: { gene_id: '672', tax_id: '9606' } }] });
+      const datasets = new Datasets();
+
+      const reports = await datasets.geneById([672]);
+      expect(reports[0]!.geneId).toBe(672);
+      expect(reports[0]!.taxId).toBe(9606);
+    });
+
     it('should handle go terms with missing fields', async () => {
       mockFetchJson({
         reports: [
