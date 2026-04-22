@@ -35,3 +35,8 @@ export interface EntitySearchResult {
   readonly name: string;
   readonly type: string;
 }
+
+/** Configuration for the BioC client. */
+export interface BioCConfig {
+  readonly maxRetries?: number;
+}

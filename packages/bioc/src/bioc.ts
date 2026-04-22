@@ -1,120 +1,124 @@
-import type { BioCDocument, BioCFormat, EntitySearchResult } from './interfaces/bioc.interface';
+import { TokenBucket } from '@ncbijs/rate-limiter';
+import { fetchText } from './bioc-client';
+import type { BioCClientConfig } from './bioc-client';
+import type {
+  BioCConfig,
+  BioCDocument,
+  BioCFormat,
+  EntitySearchResult,
+} from './interfaces/bioc.interface';
 
 const BASE_URL = 'https://www.ncbi.nlm.nih.gov/research/bionlp/RESTful';
 const PUBTATOR3_BASE_URL = 'https://www.ncbi.nlm.nih.gov/research/pubtator3-api';
+const REQUESTS_PER_SECOND = 3;
 
-/** Fetch BioC annotations for a PubMed article by PMID. */
-export function pubmed(pmid: string, format?: 'json'): Promise<BioCDocument>;
-export function pubmed(pmid: string, format: 'xml'): Promise<string>;
-export function pubmed(pmid: string, format: BioCFormat = 'json'): Promise<BioCDocument | string> {
-  return fetchBioC('pmid', pmid, format);
-}
+/** Client for the BioC API providing annotated PubMed and PMC article retrieval. */
+export class BioC {
+  private readonly _config: BioCClientConfig;
 
-/** Fetch BioC annotations for a PMC article by PMCID. */
-export function pmc(pmcid: string, format?: 'json'): Promise<BioCDocument>;
-export function pmc(pmcid: string, format: 'xml'): Promise<string>;
-export function pmc(pmcid: string, format: BioCFormat = 'json'): Promise<BioCDocument | string> {
-  return fetchBioC('pmcid', pmcid, format);
-}
-
-/** Batch fetch BioC annotations for multiple PubMed articles. */
-export function pubmedBatch(
-  pmids: ReadonlyArray<string>,
-  format?: 'json',
-): Promise<ReadonlyArray<BioCDocument>>;
-export function pubmedBatch(pmids: ReadonlyArray<string>, format: 'xml'): Promise<string>;
-export function pubmedBatch(
-  pmids: ReadonlyArray<string>,
-  format: BioCFormat = 'json',
-): Promise<ReadonlyArray<BioCDocument> | string> {
-  return fetchBioCBatch('pmids', pmids, format);
-}
-
-/** Batch fetch BioC annotations for multiple PMC articles. */
-export function pmcBatch(
-  pmcids: ReadonlyArray<string>,
-  format?: 'json',
-): Promise<ReadonlyArray<BioCDocument>>;
-export function pmcBatch(pmcids: ReadonlyArray<string>, format: 'xml'): Promise<string>;
-export function pmcBatch(
-  pmcids: ReadonlyArray<string>,
-  format: BioCFormat = 'json',
-): Promise<ReadonlyArray<BioCDocument> | string> {
-  return fetchBioCBatch('pmcids', pmcids, format);
-}
-
-/** Search for entities by name using the PubTator3 autocomplete API. */
-export async function entitySearch(
-  query: string,
-  type?: string,
-): Promise<ReadonlyArray<EntitySearchResult>> {
-  if (!query) {
-    throw new Error('query must not be empty');
+  constructor(config?: BioCConfig) {
+    this._config = {
+      maxRetries: config?.maxRetries ?? 3,
+      rateLimiter: new TokenBucket({ requestsPerSecond: REQUESTS_PER_SECOND }),
+    };
   }
 
-  let url = `${PUBTATOR3_BASE_URL}/entity/autocomplete/?query=${encodeURIComponent(query)}`;
-
-  if (type) {
-    url += `&type=${encodeURIComponent(type)}`;
+  /** Fetch BioC annotations for a PubMed article by PMID. */
+  public pubmed(pmid: string, format?: 'json'): Promise<BioCDocument>;
+  public pubmed(pmid: string, format: 'xml'): Promise<string>;
+  public pubmed(pmid: string, format: BioCFormat = 'json'): Promise<BioCDocument | string> {
+    return this.fetchBioC('pmid', pmid, format);
   }
 
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(`PubTator3 API returned status ${response.status}`);
+  /** Fetch BioC annotations for a PMC article by PMCID. */
+  public pmc(pmcid: string, format?: 'json'): Promise<BioCDocument>;
+  public pmc(pmcid: string, format: 'xml'): Promise<string>;
+  public pmc(pmcid: string, format: BioCFormat = 'json'): Promise<BioCDocument | string> {
+    return this.fetchBioC('pmcid', pmcid, format);
   }
 
-  return (await response.json()) as ReadonlyArray<EntitySearchResult>;
-}
-
-async function fetchBioC(
-  idType: string,
-  id: string,
-  format: BioCFormat,
-): Promise<BioCDocument | string> {
-  if (!id) {
-    throw new Error('id must not be empty');
+  /** Batch fetch BioC annotations for multiple PubMed articles. */
+  public pubmedBatch(
+    pmids: ReadonlyArray<string>,
+    format?: 'json',
+  ): Promise<ReadonlyArray<BioCDocument>>;
+  public pubmedBatch(pmids: ReadonlyArray<string>, format: 'xml'): Promise<string>;
+  public pubmedBatch(
+    pmids: ReadonlyArray<string>,
+    format: BioCFormat = 'json',
+  ): Promise<ReadonlyArray<BioCDocument> | string> {
+    return this.fetchBioCBatch('pmids', pmids, format);
   }
 
-  const url = `${BASE_URL}/${idType}/get/${encodeURIComponent(id)}/${format}`;
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(`BioC API returned status ${response.status}`);
+  /** Batch fetch BioC annotations for multiple PMC articles. */
+  public pmcBatch(
+    pmcids: ReadonlyArray<string>,
+    format?: 'json',
+  ): Promise<ReadonlyArray<BioCDocument>>;
+  public pmcBatch(pmcids: ReadonlyArray<string>, format: 'xml'): Promise<string>;
+  public pmcBatch(
+    pmcids: ReadonlyArray<string>,
+    format: BioCFormat = 'json',
+  ): Promise<ReadonlyArray<BioCDocument> | string> {
+    return this.fetchBioCBatch('pmcids', pmcids, format);
   }
 
-  const text = await response.text();
+  /** Search for entities by name using the PubTator3 autocomplete API. */
+  public async entitySearch(
+    query: string,
+    type?: string,
+  ): Promise<ReadonlyArray<EntitySearchResult>> {
+    if (!query) {
+      throw new Error('query must not be empty');
+    }
 
-  if (format === 'xml') {
-    return text;
+    let url = `${PUBTATOR3_BASE_URL}/entity/autocomplete/?query=${encodeURIComponent(query)}`;
+
+    if (type) {
+      url += `&type=${encodeURIComponent(type)}`;
+    }
+
+    const text = await fetchText(url, this._config);
+    return JSON.parse(text) as ReadonlyArray<EntitySearchResult>;
   }
 
-  return JSON.parse(text) as BioCDocument;
-}
+  private async fetchBioC(
+    idType: string,
+    id: string,
+    format: BioCFormat,
+  ): Promise<BioCDocument | string> {
+    if (!id) {
+      throw new Error('id must not be empty');
+    }
 
-async function fetchBioCBatch(
-  idParam: string,
-  ids: ReadonlyArray<string>,
-  format: BioCFormat,
-): Promise<ReadonlyArray<BioCDocument> | string> {
-  if (ids.length === 0) {
-    throw new Error('ids must not be empty');
+    const url = `${BASE_URL}/${idType}/get/${encodeURIComponent(id)}/${format}`;
+    const text = await fetchText(url, this._config);
+
+    if (format === 'xml') {
+      return text;
+    }
+
+    return JSON.parse(text) as BioCDocument;
   }
 
-  const formatSegment = format === 'xml' ? 'biocxml' : 'biocjson';
-  const commaSeparated = ids.map((id) => encodeURIComponent(id)).join(',');
-  const url = `${PUBTATOR3_BASE_URL}/publications/export/${formatSegment}?${idParam}=${commaSeparated}`;
-  const response = await fetch(url);
+  private async fetchBioCBatch(
+    idParam: string,
+    ids: ReadonlyArray<string>,
+    format: BioCFormat,
+  ): Promise<ReadonlyArray<BioCDocument> | string> {
+    if (ids.length === 0) {
+      throw new Error('ids must not be empty');
+    }
 
-  if (!response.ok) {
-    throw new Error(`PubTator3 API returned status ${response.status}`);
+    const formatSegment = format === 'xml' ? 'biocxml' : 'biocjson';
+    const commaSeparated = ids.map((id) => encodeURIComponent(id)).join(',');
+    const url = `${PUBTATOR3_BASE_URL}/publications/export/${formatSegment}?${idParam}=${commaSeparated}`;
+    const text = await fetchText(url, this._config);
+
+    if (format === 'xml') {
+      return text;
+    }
+
+    return JSON.parse(text) as ReadonlyArray<BioCDocument>;
   }
-
-  const text = await response.text();
-
-  if (format === 'xml') {
-    return text;
-  }
-
-  return JSON.parse(text) as ReadonlyArray<BioCDocument>;
 }

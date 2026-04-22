@@ -19,6 +19,11 @@ export interface CitationData {
   readonly nlm: CitationStyle;
 }
 
+/** Configuration for the Citation Exporter client. */
+export interface CiteConfig {
+  readonly maxRetries?: number;
+}
+
 /** Citation data in Citation Style Language (CSL) JSON format. */
 export interface CSLData {
   readonly type: string;

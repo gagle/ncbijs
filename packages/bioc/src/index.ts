@@ -1,9 +1,11 @@
 export type {
   BioCAnnotation,
+  BioCConfig,
   BioCDocument,
   BioCFormat,
   BioCLocation,
   BioCPassage,
   EntitySearchResult,
 } from './interfaces/bioc.interface';
-export { entitySearch, pmc, pmcBatch, pubmed, pubmedBatch } from './bioc';
+export { BioCHttpError } from './bioc-client';
+export { BioC } from './bioc';

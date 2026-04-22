@@ -1,5 +1,5 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
-import { cite } from '@ncbijs/cite';
+import { Cite } from '@ncbijs/cite';
 import { convert } from '@ncbijs/id-converter';
 import { MeSH } from '@ncbijs/mesh';
 import { z } from 'zod';
@@ -48,20 +48,21 @@ export function registerUtilityTools(server: McpServer): void {
       },
     },
     async ({ pmid, format }) => {
+      const citeClient = new Cite();
       let text: string;
 
       switch (format) {
         case 'csl':
-          text = JSON.stringify(await cite(pmid, 'csl'), null, 2);
+          text = JSON.stringify(await citeClient.cite(pmid, 'csl'), null, 2);
           break;
         case 'citation':
-          text = JSON.stringify(await cite(pmid, 'citation'), null, 2);
+          text = JSON.stringify(await citeClient.cite(pmid, 'citation'), null, 2);
           break;
         case 'ris':
-          text = await cite(pmid, 'ris');
+          text = await citeClient.cite(pmid, 'ris');
           break;
         case 'medline':
-          text = await cite(pmid, 'medline');
+          text = await citeClient.cite(pmid, 'medline');
           break;
       }
 

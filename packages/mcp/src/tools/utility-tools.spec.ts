@@ -12,9 +12,12 @@ vi.mock('@ncbijs/id-converter', () => ({
   convert: mockConvert,
 }));
 
-vi.mock('@ncbijs/cite', () => ({
-  cite: mockCite,
-}));
+vi.mock('@ncbijs/cite', () => {
+  const Cite = function Cite(this: Record<string, unknown>) {
+    this['cite'] = mockCite;
+  } as unknown;
+  return { Cite };
+});
 
 vi.mock('@ncbijs/mesh', () => {
   const MeSH = function MeSH(this: Record<string, unknown>) {

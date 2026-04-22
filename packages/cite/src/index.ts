@@ -3,6 +3,8 @@ export type {
   CitationFormat,
   CitationSource,
   CitationStyle,
+  CiteConfig,
   CSLData,
 } from './interfaces/cite.interface';
-export { cite, citeMany } from './cite';
+export { CiteHttpError } from './cite-client';
+export { Cite } from './cite';

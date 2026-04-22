@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cite, citeMany } from './cite';
+import { Cite } from './cite';
 
 function mockFetchText(text: string, status = 200): void {
   vi.stubGlobal(
@@ -41,13 +41,15 @@ describe('cite', () => {
   describe('format handling', () => {
     it('should fetch citation in RIS format', async () => {
       mockFetchText('TY  - JOUR\nAU  - Smith\nER  -\n');
-      const result = await cite('12345', 'ris');
+      const client = new Cite();
+      const result = await client.cite('12345', 'ris');
       expect(result).toContain('TY  - JOUR');
     });
 
     it('should fetch citation in MEDLINE format', async () => {
       mockFetchText('PMID- 12345\nOWN - NLM');
-      const result = await cite('12345', 'medline');
+      const client = new Cite();
+      const result = await client.cite('12345', 'medline');
       expect(result).toContain('PMID- 12345');
     });
 
@@ -60,7 +62,8 @@ describe('cite', () => {
         nlm: { orig: 'Smith J. Test.', format: 'nlm' },
       });
       mockFetchText(citationJson);
-      const result = await cite('12345', 'citation');
+      const client = new Cite();
+      const result = await client.cite('12345', 'citation');
       expect(result.id).toBe('12345');
       expect(result.ama.orig).toBe('Smith J. Test.');
       expect(result.apa.orig).toBe('Smith, J. (2024).');
@@ -70,7 +73,8 @@ describe('cite', () => {
 
     it('should fetch citation in CSL format', async () => {
       mockFetchText(SAMPLE_CSL);
-      const result = await cite('12345', 'csl');
+      const client = new Cite();
+      const result = await client.cite('12345', 'csl');
       expect(result.type).toBe('article-journal');
       expect(result.title).toBe('Test Article');
     });
@@ -79,13 +83,15 @@ describe('cite', () => {
   describe('CSL format response', () => {
     it('should return parsed CSLData object', async () => {
       mockFetchText(SAMPLE_CSL);
-      const result = await cite('12345', 'csl');
+      const client = new Cite();
+      const result = await client.cite('12345', 'csl');
       expect(typeof result).toBe('object');
     });
 
     it('should include type, id, title', async () => {
       mockFetchText(SAMPLE_CSL);
-      const result = await cite('12345', 'csl');
+      const client = new Cite();
+      const result = await client.cite('12345', 'csl');
       expect(result.type).toBe('article-journal');
       expect(result.id).toBe('12345');
       expect(result.title).toBe('Test Article');
@@ -93,7 +99,8 @@ describe('cite', () => {
 
     it('should include author array with family and given', async () => {
       mockFetchText(SAMPLE_CSL);
-      const result = await cite('12345', 'csl');
+      const client = new Cite();
+      const result = await client.cite('12345', 'csl');
       expect(result.author).toHaveLength(1);
       expect(result.author[0]!.family).toBe('Smith');
       expect(result.author[0]!.given).toBe('John');
@@ -101,56 +108,65 @@ describe('cite', () => {
 
     it('should include issued date-parts', async () => {
       mockFetchText(SAMPLE_CSL);
-      const result = await cite('12345', 'csl');
+      const client = new Cite();
+      const result = await client.cite('12345', 'csl');
       expect(result.issued['date-parts'][0]).toEqual([2024, 1, 15]);
     });
 
     it('should include optional container-title', async () => {
       mockFetchText(SAMPLE_CSL);
-      const result = await cite('12345', 'csl');
+      const client = new Cite();
+      const result = await client.cite('12345', 'csl');
       expect(result['container-title']).toBe('Nature');
     });
 
     it('should include optional volume and issue', async () => {
       mockFetchText(SAMPLE_CSL);
-      const result = await cite('12345', 'csl');
+      const client = new Cite();
+      const result = await client.cite('12345', 'csl');
       expect(result.volume).toBe('625');
       expect(result.issue).toBe('1');
     });
 
     it('should include optional page', async () => {
       mockFetchText(SAMPLE_CSL);
-      const result = await cite('12345', 'csl');
+      const client = new Cite();
+      const result = await client.cite('12345', 'csl');
       expect(result.page).toBe('100-105');
     });
 
     it('should include optional DOI', async () => {
       mockFetchText(SAMPLE_CSL);
-      const result = await cite('12345', 'csl');
+      const client = new Cite();
+      const result = await client.cite('12345', 'csl');
       expect(result.DOI).toBe('10.1038/test');
     });
 
     it('should include optional PMID', async () => {
       mockFetchText(SAMPLE_CSL);
-      const result = await cite('12345', 'csl');
+      const client = new Cite();
+      const result = await client.cite('12345', 'csl');
       expect(result.PMID).toBe('12345');
     });
 
     it('should include optional PMCID', async () => {
       mockFetchText(SAMPLE_CSL);
-      const result = await cite('12345', 'csl');
+      const client = new Cite();
+      const result = await client.cite('12345', 'csl');
       expect(result.PMCID).toBe('PMC9999');
     });
 
     it('should include optional URL', async () => {
       mockFetchText(SAMPLE_CSL);
-      const result = await cite('12345', 'csl');
+      const client = new Cite();
+      const result = await client.cite('12345', 'csl');
       expect(result.URL).toBe('https://example.com');
     });
 
     it('should include optional abstract', async () => {
       mockFetchText(SAMPLE_CSL);
-      const result = await cite('12345', 'csl');
+      const client = new Cite();
+      const result = await client.cite('12345', 'csl');
       expect(result.abstract).toBe('Test abstract.');
     });
   });
@@ -158,14 +174,16 @@ describe('cite', () => {
   describe('non-CSL format response', () => {
     it('should return string for all non-CSL formats', async () => {
       mockFetchText('TY  - JOUR');
-      const result = await cite('12345', 'ris');
+      const client = new Cite();
+      const result = await client.cite('12345', 'ris');
       expect(typeof result).toBe('string');
     });
 
     it('should return raw formatted text', async () => {
       const rawText = 'PMID- 12345\nTI  - Test Title\n';
       mockFetchText(rawText);
-      const result = await cite('12345', 'medline');
+      const client = new Cite();
+      const result = await client.cite('12345', 'medline');
       expect(result).toBe(rawText);
     });
   });
@@ -173,35 +191,40 @@ describe('cite', () => {
   describe('source handling', () => {
     it('should default to pubmed source', async () => {
       mockFetchText('TY  - JOUR');
-      await cite('12345', 'ris');
+      const client = new Cite();
+      await client.cite('12345', 'ris');
       const fetchCall = vi.mocked(fetch).mock.calls[0]![0] as string;
       expect(fetchCall).toContain('/pubmed/');
     });
 
     it('should support pubmed source', async () => {
       mockFetchText('TY  - JOUR');
-      await cite('12345', 'ris', 'pubmed');
+      const client = new Cite();
+      await client.cite('12345', 'ris', 'pubmed');
       const fetchCall = vi.mocked(fetch).mock.calls[0]![0] as string;
       expect(fetchCall).toContain('/pubmed/');
     });
 
     it('should support pmc source', async () => {
       mockFetchText('TY  - JOUR');
-      await cite('PMC12345', 'ris', 'pmc');
+      const client = new Cite();
+      await client.cite('PMC12345', 'ris', 'pmc');
       const fetchCall = vi.mocked(fetch).mock.calls[0]![0] as string;
       expect(fetchCall).toContain('/pmc/');
     });
 
     it('should support books source', async () => {
       mockFetchText('TY  - BOOK');
-      await cite('NBK12345', 'ris', 'books');
+      const client = new Cite();
+      await client.cite('NBK12345', 'ris', 'books');
       const fetchCall = vi.mocked(fetch).mock.calls[0]![0] as string;
       expect(fetchCall).toContain('/books/');
     });
 
     it('should construct correct URL for each source', async () => {
       mockFetchText('TY  - JOUR');
-      await cite('12345', 'ris', 'pubmed');
+      const client = new Cite();
+      await client.cite('12345', 'ris', 'pubmed');
       const fetchCall = vi.mocked(fetch).mock.calls[0]![0] as string;
       const url = new URL(fetchCall);
       expect(url.pathname).toContain('/pubmed/');
@@ -212,39 +235,46 @@ describe('cite', () => {
 
   describe('error handling', () => {
     it('should throw on invalid ID', async () => {
-      await expect(cite('', 'ris')).rejects.toThrow('id must not be empty');
+      const client = new Cite();
+      await expect(client.cite('', 'ris')).rejects.toThrow('id must not be empty');
     });
 
     it('should throw on network error', async () => {
       mockFetchFailure('Failed to fetch');
-      await expect(cite('12345', 'ris')).rejects.toThrow('Failed to fetch');
+      const client = new Cite();
+      await expect(client.cite('12345', 'ris')).rejects.toThrow('Failed to fetch');
     });
 
     it('should throw on non-existent article', async () => {
       mockFetchText('Not found', 404);
-      await expect(cite('99999999', 'ris')).rejects.toThrow('Article not found');
+      const client = new Cite();
+      await expect(client.cite('99999999', 'ris')).rejects.toThrow('Article not found');
     });
 
     it('should throw on malformed CSL JSON response', async () => {
       mockFetchText('not valid json');
-      await expect(cite('12345', 'csl')).rejects.toThrow('malformed JSON');
+      const client = new Cite();
+      await expect(client.cite('12345', 'csl')).rejects.toThrow('malformed JSON');
     });
 
     it('should throw on non-404 HTTP error status', async () => {
       mockFetchText('Server Error', 500);
-      await expect(cite('12345', 'ris')).rejects.toThrow(
+      const client = new Cite();
+      await expect(client.cite('12345', 'ris')).rejects.toThrow(
         'Citation Exporter API returned status 500',
       );
     });
 
     it('should throw on valid JSON missing required key for CSL format', async () => {
       mockFetchText(JSON.stringify({ irrelevant: 'data' }));
-      await expect(cite('12345', 'csl')).rejects.toThrow('malformed JSON');
+      const client = new Cite();
+      await expect(client.cite('12345', 'csl')).rejects.toThrow('malformed JSON');
     });
 
     it('should throw on valid JSON missing required key for citation format', async () => {
       mockFetchText(JSON.stringify({ irrelevant: 'data' }));
-      await expect(cite('12345', 'citation')).rejects.toThrow('malformed JSON');
+      const client = new Cite();
+      await expect(client.cite('12345', 'citation')).rejects.toThrow('malformed JSON');
     });
   });
 });
@@ -258,8 +288,9 @@ describe('citeMany', () => {
   it('should yield citation for each ID', async () => {
     mockFetchText('TY  - JOUR');
     vi.useFakeTimers({ shouldAdvanceTime: true });
+    const client = new Cite();
     const results: Array<{ id: string }> = [];
-    for await (const result of citeMany(['111', '222'], 'ris')) {
+    for await (const result of client.citeMany(['111', '222'], 'ris')) {
       results.push(result);
     }
     expect(results).toHaveLength(2);
@@ -268,8 +299,9 @@ describe('citeMany', () => {
   it('should include id and citation in each yielded value', async () => {
     mockFetchText('TY  - JOUR');
     vi.useFakeTimers({ shouldAdvanceTime: true });
+    const client = new Cite();
     const results: Array<{ id: string; citation: unknown }> = [];
-    for await (const result of citeMany(['111'], 'ris')) {
+    for await (const result of client.citeMany(['111'], 'ris')) {
       results.push(result);
     }
     expect(results[0]!.id).toBe('111');
@@ -279,8 +311,9 @@ describe('citeMany', () => {
   it('should return CSLData for csl format', async () => {
     mockFetchText(SAMPLE_CSL);
     vi.useFakeTimers({ shouldAdvanceTime: true });
+    const client = new Cite();
     const results: Array<{ citation: unknown }> = [];
-    for await (const result of citeMany(['12345'], 'csl')) {
+    for await (const result of client.citeMany(['12345'], 'csl')) {
       results.push(result);
     }
     expect(typeof results[0]!.citation).toBe('object');
@@ -289,8 +322,9 @@ describe('citeMany', () => {
   it('should return string for non-csl formats', async () => {
     mockFetchText('TY  - JOUR');
     vi.useFakeTimers({ shouldAdvanceTime: true });
+    const client = new Cite();
     const results: Array<{ citation: unknown }> = [];
-    for await (const result of citeMany(['12345'], 'ris')) {
+    for await (const result of client.citeMany(['12345'], 'ris')) {
       results.push(result);
     }
     expect(typeof results[0]!.citation).toBe('string');
@@ -299,9 +333,10 @@ describe('citeMany', () => {
   it('should respect rate limiting between requests', async () => {
     mockFetchText('TY  - JOUR');
     vi.useFakeTimers({ shouldAdvanceTime: true });
+    const client = new Cite();
     const start = Date.now();
     const results: Array<unknown> = [];
-    for await (const result of citeMany(['111', '222', '333'], 'ris')) {
+    for await (const result of client.citeMany(['111', '222', '333'], 'ris')) {
       results.push(result);
     }
     const elapsed = Date.now() - start;
@@ -311,16 +346,18 @@ describe('citeMany', () => {
   it('should handle single ID', async () => {
     mockFetchText('TY  - JOUR');
     vi.useFakeTimers({ shouldAdvanceTime: true });
+    const client = new Cite();
     const results: Array<unknown> = [];
-    for await (const result of citeMany(['111'], 'ris')) {
+    for await (const result of client.citeMany(['111'], 'ris')) {
       results.push(result);
     }
     expect(results).toHaveLength(1);
   });
 
   it('should handle empty IDs array', async () => {
+    const client = new Cite();
     const results: Array<unknown> = [];
-    for await (const result of citeMany([], 'ris')) {
+    for await (const result of client.citeMany([], 'ris')) {
       results.push(result);
     }
     expect(results).toHaveLength(0);
@@ -329,9 +366,10 @@ describe('citeMany', () => {
   it('should propagate errors for individual IDs', async () => {
     mockFetchText('Not found', 404);
     vi.useFakeTimers({ shouldAdvanceTime: true });
+    const client = new Cite();
     await expect(async () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      for await (const _result of citeMany(['bad-id'], 'ris')) {
+      for await (const _result of client.citeMany(['bad-id'], 'ris')) {
         // noop
       }
     }).rejects.toThrow('Article not found');
@@ -340,8 +378,9 @@ describe('citeMany', () => {
   it('should support source option', async () => {
     mockFetchText('TY  - JOUR');
     vi.useFakeTimers({ shouldAdvanceTime: true });
+    const client = new Cite();
     const results: Array<unknown> = [];
-    for await (const result of citeMany(['PMC12345'], 'ris', 'pmc')) {
+    for await (const result of client.citeMany(['PMC12345'], 'ris', 'pmc')) {
       results.push(result);
     }
     const fetchCall = vi.mocked(fetch).mock.calls[0]![0] as string;

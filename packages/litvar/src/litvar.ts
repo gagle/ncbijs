@@ -1,11 +1,16 @@
+import { TokenBucket } from '@ncbijs/rate-limiter';
+import { fetchJson } from './litvar-client';
+import type { LitVarClientConfig } from './litvar-client';
 import type {
   LitVarAnnotation,
+  LitVarConfig,
   LitVarPublication,
   LitVarSearchResult,
   LitVarVariant,
 } from './interfaces/litvar.interface';
 
 const BASE_URL = 'https://www.ncbi.nlm.nih.gov/research/litvar2-api';
+const REQUESTS_PER_SECOND = 3;
 
 interface RawVariantResult {
   readonly rsid: string;
@@ -18,85 +23,67 @@ interface RawVariantResponse {
   readonly results: ReadonlyArray<RawVariantResult>;
 }
 
-/** Fetch variant details and publication count for an rsID. */
-export async function variant(rsid: string): Promise<LitVarVariant> {
-  if (!rsid) {
-    throw new Error('rsid must not be empty');
+/** Client for the LitVar2 API providing variant-literature association queries. */
+export class LitVar {
+  private readonly _config: LitVarClientConfig;
+
+  constructor(config?: LitVarConfig) {
+    this._config = {
+      maxRetries: config?.maxRetries ?? 3,
+      rateLimiter: new TokenBucket({ requestsPerSecond: REQUESTS_PER_SECOND }),
+    };
   }
 
-  const url = `${BASE_URL}/variant/get/litvar/${encodeURIComponent(rsid)}%23%23`;
-  const response = await fetch(url);
+  /** Fetch variant details and publication count for an rsID. */
+  public async variant(rsid: string): Promise<LitVarVariant> {
+    if (!rsid) {
+      throw new Error('rsid must not be empty');
+    }
 
-  if (!response.ok) {
-    throw new Error(`LitVar API returned status ${response.status}`);
+    const url = `${BASE_URL}/variant/get/litvar/${encodeURIComponent(rsid)}%23%23`;
+    const raw = await fetchJson<RawVariantResponse>(url, this._config);
+
+    if (!raw.results || raw.results.length === 0) {
+      throw new Error(`No variant found for ${rsid}`);
+    }
+
+    const result = raw.results[0]!;
+
+    return {
+      rsid: result.rsid,
+      hgvs: result.hgvs_list,
+      gene: result.gene,
+      publicationCount: result.pmid_count,
+    };
   }
 
-  const raw: RawVariantResponse = await response.json();
+  /** Fetch publications mentioning a variant by rsID. */
+  public async publications(rsid: string): Promise<ReadonlyArray<LitVarPublication>> {
+    if (!rsid) {
+      throw new Error('rsid must not be empty');
+    }
 
-  if (!raw.results || raw.results.length === 0) {
-    throw new Error(`No variant found for ${rsid}`);
+    const url = `${BASE_URL}/variant/publications/litvar/${encodeURIComponent(rsid)}%23%23`;
+    return fetchJson<ReadonlyArray<LitVarPublication>>(url, this._config);
   }
 
-  const result = raw.results[0]!;
+  /** Search LitVar for variants matching a text query. */
+  public async search(query: string): Promise<ReadonlyArray<LitVarSearchResult>> {
+    if (!query) {
+      throw new Error('query must not be empty');
+    }
 
-  return {
-    rsid: result.rsid,
-    hgvs: result.hgvs_list,
-    gene: result.gene,
-    publicationCount: result.pmid_count,
-  };
-}
-
-/** Fetch publications mentioning a variant by rsID. */
-export async function publications(rsid: string): Promise<ReadonlyArray<LitVarPublication>> {
-  if (!rsid) {
-    throw new Error('rsid must not be empty');
+    const url = `${BASE_URL}/api/v1/entity/search/${encodeURIComponent(query)}`;
+    return fetchJson<ReadonlyArray<LitVarSearchResult>>(url, this._config);
   }
 
-  const url = `${BASE_URL}/variant/publications/litvar/${encodeURIComponent(rsid)}%23%23`;
-  const response = await fetch(url);
+  /** Fetch detailed annotations for a variant by rsID. */
+  public async variantAnnotations(rsid: string): Promise<ReadonlyArray<LitVarAnnotation>> {
+    if (!rsid) {
+      throw new Error('rsid must not be empty');
+    }
 
-  if (!response.ok) {
-    throw new Error(`LitVar API returned status ${response.status}`);
+    const url = `${BASE_URL}/api/v1/entity/litvar/${encodeURIComponent(rsid)}%23%23/annotations`;
+    return fetchJson<ReadonlyArray<LitVarAnnotation>>(url, this._config);
   }
-
-  const raw: ReadonlyArray<LitVarPublication> = await response.json();
-
-  return raw;
-}
-
-/** Search LitVar for variants matching a text query. */
-export async function search(query: string): Promise<ReadonlyArray<LitVarSearchResult>> {
-  if (!query) {
-    throw new Error('query must not be empty');
-  }
-
-  const url = `${BASE_URL}/api/v1/entity/search/${encodeURIComponent(query)}`;
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(`LitVar API returned status ${response.status}`);
-  }
-
-  const raw: ReadonlyArray<LitVarSearchResult> = await response.json();
-
-  return raw;
-}
-
-/** Fetch detailed annotations for a variant by rsID. */
-export async function variantAnnotations(rsid: string): Promise<ReadonlyArray<LitVarAnnotation>> {
-  if (!rsid) {
-    throw new Error('rsid must not be empty');
-  }
-
-  const url = `${BASE_URL}/api/v1/entity/litvar/${encodeURIComponent(rsid)}%23%23/annotations`;
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(`LitVar API returned status ${response.status}`);
-  }
-
-  const raw: ReadonlyArray<LitVarAnnotation> = await response.json();
-
-  return raw;
 }

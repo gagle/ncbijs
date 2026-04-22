@@ -6,10 +6,13 @@ const { mockVariant, mockPublications } = vi.hoisted(() => ({
   mockPublications: vi.fn(),
 }));
 
-vi.mock('@ncbijs/litvar', () => ({
-  variant: mockVariant,
-  publications: mockPublications,
-}));
+vi.mock('@ncbijs/litvar', () => {
+  const LitVar = function LitVar(this: Record<string, unknown>) {
+    this['variant'] = mockVariant;
+    this['publications'] = mockPublications;
+  } as unknown;
+  return { LitVar };
+});
 
 import { registerLitVarTools } from './litvar-tools';
 

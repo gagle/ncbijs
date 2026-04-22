@@ -27,3 +27,8 @@ export interface LitVarAnnotation {
   readonly genes: ReadonlyArray<string>;
   readonly pmids: ReadonlyArray<number>;
 }
+
+/** Configuration for the LitVar client. */
+export interface LitVarConfig {
+  readonly maxRetries?: number;
+}

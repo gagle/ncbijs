@@ -15,8 +15,12 @@ export function registerLitVarTools(server: McpServer): void {
       },
     },
     async ({ rsid }) => {
-      const { variant, publications } = await import('@ncbijs/litvar');
-      const [variantInfo, pubs] = await Promise.all([variant(rsid), publications(rsid)]);
+      const { LitVar } = await import('@ncbijs/litvar');
+      const litvar = new LitVar();
+      const [variantInfo, pubs] = await Promise.all([
+        litvar.variant(rsid),
+        litvar.publications(rsid),
+      ]);
       return {
         content: [
           {
