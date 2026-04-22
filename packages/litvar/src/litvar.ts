@@ -13,14 +13,58 @@ const BASE_URL = 'https://www.ncbi.nlm.nih.gov/research/litvar2-api';
 const REQUESTS_PER_SECOND = 3;
 
 interface RawVariantResult {
-  readonly rsid: string;
-  readonly hgvs_list: ReadonlyArray<string>;
-  readonly gene: string;
-  readonly pmid_count: number;
+  readonly rsid?: string;
+  readonly hgvs_list?: ReadonlyArray<string>;
+  readonly gene?: string;
+  readonly pmid_count?: number;
 }
 
 interface RawVariantResponse {
-  readonly results: ReadonlyArray<RawVariantResult>;
+  readonly results?: ReadonlyArray<RawVariantResult>;
+}
+
+interface RawPublication {
+  readonly pmid?: number;
+  readonly title?: string;
+  readonly journal?: string;
+  readonly year?: number;
+}
+
+interface RawSearchResult {
+  readonly term?: string;
+  readonly type?: string;
+  readonly score?: number;
+}
+
+interface RawAnnotation {
+  readonly disease?: string;
+  readonly genes?: ReadonlyArray<string>;
+  readonly pmids?: ReadonlyArray<number>;
+}
+
+function mapPublication(raw: RawPublication): LitVarPublication {
+  return {
+    pmid: raw.pmid ?? 0,
+    title: raw.title ?? '',
+    journal: raw.journal ?? '',
+    year: raw.year ?? 0,
+  };
+}
+
+function mapSearchResult(raw: RawSearchResult): LitVarSearchResult {
+  return {
+    term: raw.term ?? '',
+    type: raw.type ?? '',
+    score: raw.score ?? 0,
+  };
+}
+
+function mapAnnotation(raw: RawAnnotation): LitVarAnnotation {
+  return {
+    disease: raw.disease ?? '',
+    genes: raw.genes ?? [],
+    pmids: raw.pmids ?? [],
+  };
 }
 
 /** Client for the LitVar2 API providing variant-literature association queries. */
@@ -50,10 +94,10 @@ export class LitVar {
     const result = raw.results[0]!;
 
     return {
-      rsid: result.rsid,
-      hgvs: result.hgvs_list,
-      gene: result.gene,
-      publicationCount: result.pmid_count,
+      rsid: result.rsid ?? '',
+      hgvs: result.hgvs_list ?? [],
+      gene: result.gene ?? '',
+      publicationCount: result.pmid_count ?? 0,
     };
   }
 
@@ -64,7 +108,8 @@ export class LitVar {
     }
 
     const url = `${BASE_URL}/variant/publications/litvar/${encodeURIComponent(rsid)}%23%23`;
-    return fetchJson<ReadonlyArray<LitVarPublication>>(url, this._config);
+    const raw = await fetchJson<ReadonlyArray<RawPublication>>(url, this._config);
+    return raw.map(mapPublication);
   }
 
   /** Search LitVar for variants matching a text query. */
@@ -74,7 +119,8 @@ export class LitVar {
     }
 
     const url = `${BASE_URL}/api/v1/entity/search/${encodeURIComponent(query)}`;
-    return fetchJson<ReadonlyArray<LitVarSearchResult>>(url, this._config);
+    const raw = await fetchJson<ReadonlyArray<RawSearchResult>>(url, this._config);
+    return raw.map(mapSearchResult);
   }
 
   /** Fetch detailed annotations for a variant by rsID. */
@@ -84,6 +130,7 @@ export class LitVar {
     }
 
     const url = `${BASE_URL}/api/v1/entity/litvar/${encodeURIComponent(rsid)}%23%23/annotations`;
-    return fetchJson<ReadonlyArray<LitVarAnnotation>>(url, this._config);
+    const raw = await fetchJson<ReadonlyArray<RawAnnotation>>(url, this._config);
+    return raw.map(mapAnnotation);
   }
 }

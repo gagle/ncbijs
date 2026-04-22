@@ -68,6 +68,34 @@ describe('variant', () => {
     expect(result.publicationCount).toBe(42);
   });
 
+  it('should default rsid to empty string when missing from response', async () => {
+    mockFetchJson({ results: [{ hgvs_list: [], gene: 'LPL', pmid_count: 1 }] });
+    const client = new LitVar();
+    const result = await client.variant('rs328');
+    expect(result.rsid).toBe('');
+  });
+
+  it('should default hgvs to empty array when hgvs_list is missing', async () => {
+    mockFetchJson({ results: [{ rsid: 'rs328', gene: 'LPL', pmid_count: 1 }] });
+    const client = new LitVar();
+    const result = await client.variant('rs328');
+    expect(result.hgvs).toEqual([]);
+  });
+
+  it('should default gene to empty string when missing from response', async () => {
+    mockFetchJson({ results: [{ rsid: 'rs328', hgvs_list: [], pmid_count: 1 }] });
+    const client = new LitVar();
+    const result = await client.variant('rs328');
+    expect(result.gene).toBe('');
+  });
+
+  it('should default publicationCount to 0 when pmid_count is missing', async () => {
+    mockFetchJson({ results: [{ rsid: 'rs328', hgvs_list: [], gene: 'LPL' }] });
+    const client = new LitVar();
+    const result = await client.variant('rs328');
+    expect(result.publicationCount).toBe(0);
+  });
+
   it('should throw when results array is empty', async () => {
     mockFetchJson({ results: [] });
     const client = new LitVar();
@@ -150,6 +178,41 @@ describe('publications', () => {
     expect(result[0]!.year).toBe(2023);
   });
 
+  it('should default pmid to 0 when missing from response', async () => {
+    mockFetchJson([{ title: 'Test', journal: 'Nature', year: 2023 }]);
+    const client = new LitVar();
+    const result = await client.publications('rs328');
+    expect(result[0]!.pmid).toBe(0);
+  });
+
+  it('should default title to empty string when missing from response', async () => {
+    mockFetchJson([{ pmid: 123, journal: 'Nature', year: 2023 }]);
+    const client = new LitVar();
+    const result = await client.publications('rs328');
+    expect(result[0]!.title).toBe('');
+  });
+
+  it('should default journal to empty string when missing from response', async () => {
+    mockFetchJson([{ pmid: 123, title: 'Test', year: 2023 }]);
+    const client = new LitVar();
+    const result = await client.publications('rs328');
+    expect(result[0]!.journal).toBe('');
+  });
+
+  it('should default year to 0 when missing from response', async () => {
+    mockFetchJson([{ pmid: 123, title: 'Test', journal: 'Nature' }]);
+    const client = new LitVar();
+    const result = await client.publications('rs328');
+    expect(result[0]!.year).toBe(0);
+  });
+
+  it('should default all fields when response contains empty objects', async () => {
+    mockFetchJson([{}]);
+    const client = new LitVar();
+    const result = await client.publications('rs328');
+    expect(result[0]).toEqual({ pmid: 0, title: '', journal: '', year: 0 });
+  });
+
   it('should return empty array when API returns empty array', async () => {
     mockFetchJson([]);
     const client = new LitVar();
@@ -219,6 +282,34 @@ describe('search', () => {
     expect(result[0]!.score).toBe(0.95);
   });
 
+  it('should default term to empty string when missing from response', async () => {
+    mockFetchJson([{ type: 'variant', score: 0.5 }]);
+    const client = new LitVar();
+    const result = await client.search('LPL');
+    expect(result[0]!.term).toBe('');
+  });
+
+  it('should default type to empty string when missing from response', async () => {
+    mockFetchJson([{ term: 'rs328', score: 0.5 }]);
+    const client = new LitVar();
+    const result = await client.search('LPL');
+    expect(result[0]!.type).toBe('');
+  });
+
+  it('should default score to 0 when missing from response', async () => {
+    mockFetchJson([{ term: 'rs328', type: 'variant' }]);
+    const client = new LitVar();
+    const result = await client.search('LPL');
+    expect(result[0]!.score).toBe(0);
+  });
+
+  it('should default all fields when response contains empty objects', async () => {
+    mockFetchJson([{}]);
+    const client = new LitVar();
+    const result = await client.search('LPL');
+    expect(result[0]).toEqual({ term: '', type: '', score: 0 });
+  });
+
   it('should return empty array when API returns empty array', async () => {
     mockFetchJson([]);
     const client = new LitVar();
@@ -286,6 +377,34 @@ describe('variantAnnotations', () => {
     const client = new LitVar();
     const result = await client.variantAnnotations('rs328');
     expect(result[0]!.pmids).toEqual([12345678, 87654321]);
+  });
+
+  it('should default disease to empty string when missing from response', async () => {
+    mockFetchJson([{ genes: ['LPL'], pmids: [123] }]);
+    const client = new LitVar();
+    const result = await client.variantAnnotations('rs328');
+    expect(result[0]!.disease).toBe('');
+  });
+
+  it('should default genes to empty array when missing from response', async () => {
+    mockFetchJson([{ disease: 'CAD', pmids: [123] }]);
+    const client = new LitVar();
+    const result = await client.variantAnnotations('rs328');
+    expect(result[0]!.genes).toEqual([]);
+  });
+
+  it('should default pmids to empty array when missing from response', async () => {
+    mockFetchJson([{ disease: 'CAD', genes: ['LPL'] }]);
+    const client = new LitVar();
+    const result = await client.variantAnnotations('rs328');
+    expect(result[0]!.pmids).toEqual([]);
+  });
+
+  it('should default all fields when response contains empty objects', async () => {
+    mockFetchJson([{}]);
+    const client = new LitVar();
+    const result = await client.variantAnnotations('rs328');
+    expect(result[0]).toEqual({ disease: '', genes: [], pmids: [] });
   });
 
   it('should return empty array when API returns empty array', async () => {
