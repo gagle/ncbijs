@@ -1,9 +1,9 @@
-<h1 align="center">@ncbijs/mcp</h1>
+<h1 align="center">@ncbijs/http-mcp</h1>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@ncbijs/mcp"><img src="https://img.shields.io/npm/v/@ncbijs/mcp" alt="npm version" /></a>
-  <a href="https://www.npmjs.com/package/@ncbijs/mcp"><img src="https://img.shields.io/npm/dm/@ncbijs/mcp" alt="npm downloads" /></a>
-  <a href="https://github.com/gagle/ncbijs/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@ncbijs/mcp" alt="license" /></a>
+  <a href="https://www.npmjs.com/package/@ncbijs/http-mcp"><img src="https://img.shields.io/npm/v/@ncbijs/http-mcp" alt="npm version" /></a>
+  <a href="https://www.npmjs.com/package/@ncbijs/http-mcp"><img src="https://img.shields.io/npm/dm/@ncbijs/http-mcp" alt="npm downloads" /></a>
+  <a href="https://github.com/gagle/ncbijs/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@ncbijs/http-mcp" alt="license" /></a>
 </p>
 
 <p align="center">
@@ -25,7 +25,7 @@ Add to your Claude Code `.mcp.json`:
   "mcpServers": {
     "ncbijs": {
       "command": "npx",
-      "args": ["-y", "@ncbijs/mcp"],
+      "args": ["-y", "@ncbijs/http-mcp"],
       "env": {
         "NCBI_API_KEY": "",
         "NCBI_TOOL": "my-app",

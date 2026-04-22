@@ -4,17 +4,17 @@ Storage-agnostic architecture for running ncbijs against local NCBI data at RAG-
 
 ## Problem
 
-The NCBI API allows 10 requests/second with an API key. A RAG pipeline indexing 37M+ PubMed articles needs orders of magnitude more throughput. The solution: download bulk data from NCBI FTP, parse it with existing ncbijs parsers, and store it in a local or cloud database that the user controls.
+The NCBI API allows 10 requests/second with an API key. A RAG pipeline indexing 37M+ PubMed articles needs orders of magnitude more throughput. The solution: download bulk data from NCBI FTP, parse it with existing ncbijs parsers, and store it in a database that the user controls.
 
 ## Design Principle
 
 **ncbijs defines the contract, users bring the storage.** The library provides:
 
-1. Interfaces that describe what a store must do
-2. A sync engine that downloads and parses NCBI bulk data
-3. Adapter functions that bridge parsed data into the store interface
+1. A `Storage` interface that describes what a store must do
+2. Parsers that convert NCBI bulk data into typed objects
+3. A `DuckDbFileStorage` reference implementation (single `.duckdb` file)
 
-Users choose their own database (DuckDB, PostgreSQL, SQLite, Elasticsearch, etc.) and implement the store interface. A reference DuckDB implementation ships as an example with Docker instructions.
+Users can implement `Storage` with any backend. The strategy pattern ensures parsers, loaders, and MCP tools never depend on a specific storage engine.
 
 ## Architecture Overview
 
@@ -22,147 +22,127 @@ Users choose their own database (DuckDB, PostgreSQL, SQLite, Elasticsearch, etc.
 NCBI FTP / AWS S3
        │
        ▼
-┌─────────────────────┐
-│  @ncbijs/sync        │  Downloads bulk files, detects updates
-│  (fetch + parse)     │  Uses existing parsers (pubmed-xml, jats, etc.)
-└────────┬────────────┘
-         │ ReadonlyArray<PubmedArticle>
+┌──────────────────────┐
+│  Download scripts     │  Fetch bulk files, decompress
+└────────┬─────────────┘
+         │ raw XML/TSV/CSV/JSON files
+         ▼
+┌──────────────────────┐
+│  ncbijs parsers       │  parseMeshDescriptorXml(), parseGeneInfoTsv(), etc.
+│  (existing packages)  │  Pure computation: string → typed objects
+└────────┬─────────────┘
          │ ReadonlyArray<MeshDescriptor>
+         │ ReadonlyArray<GeneReport>
          │ ReadonlyArray<VariantReport>
          ▼
-┌─────────────────────┐
-│  @ncbijs/store       │  Interface-only package (zero deps)
-│  (ArticleStore,      │  Defines the storage contract
-│   VocabularyStore,   │
-│   SyncStateStore)    │
-└────────┬────────────┘
+┌──────────────────────┐
+│  @ncbijs/store        │  Storage interface + strategy pattern
+│  (Storage,            │
+│   FileStorage,        │
+│   CloudStorage)       │
+└────────┬─────────────┘
          │ implements
          ▼
-┌─────────────────────┐
-│  User's storage      │  DuckDB, PostgreSQL, SQLite, Elasticsearch...
-│  (their code)        │  Implements the store interfaces
-└─────────────────────┘
+┌──────────────────────┐
+│  DuckDbFileStorage    │  Single .duckdb file (~2-3 GB)
+│  (reference strategy) │  Columnar, indexed, SQL-queryable
+└────────┬─────────────┘
+         │ queried by
+         ▼
+┌──────────────────────┐
+│  @ncbijs/store-mcp    │  MCP tools for querying stored data
+│  (query, search, sql) │  Works with any Storage implementation
+└──────────────────────┘
 ```
 
-## Store Interface
+## Storage Strategy Pattern
+
+```
+Storage (interface)                    Base contract — read/write/query/stats
+    ├── FileStorage (interface)        Extends Storage + path, close()
+    │   ├── DuckDbFileStorage          Single .duckdb file, columnar, indexed
+    │   └── JsonFileStorage            JSON files on disk (future)
+    ├── CloudStorage (interface)       Extends Storage + connect(), disconnect()
+    │   └── MotherDuckStorage          Cloud DuckDB via MotherDuck (future)
+    └── InMemoryStorage                For tests (future)
+```
 
 ```typescript
-// @ncbijs/store — zero dependencies, interfaces only
+// @ncbijs/store — zero runtime dependencies, interfaces + one DuckDB strategy
 
-import type { PubmedArticle } from '@ncbijs/pubmed-xml';
-import type { MeshDescriptor } from '@ncbijs/mesh';
+type DatasetType = 'mesh' | 'clinvar' | 'genes' | 'taxonomy' | 'compounds' | 'id-mappings';
 
-// ─── Article Storage ───────────────────────────────────────────
+// ─── Base Contract (medium-agnostic) ──────────────────────────
 
-interface ArticleStore {
-  readonly upsertArticles: (articles: ReadonlyArray<PubmedArticle>) => Promise<void>;
-  readonly deleteArticles: (pmids: ReadonlyArray<string>) => Promise<void>;
-  readonly getArticle: (pmid: string) => Promise<PubmedArticle | undefined>;
-  readonly getArticles: (pmids: ReadonlyArray<string>) => Promise<ReadonlyArray<PubmedArticle>>;
+interface Storage {
+  readonly writeRecords: (dataset: DatasetType, records: ReadonlyArray<unknown>) => Promise<void>;
+  readonly getRecord: <T>(dataset: DatasetType, key: string) => Promise<T | undefined>;
+  readonly searchRecords: <T>(
+    dataset: DatasetType,
+    query: SearchQuery,
+  ) => Promise<ReadonlyArray<T>>;
+  readonly getStats: () => Promise<ReadonlyArray<DatasetStats>>;
 }
 
-// ─── Search ────────────────────────────────────────────────────
+// ─── File-Based Strategies ────────────────────────────────────
 
-interface SearchOptions {
-  readonly maxResults?: number;
-  readonly offset?: number;
-  readonly filters?: SearchFilters;
+interface FileStorage extends Storage {
+  readonly path: string;
+  readonly close: () => Promise<void>;
 }
 
-interface SearchFilters {
-  readonly meshTerms?: ReadonlyArray<string>;
-  readonly dateRange?: readonly [start: string, end: string];
-  readonly publicationTypes?: ReadonlyArray<string>;
-  readonly journals?: ReadonlyArray<string>;
+// ─── Cloud Strategies ─────────────────────────────────────────
+
+interface CloudStorage extends Storage {
+  readonly connect: () => Promise<void>;
+  readonly disconnect: () => Promise<void>;
 }
 
-interface SearchResult {
-  readonly pmid: string;
-  readonly title: string;
-  readonly score: number;
+// ─── Query Types ──────────────────────────────────────────────
+
+interface SearchQuery {
+  readonly field: string;
+  readonly value: string;
+  readonly operator?: 'eq' | 'contains' | 'starts_with';
+  readonly limit?: number;
 }
 
-interface SearchableStore {
-  readonly searchArticles: (
-    query: string,
-    options?: SearchOptions,
-  ) => Promise<ReadonlyArray<SearchResult>>;
+interface DatasetStats {
+  readonly dataset: DatasetType;
+  readonly recordCount: number;
+  readonly sizeBytes: number;
+  readonly lastUpdated?: string;
 }
-
-// ─── Vector / Embedding ────────────────────────────────────────
-
-interface EmbeddingEntry {
-  readonly pmid: string;
-  readonly embedding: Float32Array;
-}
-
-interface SimilarityOptions {
-  readonly maxResults?: number;
-  readonly minScore?: number;
-  readonly filters?: SearchFilters;
-}
-
-interface SimilarityResult {
-  readonly pmid: string;
-  readonly score: number;
-}
-
-interface VectorStore {
-  readonly upsertEmbeddings: (entries: ReadonlyArray<EmbeddingEntry>) => Promise<void>;
-  readonly deleteEmbeddings: (pmids: ReadonlyArray<string>) => Promise<void>;
-  readonly similaritySearch: (
-    embedding: Float32Array,
-    options?: SimilarityOptions,
-  ) => Promise<ReadonlyArray<SimilarityResult>>;
-}
-
-// ─── Sync State ────────────────────────────────────────────────
-
-interface SyncState {
-  readonly dataset: string;
-  readonly lastFile?: string;
-  readonly lastUpdate?: string;
-  readonly contentHashes?: ReadonlyMap<string, string>;
-}
-
-interface SyncStateStore {
-  readonly getSyncState: (dataset: string) => Promise<SyncState | undefined>;
-  readonly setSyncState: (state: SyncState) => Promise<void>;
-}
-
-// ─── Composed Stores ───────────────────────────────────────────
-
-// Minimal: articles + sync tracking
-interface BaseStore extends ArticleStore, SyncStateStore {}
-
-// With full-text search
-interface SearchStore extends BaseStore, SearchableStore {}
-
-// With vector similarity (full RAG)
-interface RagStore extends SearchStore, VectorStore {}
 ```
 
-### Why separate interfaces
+### Why this pattern
 
-Not every user needs every capability:
+| Concern                     | Decision                                                                                                                 |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Parsers depend on storage?  | No — parsers return typed arrays, loaders call `Storage.writeRecords()`                                                  |
+| MCP tools depend on DuckDB? | No — MCP tools call `Storage.searchRecords()`                                                                            |
+| Swap DuckDB for cloud?      | Implement `CloudStorage`, pass to loader/MCP — zero code changes elsewhere                                               |
+| Why not one interface?      | `FileStorage` needs `path` + `close()`, `CloudStorage` needs `connect()` + `disconnect()` — different lifecycle concerns |
 
-| Use case               | Implements    | Example backend                                            |
-| ---------------------- | ------------- | ---------------------------------------------------------- |
-| Offline article lookup | `BaseStore`   | SQLite, LMDB, JSON files                                   |
-| Full-text search       | `SearchStore` | DuckDB (FTS), Elasticsearch, PostgreSQL (tsvector)         |
-| RAG pipeline           | `RagStore`    | DuckDB (FTS + VSS), PostgreSQL (pgvector), Qdrant + SQLite |
+### Why DuckDB for the reference implementation
 
-Users implement only what they need. The sync engine works with `BaseStore` — search and vector capabilities are additive.
+| Factor                    | DuckDB                      | SQLite          | JSON files            |
+| ------------------------- | --------------------------- | --------------- | --------------------- |
+| 10 GB parsed data on disk | ~2-3 GB                     | ~8-9 GB         | ~10 GB                |
+| Query 35M genes by symbol | Instant (indexed, columnar) | Slow (row scan) | Read 4 GB into memory |
+| Analytical queries        | 8x faster (vectorized)      | Single-threaded | Not supported         |
+| Native CSV/Parquet query  | Yes                         | No              | No                    |
+| Single file, no server    | Yes                         | Yes             | Yes (many files)      |
 
 ## Sync Engine
 
 ```typescript
 // @ncbijs/sync — depends on @ncbijs/store (interfaces) + existing parsers
 
-import type { BaseStore } from '@ncbijs/store';
+import type { Storage } from '@ncbijs/store';
 
 interface SyncOptions {
-  readonly store: BaseStore;
+  readonly store: Storage;
   readonly datasets: ReadonlyArray<Dataset>;
   readonly onProgress?: (event: ProgressEvent) => void;
   readonly signal?: AbortSignal;
@@ -224,8 +204,8 @@ async function sync(options: SyncOptions): Promise<SyncReport>;
    a. Download .xml.gz from FTP
    b. Decompress → stream through createPubmedXmlStream()
    c. Batch articles (1,000 at a time)
-   d. Call store.upsertArticles(batch)
-   e. Parse <DeleteCitation> → call store.deleteArticles(pmids)
+   d. Call store.writeRecords('articles', batch)
+   e. Parse <DeleteCitation> → delete by key
    f. Update sync state with file name
 4. Report: { added: N, updated: M, deleted: K }
 ```
@@ -235,11 +215,11 @@ async function sync(options: SyncOptions): Promise<SyncReport>;
 ```
 1. Download desc20XX.xml from NLM
 2. Parse with parseMeshDescriptorXml() → MeshTreeData
-3. Call store.upsertMeshDescriptors(descriptors)  // if VocabularyStore
+3. Call store.writeRecords('mesh', descriptors)
 4. Update sync state
 ```
 
-**Other datasets:** Same pattern — download, parse with the appropriate parser, call store methods.
+**Other datasets:** Same pattern — download, parse with the appropriate parser, call `store.writeRecords()`.
 
 ### What the sync engine does NOT do
 
@@ -432,19 +412,128 @@ Everything else regenerates full files on schedule. Delta detection requires con
 
 NCBI's own lab publishes pre-computed PubMed article embeddings at `/pub/lu/MedCPT/pubmed_embeddings/`. These are contrastive pre-trained transformer embeddings trained on 255M PubMed query-article pairs. This could **eliminate the need for users to compute their own embeddings** — the sync engine could download these directly alongside article data.
 
-## Reference Implementation: DuckDB + Docker
+## Reference Implementation: DuckDbFileStorage
 
-The reference implementation lives in `examples/offline-duckdb/` and demonstrates a `RagStore` backed by DuckDB.
+The reference implementation ships as `DuckDbFileStorage` in `@ncbijs/store` — a single `.duckdb` file with columnar compression and indexed queries.
+
+### DuckDB schema
+
+```sql
+CREATE TABLE mesh_descriptors (
+  id VARCHAR PRIMARY KEY,
+  name VARCHAR NOT NULL,
+  tree_numbers VARCHAR[],
+  qualifiers JSON,
+  pharmacological_actions VARCHAR[],
+  supplementary_concepts VARCHAR[]
+);
+CREATE INDEX idx_mesh_name ON mesh_descriptors(name);
+
+CREATE TABLE clinvar_variants (
+  uid VARCHAR PRIMARY KEY,
+  title VARCHAR,
+  object_type VARCHAR,
+  accession VARCHAR,
+  clinical_significance VARCHAR,
+  genes JSON,
+  traits JSON,
+  locations JSON
+);
+
+CREATE TABLE genes (
+  gene_id INTEGER PRIMARY KEY,
+  symbol VARCHAR NOT NULL,
+  description VARCHAR,
+  tax_id INTEGER NOT NULL,
+  type VARCHAR,
+  chromosomes VARCHAR[],
+  synonyms VARCHAR[],
+  swiss_prot_accessions VARCHAR[],
+  ensembl_gene_ids VARCHAR[],
+  omim_ids VARCHAR[]
+);
+CREATE INDEX idx_genes_symbol ON genes(symbol);
+CREATE INDEX idx_genes_tax_id ON genes(tax_id);
+
+CREATE TABLE taxonomy (
+  tax_id INTEGER PRIMARY KEY,
+  organism_name VARCHAR NOT NULL,
+  common_name VARCHAR,
+  rank VARCHAR,
+  parent_tax_id INTEGER,
+  lineage INTEGER[],
+  children INTEGER[]
+);
+CREATE INDEX idx_taxonomy_name ON taxonomy(organism_name);
+
+CREATE TABLE compounds (
+  cid INTEGER PRIMARY KEY,
+  canonical_smiles VARCHAR,
+  inchi_key VARCHAR,
+  iupac_name VARCHAR,
+  exact_mass DOUBLE,
+  molecular_weight DOUBLE
+);
+CREATE INDEX idx_compounds_inchi ON compounds(inchi_key);
+
+CREATE TABLE id_mappings (
+  pmcid VARCHAR,
+  pmid VARCHAR,
+  doi VARCHAR,
+  mid VARCHAR,
+  release_date VARCHAR
+);
+CREATE INDEX idx_idmap_pmid ON id_mappings(pmid);
+CREATE INDEX idx_idmap_pmcid ON id_mappings(pmcid);
+CREATE INDEX idx_idmap_doi ON id_mappings(doi);
+
+CREATE TABLE sync_state (
+  dataset VARCHAR PRIMARY KEY,
+  last_file VARCHAR,
+  last_update VARCHAR
+);
+```
+
+### DuckDbFileStorage implementation sketch
+
+```typescript
+import type { FileStorage, DatasetType, SearchQuery, DatasetStats } from '@ncbijs/store';
+import { DuckDBInstance } from '@duckdb/node-api';
+
+class DuckDbFileStorage implements FileStorage {
+  public readonly path: string;
+  private readonly _db: DuckDBInstance;
+
+  constructor(dbPath: string) {
+    this.path = dbPath;
+    // Open or create the .duckdb file
+  }
+
+  async writeRecords(dataset: DatasetType, records: ReadonlyArray<unknown>): Promise<void> {
+    // Batch INSERT with prepared statements
+    // Maps dataset type to the correct table
+  }
+
+  async getRecord<T>(dataset: DatasetType, key: string): Promise<T | undefined> {
+    // SELECT by primary key from the appropriate table
+  }
+
+  async searchRecords<T>(dataset: DatasetType, query: SearchQuery): Promise<ReadonlyArray<T>> {
+    // Parameterized SQL query with operator mapping
+    // 'eq' → =, 'contains' → LIKE '%...%', 'starts_with' → LIKE '...%'
+  }
+
+  async getStats(): Promise<ReadonlyArray<DatasetStats>> {
+    // SELECT COUNT(*) from each table + file size from disk
+  }
+
+  async close(): Promise<void> {
+    // Close DuckDB connection
+  }
+}
+```
 
 ### Docker setup
-
-```dockerfile
-FROM node:22-slim
-RUN npm install -g @ncbijs/sync  # hypothetical global install
-WORKDIR /data
-COPY store.ts .
-CMD ["node", "--import", "tsx", "store.ts"]
-```
 
 ```yaml
 # docker-compose.yml
@@ -452,103 +541,14 @@ services:
   ncbijs-store:
     build: .
     volumes:
-      - ncbijs-data:/data/db # Persist DuckDB file
-      - ncbijs-cache:/data/cache # Cache downloaded FTP files
+      - ncbijs-data:/data/db # Persist .duckdb file
+      - ncbijs-cache:/data/raw # Cache downloaded FTP files
     environment:
       - NCBI_API_KEY=${NCBI_API_KEY}
-    # Run daily sync at 06:00 UTC
-    # Use host cron, Kubernetes CronJob, or GitHub Actions
 
 volumes:
   ncbijs-data:
   ncbijs-cache:
-```
-
-### DuckDB store implementation sketch
-
-```typescript
-import type { RagStore, SyncState, SearchOptions, SearchResult } from '@ncbijs/store';
-import type { PubmedArticle } from '@ncbijs/pubmed-xml';
-import duckdb from 'duckdb-node';
-
-class DuckDbStore implements RagStore {
-  private readonly db: duckdb.Database;
-
-  constructor(dbPath: string) {
-    this.db = new duckdb.Database(dbPath);
-    this.db.exec(`
-      INSTALL fts; LOAD fts;
-      INSTALL vss; LOAD vss;
-
-      CREATE TABLE IF NOT EXISTS articles (
-        pmid       INTEGER PRIMARY KEY,
-        title      TEXT NOT NULL,
-        abstract   TEXT,
-        authors    JSON,
-        journal    TEXT,
-        pub_date   DATE,
-        mesh       JSON,
-        keywords   JSON,
-        doi        TEXT,
-        pmcid      TEXT,
-        raw        JSON,
-        content_hash TEXT,
-        updated_at  TIMESTAMP DEFAULT current_timestamp
-      );
-
-      CREATE TABLE IF NOT EXISTS embeddings (
-        pmid      INTEGER PRIMARY KEY,
-        embedding FLOAT[768],
-        FOREIGN KEY (pmid) REFERENCES articles(pmid)
-      );
-
-      CREATE TABLE IF NOT EXISTS sync_state (
-        dataset    TEXT PRIMARY KEY,
-        last_file  TEXT,
-        last_update TEXT,
-        hashes     JSON
-      );
-    `);
-  }
-
-  async upsertArticles(articles: ReadonlyArray<PubmedArticle>): Promise<void> {
-    // INSERT OR REPLACE with prepared statement
-    // Store full PubmedArticle as JSON in `raw` column for lossless roundtrip
-    // Extract searchable fields into typed columns
-  }
-
-  async deleteArticles(pmids: ReadonlyArray<string>): Promise<void> {
-    // DELETE FROM articles WHERE pmid IN (...)
-    // DELETE FROM embeddings WHERE pmid IN (...)
-  }
-
-  async searchArticles(
-    query: string,
-    options?: SearchOptions,
-  ): Promise<ReadonlyArray<SearchResult>> {
-    // Use DuckDB FTS extension with BM25 scoring
-    // Apply filters via WHERE clauses
-    // PRAGMA create_fts_index('articles', 'pmid', 'title', 'abstract', 'mesh')
-  }
-
-  async upsertEmbeddings(entries: ReadonlyArray<EmbeddingEntry>): Promise<void> {
-    // INSERT OR REPLACE into embeddings table
-  }
-
-  async similaritySearch(embedding: Float32Array, options?: SimilarityOptions) {
-    // Use DuckDB VSS extension with HNSW index
-    // SELECT pmid, array_cosine_similarity(embedding, ?) AS score
-    // FROM embeddings ORDER BY score DESC LIMIT ?
-  }
-
-  async getSyncState(dataset: string): Promise<SyncState | undefined> {
-    // SELECT from sync_state table
-  }
-
-  async setSyncState(state: SyncState): Promise<void> {
-    // INSERT OR REPLACE into sync_state table
-  }
-}
 ```
 
 ### Usage
@@ -655,7 +655,7 @@ NCBI has no push notifications. The sync engine detects updates by:
 | ClinicalTrials.gov | API v2 `query.term` with `_lastUpdatePostDate` filter                | Daily        |
 | Pathogen           | Directory listing for new organism results                           | Weekly       |
 
-Additionally, `@ncbijs/sync` can use EInfo API to check `lastupdate` and `dbbuild` fields across all 38 Entrez databases as a fast pre-check before hitting FTP. The existing `@ncbijs/mcp` skill `ncbi-check-updates` already implements this pattern.
+Additionally, `@ncbijs/sync` can use EInfo API to check `lastupdate` and `dbbuild` fields across all 38 Entrez databases as a fast pre-check before hitting FTP. The existing `@ncbijs/http-mcp` skill `ncbi-check-updates` already implements this pattern.
 
 ## Embedding Pipeline
 
@@ -743,7 +743,7 @@ examples/
     README.md
     docker-compose.yml
     Dockerfile
-    duckdb-store.ts       # Reference RagStore implementation
+    duckdb-store.ts       # Reference DuckDbFileStorage implementation
     sync-job.ts           # Cron-compatible sync script
     search-example.ts     # Query example
     hybrid-search.ts      # BM25 + vector reranking example
@@ -801,7 +801,7 @@ These datasets don't warrant dedicated packages — they're consumed directly by
 
 | NCBI Source            | FTP path                              | Format     | Size       | Parser strategy                                |
 | ---------------------- | ------------------------------------- | ---------- | ---------- | ---------------------------------------------- |
-| **MedCPT embeddings**  | `/pub/lu/MedCPT/pubmed_embeddings/`   | Binary     | Tens of GB | Binary loader → VectorStore directly           |
+| **MedCPT embeddings**  | `/pub/lu/MedCPT/pubmed_embeddings/`   | Binary     | Tens of GB | Binary loader → Storage directly               |
 | **BioConceptVec**      | `/pub/lu/BioConceptVec/`              | Binary     | ~10 GB     | Vector file loader (FastText/GloVe/Word2Vec)   |
 | **ComputedAuthors**    | `/pub/lu/ComputedAuthors/`            | JSON       | ~3.7 GB    | JSON stream parser                             |
 | **PMCSMBioC**          | `/pub/lu/PMCSMBioC/`                  | BioC XML   | ~1.5 TB    | Reuses `parseBioC()` from `@ncbijs/pubtator`   |

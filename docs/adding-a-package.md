@@ -73,12 +73,12 @@ Add the package to `docs/README.md` "Additional Packages" table.
 
 If the package exposes functionality useful to LLM agents:
 
-- Create a tool registration file in `packages/mcp/src/tools/{name}-tools.ts`
-- Register tools in `packages/mcp/src/register-tools.ts`
+- Create a tool registration file in `packages/http-mcp/src/tools/{name}-tools.ts`
+- Register tools in `packages/http-mcp/src/register-tools.ts`
 - Add Zod schemas with `.describe()` on every parameter
 - Write meaningful tool titles and descriptions
-- Update `packages/mcp/README.md` with the new tools
-- Update the MCP server `instructions` string in `packages/mcp/src/index.ts`
+- Update `packages/http-mcp/README.md` with the new tools
+- Update the MCP server `instructions` string in `packages/http-mcp/src/index.ts`
 
 ## 7. Global configuration
 

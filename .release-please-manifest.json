@@ -29,7 +29,7 @@
   "packages/cdd": "0.0.0",
   "packages/books": "0.0.0",
   "packages/nlm-catalog": "0.0.0",
-  "packages/mcp": "0.0.0",
+  "packages/http-mcp": "0.0.0",
   "packages/rxnorm": "0.0.0",
   "packages/litvar": "0.0.0",
   "packages/clinical-trials": "0.0.0",

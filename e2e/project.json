@@ -22,7 +22,7 @@
         "@ncbijs/id-converter:build",
         "@ncbijs/jats:build",
         "@ncbijs/litvar:build",
-        "@ncbijs/mcp:build",
+        "@ncbijs/http-mcp:build",
         "@ncbijs/medgen:build",
         "@ncbijs/mesh:build",
         "@ncbijs/nlm-catalog:build",

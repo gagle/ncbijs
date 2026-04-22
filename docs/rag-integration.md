@@ -39,7 +39,7 @@ This transforms the system from "here's what the source material says" to "here'
 
 ### 4. MCP server as LLM tool provider
 
-The `@ncbijs/mcp` server exposes all ncbijs tools for LLM agents. If the RAG system includes agent workflows, this is the lowest-friction integration.
+The `@ncbijs/http-mcp` server exposes all ncbijs tools for LLM agents. If the RAG system includes agent workflows, this is the lowest-friction integration.
 
 The LLM agent calls MCP tools directly during generation to search PubMed for a specific claim, look up a gene's function, check variant clinical significance, or get entity annotations. This turns the RAG system from a closed-book system (source materials only) to an open-book system that verifies and enriches answers with current biomedical literature in real time.
 
@@ -49,7 +49,7 @@ No wrapper code needed. Register the MCP server as a tool provider for the LLM a
 
 ```
 Backend
-  |-- MCP Server (@ncbijs/mcp)            LLM agent tools (zero glue code)
+  |-- MCP Server (@ncbijs/http-mcp)            LLM agent tools (zero glue code)
   |-- EnrichmentService (ingestion)
   |     |-- @ncbijs/pubtator              entity extraction per chunk
   |     |-- @ncbijs/mesh                  vocabulary normalization

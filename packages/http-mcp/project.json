@@ -1,18 +1,18 @@
 {
-  "name": "@ncbijs/mcp",
-  "sourceRoot": "packages/mcp/src",
+  "name": "@ncbijs/http-mcp",
+  "sourceRoot": "packages/http-mcp/src",
   "targets": {
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p packages/mcp/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/mcp/dist"
+        "command": "tsc -p packages/http-mcp/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/http-mcp/dist"
       },
       "outputs": ["{projectRoot}/dist"]
     },
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "vitest run --config packages/mcp/vitest.config.ts"
+        "command": "vitest run --config packages/http-mcp/vitest.config.ts"
       }
     },
     "lint": {
@@ -21,7 +21,7 @@
     },
     "typecheck": {
       "executor": "nx:run-commands",
-      "options": { "command": "tsc --noEmit -p packages/mcp/tsconfig.json" }
+      "options": { "command": "tsc --noEmit -p packages/http-mcp/tsconfig.json" }
     }
   }
 }
