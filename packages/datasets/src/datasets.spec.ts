@@ -66,6 +66,30 @@ function buildTaxonomyResponse(overrides: Record<string, unknown> = {}): Record<
   };
 }
 
+function buildTaxonomyResponseV2(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    reports: [
+      {
+        taxonomy: {
+          tax_id: 9606,
+          current_scientific_name: { name: 'Homo sapiens' },
+          curator_common_name: 'human',
+          rank: 'SPECIES',
+          parents: [1, 131567, 2759, 9605],
+          children: [741158, 63221],
+          counts: [
+            { type: 'COUNT_TYPE_ASSEMBLY', count: 2497 },
+            { type: 'COUNT_TYPE_GENE', count: 193862 },
+          ],
+          ...overrides,
+        },
+        query: ['9606'],
+      },
+    ],
+    total_count: 1,
+  };
+}
+
 function buildGenomeResponse(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
     reports: [
@@ -219,6 +243,14 @@ describe('Datasets', () => {
       expect(reports[0]!.taxId).toBe(9606);
     });
 
+    it('should normalize UPPER_SNAKE_CASE gene type to kebab-case', async () => {
+      mockFetchJson(buildGeneResponse({ type: 'PROTEIN_CODING' }));
+      const datasets = new Datasets();
+
+      const reports = await datasets.geneById([672]);
+      expect(reports[0]!.type).toBe('protein-coding');
+    });
+
     it('should handle go terms with missing fields', async () => {
       mockFetchJson({
         reports: [
@@ -341,6 +373,49 @@ describe('Datasets', () => {
       const reports = await datasets.taxonomy([1]);
       expect(reports[0]!.counts[0]!.type).toBe('');
       expect(reports[0]!.counts[0]!.count).toBe(0);
+    });
+
+    it('should map v2 taxonomy response with reports key', async () => {
+      mockFetchJson(buildTaxonomyResponseV2());
+      const datasets = new Datasets();
+
+      const reports = await datasets.taxonomy([9606]);
+
+      expect(reports).toHaveLength(1);
+      expect(reports[0]!.taxId).toBe(9606);
+      expect(reports[0]!.organismName).toBe('Homo sapiens');
+      expect(reports[0]!.commonName).toBe('human');
+      expect(reports[0]!.rank).toBe('species');
+      expect(reports[0]!.lineage).toContain(9605);
+      expect(reports[0]!.children).toContain(741158);
+      expect(reports[0]!.counts).toHaveLength(2);
+      expect(reports[0]!.counts[0]!.type).toBe('assembly');
+      expect(reports[0]!.counts[0]!.count).toBe(2497);
+      expect(reports[0]!.counts[1]!.type).toBe('gene');
+      expect(reports[0]!.counts[1]!.count).toBe(193862);
+    });
+
+    it('should handle v2 taxonomy response with missing fields', async () => {
+      mockFetchJson({ reports: [{ taxonomy: {} }], total_count: 1 });
+      const datasets = new Datasets();
+
+      const reports = await datasets.taxonomy([1]);
+      expect(reports[0]!.taxId).toBe(0);
+      expect(reports[0]!.organismName).toBe('');
+      expect(reports[0]!.commonName).toBe('');
+      expect(reports[0]!.rank).toBe('');
+      expect(reports[0]!.lineage).toEqual([]);
+      expect(reports[0]!.children).toEqual([]);
+      expect(reports[0]!.counts).toEqual([]);
+    });
+
+    it('should handle v2 taxonomy response with missing taxonomy wrapper', async () => {
+      mockFetchJson({ reports: [{}], total_count: 1 });
+      const datasets = new Datasets();
+
+      const reports = await datasets.taxonomy([1]);
+      expect(reports[0]!.taxId).toBe(0);
+      expect(reports[0]!.organismName).toBe('');
     });
   });
 

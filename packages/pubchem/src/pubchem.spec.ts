@@ -8,6 +8,7 @@ function mockFetchJson(data: unknown): void {
       ok: true,
       status: 200,
       json: () => Promise.resolve(data),
+      headers: new Headers({ 'content-type': 'application/json' }),
     }),
   );
 }
@@ -180,6 +181,46 @@ describe('PubChem', () => {
       await expect(pubchem.compoundByCid(999999999)).rejects.toThrow(
         'PubChem API returned status 404',
       );
+    });
+
+    it('should map ConnectivitySMILES when CanonicalSMILES is absent', async () => {
+      mockFetchJson({
+        PropertyTable: {
+          Properties: [
+            {
+              CID: 2244,
+              ConnectivitySMILES: 'CC(=O)OC1=CC=CC=C1C(=O)O',
+              MolecularFormula: 'C9H8O4',
+            },
+          ],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const compound = await pubchem.compoundByCid(2244);
+      expect(compound.canonicalSmiles).toBe('CC(=O)OC1=CC=CC=C1C(=O)O');
+      expect(compound.isomericSmiles).toBe('CC(=O)OC1=CC=CC=C1C(=O)O');
+    });
+
+    it('should coerce string MolecularWeight and ExactMass to numbers', async () => {
+      mockFetchJson({
+        PropertyTable: {
+          Properties: [
+            {
+              CID: 2244,
+              MolecularWeight: '180.16',
+              ExactMass: '180.04225873',
+              MonoisotopicMass: '180.04225873',
+            },
+          ],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const compound = await pubchem.compoundByCid(2244);
+      expect(compound.molecularWeight).toBe(180.16);
+      expect(compound.exactMass).toBeCloseTo(180.042259, 4);
+      expect(compound.monoisotopicMass).toBeCloseTo(180.042259, 4);
     });
   });
 

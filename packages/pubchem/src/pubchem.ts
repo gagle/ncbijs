@@ -308,15 +308,17 @@ interface RawPropertyResponse {
 interface RawCompoundProperty {
   readonly CID?: number;
   readonly MolecularFormula?: string;
-  readonly MolecularWeight?: number;
+  readonly MolecularWeight?: number | string;
   readonly IUPACName?: string;
   readonly CanonicalSMILES?: string;
+  readonly ConnectivitySMILES?: string;
+  readonly SMILES?: string;
   readonly IsomericSMILES?: string;
   readonly InChI?: string;
   readonly InChIKey?: string;
   readonly XLogP?: number;
-  readonly ExactMass?: number;
-  readonly MonoisotopicMass?: number;
+  readonly ExactMass?: number | string;
+  readonly MonoisotopicMass?: number | string;
   readonly TPSA?: number;
   readonly Complexity?: number;
   readonly HBondDonorCount?: number;
@@ -437,18 +439,21 @@ function mapCompoundProperty(raw: RawPropertyResponse): CompoundProperty {
 }
 
 function mapCompoundPropertyEntry(property: RawCompoundProperty): CompoundProperty {
+  const canonicalSmiles =
+    property.CanonicalSMILES ?? property.ConnectivitySMILES ?? property.SMILES ?? '';
+
   return {
     cid: property.CID ?? 0,
     molecularFormula: property.MolecularFormula ?? '',
-    molecularWeight: property.MolecularWeight ?? 0,
+    molecularWeight: Number(property.MolecularWeight ?? 0),
     iupacName: property.IUPACName ?? '',
-    canonicalSmiles: property.CanonicalSMILES ?? '',
-    isomericSmiles: property.IsomericSMILES ?? '',
+    canonicalSmiles,
+    isomericSmiles: property.IsomericSMILES ?? canonicalSmiles,
     inchi: property.InChI ?? '',
     inchiKey: property.InChIKey ?? '',
     xLogP: property.XLogP ?? 0,
-    exactMass: property.ExactMass ?? 0,
-    monoisotopicMass: property.MonoisotopicMass ?? 0,
+    exactMass: Number(property.ExactMass ?? 0),
+    monoisotopicMass: Number(property.MonoisotopicMass ?? 0),
     tpsa: property.TPSA ?? 0,
     complexity: property.Complexity ?? 0,
     hBondDonorCount: property.HBondDonorCount ?? 0,

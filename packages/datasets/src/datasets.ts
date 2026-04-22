@@ -83,7 +83,11 @@ export class Datasets {
     const url = `${BASE_URL}/taxonomy/taxon/${encodeURIComponent(joined)}/dataset_report`;
     const raw = await fetchJson<RawTaxonomyResponse>(url, this._config);
 
-    return (raw.taxonomy_nodes ?? []).map(mapTaxonomyReport);
+    if (raw.reports !== undefined && raw.reports.length > 0) {
+      return raw.reports.map(mapTaxonomyReportV2);
+    }
+
+    return (raw.taxonomy_nodes ?? []).map(mapTaxonomyReportLegacy);
   }
 
   /** Fetch genome assembly reports by accession numbers. */
@@ -239,13 +243,30 @@ interface RawGoTerm {
 
 interface RawTaxonomyResponse {
   readonly taxonomy_nodes?: ReadonlyArray<RawTaxonomyNode>;
+  readonly reports?: ReadonlyArray<RawTaxonomyReportWrapper>;
+  readonly total_count?: number;
+}
+
+interface RawTaxonomyReportWrapper {
+  readonly taxonomy?: RawTaxonomyDataV2;
+  readonly query?: ReadonlyArray<string>;
+}
+
+interface RawTaxonomyDataV2 {
+  readonly tax_id?: number;
+  readonly current_scientific_name?: { readonly name?: string };
+  readonly curator_common_name?: string;
+  readonly rank?: string;
+  readonly parents?: ReadonlyArray<number>;
+  readonly children?: ReadonlyArray<number>;
+  readonly counts?: ReadonlyArray<RawTaxonomyCount>;
 }
 
 interface RawTaxonomyNode {
-  readonly taxonomy?: RawTaxonomyData;
+  readonly taxonomy?: RawTaxonomyDataLegacy;
 }
 
-interface RawTaxonomyData {
+interface RawTaxonomyDataLegacy {
   readonly tax_id?: number;
   readonly organism_name?: string;
   readonly genbank_common_name?: string;
@@ -313,7 +334,7 @@ function mapGeneReport(wrapper: RawGeneReportWrapper): GeneReport {
     taxId: Number(gene.tax_id ?? 0),
     taxName: gene.taxname ?? '',
     commonName: gene.common_name ?? '',
-    type: gene.type ?? '',
+    type: normalizeGeneType(gene.type ?? ''),
     chromosomes: gene.chromosomes ?? [],
     synonyms: gene.synonyms ?? [],
     swissProtAccessions: gene.swiss_prot_accessions ?? [],
@@ -324,6 +345,10 @@ function mapGeneReport(wrapper: RawGeneReportWrapper): GeneReport {
     proteinCount: gene.protein_count ?? 0,
     geneOntology: mapGeneOntology(gene.gene_ontology),
   };
+}
+
+function normalizeGeneType(rawType: string): string {
+  return rawType.toLowerCase().replace(/_/g, '-');
 }
 
 function mapGeneOntology(raw?: RawGeneOntology): GeneOntology {
@@ -341,7 +366,20 @@ function mapGoTerm(raw: RawGoTerm): GoTerm {
   };
 }
 
-function mapTaxonomyReport(node: RawTaxonomyNode): TaxonomyReport {
+function mapTaxonomyReportV2(wrapper: RawTaxonomyReportWrapper): TaxonomyReport {
+  const taxonomy = wrapper.taxonomy ?? {};
+  return {
+    taxId: taxonomy.tax_id ?? 0,
+    organismName: taxonomy.current_scientific_name?.name ?? '',
+    commonName: taxonomy.curator_common_name ?? '',
+    rank: (taxonomy.rank ?? '').toLowerCase(),
+    lineage: taxonomy.parents ?? [],
+    children: taxonomy.children ?? [],
+    counts: (taxonomy.counts ?? []).map(mapTaxonomyCountV2),
+  };
+}
+
+function mapTaxonomyReportLegacy(node: RawTaxonomyNode): TaxonomyReport {
   const taxonomy = node.taxonomy ?? {};
   return {
     taxId: taxonomy.tax_id ?? 0,
@@ -350,11 +388,23 @@ function mapTaxonomyReport(node: RawTaxonomyNode): TaxonomyReport {
     rank: taxonomy.rank ?? '',
     lineage: taxonomy.lineage ?? [],
     children: taxonomy.children ?? [],
-    counts: (taxonomy.counts ?? []).map(mapTaxonomyCount),
+    counts: (taxonomy.counts ?? []).map(mapTaxonomyCountLegacy),
   };
 }
 
-function mapTaxonomyCount(raw: RawTaxonomyCount): TaxonomyCount {
+function mapTaxonomyCountV2(raw: RawTaxonomyCount): TaxonomyCount {
+  const rawType = raw.type ?? '';
+  const normalizedType = rawType.startsWith('COUNT_TYPE_')
+    ? rawType.slice('COUNT_TYPE_'.length).toLowerCase()
+    : rawType.toLowerCase();
+
+  return {
+    type: normalizedType,
+    count: raw.count ?? 0,
+  };
+}
+
+function mapTaxonomyCountLegacy(raw: RawTaxonomyCount): TaxonomyCount {
   return {
     type: raw.type ?? '',
     count: raw.count ?? 0,

@@ -16,5 +16,11 @@ export async function fetchJson<T>(url: string, config: PubChemClientConfig): Pr
     createError: (status, body) => new PubChemHttpError(status, body),
   });
 
+  const contentType = response.headers.get('content-type') ?? '';
+  if (!contentType.includes('json')) {
+    const body = `Expected JSON but received content-type: ${contentType}`;
+    throw new HttpRetryError(response.status, body, body);
+  }
+
   return (await response.json()) as T;
 }

@@ -11,7 +11,7 @@ describe('PubChem PUG REST E2E', () => {
     expect(compound.molecularFormula).toBe('C9H8O4');
     expect(compound.molecularWeight).toBeCloseTo(180.16, 1);
     expect(compound.canonicalSmiles).toBeTruthy();
-    expect(compound.inchiKey).toBeTruthy();
+    expect(compound.inchiKey).toBe('BSYNRYMUTXBXSQ-UHFFFAOYSA-N');
   });
 
   it('should retrieve aspirin by name', async () => {

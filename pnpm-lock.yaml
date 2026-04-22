@@ -74,6 +74,12 @@ importers:
       '@ncbijs/cite':
         specifier: workspace:*
         version: link:../packages/cite
+      '@ncbijs/clinical-tables':
+        specifier: workspace:*
+        version: link:../packages/clinical-tables
+      '@ncbijs/clinical-trials':
+        specifier: workspace:*
+        version: link:../packages/clinical-trials
       '@ncbijs/clinvar':
         specifier: workspace:*
         version: link:../packages/clinvar
@@ -98,12 +104,18 @@ importers:
       '@ncbijs/gtr':
         specifier: workspace:*
         version: link:../packages/gtr
+      '@ncbijs/icite':
+        specifier: workspace:*
+        version: link:../packages/icite
       '@ncbijs/id-converter':
         specifier: workspace:*
         version: link:../packages/id-converter
       '@ncbijs/jats':
         specifier: workspace:*
         version: link:../packages/jats
+      '@ncbijs/litvar':
+        specifier: workspace:*
+        version: link:../packages/litvar
       '@ncbijs/medgen':
         specifier: workspace:*
         version: link:../packages/medgen
@@ -140,6 +152,9 @@ importers:
       '@ncbijs/rate-limiter':
         specifier: workspace:*
         version: link:../packages/rate-limiter
+      '@ncbijs/rxnorm':
+        specifier: workspace:*
+        version: link:../packages/rxnorm
       '@ncbijs/snp':
         specifier: workspace:*
         version: link:../packages/snp

@@ -26,11 +26,12 @@ function createConfig(): PubChemClientConfig {
   };
 }
 
-function mockResponse(data: unknown): Response {
+function mockResponse(data: unknown, contentType = 'application/json'): Response {
   return {
     ok: true,
     status: 200,
     json: () => Promise.resolve(data),
+    headers: new Headers({ 'content-type': contentType }),
   } as Response;
 }
 
@@ -64,6 +65,14 @@ describe('fetchJson', () => {
       'https://pubchem.example.com/test',
       config,
       expect.any(Object),
+    );
+  });
+
+  it('should throw HttpRetryError when content-type is not JSON', async () => {
+    mockedFetchWithRetry.mockResolvedValue(mockResponse({}, 'application/zip'));
+
+    await expect(fetchJson('https://pubchem.example.com/test', createConfig())).rejects.toThrow(
+      'Expected JSON but received content-type: application/zip',
     );
   });
 
