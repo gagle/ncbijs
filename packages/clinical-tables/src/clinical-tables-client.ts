@@ -31,5 +31,13 @@ export async function fetchJson<T>(url: string, config: ClinicalTablesClientConf
     createError: (status, body) => new ClinicalTablesHttpError(status, body),
   });
 
+  const contentType = response.headers.get('content-type') ?? '';
+  if (!contentType.includes('json')) {
+    throw new ClinicalTablesHttpError(
+      response.status,
+      `Expected JSON but received content-type: ${contentType}`,
+    );
+  }
+
   return (await response.json()) as T;
 }

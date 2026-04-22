@@ -8,6 +8,7 @@ function mockFetchJson(data: unknown, status = 200): void {
     vi.fn().mockResolvedValue({
       ok: status >= 200 && status < 300,
       status,
+      headers: new Headers({ 'content-type': 'application/json' }),
       json: () => Promise.resolve(data),
       text: () => Promise.resolve(text),
     }),
@@ -120,6 +121,21 @@ describe('search', () => {
     it('should throw on network failure', async () => {
       mockFetchFailure('Failed to fetch');
       await expect(search('icd10cm', 'diabetes')).rejects.toThrow('Failed to fetch');
+    });
+
+    it('should throw when response is not JSON', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: true,
+          status: 200,
+          headers: new Headers({ 'content-type': 'application/zip' }),
+          text: () => Promise.resolve('binary data'),
+        }),
+      );
+      await expect(search('icd10cm', 'diabetes')).rejects.toThrow(
+        'Clinical Tables API returned status 200',
+      );
     });
   });
 
