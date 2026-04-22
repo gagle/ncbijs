@@ -4,7 +4,7 @@
   "pull-request-footer": "",
   "separate-pull-requests": false,
   "include-component-in-tag": true,
-  "group-pull-request-title-pattern": "chore: release ${component} ${version}",
+  "last-release-sha": "58b935b",
   "plugins": [
     {
       "type": "linked-versions",
