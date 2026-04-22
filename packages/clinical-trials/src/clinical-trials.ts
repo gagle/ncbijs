@@ -4,9 +4,12 @@ import type { ClinicalTrialsClientConfig } from './clinical-trials-client';
 import type {
   ClinicalTrialsConfig,
   FieldValueCount,
+  StudyFieldDefinition,
   StudyIntervention,
   StudyLocation,
+  StudyMetadata,
   StudyReport,
+  StudySearchFilter,
   StudySearchOptions,
   StudySponsor,
   StudyStats,
@@ -110,6 +113,63 @@ export class ClinicalTrials {
       count: entry.count ?? 0,
     }));
   }
+
+  /** Fetch field definitions for the studies API. */
+  public async studyMetadata(): Promise<StudyMetadata> {
+    const url = `${BASE_URL}/studies/metadata`;
+    const raw = await fetchJson<RawMetadataResponse>(url, this._config);
+
+    return {
+      fields: (raw.fields ?? []).map(mapFieldDefinition),
+    };
+  }
+
+  /** Fetch valid enum values for a specific study field. */
+  public async enumValues(field: string): Promise<ReadonlyArray<string>> {
+    const url = `${BASE_URL}/studies/enums/${encodeURIComponent(field)}`;
+    const raw = await fetchJson<RawEnumValuesResponse>(url, this._config);
+
+    return raw.values ?? [];
+  }
+
+  /** Get total count of studies matching a query without fetching results. */
+  public async studySize(query?: string, filter?: StudySearchFilter): Promise<number> {
+    const params = new URLSearchParams();
+    params.set('countTotal', 'true');
+    params.set('pageSize', '0');
+
+    if (query !== undefined) {
+      params.set('query.term', query);
+    }
+
+    if (filter?.overallStatus !== undefined) {
+      params.set('filter.overallStatus', filter.overallStatus.join(','));
+    }
+    if (filter?.condition !== undefined) {
+      for (const condition of filter.condition) {
+        params.append('query.cond', condition);
+      }
+    }
+    if (filter?.intervention !== undefined) {
+      for (const intervention of filter.intervention) {
+        params.append('query.intr', intervention);
+      }
+    }
+    if (filter?.sponsor !== undefined) {
+      params.set('query.spons', filter.sponsor);
+    }
+    if (filter?.phase !== undefined) {
+      params.set('filter.phase', filter.phase.join(','));
+    }
+    if (filter?.studyType !== undefined) {
+      params.set('filter.studyType', filter.studyType);
+    }
+
+    const url = `${BASE_URL}/studies?${params.toString()}`;
+    const raw = await fetchJson<RawStudySizeResponse>(url, this._config);
+
+    return raw.totalCount ?? 0;
+  }
 }
 
 interface RawStudyResponse {
@@ -167,6 +227,24 @@ interface RawStatsResponse {
 
 interface RawFieldValuesResponse {
   readonly values?: ReadonlyArray<{ readonly value?: string; readonly count?: number }>;
+}
+
+interface RawMetadataResponse {
+  readonly fields?: ReadonlyArray<{
+    readonly name?: string;
+    readonly type?: string;
+    readonly description?: string;
+    readonly sourceField?: string;
+    readonly isEnum?: boolean;
+  }>;
+}
+
+interface RawEnumValuesResponse {
+  readonly values?: ReadonlyArray<string>;
+}
+
+interface RawStudySizeResponse {
+  readonly totalCount?: number;
 }
 
 function mapStudyReport(raw: RawStudyResponse): StudyReport {
@@ -229,5 +307,21 @@ function mapLocation(raw: {
     city: raw.city ?? '',
     state: raw.state ?? '',
     country: raw.country ?? '',
+  };
+}
+
+function mapFieldDefinition(raw: {
+  readonly name?: string;
+  readonly type?: string;
+  readonly description?: string;
+  readonly sourceField?: string;
+  readonly isEnum?: boolean;
+}): StudyFieldDefinition {
+  return {
+    name: raw.name ?? '',
+    type: raw.type ?? '',
+    description: raw.description ?? '',
+    sourceField: raw.sourceField ?? '',
+    isEnum: raw.isEnum ?? false,
   };
 }

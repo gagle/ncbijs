@@ -114,6 +114,63 @@ Fetch details for multiple bioassays by AID in a single request.
 
 Fetch a summary of substance and compound counts for a bioassay.
 
+### Gene
+
+#### `geneByGeneId(geneId: number): Promise<GeneRecord>`
+
+Fetch a gene summary by NCBI Gene ID.
+
+```ts
+const gene = await pubchem.geneByGeneId(1956);
+console.log(gene.symbol); // 'EGFR'
+console.log(gene.name); // 'epidermal growth factor receptor'
+```
+
+#### `geneByCid(cid: number): Promise<Array<number>>`
+
+Get NCBI Gene IDs linked to a compound by CID.
+
+```ts
+const geneIds = await pubchem.geneByCid(2244);
+console.log(geneIds); // [5742, 5743]
+```
+
+### Protein
+
+#### `proteinByAccession(accession: string): Promise<ProteinRecord>`
+
+Fetch a protein summary by accession.
+
+```ts
+const protein = await pubchem.proteinByAccession('P00533');
+console.log(protein.name); // 'Epidermal growth factor receptor'
+console.log(protein.organism); // 'Homo sapiens'
+```
+
+### Classification
+
+#### `compoundClassification(cid: number): Promise<Array<ClassificationNode>>`
+
+Fetch the classification hierarchy for a compound from PUG View.
+
+```ts
+const nodes = await pubchem.compoundClassification(2244);
+console.log(nodes[0].name); // 'MeSH Tree'
+console.log(nodes[0].childNodes.length);
+```
+
+### Patents
+
+#### `compoundPatents(cid: number): Promise<Array<PatentRecord>>`
+
+Fetch patents associated with a compound from PUG View.
+
+```ts
+const patents = await pubchem.compoundPatents(2244);
+console.log(patents[0].patentId); // 'US-1234567-A'
+console.log(patents[0].title);
+```
+
 ### PUG View Annotations
 
 #### `compoundAnnotations(cid: number, heading?: string): Promise<AnnotationRecord>`
@@ -272,5 +329,49 @@ interface AnnotationData {
   name: string;
   value: string;
   url: string;
+}
+```
+
+### `GeneRecord`
+
+```ts
+interface GeneRecord {
+  geneId: number;
+  symbol: string;
+  name: string;
+  taxId: number;
+  description: string;
+}
+```
+
+### `ProteinRecord`
+
+```ts
+interface ProteinRecord {
+  accession: string;
+  name: string;
+  organism: string;
+  taxId: number;
+}
+```
+
+### `ClassificationNode`
+
+```ts
+interface ClassificationNode {
+  name: string;
+  description: string;
+  childNodes: Array<ClassificationNode>;
+}
+```
+
+### `PatentRecord`
+
+```ts
+interface PatentRecord {
+  patentId: string;
+  title: string;
+  inventorNames: Array<string>;
+  assigneeNames: Array<string>;
 }
 ```

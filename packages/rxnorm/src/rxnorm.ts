@@ -2,13 +2,17 @@ import { TokenBucket } from '@ncbijs/rate-limiter';
 import { fetchJson } from './rxnorm-client';
 import type { RxNormClientConfig } from './rxnorm-client';
 import type {
+  ApproximateTermOptions,
   ConceptGroup,
   DrugGroup,
   DrugInteraction,
   InteractionConcept,
   RxConcept,
+  RxConceptHistory,
   RxConceptProperties,
   RxNormConfig,
+  RxProperty,
+  RxTermCandidate,
 } from './interfaces/rxnorm.interface';
 
 const BASE_URL = 'https://rxnav.nlm.nih.gov/REST';
@@ -135,6 +139,67 @@ export class RxNorm {
 
     return raw.ndcGroup?.ndcList?.ndc ?? [];
   }
+
+  /** Fuzzy drug name lookup returning ranked candidates with scores. */
+  public async approximateTerm(
+    name: string,
+    options?: ApproximateTermOptions,
+  ): Promise<ReadonlyArray<RxTermCandidate>> {
+    let url = `${BASE_URL}/approximateTerm.json?term=${encodeURIComponent(name)}`;
+
+    if (options?.maxEntries !== undefined) {
+      url += `&maxEntries=${encodeURIComponent(String(options.maxEntries))}`;
+    }
+
+    if (options?.option !== undefined) {
+      url += `&option=${encodeURIComponent(String(options.option))}`;
+    }
+
+    const raw = await fetchJson<RawApproximateTermResponse>(url, this._config);
+    const candidates = raw.approximateGroup?.candidate ?? [];
+
+    return candidates.map((candidate) => ({
+      rxcui: candidate.rxcui ?? '',
+      name: candidate.name ?? '',
+      score: Number(candidate.score ?? '0'),
+      rank: Number(candidate.rank ?? '0'),
+    }));
+  }
+
+  /** Get historical status of an RxCUI including remapping information. */
+  public async history(rxcui: string): Promise<RxConceptHistory> {
+    const url = `${BASE_URL}/rxcui/${encodeURIComponent(rxcui)}/historystatus.json`;
+    const raw = await fetchJson<RawHistoryResponse>(url, this._config);
+    const status = raw.rxcuiStatusHistory?.metaData;
+    const derivedConcepts = raw.rxcuiStatusHistory?.derivedConcepts?.remappedTo ?? [];
+
+    return {
+      rxcui: status?.rxcui ?? '',
+      name: status?.name ?? '',
+      status: status?.status ?? '',
+      remappedTo: remappedConcepts(derivedConcepts),
+    };
+  }
+
+  /**
+   * Fetch all properties for an RxCUI filtered by property category.
+   * @param rxcui - The RxCUI to fetch properties for.
+   * @param properties - Property categories to include (e.g., 'NAMES', 'SOURCES').
+   */
+  public async allProperties(
+    rxcui: string,
+    properties: ReadonlyArray<string>,
+  ): Promise<ReadonlyArray<RxProperty>> {
+    const propParam = properties.join('+');
+    const url = `${BASE_URL}/rxcui/${encodeURIComponent(rxcui)}/allProperties.json?prop=${encodeURIComponent(propParam)}`;
+    const raw = await fetchJson<RawAllPropertiesResponse>(url, this._config);
+
+    return (raw.propConceptGroup?.propConcept ?? []).map((prop) => ({
+      category: prop.propCategory ?? '',
+      name: prop.propName ?? '',
+      value: prop.propValue ?? '',
+    }));
+  }
 }
 
 interface RawRxcuiResponse {
@@ -221,6 +286,48 @@ interface RawNdcResponse {
   };
 }
 
+interface RawApproximateTermResponse {
+  readonly approximateGroup?: {
+    readonly candidate?: ReadonlyArray<RawApproximateCandidate>;
+  };
+}
+
+interface RawApproximateCandidate {
+  readonly rxcui?: string;
+  readonly name?: string;
+  readonly score?: string;
+  readonly rank?: string;
+}
+
+interface RawHistoryResponse {
+  readonly rxcuiStatusHistory?: {
+    readonly metaData?: {
+      readonly rxcui?: string;
+      readonly name?: string;
+      readonly status?: string;
+    };
+    readonly derivedConcepts?: {
+      readonly remappedTo?: ReadonlyArray<RawRemappedConcept>;
+    };
+  };
+}
+
+interface RawRemappedConcept {
+  readonly rxcui?: string;
+}
+
+interface RawAllPropertiesResponse {
+  readonly propConceptGroup?: {
+    readonly propConcept?: ReadonlyArray<RawPropConcept>;
+  };
+}
+
+interface RawPropConcept {
+  readonly propCategory?: string;
+  readonly propName?: string;
+  readonly propValue?: string;
+}
+
 function mapConceptGroup(raw: RawConceptGroup): ConceptGroup {
   return {
     tty: raw.tty ?? '',
@@ -240,4 +347,14 @@ function mapInteractionConcept(raw: RawInteractionConcept): InteractionConcept {
     sourceConceptId: raw.sourceConceptItem?.id ?? '',
     sourceConceptName: raw.sourceConceptItem?.name ?? '',
   };
+}
+
+function remappedConcepts(concepts: ReadonlyArray<RawRemappedConcept>): ReadonlyArray<string> {
+  const rxcuis: Array<string> = [];
+  for (const concept of concepts) {
+    if (concept.rxcui) {
+      rxcuis.push(concept.rxcui);
+    }
+  }
+  return rxcuis;
 }

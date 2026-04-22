@@ -513,6 +513,216 @@ describe('ClinicalTrials', () => {
     });
   });
 
+  describe('studyMetadata', () => {
+    it('should return mapped field definitions', async () => {
+      mockFetchJson({
+        fields: [
+          {
+            name: 'NCTId',
+            type: 'string',
+            description: 'Unique identifier',
+            sourceField: 'protocolSection.identificationModule.nctId',
+            isEnum: false,
+          },
+          {
+            name: 'OverallStatus',
+            type: 'string',
+            description: 'Current status',
+            sourceField: 'protocolSection.statusModule.overallStatus',
+            isEnum: true,
+          },
+        ],
+      });
+      const ct = new ClinicalTrials();
+
+      const metadata = await ct.studyMetadata();
+
+      expect(metadata.fields).toHaveLength(2);
+      expect(metadata.fields[0]!.name).toBe('NCTId');
+      expect(metadata.fields[0]!.type).toBe('string');
+      expect(metadata.fields[0]!.description).toBe('Unique identifier');
+      expect(metadata.fields[0]!.sourceField).toBe('protocolSection.identificationModule.nctId');
+      expect(metadata.fields[0]!.isEnum).toBe(false);
+      expect(metadata.fields[1]!.isEnum).toBe(true);
+    });
+
+    it('should build correct URL', async () => {
+      mockFetchJson({ fields: [] });
+      const ct = new ClinicalTrials();
+
+      await ct.studyMetadata();
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe('https://clinicaltrials.gov/api/v2/studies/metadata');
+    });
+
+    it('should handle missing fields array', async () => {
+      mockFetchJson({});
+      const ct = new ClinicalTrials();
+
+      const metadata = await ct.studyMetadata();
+
+      expect(metadata.fields).toEqual([]);
+    });
+
+    it('should default missing field properties', async () => {
+      mockFetchJson({ fields: [{}] });
+      const ct = new ClinicalTrials();
+
+      const metadata = await ct.studyMetadata();
+
+      expect(metadata.fields[0]!.name).toBe('');
+      expect(metadata.fields[0]!.type).toBe('');
+      expect(metadata.fields[0]!.description).toBe('');
+      expect(metadata.fields[0]!.sourceField).toBe('');
+      expect(metadata.fields[0]!.isEnum).toBe(false);
+    });
+  });
+
+  describe('enumValues', () => {
+    it('should return enum values for a field', async () => {
+      mockFetchJson({ values: ['RECRUITING', 'COMPLETED', 'TERMINATED'] });
+      const ct = new ClinicalTrials();
+
+      const values = await ct.enumValues('OverallStatus');
+
+      expect(values).toEqual(['RECRUITING', 'COMPLETED', 'TERMINATED']);
+    });
+
+    it('should build correct URL with encoded field', async () => {
+      mockFetchJson({ values: [] });
+      const ct = new ClinicalTrials();
+
+      await ct.enumValues('OverallStatus');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe('https://clinicaltrials.gov/api/v2/studies/enums/OverallStatus');
+    });
+
+    it('should handle missing values', async () => {
+      mockFetchJson({});
+      const ct = new ClinicalTrials();
+
+      const values = await ct.enumValues('OverallStatus');
+
+      expect(values).toEqual([]);
+    });
+
+    it('should return empty array for empty response', async () => {
+      mockFetchJson({ values: [] });
+      const ct = new ClinicalTrials();
+
+      const values = await ct.enumValues('Phase');
+
+      expect(values).toEqual([]);
+    });
+  });
+
+  describe('studySize', () => {
+    it('should return total count for a query', async () => {
+      mockFetchJson({ totalCount: 12345 });
+      const ct = new ClinicalTrials();
+
+      const count = await ct.studySize('diabetes');
+
+      expect(count).toBe(12345);
+    });
+
+    it('should build correct URL with query', async () => {
+      mockFetchJson({ totalCount: 0 });
+      const ct = new ClinicalTrials();
+
+      await ct.studySize('diabetes');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('countTotal=true');
+      expect(url).toContain('pageSize=0');
+      expect(url).toContain('query.term=diabetes');
+    });
+
+    it('should work without a query', async () => {
+      mockFetchJson({ totalCount: 500000 });
+      const ct = new ClinicalTrials();
+
+      const count = await ct.studySize();
+
+      expect(count).toBe(500000);
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).not.toContain('query.term');
+    });
+
+    it('should handle missing totalCount', async () => {
+      mockFetchJson({});
+      const ct = new ClinicalTrials();
+
+      const count = await ct.studySize('test');
+
+      expect(count).toBe(0);
+    });
+
+    it('should apply filter.overallStatus', async () => {
+      mockFetchJson({ totalCount: 100 });
+      const ct = new ClinicalTrials();
+
+      await ct.studySize('diabetes', { overallStatus: ['RECRUITING', 'COMPLETED'] });
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('filter.overallStatus=RECRUITING%2CCOMPLETED');
+    });
+
+    it('should apply filter.condition', async () => {
+      mockFetchJson({ totalCount: 100 });
+      const ct = new ClinicalTrials();
+
+      await ct.studySize('diabetes', { condition: ['Diabetes', 'Obesity'] });
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('query.cond=Diabetes');
+      expect(url).toContain('query.cond=Obesity');
+    });
+
+    it('should apply filter.intervention', async () => {
+      mockFetchJson({ totalCount: 100 });
+      const ct = new ClinicalTrials();
+
+      await ct.studySize('diabetes', { intervention: ['Metformin', 'Insulin'] });
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('query.intr=Metformin');
+      expect(url).toContain('query.intr=Insulin');
+    });
+
+    it('should apply filter.sponsor', async () => {
+      mockFetchJson({ totalCount: 100 });
+      const ct = new ClinicalTrials();
+
+      await ct.studySize('diabetes', { sponsor: 'NIH' });
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('query.spons=NIH');
+    });
+
+    it('should apply filter.phase', async () => {
+      mockFetchJson({ totalCount: 100 });
+      const ct = new ClinicalTrials();
+
+      await ct.studySize('diabetes', { phase: ['PHASE1', 'PHASE2'] });
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('filter.phase=PHASE1%2CPHASE2');
+    });
+
+    it('should apply filter.studyType', async () => {
+      mockFetchJson({ totalCount: 100 });
+      const ct = new ClinicalTrials();
+
+      await ct.studySize('diabetes', { studyType: 'INTERVENTIONAL' });
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('filter.studyType=INTERVENTIONAL');
+    });
+  });
+
   describe('configuration', () => {
     it('should work without any config', async () => {
       mockFetchJson(buildStudyResponse());

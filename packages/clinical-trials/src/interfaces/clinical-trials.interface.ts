@@ -69,3 +69,17 @@ export interface FieldValueCount {
   readonly value: string;
   readonly count: number;
 }
+
+/** Metadata describing available study fields in the API. */
+export interface StudyMetadata {
+  readonly fields: ReadonlyArray<StudyFieldDefinition>;
+}
+
+/** Definition of a single study field. */
+export interface StudyFieldDefinition {
+  readonly name: string;
+  readonly type: string;
+  readonly description: string;
+  readonly sourceField: string;
+  readonly isEnum: boolean;
+}

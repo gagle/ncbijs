@@ -51,3 +51,53 @@ export interface VariantLocation {
   readonly start: number;
   readonly stop: number;
 }
+
+/** RefSNP report from the NCBI Variation Services API. */
+export interface RefSnpReport {
+  readonly rsid: number;
+  readonly variantType: string;
+  readonly placements: ReadonlyArray<RefSnpPlacement>;
+}
+
+/** Genomic placement of a RefSNP variant on a specific sequence. */
+export interface RefSnpPlacement {
+  readonly sequenceAccession: string;
+  readonly alleles: ReadonlyArray<RefSnpAllele>;
+}
+
+/** Allele within a RefSNP placement with SPDI and HGVS notation. */
+export interface RefSnpAllele {
+  readonly spdi: string;
+  readonly hgvs: string;
+}
+
+/** Validated SPDI expression result from the Variation Services API. */
+export interface SpdiResult {
+  readonly sequenceAccession: string;
+  readonly position: number;
+  readonly deletedSequence: string;
+  readonly insertedSequence: string;
+}
+
+/** SPDI allele from HGVS-to-SPDI conversion. */
+export interface SpdiAllele {
+  readonly sequenceAccession: string;
+  readonly position: number;
+  readonly deletedSequence: string;
+  readonly insertedSequence: string;
+}
+
+/** Allele frequency report for a variant from the ALFA database. */
+export interface FrequencyReport {
+  readonly rsid: number;
+  readonly populations: ReadonlyArray<PopulationFrequency>;
+}
+
+/** Allele frequency for a specific population within a study. */
+export interface PopulationFrequency {
+  readonly study: string;
+  readonly population: string;
+  readonly alleleCount: number;
+  readonly totalCount: number;
+  readonly frequency: number;
+}

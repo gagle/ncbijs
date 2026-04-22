@@ -58,7 +58,10 @@
     "@ncbijs/blast": "workspace:*",
     "@ncbijs/snp": "workspace:*",
     "@ncbijs/clinvar": "workspace:*",
+    "@ncbijs/icite": "workspace:*",
+    "@ncbijs/litvar": "workspace:*",
     "@ncbijs/pubchem": "workspace:*",
+    "@ncbijs/rxnorm": "workspace:*",
     "zod": "^3.24.0"
   },
   "scripts": {

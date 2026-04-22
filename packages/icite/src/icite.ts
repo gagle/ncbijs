@@ -39,6 +39,46 @@ export class ICite {
 
     return (raw.data ?? []).map(mapPublication);
   }
+
+  /**
+   * Fetch full citation metrics for all publications that cite a given article.
+   * @param pmid - PubMed ID of the article whose citers to retrieve.
+   */
+  public async citedBy(pmid: number): Promise<ReadonlyArray<ICitePublication>> {
+    const [source] = await this.publications([pmid]);
+    if (!source || source.citedByPmids.length === 0) {
+      return [];
+    }
+
+    return this._fetchInBatches(source.citedByPmids);
+  }
+
+  /**
+   * Fetch full citation metrics for all publications referenced by a given article.
+   * @param pmid - PubMed ID of the article whose references to retrieve.
+   */
+  public async references(pmid: number): Promise<ReadonlyArray<ICitePublication>> {
+    const [source] = await this.publications([pmid]);
+    if (!source || source.referencesPmids.length === 0) {
+      return [];
+    }
+
+    return this._fetchInBatches(source.referencesPmids);
+  }
+
+  private async _fetchInBatches(
+    pmids: ReadonlyArray<number>,
+  ): Promise<ReadonlyArray<ICitePublication>> {
+    const results: Array<ICitePublication> = [];
+
+    for (let offset = 0; offset < pmids.length; offset += MAX_PMIDS_PER_REQUEST) {
+      const batch = pmids.slice(offset, offset + MAX_PMIDS_PER_REQUEST);
+      const publications = await this.publications(batch);
+      results.push(...publications);
+    }
+
+    return results;
+  }
 }
 
 interface RawICiteResponse {
@@ -59,7 +99,13 @@ interface RawICitePublication {
   readonly references_count?: number;
   readonly expected_citations_per_year?: number | null;
   readonly field_citation_rate?: number | null;
+  readonly citations_per_year?: number | null;
   readonly is_clinical?: boolean;
+  readonly provisional?: boolean;
+  readonly human?: number;
+  readonly animal?: number;
+  readonly molecular_cellular?: number;
+  readonly apt?: number;
   readonly cited_by?: ReadonlyArray<number>;
   readonly references?: ReadonlyArray<number>;
   readonly doi?: string;
@@ -79,7 +125,13 @@ function mapPublication(raw: RawICitePublication): ICitePublication {
     referencesCount: raw.references_count ?? 0,
     expectedCitationsPerYear: raw.expected_citations_per_year ?? undefined,
     fieldCitationRate: raw.field_citation_rate ?? undefined,
+    citationsPerYear: raw.citations_per_year ?? undefined,
     isClinicallyCited: raw.is_clinical ?? false,
+    provisional: raw.provisional ?? false,
+    human: raw.human ?? 0,
+    animal: raw.animal ?? 0,
+    molecularCellular: raw.molecular_cellular ?? 0,
+    apt: raw.apt ?? 0,
     citedByPmids: raw.cited_by ?? [],
     referencesPmids: raw.references ?? [],
     doi: raw.doi ?? '',

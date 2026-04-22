@@ -28,3 +28,10 @@ export interface BioCLocation {
   readonly offset: number;
   readonly length: number;
 }
+
+/** An entity returned by the PubTator3 autocomplete search. */
+export interface EntitySearchResult {
+  readonly identifier: string;
+  readonly name: string;
+  readonly type: string;
+}

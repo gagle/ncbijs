@@ -60,6 +60,65 @@ Fetch variant details by UIDs. Entries with errors are automatically skipped.
 
 Search and fetch in one call. Combines `search` + `fetch`. Returns empty array if no results.
 
+### Variation Services
+
+#### `refsnp(rsid: number): Promise<RefSnpReport>`
+
+Get a RefSNP variant report by rsID. Returns variant type and placements with alleles in SPDI and HGVS notation.
+
+```ts
+const report = await clinvar.refsnp(328);
+console.log(report.variantType); // 'snv'
+console.log(report.placements[0].sequenceAccession); // 'NC_000011.10'
+console.log(report.placements[0].alleles[0].hgvs); // 'NC_000011.10:g.5227002C>T'
+```
+
+#### `spdi(spdiExpression: string): Promise<SpdiResult>`
+
+Validate and resolve an SPDI expression. Returns the parsed sequence accession, position, deleted sequence, and inserted sequence.
+
+```ts
+const result = await clinvar.spdi('NC_000011.10:5227001:C:T');
+console.log(result.sequenceAccession); // 'NC_000011.10'
+console.log(result.position); // 5227001
+console.log(result.deletedSequence); // 'C'
+console.log(result.insertedSequence); // 'T'
+```
+
+#### `spdiToHgvs(spdiExpression: string): Promise<Array<string>>`
+
+Convert an SPDI expression to HGVS notation. Returns one or more HGVS expression strings.
+
+```ts
+const hgvsList = await clinvar.spdiToHgvs('NC_000011.10:5227001:C:T');
+console.log(hgvsList[0]); // 'NC_000011.10:g.5227002C>T'
+```
+
+#### `hgvsToSpdi(hgvsExpression: string, assembly?: string): Promise<Array<SpdiAllele>>`
+
+Convert an HGVS expression to contextual SPDI alleles. Optionally filter by genome assembly.
+
+| Option     | Default | Description                                        |
+| ---------- | ------- | -------------------------------------------------- |
+| `assembly` | --      | Genome assembly filter (e.g. `'GCF_000001405.40'`) |
+
+```ts
+const alleles = await clinvar.hgvsToSpdi('NC_000011.10:g.5227002C>T');
+console.log(alleles[0].sequenceAccession); // 'NC_000011.10'
+console.log(alleles[0].position); // 5227001
+```
+
+#### `frequency(rsid: number): Promise<FrequencyReport>`
+
+Get allele frequency data (ALFA) for a variant by rsID. Returns population-level allele counts and frequencies.
+
+```ts
+const freq = await clinvar.frequency(328);
+console.log(freq.populations[0].study); // 'ALFA'
+console.log(freq.populations[0].population); // 'European'
+console.log(freq.populations[0].frequency); // 0.234
+```
+
 ## Error handling
 
 ```ts
@@ -130,5 +189,76 @@ interface VariantLocation {
   chromosome: string;
   start: number;
   stop: number;
+}
+```
+
+### `RefSnpReport`
+
+```ts
+interface RefSnpReport {
+  rsid: number;
+  variantType: string;
+  placements: Array<RefSnpPlacement>;
+}
+```
+
+### `RefSnpPlacement`
+
+```ts
+interface RefSnpPlacement {
+  sequenceAccession: string;
+  alleles: Array<RefSnpAllele>;
+}
+```
+
+### `RefSnpAllele`
+
+```ts
+interface RefSnpAllele {
+  spdi: string;
+  hgvs: string;
+}
+```
+
+### `SpdiResult`
+
+```ts
+interface SpdiResult {
+  sequenceAccession: string;
+  position: number;
+  deletedSequence: string;
+  insertedSequence: string;
+}
+```
+
+### `SpdiAllele`
+
+```ts
+interface SpdiAllele {
+  sequenceAccession: string;
+  position: number;
+  deletedSequence: string;
+  insertedSequence: string;
+}
+```
+
+### `FrequencyReport`
+
+```ts
+interface FrequencyReport {
+  rsid: number;
+  populations: Array<PopulationFrequency>;
+}
+```
+
+### `PopulationFrequency`
+
+```ts
+interface PopulationFrequency {
+  study: string;
+  population: string;
+  alleleCount: number;
+  totalCount: number;
+  frequency: number;
 }
 ```

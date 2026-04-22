@@ -58,16 +58,23 @@ const result = await blast.retrieve(rid);
 
 Submit a BLAST search. Returns `{ rid, estimatedSeconds }`.
 
-| Parameter             | Type           | Description                                                                 |
-| --------------------- | -------------- | --------------------------------------------------------------------------- |
-| `query`               | `string`       | Sequence query (FASTA or plain)                                             |
-| `program`             | `BlastProgram` | `'blastn'`, `'blastp'`, `'blastx'`, `'tblastn'`, `'tblastx'`, `'megablast'` |
-| `database`            | `string`       | Target database (`'nt'`, `'nr'`, `'swissprot'`, etc.)                       |
-| `options.entrezQuery` | `string`       | Entrez query to limit search                                                |
-| `options.expect`      | `number`       | E-value threshold                                                           |
-| `options.hitListSize` | `number`       | Max number of hits                                                          |
-| `options.matrix`      | `string`       | Scoring matrix (e.g., `'BLOSUM62'`)                                         |
-| `options.wordSize`    | `number`       | Word size for seeding alignments                                            |
+| Parameter                            | Type               | Description                                                                                                                             |
+| ------------------------------------ | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `query`                              | `string`           | Sequence query (FASTA or plain)                                                                                                         |
+| `program`                            | `BlastProgram`     | `'blastn'`, `'blastp'`, `'blastx'`, `'tblastn'`, `'tblastx'`, `'megablast'`, `'psiblast'`, `'deltablast'`, `'rpsblast'`, `'rpstblastn'` |
+| `database`                           | `string`           | Target database (`'nt'`, `'nr'`, `'swissprot'`, etc.)                                                                                   |
+| `options.entrezQuery`                | `string`           | Entrez query to limit search                                                                                                            |
+| `options.expect`                     | `number`           | E-value threshold                                                                                                                       |
+| `options.hitListSize`                | `number`           | Max number of hits                                                                                                                      |
+| `options.matrix`                     | `string`           | Scoring matrix (e.g., `'BLOSUM62'`)                                                                                                     |
+| `options.wordSize`                   | `number`           | Word size for seeding alignments                                                                                                        |
+| `options.compositionBasedStatistics` | `0 \| 1 \| 2 \| 3` | Composition-based statistics mode                                                                                                       |
+| `options.seg`                        | `boolean`          | Enable SEG low-complexity filtering                                                                                                     |
+| `options.softMasking`                | `boolean`          | Enable soft masking of query sequence                                                                                                   |
+| `options.gapOpen`                    | `number`           | Gap opening penalty (use with `gapExtend`)                                                                                              |
+| `options.gapExtend`                  | `number`           | Gap extension penalty (use with `gapOpen`)                                                                                              |
+| `options.threshold`                  | `number`           | Neighboring word score threshold                                                                                                        |
+| `options.numIterations`              | `number`           | Number of PSI-BLAST iterations                                                                                                          |
 
 ### `poll(rid)`
 

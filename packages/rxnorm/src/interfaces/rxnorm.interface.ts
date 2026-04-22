@@ -47,3 +47,32 @@ export interface InteractionConcept {
   readonly sourceConceptId: string;
   readonly sourceConceptName: string;
 }
+
+/** Options for fuzzy drug name lookup. */
+export interface ApproximateTermOptions {
+  readonly maxEntries?: number;
+  readonly option?: 0 | 1;
+}
+
+/** A ranked candidate from a fuzzy drug name lookup. */
+export interface RxTermCandidate {
+  readonly rxcui: string;
+  readonly name: string;
+  readonly score: number;
+  readonly rank: number;
+}
+
+/** Historical status of an RxNorm concept. */
+export interface RxConceptHistory {
+  readonly rxcui: string;
+  readonly name: string;
+  readonly status: string;
+  readonly remappedTo: ReadonlyArray<string>;
+}
+
+/** A property name-value pair for an RxNorm concept. */
+export interface RxProperty {
+  readonly category: string;
+  readonly name: string;
+  readonly value: string;
+}

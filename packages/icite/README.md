@@ -37,6 +37,14 @@ iCite is a fully public API with no API key required. Rate limit: 2 requests/sec
 
 Get citation metrics for up to 1000 PMIDs in a single request.
 
+#### `citedBy(pmid: number): Promise<ReadonlyArray<ICitePublication>>`
+
+Fetch full citation metrics for all publications that cite a given article. Retrieves the source article first, then batch-fetches metrics for every citing PMID.
+
+#### `references(pmid: number): Promise<ReadonlyArray<ICitePublication>>`
+
+Fetch full citation metrics for all publications referenced by a given article. Retrieves the source article first, then batch-fetches metrics for every referenced PMID.
+
 ## Error handling
 
 ```ts
@@ -71,7 +79,13 @@ interface ICitePublication {
   referencesCount: number;
   expectedCitationsPerYear: number | undefined;
   fieldCitationRate: number | undefined;
+  citationsPerYear: number | undefined;
   isClinicallyCited: boolean;
+  provisional: boolean;
+  human: number;
+  animal: number;
+  molecularCellular: number;
+  apt: number;
   citedByPmids: Array<number>;
   referencesPmids: Array<number>;
   doi: string;

@@ -7,9 +7,13 @@ import type {
   AnnotationSection,
   AssayRecord,
   AssaySummary,
+  ClassificationNode,
   CompoundDescription,
   CompoundProperty,
   CompoundSynonyms,
+  GeneRecord,
+  PatentRecord,
+  ProteinRecord,
   PubChemConfig,
   SubstanceRecord,
   SubstanceSynonyms,
@@ -230,6 +234,56 @@ export class PubChem {
     return this._fetchAnnotations('bioassay', aid, heading);
   }
 
+  /** Fetch a gene summary by NCBI Gene ID. */
+  public async geneByGeneId(geneId: number): Promise<GeneRecord> {
+    const url = `${BASE_URL}/gene/geneid/${encodeURIComponent(geneId)}/summary/JSON`;
+    const raw = await fetchJson<RawGeneSummaryResponse>(url, this._config);
+
+    return mapGeneRecord(raw.GeneSummaries?.GeneSummary?.[0]);
+  }
+
+  /** Fetch gene IDs linked to a compound by CID. */
+  public async geneByCid(cid: number): Promise<ReadonlyArray<number>> {
+    const url = `${BASE_URL}/compound/cid/${encodeURIComponent(cid)}/xrefs/GeneID/JSON`;
+    const raw = await fetchJson<RawGeneXrefResponse>(url, this._config);
+
+    return raw.InformationList?.Information?.[0]?.GeneID ?? [];
+  }
+
+  /** Fetch a protein summary by accession. */
+  public async proteinByAccession(accession: string): Promise<ProteinRecord> {
+    const url = `${BASE_URL}/protein/accession/${encodeURIComponent(accession)}/summary/JSON`;
+    const raw = await fetchJson<RawProteinSummaryResponse>(url, this._config);
+
+    return mapProteinRecord(raw.ProteinSummaries?.ProteinSummary?.[0]);
+  }
+
+  /** Fetch compound classification hierarchy from PUG View. */
+  public async compoundClassification(cid: number): Promise<ReadonlyArray<ClassificationNode>> {
+    const url = `${PUG_VIEW_BASE_URL}/data/compound/${encodeURIComponent(cid)}/JSON?heading=Classification`;
+    const raw = await fetchJson<RawPugViewResponse>(url, this._config);
+    const classificationSection = findSectionByHeading(raw.Record?.Section ?? [], 'Classification');
+
+    if (classificationSection === undefined) {
+      return [];
+    }
+
+    return (classificationSection.Section ?? []).map(mapClassificationNode);
+  }
+
+  /** Fetch patents associated with a compound from PUG View. */
+  public async compoundPatents(cid: number): Promise<ReadonlyArray<PatentRecord>> {
+    const url = `${PUG_VIEW_BASE_URL}/data/compound/${encodeURIComponent(cid)}/JSON?heading=Patents`;
+    const raw = await fetchJson<RawPugViewResponse>(url, this._config);
+    const patentsSection = findSectionByHeading(raw.Record?.Section ?? [], 'Patents');
+
+    if (patentsSection === undefined) {
+      return [];
+    }
+
+    return mapPatentRecords(patentsSection);
+  }
+
   private async _fetchAnnotations(
     entityType: string,
     id: number,
@@ -432,6 +486,7 @@ interface RawPugViewInformation {
 interface RawPugViewValue {
   readonly StringWithMarkup?: ReadonlyArray<{ readonly String?: string }>;
   readonly Number?: ReadonlyArray<number>;
+  readonly ExtraColumns?: Record<string, ReadonlyArray<string> | string>;
 }
 
 function mapAnnotationRecord(raw?: RawPugViewRecord): AnnotationRecord {
@@ -462,5 +517,104 @@ function mapAnnotationData(raw: RawPugViewInformation): AnnotationData {
     name: raw.Name ?? '',
     value,
     url: raw.URL ?? '',
+  };
+}
+
+interface RawGeneSummaryResponse {
+  readonly GeneSummaries?: {
+    readonly GeneSummary?: ReadonlyArray<RawGeneSummary>;
+  };
+}
+
+interface RawGeneSummary {
+  readonly GeneID?: number;
+  readonly Symbol?: string;
+  readonly Name?: string;
+  readonly TaxID?: number;
+  readonly Description?: string;
+}
+
+interface RawGeneXrefResponse {
+  readonly InformationList?: {
+    readonly Information?: ReadonlyArray<{
+      readonly CID?: number;
+      readonly GeneID?: ReadonlyArray<number>;
+    }>;
+  };
+}
+
+interface RawProteinSummaryResponse {
+  readonly ProteinSummaries?: {
+    readonly ProteinSummary?: ReadonlyArray<RawProteinSummary>;
+  };
+}
+
+interface RawProteinSummary {
+  readonly RegistryID?: string;
+  readonly Name?: string;
+  readonly Organism?: string;
+  readonly TaxID?: number;
+}
+
+function mapGeneRecord(raw?: RawGeneSummary): GeneRecord {
+  return {
+    geneId: raw?.GeneID ?? 0,
+    symbol: raw?.Symbol ?? '',
+    name: raw?.Name ?? '',
+    taxId: raw?.TaxID ?? 0,
+    description: raw?.Description ?? '',
+  };
+}
+
+function mapProteinRecord(raw?: RawProteinSummary): ProteinRecord {
+  return {
+    accession: raw?.RegistryID ?? '',
+    name: raw?.Name ?? '',
+    organism: raw?.Organism ?? '',
+    taxId: raw?.TaxID ?? 0,
+  };
+}
+
+function findSectionByHeading(
+  sections: ReadonlyArray<RawPugViewSection>,
+  heading: string,
+): RawPugViewSection | undefined {
+  for (const section of sections) {
+    if (section.TOCHeading === heading) {
+      return section;
+    }
+
+    const nested = findSectionByHeading(section.Section ?? [], heading);
+    if (nested !== undefined) {
+      return nested;
+    }
+  }
+
+  return undefined;
+}
+
+function mapClassificationNode(raw: RawPugViewSection): ClassificationNode {
+  return {
+    name: raw.TOCHeading ?? '',
+    description: raw.Description ?? '',
+    childNodes: (raw.Section ?? []).map(mapClassificationNode),
+  };
+}
+
+function mapPatentRecords(section: RawPugViewSection): ReadonlyArray<PatentRecord> {
+  return (section.Information ?? []).map(mapPatentRecord);
+}
+
+function mapPatentRecord(raw: RawPugViewInformation): PatentRecord {
+  const extraColumns = raw.Value?.ExtraColumns ?? {};
+  const title = extraColumns['Title'];
+  const inventorNames = extraColumns['Inventor Names'];
+  const assigneeNames = extraColumns['Assignee Names'];
+
+  return {
+    patentId: raw.Value?.StringWithMarkup?.[0]?.String ?? '',
+    title: typeof title === 'string' ? title : '',
+    inventorNames: Array.isArray(inventorNames) ? inventorNames : [],
+    assigneeNames: Array.isArray(assigneeNames) ? assigneeNames : [],
   };
 }

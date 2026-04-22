@@ -36,10 +36,10 @@ describe('MCP Server E2E', () => {
     return first.text;
   }
 
-  it('should list all 20 tools', async () => {
+  it('should list all 29 tools', async () => {
     const { tools } = await client.listTools();
 
-    expect(tools).toHaveLength(20);
+    expect(tools).toHaveLength(29);
     const names = tools.map((tool) => tool.name).sort();
     expect(names).toContain('search-pubmed');
     expect(names).toContain('get-full-text');
@@ -55,6 +55,15 @@ describe('MCP Server E2E', () => {
     expect(names).toContain('lookup-variant');
     expect(names).toContain('search-clinvar');
     expect(names).toContain('search-compound');
+    expect(names).toContain('lookup-refsnp');
+    expect(names).toContain('lookup-frequency');
+    expect(names).toContain('search-gene-by-compound');
+    expect(names).toContain('dataset-catalog');
+    expect(names).toContain('citation-metrics');
+    expect(names).toContain('citation-graph');
+    expect(names).toContain('drug-lookup');
+    expect(names).toContain('drug-interaction');
+    expect(names).toContain('search-litvar');
   });
 
   it('should search PubMed', async () => {
@@ -196,6 +205,59 @@ describe('MCP Server E2E', () => {
     const text = textContent(result);
     expect(text.length).toBeGreaterThan(0);
     expect(result.isError).not.toBe(true);
+  });
+
+  it('should look up a RefSNP variant', async () => {
+    const result = await client.callTool({
+      name: 'lookup-refsnp',
+      arguments: { rsid: 7412 },
+    });
+
+    const report = JSON.parse(textContent(result)) as { rsid: number };
+    expect(report.rsid).toBe(7412);
+  });
+
+  it('should look up variant frequency', async () => {
+    const result = await client.callTool({
+      name: 'lookup-frequency',
+      arguments: { rsid: 7412 },
+    });
+
+    expect(result.isError).not.toBe(true);
+    const text = textContent(result);
+    expect(text.length).toBeGreaterThan(0);
+  });
+
+  it('should get citation metrics', async () => {
+    const result = await client.callTool({
+      name: 'citation-metrics',
+      arguments: { pmids: [33533846] },
+    });
+
+    const pubs = JSON.parse(textContent(result)) as Array<{ pmid: number }>;
+    expect(pubs.length).toBeGreaterThan(0);
+    expect(pubs[0]!.pmid).toBe(33533846);
+  });
+
+  it('should look up a drug by fuzzy name', async () => {
+    const result = await client.callTool({
+      name: 'drug-lookup',
+      arguments: { name: 'aspirin', maxResults: 5 },
+    });
+
+    const candidates = JSON.parse(textContent(result)) as Array<{ name: string }>;
+    expect(candidates.length).toBeGreaterThan(0);
+  });
+
+  it('should search LitVar for a variant', async () => {
+    const result = await client.callTool({
+      name: 'search-litvar',
+      arguments: { rsid: 'rs328' },
+    });
+
+    expect(result.isError).not.toBe(true);
+    const data = JSON.parse(textContent(result)) as { variant: { rsid: string } };
+    expect(data.variant.rsid).toBeTruthy();
   });
 
   it('should search PubChem compound', async () => {

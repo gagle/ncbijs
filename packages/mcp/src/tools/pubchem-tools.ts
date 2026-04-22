@@ -75,4 +75,22 @@ export function registerPubChemTools(server: McpServer, getPubChem: () => PubChe
       };
     },
   );
+
+  server.registerTool(
+    'search-gene-by-compound',
+    {
+      title: 'Find Genes Linked to Compound',
+      description:
+        'Find NCBI Gene IDs linked to a PubChem compound by CID. ' +
+        'Useful for identifying gene targets of a chemical compound.',
+      inputSchema: {
+        cid: z.number().describe('PubChem Compound ID'),
+      },
+    },
+    async ({ cid }) => {
+      const pubchem = getPubChem();
+      const geneIds = await pubchem.geneByCid(cid);
+      return { content: [{ type: 'text' as const, text: JSON.stringify(geneIds, null, 2) }] };
+    },
+  );
 }

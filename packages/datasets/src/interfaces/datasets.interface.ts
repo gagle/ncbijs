@@ -142,3 +142,33 @@ export interface BioSampleAttribute {
   readonly name: string;
   readonly value: string;
 }
+
+/** Lightweight assembly descriptor with core metadata. */
+export interface AssemblyDescriptor {
+  readonly accession: string;
+  readonly assemblyName: string;
+  readonly assemblyLevel: string;
+  readonly organism: string;
+  readonly taxId: number;
+  readonly submitter: string;
+  readonly releaseDate: string;
+}
+
+/** External database link associated with a gene. */
+export interface GeneLink {
+  readonly geneId: number;
+  readonly links: ReadonlyArray<ExternalLink>;
+}
+
+/** A single link to an external resource. */
+export interface ExternalLink {
+  readonly resourceName: string;
+  readonly url: string;
+}
+
+/** Metadata about an available NCBI dataset. */
+export interface DatasetInfo {
+  readonly name: string;
+  readonly description: string;
+  readonly version: string;
+}

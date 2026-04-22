@@ -124,4 +124,18 @@ export function registerDatasetsTools(server: McpServer, getDatasets: () => Data
       };
     },
   );
+
+  server.registerTool(
+    'dataset-catalog',
+    {
+      title: 'List NCBI Datasets',
+      description: 'List available datasets in the NCBI Datasets API catalog.',
+      inputSchema: {},
+    },
+    async () => {
+      const datasets = getDatasets();
+      const catalog = await datasets.datasetCatalog();
+      return { content: [{ type: 'text' as const, text: JSON.stringify(catalog, null, 2) }] };
+    },
+  );
 }

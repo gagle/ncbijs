@@ -141,6 +141,30 @@ export class Blast {
       body.set('WORD_SIZE', String(options.wordSize));
     }
 
+    if (options?.compositionBasedStatistics !== undefined) {
+      body.set('COMPOSITION_BASED_STATISTICS', String(options.compositionBasedStatistics));
+    }
+
+    if (options?.seg !== undefined) {
+      body.set('FILTER', options.seg ? 'L' : '');
+    }
+
+    if (options?.softMasking !== undefined) {
+      body.set('SOFT_MASKING', String(options.softMasking));
+    }
+
+    if (options?.gapOpen !== undefined && options?.gapExtend !== undefined) {
+      body.set('GAPCOSTS', `${options.gapOpen} ${options.gapExtend}`);
+    }
+
+    if (options?.threshold !== undefined) {
+      body.set('THRESHOLD', String(options.threshold));
+    }
+
+    if (options?.numIterations !== undefined) {
+      body.set('NUM_ITERATIONS', String(options.numIterations));
+    }
+
     const responseText = await this._fetchText(BLAST_BASE_URL, this._submitLimiter, {
       method: 'POST',
       body: body.toString(),

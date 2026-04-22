@@ -1176,6 +1176,567 @@ describe('PubChem', () => {
     });
   });
 
+  describe('geneByGeneId', () => {
+    it('should fetch gene by gene ID and map all fields', async () => {
+      mockFetchJson({
+        GeneSummaries: {
+          GeneSummary: [
+            {
+              GeneID: 7157,
+              Symbol: 'TP53',
+              Name: 'tumor protein p53',
+              TaxID: 9606,
+              Description: 'This gene encodes a tumor suppressor protein.',
+            },
+          ],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const gene = await pubchem.geneByGeneId(7157);
+
+      expect(gene.geneId).toBe(7157);
+      expect(gene.symbol).toBe('TP53');
+      expect(gene.name).toBe('tumor protein p53');
+      expect(gene.taxId).toBe(9606);
+      expect(gene.description).toBe('This gene encodes a tumor suppressor protein.');
+    });
+
+    it('should build correct URL with gene ID', async () => {
+      mockFetchJson({ GeneSummaries: { GeneSummary: [] } });
+      const pubchem = new PubChem();
+
+      await pubchem.geneByGeneId(7157);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('/gene/geneid/7157/summary/JSON');
+    });
+
+    it('should handle missing GeneSummaries', async () => {
+      mockFetchJson({});
+      const pubchem = new PubChem();
+
+      const gene = await pubchem.geneByGeneId(1);
+
+      expect(gene.geneId).toBe(0);
+      expect(gene.symbol).toBe('');
+      expect(gene.name).toBe('');
+      expect(gene.taxId).toBe(0);
+      expect(gene.description).toBe('');
+    });
+
+    it('should handle empty GeneSummary array', async () => {
+      mockFetchJson({ GeneSummaries: { GeneSummary: [] } });
+      const pubchem = new PubChem();
+
+      const gene = await pubchem.geneByGeneId(1);
+
+      expect(gene.geneId).toBe(0);
+      expect(gene.symbol).toBe('');
+    });
+
+    it('should handle GeneSummary entry with missing fields', async () => {
+      mockFetchJson({ GeneSummaries: { GeneSummary: [{ GeneID: 7157 }] } });
+      const pubchem = new PubChem();
+
+      const gene = await pubchem.geneByGeneId(7157);
+
+      expect(gene.geneId).toBe(7157);
+      expect(gene.symbol).toBe('');
+      expect(gene.name).toBe('');
+      expect(gene.taxId).toBe(0);
+      expect(gene.description).toBe('');
+    });
+
+    it('should throw on 404 for non-existent gene', async () => {
+      mockFetchError(404, 'PUGREST.NotFound');
+      const pubchem = new PubChem();
+
+      await expect(pubchem.geneByGeneId(999999999)).rejects.toThrow(
+        'PubChem API returned status 404',
+      );
+    });
+  });
+
+  describe('geneByCid', () => {
+    it('should return gene IDs linked to a compound', async () => {
+      mockFetchJson({
+        InformationList: {
+          Information: [{ CID: 2244, GeneID: [7157, 672] }],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const geneIds = await pubchem.geneByCid(2244);
+
+      expect(geneIds).toEqual([7157, 672]);
+    });
+
+    it('should build correct URL with CID', async () => {
+      mockFetchJson({ InformationList: { Information: [] } });
+      const pubchem = new PubChem();
+
+      await pubchem.geneByCid(2244);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('/compound/cid/2244/xrefs/GeneID/JSON');
+    });
+
+    it('should handle missing InformationList', async () => {
+      mockFetchJson({});
+      const pubchem = new PubChem();
+
+      const geneIds = await pubchem.geneByCid(1);
+
+      expect(geneIds).toEqual([]);
+    });
+
+    it('should handle empty Information array', async () => {
+      mockFetchJson({ InformationList: { Information: [] } });
+      const pubchem = new PubChem();
+
+      const geneIds = await pubchem.geneByCid(1);
+
+      expect(geneIds).toEqual([]);
+    });
+
+    it('should handle Information entry with missing GeneID', async () => {
+      mockFetchJson({ InformationList: { Information: [{ CID: 2244 }] } });
+      const pubchem = new PubChem();
+
+      const geneIds = await pubchem.geneByCid(2244);
+
+      expect(geneIds).toEqual([]);
+    });
+
+    it('should throw on 404 for non-existent compound', async () => {
+      mockFetchError(404, 'PUGREST.NotFound');
+      const pubchem = new PubChem();
+
+      await expect(pubchem.geneByCid(999999999)).rejects.toThrow('PubChem API returned status 404');
+    });
+  });
+
+  describe('proteinByAccession', () => {
+    it('should fetch protein by accession and map all fields', async () => {
+      mockFetchJson({
+        ProteinSummaries: {
+          ProteinSummary: [
+            {
+              RegistryID: 'P04637',
+              Name: 'Cellular tumor antigen p53',
+              Organism: 'Homo sapiens',
+              TaxID: 9606,
+            },
+          ],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const protein = await pubchem.proteinByAccession('P04637');
+
+      expect(protein.accession).toBe('P04637');
+      expect(protein.name).toBe('Cellular tumor antigen p53');
+      expect(protein.organism).toBe('Homo sapiens');
+      expect(protein.taxId).toBe(9606);
+    });
+
+    it('should build correct URL with encoded accession', async () => {
+      mockFetchJson({ ProteinSummaries: { ProteinSummary: [] } });
+      const pubchem = new PubChem();
+
+      await pubchem.proteinByAccession('P04637');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('/protein/accession/P04637/summary/JSON');
+    });
+
+    it('should handle missing ProteinSummaries', async () => {
+      mockFetchJson({});
+      const pubchem = new PubChem();
+
+      const protein = await pubchem.proteinByAccession('UNKNOWN');
+
+      expect(protein.accession).toBe('');
+      expect(protein.name).toBe('');
+      expect(protein.organism).toBe('');
+      expect(protein.taxId).toBe(0);
+    });
+
+    it('should handle empty ProteinSummary array', async () => {
+      mockFetchJson({ ProteinSummaries: { ProteinSummary: [] } });
+      const pubchem = new PubChem();
+
+      const protein = await pubchem.proteinByAccession('UNKNOWN');
+
+      expect(protein.accession).toBe('');
+      expect(protein.name).toBe('');
+    });
+
+    it('should handle ProteinSummary entry with missing fields', async () => {
+      mockFetchJson({ ProteinSummaries: { ProteinSummary: [{ RegistryID: 'P04637' }] } });
+      const pubchem = new PubChem();
+
+      const protein = await pubchem.proteinByAccession('P04637');
+
+      expect(protein.accession).toBe('P04637');
+      expect(protein.name).toBe('');
+      expect(protein.organism).toBe('');
+      expect(protein.taxId).toBe(0);
+    });
+
+    it('should throw on 404 for non-existent protein', async () => {
+      mockFetchError(404, 'PUGREST.NotFound');
+      const pubchem = new PubChem();
+
+      await expect(pubchem.proteinByAccession('INVALID')).rejects.toThrow(
+        'PubChem API returned status 404',
+      );
+    });
+  });
+
+  describe('compoundClassification', () => {
+    it('should fetch classification hierarchy and map nodes', async () => {
+      mockFetchJson({
+        Record: {
+          RecordType: 'CID',
+          RecordNumber: 2244,
+          Section: [
+            {
+              TOCHeading: 'Classification',
+              Section: [
+                {
+                  TOCHeading: 'MeSH Tree',
+                  Description: 'MeSH classification',
+                  Section: [
+                    {
+                      TOCHeading: 'Analgesics',
+                      Description: 'Pain relievers',
+                      Section: [],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const nodes = await pubchem.compoundClassification(2244);
+
+      expect(nodes).toHaveLength(1);
+      expect(nodes[0]!.name).toBe('MeSH Tree');
+      expect(nodes[0]!.description).toBe('MeSH classification');
+      expect(nodes[0]!.childNodes).toHaveLength(1);
+      expect(nodes[0]!.childNodes[0]!.name).toBe('Analgesics');
+      expect(nodes[0]!.childNodes[0]!.description).toBe('Pain relievers');
+      expect(nodes[0]!.childNodes[0]!.childNodes).toEqual([]);
+    });
+
+    it('should build correct URL with heading filter', async () => {
+      mockFetchJson({ Record: {} });
+      const pubchem = new PubChem();
+
+      await pubchem.compoundClassification(2244);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe(
+        'https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/2244/JSON?heading=Classification',
+      );
+    });
+
+    it('should handle missing Record', async () => {
+      mockFetchJson({});
+      const pubchem = new PubChem();
+
+      const nodes = await pubchem.compoundClassification(1);
+
+      expect(nodes).toEqual([]);
+    });
+
+    it('should handle missing Classification section', async () => {
+      mockFetchJson({
+        Record: {
+          Section: [{ TOCHeading: 'Other', Section: [] }],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const nodes = await pubchem.compoundClassification(1);
+
+      expect(nodes).toEqual([]);
+    });
+
+    it('should handle empty Section array', async () => {
+      mockFetchJson({ Record: { Section: [] } });
+      const pubchem = new PubChem();
+
+      const nodes = await pubchem.compoundClassification(1);
+
+      expect(nodes).toEqual([]);
+    });
+
+    it('should find Classification section nested inside a parent section', async () => {
+      mockFetchJson({
+        Record: {
+          Section: [
+            {
+              TOCHeading: 'Wrapper',
+              Section: [
+                {
+                  TOCHeading: 'Classification',
+                  Section: [{ TOCHeading: 'Nested Class', Description: 'Found via recursion' }],
+                },
+              ],
+            },
+          ],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const nodes = await pubchem.compoundClassification(1);
+
+      expect(nodes).toHaveLength(1);
+      expect(nodes[0]!.name).toBe('Nested Class');
+      expect(nodes[0]!.description).toBe('Found via recursion');
+    });
+
+    it('should handle Classification section with no child sections', async () => {
+      mockFetchJson({
+        Record: {
+          Section: [{ TOCHeading: 'Classification' }],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const nodes = await pubchem.compoundClassification(1);
+
+      expect(nodes).toEqual([]);
+    });
+
+    it('should handle deeply nested classification', async () => {
+      mockFetchJson({
+        Record: {
+          Section: [
+            {
+              TOCHeading: 'Classification',
+              Section: [
+                {
+                  TOCHeading: 'Level 1',
+                  Section: [
+                    {
+                      TOCHeading: 'Level 2',
+                      Section: [{ TOCHeading: 'Level 3' }],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const nodes = await pubchem.compoundClassification(1);
+
+      expect(nodes[0]!.childNodes[0]!.childNodes[0]!.name).toBe('Level 3');
+    });
+
+    it('should throw on 404 for non-existent compound', async () => {
+      mockFetchError(404, 'PUGREST.NotFound');
+      const pubchem = new PubChem();
+
+      await expect(pubchem.compoundClassification(999999999)).rejects.toThrow(
+        'PubChem API returned status 404',
+      );
+    });
+  });
+
+  describe('compoundPatents', () => {
+    it('should fetch patents and map all fields', async () => {
+      mockFetchJson({
+        Record: {
+          RecordType: 'CID',
+          RecordNumber: 2244,
+          Section: [
+            {
+              TOCHeading: 'Patents',
+              Information: [
+                {
+                  ReferenceNumber: 1,
+                  Value: {
+                    StringWithMarkup: [{ String: 'US-1234567-A' }],
+                    ExtraColumns: {
+                      Title: 'Aspirin formulation',
+                      'Inventor Names': ['John Doe', 'Jane Smith'],
+                      'Assignee Names': ['Pharma Corp'],
+                    },
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const patents = await pubchem.compoundPatents(2244);
+
+      expect(patents).toHaveLength(1);
+      expect(patents[0]!.patentId).toBe('US-1234567-A');
+      expect(patents[0]!.title).toBe('Aspirin formulation');
+      expect(patents[0]!.inventorNames).toEqual(['John Doe', 'Jane Smith']);
+      expect(patents[0]!.assigneeNames).toEqual(['Pharma Corp']);
+    });
+
+    it('should build correct URL with heading filter', async () => {
+      mockFetchJson({ Record: {} });
+      const pubchem = new PubChem();
+
+      await pubchem.compoundPatents(2244);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe(
+        'https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/2244/JSON?heading=Patents',
+      );
+    });
+
+    it('should handle missing Record', async () => {
+      mockFetchJson({});
+      const pubchem = new PubChem();
+
+      const patents = await pubchem.compoundPatents(1);
+
+      expect(patents).toEqual([]);
+    });
+
+    it('should handle missing Patents section', async () => {
+      mockFetchJson({
+        Record: {
+          Section: [{ TOCHeading: 'Other' }],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const patents = await pubchem.compoundPatents(1);
+
+      expect(patents).toEqual([]);
+    });
+
+    it('should handle Patents section with empty Information', async () => {
+      mockFetchJson({
+        Record: {
+          Section: [{ TOCHeading: 'Patents', Information: [] }],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const patents = await pubchem.compoundPatents(1);
+
+      expect(patents).toEqual([]);
+    });
+
+    it('should handle patent entry with missing ExtraColumns', async () => {
+      mockFetchJson({
+        Record: {
+          Section: [
+            {
+              TOCHeading: 'Patents',
+              Information: [
+                {
+                  ReferenceNumber: 1,
+                  Value: { StringWithMarkup: [{ String: 'US-9999999-A' }] },
+                },
+              ],
+            },
+          ],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const patents = await pubchem.compoundPatents(1);
+
+      expect(patents).toHaveLength(1);
+      expect(patents[0]!.patentId).toBe('US-9999999-A');
+      expect(patents[0]!.title).toBe('');
+      expect(patents[0]!.inventorNames).toEqual([]);
+      expect(patents[0]!.assigneeNames).toEqual([]);
+    });
+
+    it('should handle patent entry with missing Value', async () => {
+      mockFetchJson({
+        Record: {
+          Section: [
+            {
+              TOCHeading: 'Patents',
+              Information: [{ ReferenceNumber: 1 }],
+            },
+          ],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const patents = await pubchem.compoundPatents(1);
+
+      expect(patents).toHaveLength(1);
+      expect(patents[0]!.patentId).toBe('');
+      expect(patents[0]!.title).toBe('');
+      expect(patents[0]!.inventorNames).toEqual([]);
+      expect(patents[0]!.assigneeNames).toEqual([]);
+    });
+
+    it('should handle multiple patents', async () => {
+      mockFetchJson({
+        Record: {
+          Section: [
+            {
+              TOCHeading: 'Patents',
+              Information: [
+                {
+                  Value: {
+                    StringWithMarkup: [{ String: 'US-111-A' }],
+                    ExtraColumns: {
+                      Title: 'Patent 1',
+                      'Inventor Names': ['Inv 1'],
+                      'Assignee Names': ['Assign 1'],
+                    },
+                  },
+                },
+                {
+                  Value: {
+                    StringWithMarkup: [{ String: 'US-222-B' }],
+                    ExtraColumns: {
+                      Title: 'Patent 2',
+                      'Inventor Names': ['Inv 2'],
+                      'Assignee Names': ['Assign 2'],
+                    },
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const patents = await pubchem.compoundPatents(1);
+
+      expect(patents).toHaveLength(2);
+      expect(patents[0]!.patentId).toBe('US-111-A');
+      expect(patents[1]!.patentId).toBe('US-222-B');
+    });
+
+    it('should throw on 404 for non-existent compound', async () => {
+      mockFetchError(404, 'PUGREST.NotFound');
+      const pubchem = new PubChem();
+
+      await expect(pubchem.compoundPatents(999999999)).rejects.toThrow(
+        'PubChem API returned status 404',
+      );
+    });
+  });
+
   describe('configuration', () => {
     it('should work without any config', async () => {
       mockFetchJson(buildPropertyResponse());

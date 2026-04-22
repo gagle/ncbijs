@@ -1,8 +1,10 @@
 export type {
   ClinicalTrialsConfig,
   FieldValueCount,
+  StudyFieldDefinition,
   StudyIntervention,
   StudyLocation,
+  StudyMetadata,
   StudyReport,
   StudySearchFilter,
   StudySearchOptions,

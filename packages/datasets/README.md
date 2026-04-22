@@ -84,6 +84,24 @@ Fetch BioProject reports by accessions (e.g., `PRJNA12345`).
 
 Fetch BioSample reports by accessions (e.g., `SAMN12345`).
 
+### Assembly
+
+#### `assemblyDescriptors(accessions: Array<string>): Promise<Array<AssemblyDescriptor>>`
+
+Fetch lightweight assembly descriptors by accession numbers.
+
+### Gene links
+
+#### `geneLinks(geneIds: Array<number>): Promise<Array<GeneLink>>`
+
+Fetch external database links for genes by NCBI Gene IDs.
+
+### Catalog
+
+#### `datasetCatalog(): Promise<Array<DatasetInfo>>`
+
+List available NCBI datasets from the catalog.
+
 ## Error handling
 
 ```ts
@@ -206,5 +224,47 @@ interface BioSampleReport {
 interface BioSampleAttribute {
   name: string;
   value: string;
+}
+```
+
+### `AssemblyDescriptor`
+
+```ts
+interface AssemblyDescriptor {
+  accession: string;
+  assemblyName: string;
+  assemblyLevel: string;
+  organism: string;
+  taxId: number;
+  submitter: string;
+  releaseDate: string;
+}
+```
+
+### `GeneLink`
+
+```ts
+interface GeneLink {
+  geneId: number;
+  links: Array<ExternalLink>;
+}
+```
+
+### `ExternalLink`
+
+```ts
+interface ExternalLink {
+  resourceName: string;
+  url: string;
+}
+```
+
+### `DatasetInfo`
+
+```ts
+interface DatasetInfo {
+  name: string;
+  description: string;
+  version: string;
 }
 ```

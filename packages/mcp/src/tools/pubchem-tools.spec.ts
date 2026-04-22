@@ -24,6 +24,7 @@ describe('registerPubChemTools', () => {
     compoundByName: ReturnType<typeof vi.fn>;
     synonyms: ReturnType<typeof vi.fn>;
     description: ReturnType<typeof vi.fn>;
+    geneByCid: ReturnType<typeof vi.fn>;
   };
   let getPubChem: ReturnType<typeof vi.fn>;
 
@@ -34,14 +35,16 @@ describe('registerPubChemTools', () => {
       compoundByName: vi.fn(),
       synonyms: vi.fn(),
       description: vi.fn(),
+      geneByCid: vi.fn(),
     };
     getPubChem = vi.fn().mockReturnValue(mockPubChem);
     registerPubChemTools(mockServer, getPubChem as unknown as () => PubChem);
   });
 
-  it('registers one tool', () => {
-    expect(mockServer.registerTool).toHaveBeenCalledTimes(1);
+  it('registers two tools', () => {
+    expect(mockServer.registerTool).toHaveBeenCalledTimes(2);
     expect(mockServer.registerTool.mock.calls[0]![0]).toBe('search-compound');
+    expect(mockServer.registerTool.mock.calls[1]![0]).toBe('search-gene-by-compound');
   });
 
   describe('search-compound', () => {
@@ -128,6 +131,22 @@ describe('registerPubChemTools', () => {
       expect(parsed.synonyms).toHaveLength(20);
       expect(parsed.synonyms[0]).toBe('syn-0');
       expect(parsed.synonyms[19]).toBe('syn-19');
+    });
+  });
+
+  describe('search-gene-by-compound', () => {
+    it('finds genes linked to a compound and returns JSON', async () => {
+      const geneIds = [672, 7157, 1956];
+      mockPubChem.geneByCid.mockResolvedValue(geneIds);
+
+      const handler = mockServer.registerTool.mock.calls[1]![2] as ToolHandler;
+      const result = await handler({ cid: 2244 });
+
+      expect(getPubChem).toHaveBeenCalled();
+      expect(mockPubChem.geneByCid).toHaveBeenCalledWith(2244);
+      expect(result).toEqual({
+        content: [{ type: 'text', text: JSON.stringify(geneIds, null, 2) }],
+      });
     });
   });
 });

@@ -489,6 +489,309 @@ describe('RxNorm', () => {
     });
   });
 
+  describe('approximateTerm', () => {
+    it('should return ranked candidates', async () => {
+      mockFetchJson({
+        approximateGroup: {
+          candidate: [
+            { rxcui: '1191', name: 'aspirin', score: '75', rank: '1' },
+            { rxcui: '212033', name: 'aspirin 325 MG Oral Tablet', score: '50', rank: '2' },
+          ],
+        },
+      });
+      const rx = new RxNorm();
+
+      const candidates = await rx.approximateTerm('asprin');
+
+      expect(candidates).toHaveLength(2);
+      expect(candidates[0]!.rxcui).toBe('1191');
+      expect(candidates[0]!.name).toBe('aspirin');
+      expect(candidates[0]!.score).toBe(75);
+      expect(candidates[0]!.rank).toBe(1);
+      expect(candidates[1]!.rxcui).toBe('212033');
+      expect(candidates[1]!.score).toBe(50);
+      expect(candidates[1]!.rank).toBe(2);
+    });
+
+    it('should build correct URL without options', async () => {
+      mockFetchJson({ approximateGroup: {} });
+      const rx = new RxNorm();
+
+      await rx.approximateTerm('asprin');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe('https://rxnav.nlm.nih.gov/REST/approximateTerm.json?term=asprin');
+    });
+
+    it('should build correct URL with maxEntries', async () => {
+      mockFetchJson({ approximateGroup: {} });
+      const rx = new RxNorm();
+
+      await rx.approximateTerm('asprin', { maxEntries: 5 });
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe(
+        'https://rxnav.nlm.nih.gov/REST/approximateTerm.json?term=asprin&maxEntries=5',
+      );
+    });
+
+    it('should build correct URL with option', async () => {
+      mockFetchJson({ approximateGroup: {} });
+      const rx = new RxNorm();
+
+      await rx.approximateTerm('asprin', { option: 1 });
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe('https://rxnav.nlm.nih.gov/REST/approximateTerm.json?term=asprin&option=1');
+    });
+
+    it('should build correct URL with all options', async () => {
+      mockFetchJson({ approximateGroup: {} });
+      const rx = new RxNorm();
+
+      await rx.approximateTerm('asprin', { maxEntries: 10, option: 0 });
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe(
+        'https://rxnav.nlm.nih.gov/REST/approximateTerm.json?term=asprin&maxEntries=10&option=0',
+      );
+    });
+
+    it('should encode special characters in term', async () => {
+      mockFetchJson({ approximateGroup: {} });
+      const rx = new RxNorm();
+
+      await rx.approximateTerm('drug name & more');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('term=drug%20name%20%26%20more');
+    });
+
+    it('should handle missing approximateGroup', async () => {
+      mockFetchJson({});
+      const rx = new RxNorm();
+
+      const candidates = await rx.approximateTerm('notadrug');
+
+      expect(candidates).toEqual([]);
+    });
+
+    it('should handle missing candidate array', async () => {
+      mockFetchJson({ approximateGroup: {} });
+      const rx = new RxNorm();
+
+      const candidates = await rx.approximateTerm('notadrug');
+
+      expect(candidates).toEqual([]);
+    });
+
+    it('should default missing candidate fields', async () => {
+      mockFetchJson({
+        approximateGroup: {
+          candidate: [{}],
+        },
+      });
+      const rx = new RxNorm();
+
+      const candidates = await rx.approximateTerm('test');
+
+      expect(candidates).toHaveLength(1);
+      expect(candidates[0]!.rxcui).toBe('');
+      expect(candidates[0]!.name).toBe('');
+      expect(candidates[0]!.score).toBe(0);
+      expect(candidates[0]!.rank).toBe(0);
+    });
+  });
+
+  describe('history', () => {
+    it('should return concept history', async () => {
+      mockFetchJson({
+        rxcuiStatusHistory: {
+          metaData: {
+            rxcui: '1191',
+            name: 'aspirin',
+            status: 'Active',
+          },
+          derivedConcepts: {
+            remappedTo: [],
+          },
+        },
+      });
+      const rx = new RxNorm();
+
+      const result = await rx.history('1191');
+
+      expect(result.rxcui).toBe('1191');
+      expect(result.name).toBe('aspirin');
+      expect(result.status).toBe('Active');
+      expect(result.remappedTo).toEqual([]);
+    });
+
+    it('should build correct URL', async () => {
+      mockFetchJson({ rxcuiStatusHistory: {} });
+      const rx = new RxNorm();
+
+      await rx.history('1191');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe('https://rxnav.nlm.nih.gov/REST/rxcui/1191/historystatus.json');
+    });
+
+    it('should return remapped RxCUIs', async () => {
+      mockFetchJson({
+        rxcuiStatusHistory: {
+          metaData: {
+            rxcui: '100',
+            name: 'old drug',
+            status: 'Remapped',
+          },
+          derivedConcepts: {
+            remappedTo: [{ rxcui: '200' }, { rxcui: '300' }],
+          },
+        },
+      });
+      const rx = new RxNorm();
+
+      const result = await rx.history('100');
+
+      expect(result.remappedTo).toEqual(['200', '300']);
+    });
+
+    it('should filter out remapped entries without rxcui', async () => {
+      mockFetchJson({
+        rxcuiStatusHistory: {
+          metaData: { rxcui: '100', name: 'test', status: 'Remapped' },
+          derivedConcepts: {
+            remappedTo: [{ rxcui: '200' }, {}, { rxcui: '300' }],
+          },
+        },
+      });
+      const rx = new RxNorm();
+
+      const result = await rx.history('100');
+
+      expect(result.remappedTo).toEqual(['200', '300']);
+    });
+
+    it('should handle missing rxcuiStatusHistory', async () => {
+      mockFetchJson({});
+      const rx = new RxNorm();
+
+      const result = await rx.history('1191');
+
+      expect(result.rxcui).toBe('');
+      expect(result.name).toBe('');
+      expect(result.status).toBe('');
+      expect(result.remappedTo).toEqual([]);
+    });
+
+    it('should handle missing metaData', async () => {
+      mockFetchJson({ rxcuiStatusHistory: {} });
+      const rx = new RxNorm();
+
+      const result = await rx.history('1191');
+
+      expect(result.rxcui).toBe('');
+      expect(result.name).toBe('');
+      expect(result.status).toBe('');
+    });
+
+    it('should handle missing derivedConcepts', async () => {
+      mockFetchJson({
+        rxcuiStatusHistory: {
+          metaData: { rxcui: '1191', name: 'aspirin', status: 'Active' },
+        },
+      });
+      const rx = new RxNorm();
+
+      const result = await rx.history('1191');
+
+      expect(result.remappedTo).toEqual([]);
+    });
+
+    it('should handle missing remappedTo array', async () => {
+      mockFetchJson({
+        rxcuiStatusHistory: {
+          metaData: { rxcui: '1191', name: 'aspirin', status: 'Active' },
+          derivedConcepts: {},
+        },
+      });
+      const rx = new RxNorm();
+
+      const result = await rx.history('1191');
+
+      expect(result.remappedTo).toEqual([]);
+    });
+  });
+
+  describe('allProperties', () => {
+    it('should return properties for an RxCUI', async () => {
+      mockFetchJson({
+        propConceptGroup: {
+          propConcept: [
+            { propCategory: 'NAMES', propName: 'RxNorm Name', propValue: 'aspirin' },
+            { propCategory: 'SOURCES', propName: 'Source', propValue: 'RXNORM' },
+          ],
+        },
+      });
+      const rx = new RxNorm();
+
+      const props = await rx.allProperties('1191', ['NAMES', 'SOURCES']);
+
+      expect(props).toHaveLength(2);
+      expect(props[0]!.category).toBe('NAMES');
+      expect(props[0]!.name).toBe('RxNorm Name');
+      expect(props[0]!.value).toBe('aspirin');
+      expect(props[1]!.category).toBe('SOURCES');
+    });
+
+    it('should build correct URL with encoded categories', async () => {
+      mockFetchJson({ propConceptGroup: {} });
+      const rx = new RxNorm();
+
+      await rx.allProperties('1191', ['NAMES', 'SOURCES']);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe(
+        'https://rxnav.nlm.nih.gov/REST/rxcui/1191/allProperties.json?prop=NAMES%2BSOURCES',
+      );
+    });
+
+    it('should handle missing propConceptGroup', async () => {
+      mockFetchJson({});
+      const rx = new RxNorm();
+
+      const props = await rx.allProperties('1191', ['NAMES']);
+
+      expect(props).toEqual([]);
+    });
+
+    it('should handle missing propConcept array', async () => {
+      mockFetchJson({ propConceptGroup: {} });
+      const rx = new RxNorm();
+
+      const props = await rx.allProperties('1191', ['NAMES']);
+
+      expect(props).toEqual([]);
+    });
+
+    it('should default missing property fields', async () => {
+      mockFetchJson({
+        propConceptGroup: {
+          propConcept: [{}],
+        },
+      });
+      const rx = new RxNorm();
+
+      const props = await rx.allProperties('1191', ['NAMES']);
+
+      expect(props).toHaveLength(1);
+      expect(props[0]!.category).toBe('');
+      expect(props[0]!.name).toBe('');
+      expect(props[0]!.value).toBe('');
+    });
+  });
+
   describe('configuration', () => {
     it('should work without any config', async () => {
       mockFetchJson({ idGroup: { rxnormId: ['1191'] } });

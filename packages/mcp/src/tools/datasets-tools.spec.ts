@@ -18,6 +18,7 @@ describe('registerDatasetsTools', () => {
     taxonomy: ReturnType<typeof vi.fn>;
     genomeByAccession: ReturnType<typeof vi.fn>;
     genomeByTaxon: ReturnType<typeof vi.fn>;
+    datasetCatalog: ReturnType<typeof vi.fn>;
   };
   let getDatasets: ReturnType<typeof vi.fn>;
 
@@ -29,16 +30,18 @@ describe('registerDatasetsTools', () => {
       taxonomy: vi.fn(),
       genomeByAccession: vi.fn(),
       genomeByTaxon: vi.fn(),
+      datasetCatalog: vi.fn(),
     };
     getDatasets = vi.fn().mockReturnValue(mockDatasets);
     registerDatasetsTools(mockServer, getDatasets as unknown as () => Datasets);
   });
 
-  it('registers three tools', () => {
-    expect(mockServer.registerTool).toHaveBeenCalledTimes(3);
+  it('registers four tools', () => {
+    expect(mockServer.registerTool).toHaveBeenCalledTimes(4);
     expect(mockServer.registerTool.mock.calls[0]![0]).toBe('search-gene');
     expect(mockServer.registerTool.mock.calls[1]![0]).toBe('lookup-taxonomy');
     expect(mockServer.registerTool.mock.calls[2]![0]).toBe('search-genome');
+    expect(mockServer.registerTool.mock.calls[3]![0]).toBe('dataset-catalog');
   });
 
   describe('search-gene', () => {
@@ -260,6 +263,24 @@ describe('registerDatasetsTools', () => {
 
       expect(mockDatasets.genomeByAccession).toHaveBeenCalledWith(['GCF_000001405.40']);
       expect(mockDatasets.genomeByTaxon).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('dataset-catalog', () => {
+    it('lists available datasets and returns JSON', async () => {
+      const catalog = [{ name: 'gene', description: 'Gene dataset' }];
+      mockDatasets.datasetCatalog.mockResolvedValue(catalog);
+
+      const handler = mockServer.registerTool.mock.calls[3]![2] as (
+        ...args: ReadonlyArray<unknown>
+      ) => Promise<unknown>;
+      const result = await handler({});
+
+      expect(getDatasets).toHaveBeenCalled();
+      expect(mockDatasets.datasetCatalog).toHaveBeenCalled();
+      expect(result).toEqual({
+        content: [{ type: 'text', text: JSON.stringify(catalog, null, 2) }],
+      });
     });
   });
 });

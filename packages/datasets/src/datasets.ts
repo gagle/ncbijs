@@ -2,12 +2,16 @@ import { TokenBucket } from '@ncbijs/rate-limiter';
 import { fetchJson } from './datasets-client';
 import type { DatasetsClientConfig } from './datasets-client';
 import type {
+  AssemblyDescriptor,
   AssemblyInfo,
   AssemblyStats,
   BioProjectReport,
   BioSampleAttribute,
   BioSampleReport,
+  DatasetInfo,
   DatasetsConfig,
+  ExternalLink,
+  GeneLink,
   GeneOntology,
   GeneReport,
   GenomeOrganism,
@@ -156,6 +160,42 @@ export class Datasets {
     const raw = await fetchJson<RawBioSampleResponse>(url, this._config);
 
     return (raw.reports ?? []).map(mapBioSampleReport);
+  }
+
+  /** Fetch lightweight assembly descriptors by accession numbers. */
+  public async assemblyDescriptors(
+    accessions: ReadonlyArray<string>,
+  ): Promise<ReadonlyArray<AssemblyDescriptor>> {
+    if (accessions.length === 0) {
+      throw new Error('accessions must not be empty');
+    }
+
+    const joined = accessions.join(',');
+    const url = `${BASE_URL}/genome/accession/${encodeURIComponent(joined)}/assembly_descriptors`;
+    const raw = await fetchJson<RawAssemblyDescriptorResponse>(url, this._config);
+
+    return (raw.assemblies ?? []).map(mapAssemblyDescriptor);
+  }
+
+  /** Fetch external database links for genes by NCBI Gene IDs. */
+  public async geneLinks(geneIds: ReadonlyArray<number>): Promise<ReadonlyArray<GeneLink>> {
+    if (geneIds.length === 0) {
+      throw new Error('geneIds must not be empty');
+    }
+
+    const joined = geneIds.join(',');
+    const url = `${BASE_URL}/gene/id/${encodeURIComponent(joined)}/links`;
+    const raw = await fetchJson<RawGeneLinkResponse>(url, this._config);
+
+    return (raw.genes ?? []).map(mapGeneLink);
+  }
+
+  /** List available NCBI datasets from the catalog. */
+  public async datasetCatalog(): Promise<ReadonlyArray<DatasetInfo>> {
+    const url = `${BASE_URL}/dataset_catalog`;
+    const raw = await fetchJson<RawDatasetCatalogResponse>(url, this._config);
+
+    return (raw.datasets ?? []).map(mapDatasetInfo);
   }
 }
 
@@ -468,5 +508,77 @@ function mapBioSampleAttribute(raw: RawBioSampleAttribute): BioSampleAttribute {
   return {
     name: raw.name ?? '',
     value: raw.value ?? '',
+  };
+}
+
+interface RawAssemblyDescriptorResponse {
+  readonly assemblies?: ReadonlyArray<RawAssemblyDescriptorData>;
+}
+
+interface RawAssemblyDescriptorData {
+  readonly accession?: string;
+  readonly assembly_name?: string;
+  readonly assembly_level?: string;
+  readonly organism?: string;
+  readonly tax_id?: number;
+  readonly submitter?: string;
+  readonly release_date?: string;
+}
+
+interface RawGeneLinkResponse {
+  readonly genes?: ReadonlyArray<RawGeneLinkData>;
+}
+
+interface RawGeneLinkData {
+  readonly gene_id?: number;
+  readonly links?: ReadonlyArray<RawExternalLink>;
+}
+
+interface RawExternalLink {
+  readonly resource_name?: string;
+  readonly url?: string;
+}
+
+interface RawDatasetCatalogResponse {
+  readonly datasets?: ReadonlyArray<RawDatasetInfoData>;
+}
+
+interface RawDatasetInfoData {
+  readonly name?: string;
+  readonly description?: string;
+  readonly version?: string;
+}
+
+function mapAssemblyDescriptor(raw: RawAssemblyDescriptorData): AssemblyDescriptor {
+  return {
+    accession: raw.accession ?? '',
+    assemblyName: raw.assembly_name ?? '',
+    assemblyLevel: raw.assembly_level ?? '',
+    organism: raw.organism ?? '',
+    taxId: raw.tax_id ?? 0,
+    submitter: raw.submitter ?? '',
+    releaseDate: raw.release_date ?? '',
+  };
+}
+
+function mapGeneLink(raw: RawGeneLinkData): GeneLink {
+  return {
+    geneId: raw.gene_id ?? 0,
+    links: (raw.links ?? []).map(mapExternalLink),
+  };
+}
+
+function mapExternalLink(raw: RawExternalLink): ExternalLink {
+  return {
+    resourceName: raw.resource_name ?? '',
+    url: raw.url ?? '',
+  };
+}
+
+function mapDatasetInfo(raw: RawDatasetInfoData): DatasetInfo {
+  return {
+    name: raw.name ?? '',
+    description: raw.description ?? '',
+    version: raw.version ?? '',
   };
 }

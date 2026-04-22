@@ -5,9 +5,11 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio';
 import { Blast } from '@ncbijs/blast';
 import { ClinVar } from '@ncbijs/clinvar';
 import { Datasets } from '@ncbijs/datasets';
+import { ICite } from '@ncbijs/icite';
 import { PMC } from '@ncbijs/pmc';
 import { PubChem } from '@ncbijs/pubchem';
 import { PubMed } from '@ncbijs/pubmed';
+import { RxNorm } from '@ncbijs/rxnorm';
 import { Snp } from '@ncbijs/snp';
 
 import { registerAllTools } from './register-tools';
@@ -28,6 +30,8 @@ let blast: Blast | undefined;
 let snp: Snp | undefined;
 let clinvar: ClinVar | undefined;
 let pubchem: PubChem | undefined;
+let icite: ICite | undefined;
+let rxnorm: RxNorm | undefined;
 
 function getPubmed(): PubMed {
   if (pubmed === undefined) {
@@ -84,6 +88,20 @@ function getPubChem(): PubChem {
   return pubchem;
 }
 
+function getICite(): ICite {
+  if (icite === undefined) {
+    icite = new ICite();
+  }
+  return icite;
+}
+
+function getRxNorm(): RxNorm {
+  if (rxnorm === undefined) {
+    rxnorm = new RxNorm();
+  }
+  return rxnorm;
+}
+
 const server = new McpServer(
   { name: SERVER_NAME, version: SERVER_VERSION },
   {
@@ -108,6 +126,8 @@ registerAllTools(server, {
   getSnp,
   getClinVar,
   getPubChem,
+  getICite,
+  getRxNorm,
 });
 
 const transport = new StdioServerTransport();

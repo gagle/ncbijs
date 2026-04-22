@@ -12,10 +12,19 @@ import type {
   ClinVarGene,
   ClinVarSearchResult,
   ClinVarTrait,
+  FrequencyReport,
+  PopulationFrequency,
+  RefSnpAllele,
+  RefSnpPlacement,
+  RefSnpReport,
+  SpdiAllele,
+  SpdiResult,
   TraitXref,
   VariantLocation,
   VariantReport,
 } from './interfaces/clinvar.interface';
+
+const VARIATION_BASE_URL = 'https://api.ncbi.nlm.nih.gov/variation/v0';
 
 /** ClinVar variant database client for searching and fetching variant reports. */
 export class ClinVar {
@@ -108,6 +117,54 @@ export class ClinVar {
     }
 
     return reports;
+  }
+
+  /** Get a RefSNP report by rsID from the Variation Services API. */
+  public async refsnp(rsid: number): Promise<RefSnpReport> {
+    const url = `${VARIATION_BASE_URL}/refsnp/${rsid}`;
+    const raw = await fetchJson<RawRefSnpResponse>(url, this._config);
+
+    return mapRefSnpReport(rsid, raw);
+  }
+
+  /** Validate and resolve an SPDI expression via the Variation Services API. */
+  public async spdi(spdiExpression: string): Promise<SpdiResult> {
+    const url = `${VARIATION_BASE_URL}/spdi/${encodeURIComponent(spdiExpression)}`;
+    const raw = await fetchJson<RawSpdiResponse>(url, this._config);
+
+    return mapSpdiResult(raw);
+  }
+
+  /** Convert an SPDI expression to HGVS notation via the Variation Services API. */
+  public async spdiToHgvs(spdiExpression: string): Promise<ReadonlyArray<string>> {
+    const url = `${VARIATION_BASE_URL}/spdi/${encodeURIComponent(spdiExpression)}/hgvs`;
+    const raw = await fetchJson<RawSpdiHgvsResponse>(url, this._config);
+
+    return raw.data?.hgvsExpression ?? [];
+  }
+
+  /** Convert an HGVS expression to contextual SPDI alleles via the Variation Services API. */
+  public async hgvsToSpdi(
+    hgvsExpression: string,
+    assembly?: string,
+  ): Promise<ReadonlyArray<SpdiAllele>> {
+    let url = `${VARIATION_BASE_URL}/hgvs/${encodeURIComponent(hgvsExpression)}/contextuals`;
+
+    if (assembly !== undefined) {
+      url += `?assembly=${encodeURIComponent(assembly)}`;
+    }
+
+    const raw = await fetchJson<RawHgvsContextualsResponse>(url, this._config);
+
+    return (raw.data?.spdis ?? []).map(mapSpdiAllele);
+  }
+
+  /** Get allele frequency data for a variant by rsID from the Variation Services API. */
+  public async frequency(rsid: number): Promise<FrequencyReport> {
+    const url = `${VARIATION_BASE_URL}/refsnp/${rsid}/frequency`;
+    const raw = await fetchJson<RawFrequencyResponse>(url, this._config);
+
+    return mapFrequencyReport(rsid, raw);
   }
 }
 
@@ -230,4 +287,142 @@ function mapLocation(raw: RawVariationLocation): VariantLocation {
     start: raw.start ?? 0,
     stop: raw.stop ?? 0,
   };
+}
+
+interface RawRefSnpResponse {
+  readonly primary_snapshot_data?: {
+    readonly variant_type?: string;
+    readonly placements_with_allele?: ReadonlyArray<RawRefSnpPlacement>;
+  };
+}
+
+interface RawRefSnpPlacement {
+  readonly seq_id?: string;
+  readonly alleles?: ReadonlyArray<RawRefSnpAllele>;
+}
+
+interface RawRefSnpAllele {
+  readonly allele?: {
+    readonly spdi?: {
+      readonly seq_id?: string;
+      readonly position?: number;
+      readonly deleted_sequence?: string;
+      readonly inserted_sequence?: string;
+    };
+  };
+  readonly hgvs?: string;
+}
+
+function mapRefSnpReport(rsid: number, raw: RawRefSnpResponse): RefSnpReport {
+  const snapshot = raw.primary_snapshot_data;
+
+  return {
+    rsid,
+    variantType: snapshot?.variant_type ?? '',
+    placements: (snapshot?.placements_with_allele ?? []).map(mapRefSnpPlacement),
+  };
+}
+
+function mapRefSnpPlacement(raw: RawRefSnpPlacement): RefSnpPlacement {
+  return {
+    sequenceAccession: raw.seq_id ?? '',
+    alleles: (raw.alleles ?? []).map(mapRefSnpAllele),
+  };
+}
+
+function mapRefSnpAllele(raw: RawRefSnpAllele): RefSnpAllele {
+  const spdi = raw.allele?.spdi;
+  const spdiString =
+    spdi !== undefined
+      ? `${spdi.seq_id ?? ''}:${spdi.position ?? 0}:${spdi.deleted_sequence ?? ''}:${spdi.inserted_sequence ?? ''}`
+      : '';
+
+  return {
+    spdi: spdiString,
+    hgvs: raw.hgvs ?? '',
+  };
+}
+
+interface RawSpdiResponse {
+  readonly data?: {
+    readonly seq_id?: string;
+    readonly position?: number;
+    readonly deleted_sequence?: string;
+    readonly inserted_sequence?: string;
+  };
+}
+
+function mapSpdiResult(raw: RawSpdiResponse): SpdiResult {
+  const data = raw.data;
+
+  return {
+    sequenceAccession: data?.seq_id ?? '',
+    position: data?.position ?? 0,
+    deletedSequence: data?.deleted_sequence ?? '',
+    insertedSequence: data?.inserted_sequence ?? '',
+  };
+}
+
+interface RawSpdiHgvsResponse {
+  readonly data?: {
+    readonly hgvsExpression?: ReadonlyArray<string>;
+  };
+}
+
+interface RawHgvsContextualsResponse {
+  readonly data?: {
+    readonly spdis?: ReadonlyArray<RawSpdiEntry>;
+  };
+}
+
+interface RawSpdiEntry {
+  readonly seq_id?: string;
+  readonly position?: number;
+  readonly deleted_sequence?: string;
+  readonly inserted_sequence?: string;
+}
+
+function mapSpdiAllele(raw: RawSpdiEntry): SpdiAllele {
+  return {
+    sequenceAccession: raw.seq_id ?? '',
+    position: raw.position ?? 0,
+    deletedSequence: raw.deleted_sequence ?? '',
+    insertedSequence: raw.inserted_sequence ?? '',
+  };
+}
+
+interface RawFrequencyResponse {
+  readonly results?: ReadonlyArray<RawFrequencyResult>;
+}
+
+interface RawFrequencyResult {
+  readonly study?: string;
+  readonly populations?: ReadonlyArray<RawPopulationFrequency>;
+}
+
+interface RawPopulationFrequency {
+  readonly population?: string;
+  readonly allele_count?: number;
+  readonly total_count?: number;
+  readonly frequency?: number;
+}
+
+function mapFrequencyReport(rsid: number, raw: RawFrequencyResponse): FrequencyReport {
+  const populations: Array<PopulationFrequency> = [];
+
+  for (const result of raw.results ?? []) {
+    const study = result.study ?? '';
+
+    for (const pop of result.populations ?? []) {
+      populations.push({
+        study,
+        population: pop.population ?? '',
+        alleleCount: pop.allele_count ?? 0,
+        totalCount: pop.total_count ?? 0,
+        frequency: pop.frequency ?? 0,
+      });
+    }
+  }
+
+  return { rsid, populations };
 }

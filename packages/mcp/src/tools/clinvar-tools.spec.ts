@@ -15,6 +15,8 @@ describe('registerClinVarTools', () => {
   let mockClinVar: {
     search: ReturnType<typeof vi.fn>;
     fetch: ReturnType<typeof vi.fn>;
+    refsnp: ReturnType<typeof vi.fn>;
+    frequency: ReturnType<typeof vi.fn>;
   };
   let getClinVar: ReturnType<typeof vi.fn>;
 
@@ -23,14 +25,18 @@ describe('registerClinVarTools', () => {
     mockClinVar = {
       search: vi.fn(),
       fetch: vi.fn(),
+      refsnp: vi.fn(),
+      frequency: vi.fn(),
     };
     getClinVar = vi.fn().mockReturnValue(mockClinVar);
     registerClinVarTools(mockServer, getClinVar as unknown as () => ClinVar);
   });
 
-  it('registers one tool', () => {
-    expect(mockServer.registerTool).toHaveBeenCalledTimes(1);
+  it('registers three tools', () => {
+    expect(mockServer.registerTool).toHaveBeenCalledTimes(3);
     expect(mockServer.registerTool.mock.calls[0]![0]).toBe('search-clinvar');
+    expect(mockServer.registerTool.mock.calls[1]![0]).toBe('lookup-refsnp');
+    expect(mockServer.registerTool.mock.calls[2]![0]).toBe('lookup-frequency');
   });
 
   describe('search-clinvar', () => {
@@ -78,6 +84,42 @@ describe('registerClinVarTools', () => {
       await handler({ term: 'TP53', retmax: 50 });
 
       expect(mockClinVar.search).toHaveBeenCalledWith('TP53', { retmax: 50 });
+    });
+  });
+
+  describe('lookup-refsnp', () => {
+    it('looks up a RefSNP variant and returns JSON', async () => {
+      const report = { refsnpId: '7412', variantType: 'snv' };
+      mockClinVar.refsnp.mockResolvedValue(report);
+
+      const handler = mockServer.registerTool.mock.calls[1]![2] as (
+        ...args: ReadonlyArray<unknown>
+      ) => Promise<unknown>;
+      const result = await handler({ rsid: 7412 });
+
+      expect(getClinVar).toHaveBeenCalled();
+      expect(mockClinVar.refsnp).toHaveBeenCalledWith(7412);
+      expect(result).toEqual({
+        content: [{ type: 'text', text: JSON.stringify(report, null, 2) }],
+      });
+    });
+  });
+
+  describe('lookup-frequency', () => {
+    it('looks up variant frequency and returns JSON', async () => {
+      const report = { rsid: '7412', results: [{ study: 'ALFA', frequency: 0.25 }] };
+      mockClinVar.frequency.mockResolvedValue(report);
+
+      const handler = mockServer.registerTool.mock.calls[2]![2] as (
+        ...args: ReadonlyArray<unknown>
+      ) => Promise<unknown>;
+      const result = await handler({ rsid: 7412 });
+
+      expect(getClinVar).toHaveBeenCalled();
+      expect(mockClinVar.frequency).toHaveBeenCalledWith(7412);
+      expect(result).toEqual({
+        content: [{ type: 'text', text: JSON.stringify(report, null, 2) }],
+      });
     });
   });
 });

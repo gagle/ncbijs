@@ -32,6 +32,14 @@ Get variant information and associated publication count by rsID.
 
 Get all publications mentioning a variant by rsID.
 
+#### `search(query: string): Promise<ReadonlyArray<LitVarSearchResult>>`
+
+Search LitVar for variants matching a text query (gene name, rsID prefix, HGVS notation, etc.).
+
+#### `variantAnnotations(rsid: string): Promise<ReadonlyArray<LitVarAnnotation>>`
+
+Get detailed annotations for a variant, including disease associations, related genes, and supporting PMIDs.
+
 ## Error handling
 
 ```ts
@@ -67,5 +75,25 @@ interface LitVarPublication {
   title: string;
   journal: string;
   year: number;
+}
+```
+
+### `LitVarSearchResult`
+
+```ts
+interface LitVarSearchResult {
+  term: string;
+  type: string;
+  score: number;
+}
+```
+
+### `LitVarAnnotation`
+
+```ts
+interface LitVarAnnotation {
+  disease: string;
+  genes: Array<string>;
+  pmids: Array<number>;
 }
 ```

@@ -365,9 +365,15 @@ importers:
       '@ncbijs/datasets':
         specifier: workspace:*
         version: link:../datasets
+      '@ncbijs/icite':
+        specifier: workspace:*
+        version: link:../icite
       '@ncbijs/id-converter':
         specifier: workspace:*
         version: link:../id-converter
+      '@ncbijs/litvar':
+        specifier: workspace:*
+        version: link:../litvar
       '@ncbijs/mesh':
         specifier: workspace:*
         version: link:../mesh
@@ -383,6 +389,9 @@ importers:
       '@ncbijs/pubtator':
         specifier: workspace:*
         version: link:../pubtator
+      '@ncbijs/rxnorm':
+        specifier: workspace:*
+        version: link:../rxnorm
       '@ncbijs/snp':
         specifier: workspace:*
         version: link:../snp

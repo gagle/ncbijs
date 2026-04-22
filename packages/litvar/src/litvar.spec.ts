@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { publications, variant } from './litvar';
+import { publications, search, variant, variantAnnotations } from './litvar';
 
 function mockFetchJson(data: unknown, status = 200): void {
   vi.stubGlobal(
@@ -150,5 +150,125 @@ describe('publications', () => {
   it('should throw on 404 response status', async () => {
     mockFetchJson(null, 404);
     await expect(publications('rs328')).rejects.toThrow('LitVar API returned status 404');
+  });
+});
+
+describe('search', () => {
+  const SAMPLE_SEARCH_RESULTS = [
+    { term: 'rs328', type: 'variant', score: 0.95 },
+    { term: 'rs7412', type: 'variant', score: 0.72 },
+  ];
+
+  it('should construct the correct URL with encoded query', async () => {
+    mockFetchJson(SAMPLE_SEARCH_RESULTS);
+    await search('BRCA1 variant');
+    const fetchCall = vi.mocked(fetch).mock.calls[0]![0] as string;
+    expect(fetchCall).toBe(
+      'https://www.ncbi.nlm.nih.gov/research/litvar2-api/api/v1/entity/search/BRCA1%20variant',
+    );
+  });
+
+  it('should return array of search results', async () => {
+    mockFetchJson(SAMPLE_SEARCH_RESULTS);
+    const result = await search('LPL');
+    expect(result).toHaveLength(2);
+  });
+
+  it('should include term in each result', async () => {
+    mockFetchJson(SAMPLE_SEARCH_RESULTS);
+    const result = await search('LPL');
+    expect(result[0]!.term).toBe('rs328');
+  });
+
+  it('should include type in each result', async () => {
+    mockFetchJson(SAMPLE_SEARCH_RESULTS);
+    const result = await search('LPL');
+    expect(result[0]!.type).toBe('variant');
+  });
+
+  it('should include score in each result', async () => {
+    mockFetchJson(SAMPLE_SEARCH_RESULTS);
+    const result = await search('LPL');
+    expect(result[0]!.score).toBe(0.95);
+  });
+
+  it('should return empty array when API returns empty array', async () => {
+    mockFetchJson([]);
+    const result = await search('nonexistent');
+    expect(result).toHaveLength(0);
+  });
+
+  it('should throw when query is empty', async () => {
+    await expect(search('')).rejects.toThrow('query must not be empty');
+  });
+
+  it('should throw on non-ok response status', async () => {
+    mockFetchJson(null, 500);
+    await expect(search('LPL')).rejects.toThrow('LitVar API returned status 500');
+  });
+
+  it('should throw on 404 response status', async () => {
+    mockFetchJson(null, 404);
+    await expect(search('LPL')).rejects.toThrow('LitVar API returned status 404');
+  });
+});
+
+describe('variantAnnotations', () => {
+  const SAMPLE_ANNOTATIONS = [
+    { disease: 'Coronary artery disease', genes: ['LPL', 'APOC2'], pmids: [12345678, 87654321] },
+    { disease: 'Hypertriglyceridemia', genes: ['LPL'], pmids: [11111111] },
+  ];
+
+  it('should construct the correct URL with %23%23 suffix and /annotations path', async () => {
+    mockFetchJson(SAMPLE_ANNOTATIONS);
+    await variantAnnotations('rs328');
+    const fetchCall = vi.mocked(fetch).mock.calls[0]![0] as string;
+    expect(fetchCall).toBe(
+      'https://www.ncbi.nlm.nih.gov/research/litvar2-api/api/v1/entity/litvar/rs328%23%23/annotations',
+    );
+  });
+
+  it('should return array of annotations', async () => {
+    mockFetchJson(SAMPLE_ANNOTATIONS);
+    const result = await variantAnnotations('rs328');
+    expect(result).toHaveLength(2);
+  });
+
+  it('should include disease in each annotation', async () => {
+    mockFetchJson(SAMPLE_ANNOTATIONS);
+    const result = await variantAnnotations('rs328');
+    expect(result[0]!.disease).toBe('Coronary artery disease');
+  });
+
+  it('should include genes in each annotation', async () => {
+    mockFetchJson(SAMPLE_ANNOTATIONS);
+    const result = await variantAnnotations('rs328');
+    expect(result[0]!.genes).toEqual(['LPL', 'APOC2']);
+  });
+
+  it('should include pmids in each annotation', async () => {
+    mockFetchJson(SAMPLE_ANNOTATIONS);
+    const result = await variantAnnotations('rs328');
+    expect(result[0]!.pmids).toEqual([12345678, 87654321]);
+  });
+
+  it('should return empty array when API returns empty array', async () => {
+    mockFetchJson([]);
+    const result = await variantAnnotations('rs328');
+    expect(result).toHaveLength(0);
+  });
+
+  it('should throw when rsid is empty', async () => {
+    await expect(variantAnnotations('')).rejects.toThrow('rsid must not be empty');
+  });
+
+  it('should throw on non-ok response status', async () => {
+    mockFetchJson(null, 500);
+    await expect(variantAnnotations('rs328')).rejects.toThrow('LitVar API returned status 500');
+  });
+
+  it('should throw on 404 response status', async () => {
+    mockFetchJson(null, 404);
+    await expect(variantAnnotations('rs328')).rejects.toThrow('LitVar API returned status 404');
   });
 });

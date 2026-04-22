@@ -13,3 +13,17 @@ export interface LitVarPublication {
   readonly journal: string;
   readonly year: number;
 }
+
+/** A variant entity returned by the LitVar search endpoint. */
+export interface LitVarSearchResult {
+  readonly term: string;
+  readonly type: string;
+  readonly score: number;
+}
+
+/** An annotation for a variant (disease association, related genes, supporting PMIDs). */
+export interface LitVarAnnotation {
+  readonly disease: string;
+  readonly genes: ReadonlyArray<string>;
+  readonly pmids: ReadonlyArray<number>;
+}

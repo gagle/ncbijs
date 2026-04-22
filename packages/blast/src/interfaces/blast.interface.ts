@@ -1,5 +1,15 @@
 /** BLAST program type for sequence alignment. */
-export type BlastProgram = 'blastn' | 'blastp' | 'blastx' | 'megablast' | 'tblastn' | 'tblastx';
+export type BlastProgram =
+  | 'blastn'
+  | 'blastp'
+  | 'blastx'
+  | 'deltablast'
+  | 'megablast'
+  | 'psiblast'
+  | 'rpsblast'
+  | 'rpstblastn'
+  | 'tblastn'
+  | 'tblastx';
 
 /** Status of a BLAST search job on the server. */
 export type BlastStatus = 'failed' | 'ready' | 'unknown' | 'waiting';
@@ -11,10 +21,17 @@ export interface BlastConfig {
 
 /** Optional parameters for a BLAST job submission. */
 export interface BlastSubmitOptions {
+  readonly compositionBasedStatistics?: 0 | 1 | 2 | 3;
   readonly entrezQuery?: string;
   readonly expect?: number;
+  readonly gapExtend?: number;
+  readonly gapOpen?: number;
   readonly hitListSize?: number;
   readonly matrix?: string;
+  readonly numIterations?: number;
+  readonly seg?: boolean;
+  readonly softMasking?: boolean;
+  readonly threshold?: number;
   readonly wordSize?: number;
 }
 

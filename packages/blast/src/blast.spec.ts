@@ -173,6 +173,184 @@ describe('Blast', () => {
       expect(sentBody.has('HITLIST_SIZE')).toBe(false);
       expect(sentBody.has('MATRIX')).toBe(false);
       expect(sentBody.has('WORD_SIZE')).toBe(false);
+      expect(sentBody.has('COMPOSITION_BASED_STATISTICS')).toBe(false);
+      expect(sentBody.has('FILTER')).toBe(false);
+      expect(sentBody.has('SOFT_MASKING')).toBe(false);
+      expect(sentBody.has('GAPCOSTS')).toBe(false);
+      expect(sentBody.has('THRESHOLD')).toBe(false);
+      expect(sentBody.has('NUM_ITERATIONS')).toBe(false);
+    });
+
+    it('should accept psiblast program type', async () => {
+      mockFetchText(SUBMIT_RESPONSE);
+      const blast = new Blast();
+
+      await blast.submit('MKWVTFISLLFLFSSAYS', 'psiblast', 'nr');
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0]!;
+      const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
+      expect(sentBody.get('PROGRAM')).toBe('psiblast');
+    });
+
+    it('should accept deltablast program type', async () => {
+      mockFetchText(SUBMIT_RESPONSE);
+      const blast = new Blast();
+
+      await blast.submit('MKWVTFISLLFLFSSAYS', 'deltablast', 'nr');
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0]!;
+      const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
+      expect(sentBody.get('PROGRAM')).toBe('deltablast');
+    });
+
+    it('should accept rpsblast program type', async () => {
+      mockFetchText(SUBMIT_RESPONSE);
+      const blast = new Blast();
+
+      await blast.submit('MKWVTFISLLFLFSSAYS', 'rpsblast', 'cdd');
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0]!;
+      const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
+      expect(sentBody.get('PROGRAM')).toBe('rpsblast');
+    });
+
+    it('should accept rpstblastn program type', async () => {
+      mockFetchText(SUBMIT_RESPONSE);
+      const blast = new Blast();
+
+      await blast.submit('ATCGATCG', 'rpstblastn', 'cdd');
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0]!;
+      const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
+      expect(sentBody.get('PROGRAM')).toBe('rpstblastn');
+    });
+
+    it('should set COMPOSITION_BASED_STATISTICS when provided', async () => {
+      mockFetchText(SUBMIT_RESPONSE);
+      const blast = new Blast();
+
+      await blast.submit('MKWVTFISLLFLFSSAYS', 'blastp', 'nr', {
+        compositionBasedStatistics: 2,
+      });
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0]!;
+      const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
+      expect(sentBody.get('COMPOSITION_BASED_STATISTICS')).toBe('2');
+    });
+
+    it('should set COMPOSITION_BASED_STATISTICS to 0 when explicitly provided', async () => {
+      mockFetchText(SUBMIT_RESPONSE);
+      const blast = new Blast();
+
+      await blast.submit('MKWVTFISLLFLFSSAYS', 'blastp', 'nr', {
+        compositionBasedStatistics: 0,
+      });
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0]!;
+      const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
+      expect(sentBody.get('COMPOSITION_BASED_STATISTICS')).toBe('0');
+    });
+
+    it('should set FILTER to L when seg is true', async () => {
+      mockFetchText(SUBMIT_RESPONSE);
+      const blast = new Blast();
+
+      await blast.submit('MKWVTFISLLFLFSSAYS', 'blastp', 'nr', { seg: true });
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0]!;
+      const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
+      expect(sentBody.get('FILTER')).toBe('L');
+    });
+
+    it('should set FILTER to empty string when seg is false', async () => {
+      mockFetchText(SUBMIT_RESPONSE);
+      const blast = new Blast();
+
+      await blast.submit('MKWVTFISLLFLFSSAYS', 'blastp', 'nr', { seg: false });
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0]!;
+      const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
+      expect(sentBody.get('FILTER')).toBe('');
+    });
+
+    it('should set SOFT_MASKING when provided', async () => {
+      mockFetchText(SUBMIT_RESPONSE);
+      const blast = new Blast();
+
+      await blast.submit('ATCGATCG', 'blastn', 'nt', { softMasking: true });
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0]!;
+      const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
+      expect(sentBody.get('SOFT_MASKING')).toBe('true');
+    });
+
+    it('should set SOFT_MASKING to false when provided', async () => {
+      mockFetchText(SUBMIT_RESPONSE);
+      const blast = new Blast();
+
+      await blast.submit('ATCGATCG', 'blastn', 'nt', { softMasking: false });
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0]!;
+      const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
+      expect(sentBody.get('SOFT_MASKING')).toBe('false');
+    });
+
+    it('should set GAPCOSTS combining gapOpen and gapExtend', async () => {
+      mockFetchText(SUBMIT_RESPONSE);
+      const blast = new Blast();
+
+      await blast.submit('MKWVTFISLLFLFSSAYS', 'blastp', 'nr', {
+        gapOpen: 11,
+        gapExtend: 1,
+      });
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0]!;
+      const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
+      expect(sentBody.get('GAPCOSTS')).toBe('11 1');
+    });
+
+    it('should not set GAPCOSTS when only gapOpen is provided', async () => {
+      mockFetchText(SUBMIT_RESPONSE);
+      const blast = new Blast();
+
+      await blast.submit('MKWVTFISLLFLFSSAYS', 'blastp', 'nr', { gapOpen: 11 });
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0]!;
+      const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
+      expect(sentBody.has('GAPCOSTS')).toBe(false);
+    });
+
+    it('should not set GAPCOSTS when only gapExtend is provided', async () => {
+      mockFetchText(SUBMIT_RESPONSE);
+      const blast = new Blast();
+
+      await blast.submit('MKWVTFISLLFLFSSAYS', 'blastp', 'nr', { gapExtend: 1 });
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0]!;
+      const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
+      expect(sentBody.has('GAPCOSTS')).toBe(false);
+    });
+
+    it('should set THRESHOLD when provided', async () => {
+      mockFetchText(SUBMIT_RESPONSE);
+      const blast = new Blast();
+
+      await blast.submit('MKWVTFISLLFLFSSAYS', 'blastp', 'nr', { threshold: 13 });
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0]!;
+      const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
+      expect(sentBody.get('THRESHOLD')).toBe('13');
+    });
+
+    it('should set NUM_ITERATIONS when provided', async () => {
+      mockFetchText(SUBMIT_RESPONSE);
+      const blast = new Blast();
+
+      await blast.submit('MKWVTFISLLFLFSSAYS', 'psiblast', 'nr', { numIterations: 5 });
+
+      const fetchCall = vi.mocked(fetch).mock.calls[0]!;
+      const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
+      expect(sentBody.get('NUM_ITERATIONS')).toBe('5');
     });
 
     it('should set Content-Type header for form-encoded body', async () => {
@@ -501,6 +679,29 @@ describe('Blast', () => {
       const sentBody = new URLSearchParams(submitCall[1]?.body as string);
       expect(sentBody.get('HITLIST_SIZE')).toBe('10');
       expect(sentBody.get('EXPECT')).toBe('0.01');
+    });
+
+    it('should accept new program types in search', async () => {
+      const json2 = buildJson2Response([]);
+      mockFetchSequence(
+        { text: SUBMIT_RESPONSE },
+        { text: POLL_READY_RESPONSE },
+        { text: JSON.stringify(json2) },
+      );
+      const blast = new Blast();
+
+      const searchPromise = blast.search('MKWVTFISLLFLFSSAYS', 'psiblast', 'nr', {
+        pollIntervalMs: 1000,
+        numIterations: 3,
+      });
+
+      await drainTimers();
+      await searchPromise;
+
+      const submitCall = vi.mocked(fetch).mock.calls[0]!;
+      const sentBody = new URLSearchParams(submitCall[1]?.body as string);
+      expect(sentBody.get('PROGRAM')).toBe('psiblast');
+      expect(sentBody.get('NUM_ITERATIONS')).toBe('3');
     });
 
     it('should use default poll interval and max attempts when not specified', async () => {

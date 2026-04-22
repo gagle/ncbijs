@@ -85,6 +85,20 @@ Get total study count and other database-level statistics.
 
 Get distinct values and their counts for a study field.
 
+### Metadata
+
+#### `studyMetadata(): Promise<StudyMetadata>`
+
+Fetch field definitions for the studies API.
+
+#### `enumValues(field: string): Promise<ReadonlyArray<string>>`
+
+Fetch valid enum values for a specific study field.
+
+#### `studySize(query?: string, filter?: StudySearchFilter): Promise<number>`
+
+Get total count of studies matching a query without fetching results.
+
 ## Error handling
 
 ```ts
@@ -191,5 +205,25 @@ interface StudySearchOptions {
   pageSize?: number;
   sort?: string;
   fields?: ReadonlyArray<string>;
+}
+```
+
+### `StudyMetadata`
+
+```ts
+interface StudyMetadata {
+  fields: Array<StudyFieldDefinition>;
+}
+```
+
+### `StudyFieldDefinition`
+
+```ts
+interface StudyFieldDefinition {
+  name: string;
+  type: string;
+  description: string;
+  sourceField: string;
+  isEnum: boolean;
 }
 ```

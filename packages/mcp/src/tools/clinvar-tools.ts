@@ -37,4 +37,40 @@ export function registerClinVarTools(server: McpServer, getClinVar: () => ClinVa
       };
     },
   );
+
+  server.registerTool(
+    'lookup-refsnp',
+    {
+      title: 'Look Up RefSNP Variant',
+      description:
+        'Look up a RefSNP variant by rsID using the NCBI Variation Services API. ' +
+        'Returns variant type, genomic placements, and allele information.',
+      inputSchema: {
+        rsid: z.number().describe('RefSNP ID number (e.g., 7412)'),
+      },
+    },
+    async ({ rsid }) => {
+      const clinvar = getClinVar();
+      const report = await clinvar.refsnp(rsid);
+      return { content: [{ type: 'text' as const, text: JSON.stringify(report, null, 2) }] };
+    },
+  );
+
+  server.registerTool(
+    'lookup-frequency',
+    {
+      title: 'Look Up Variant Frequency',
+      description:
+        'Look up allele frequency data (ALFA) for a variant by rsID. ' +
+        'Returns population-level frequency data across multiple studies.',
+      inputSchema: {
+        rsid: z.number().describe('RefSNP ID number (e.g., 7412)'),
+      },
+    },
+    async ({ rsid }) => {
+      const clinvar = getClinVar();
+      const report = await clinvar.frequency(rsid);
+      return { content: [{ type: 'text' as const, text: JSON.stringify(report, null, 2) }] };
+    },
+  );
 }

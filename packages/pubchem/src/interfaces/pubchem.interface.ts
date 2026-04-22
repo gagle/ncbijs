@@ -92,3 +92,35 @@ export interface AnnotationData {
   readonly value: string;
   readonly url: string;
 }
+
+/** Gene record linked to PubChem data. */
+export interface GeneRecord {
+  readonly geneId: number;
+  readonly symbol: string;
+  readonly name: string;
+  readonly taxId: number;
+  readonly description: string;
+}
+
+/** Protein record from PubChem. */
+export interface ProteinRecord {
+  readonly accession: string;
+  readonly name: string;
+  readonly organism: string;
+  readonly taxId: number;
+}
+
+/** Node in a compound classification hierarchy. */
+export interface ClassificationNode {
+  readonly name: string;
+  readonly description: string;
+  readonly childNodes: ReadonlyArray<ClassificationNode>;
+}
+
+/** Patent record associated with a PubChem compound. */
+export interface PatentRecord {
+  readonly patentId: string;
+  readonly title: string;
+  readonly inventorNames: ReadonlyArray<string>;
+  readonly assigneeNames: ReadonlyArray<string>;
+}

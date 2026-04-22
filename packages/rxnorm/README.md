@@ -78,6 +78,31 @@ Get spelling suggestions for a drug name.
 
 Get drug-drug interactions for a concept.
 
+### Fuzzy search
+
+#### `approximateTerm(name: string, options?: ApproximateTermOptions): Promise<ReadonlyArray<RxTermCandidate>>`
+
+Fuzzy drug name lookup returning ranked candidates with scores.
+
+**`ApproximateTermOptions`**
+
+| Option       | Type     | Description                                      |
+| ------------ | -------- | ------------------------------------------------ |
+| `maxEntries` | `number` | Maximum number of candidates to return           |
+| `option`     | `0 \| 1` | Search option (0 = best, 1 = all approximations) |
+
+### History
+
+#### `history(rxcui: string): Promise<RxConceptHistory>`
+
+Get historical status of an RxCUI including remapping information.
+
+### Properties
+
+#### `allProperties(rxcui: string, properties: ReadonlyArray<string>): Promise<ReadonlyArray<RxProperty>>`
+
+Fetch all properties for an RxCUI filtered by property category (e.g., `'NAMES'`, `'SOURCES'`).
+
 ### NDC mapping
 
 #### `ndcByRxcui(rxcui: string): Promise<ReadonlyArray<string>>`
@@ -161,5 +186,46 @@ interface InteractionConcept {
   rxcui: string;
   name: string;
   tty: string;
+}
+```
+
+### `ApproximateTermOptions`
+
+```ts
+interface ApproximateTermOptions {
+  maxEntries?: number;
+  option?: 0 | 1;
+}
+```
+
+### `RxTermCandidate`
+
+```ts
+interface RxTermCandidate {
+  rxcui: string;
+  name: string;
+  score: number;
+  rank: number;
+}
+```
+
+### `RxConceptHistory`
+
+```ts
+interface RxConceptHistory {
+  rxcui: string;
+  name: string;
+  status: string;
+  remappedTo: Array<string>;
+}
+```
+
+### `RxProperty`
+
+```ts
+interface RxProperty {
+  category: string;
+  name: string;
+  value: string;
 }
 ```

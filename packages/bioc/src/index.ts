@@ -4,5 +4,6 @@ export type {
   BioCFormat,
   BioCLocation,
   BioCPassage,
+  EntitySearchResult,
 } from './interfaces/bioc.interface';
-export { pmc, pubmed } from './bioc';
+export { entitySearch, pmc, pmcBatch, pubmed, pubmedBatch } from './bioc';

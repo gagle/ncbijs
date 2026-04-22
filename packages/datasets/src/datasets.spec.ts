@@ -706,6 +706,204 @@ describe('Datasets', () => {
     });
   });
 
+  describe('assemblyDescriptors', () => {
+    it('should fetch assembly descriptors and map fields', async () => {
+      mockFetchJson({
+        assemblies: [
+          {
+            accession: 'GCF_000001405.40',
+            assembly_name: 'GRCh38.p14',
+            assembly_level: 'Chromosome',
+            organism: 'Homo sapiens',
+            tax_id: 9606,
+            submitter: 'Genome Reference Consortium',
+            release_date: '2022-02-03',
+          },
+        ],
+      });
+      const datasets = new Datasets();
+
+      const descriptors = await datasets.assemblyDescriptors(['GCF_000001405.40']);
+
+      expect(descriptors).toHaveLength(1);
+      expect(descriptors[0]!.accession).toBe('GCF_000001405.40');
+      expect(descriptors[0]!.assemblyName).toBe('GRCh38.p14');
+      expect(descriptors[0]!.assemblyLevel).toBe('Chromosome');
+      expect(descriptors[0]!.organism).toBe('Homo sapiens');
+      expect(descriptors[0]!.taxId).toBe(9606);
+      expect(descriptors[0]!.submitter).toBe('Genome Reference Consortium');
+      expect(descriptors[0]!.releaseDate).toBe('2022-02-03');
+    });
+
+    it('should build correct URL with encoded accessions', async () => {
+      mockFetchJson({ assemblies: [] });
+      const datasets = new Datasets();
+
+      await datasets.assemblyDescriptors(['GCF_000001405.40', 'GCF_000001635.27']);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain(
+        '/genome/accession/GCF_000001405.40%2CGCF_000001635.27/assembly_descriptors',
+      );
+    });
+
+    it('should throw on empty accessions array', async () => {
+      const datasets = new Datasets();
+      await expect(datasets.assemblyDescriptors([])).rejects.toThrow(
+        'accessions must not be empty',
+      );
+    });
+
+    it('should handle missing optional fields gracefully', async () => {
+      mockFetchJson({ assemblies: [{}] });
+      const datasets = new Datasets();
+
+      const descriptors = await datasets.assemblyDescriptors(['GCF_000001405.40']);
+
+      expect(descriptors[0]!.accession).toBe('');
+      expect(descriptors[0]!.assemblyName).toBe('');
+      expect(descriptors[0]!.assemblyLevel).toBe('');
+      expect(descriptors[0]!.organism).toBe('');
+      expect(descriptors[0]!.taxId).toBe(0);
+      expect(descriptors[0]!.submitter).toBe('');
+      expect(descriptors[0]!.releaseDate).toBe('');
+    });
+
+    it('should handle missing assemblies key', async () => {
+      mockFetchJson({});
+      const datasets = new Datasets();
+
+      const descriptors = await datasets.assemblyDescriptors(['GCF_000001405.40']);
+      expect(descriptors).toEqual([]);
+    });
+  });
+
+  describe('geneLinks', () => {
+    it('should fetch gene links and map fields', async () => {
+      mockFetchJson({
+        genes: [
+          {
+            gene_id: 672,
+            links: [
+              { resource_name: 'UniProtKB', url: 'https://www.uniprot.org/uniprot/P38398' },
+              { resource_name: 'Ensembl', url: 'https://ensembl.org/id/ENSG00000012048' },
+            ],
+          },
+        ],
+      });
+      const datasets = new Datasets();
+
+      const geneLinks = await datasets.geneLinks([672]);
+
+      expect(geneLinks).toHaveLength(1);
+      expect(geneLinks[0]!.geneId).toBe(672);
+      expect(geneLinks[0]!.links).toHaveLength(2);
+      expect(geneLinks[0]!.links[0]!.resourceName).toBe('UniProtKB');
+      expect(geneLinks[0]!.links[0]!.url).toBe('https://www.uniprot.org/uniprot/P38398');
+      expect(geneLinks[0]!.links[1]!.resourceName).toBe('Ensembl');
+    });
+
+    it('should build correct URL for multiple gene IDs', async () => {
+      mockFetchJson({ genes: [] });
+      const datasets = new Datasets();
+
+      await datasets.geneLinks([672, 7157]);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('/gene/id/672%2C7157/links');
+    });
+
+    it('should throw on empty gene IDs array', async () => {
+      const datasets = new Datasets();
+      await expect(datasets.geneLinks([])).rejects.toThrow('geneIds must not be empty');
+    });
+
+    it('should handle missing optional fields gracefully', async () => {
+      mockFetchJson({ genes: [{}] });
+      const datasets = new Datasets();
+
+      const geneLinks = await datasets.geneLinks([672]);
+
+      expect(geneLinks[0]!.geneId).toBe(0);
+      expect(geneLinks[0]!.links).toEqual([]);
+    });
+
+    it('should handle links with missing fields', async () => {
+      mockFetchJson({ genes: [{ gene_id: 1, links: [{}] }] });
+      const datasets = new Datasets();
+
+      const geneLinks = await datasets.geneLinks([1]);
+
+      expect(geneLinks[0]!.links[0]!.resourceName).toBe('');
+      expect(geneLinks[0]!.links[0]!.url).toBe('');
+    });
+
+    it('should handle missing genes key', async () => {
+      mockFetchJson({});
+      const datasets = new Datasets();
+
+      const geneLinks = await datasets.geneLinks([672]);
+      expect(geneLinks).toEqual([]);
+    });
+  });
+
+  describe('datasetCatalog', () => {
+    it('should fetch dataset catalog and map fields', async () => {
+      mockFetchJson({
+        datasets: [
+          {
+            name: 'gene',
+            description: 'NCBI Gene dataset',
+            version: '2.0',
+          },
+          {
+            name: 'genome',
+            description: 'NCBI Genome dataset',
+            version: '2.0',
+          },
+        ],
+      });
+      const datasets = new Datasets();
+
+      const catalog = await datasets.datasetCatalog();
+
+      expect(catalog).toHaveLength(2);
+      expect(catalog[0]!.name).toBe('gene');
+      expect(catalog[0]!.description).toBe('NCBI Gene dataset');
+      expect(catalog[0]!.version).toBe('2.0');
+      expect(catalog[1]!.name).toBe('genome');
+    });
+
+    it('should build correct URL', async () => {
+      mockFetchJson({ datasets: [] });
+      const datasets = new Datasets();
+
+      await datasets.datasetCatalog();
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('/dataset_catalog');
+    });
+
+    it('should handle missing optional fields gracefully', async () => {
+      mockFetchJson({ datasets: [{}] });
+      const datasets = new Datasets();
+
+      const catalog = await datasets.datasetCatalog();
+
+      expect(catalog[0]!.name).toBe('');
+      expect(catalog[0]!.description).toBe('');
+      expect(catalog[0]!.version).toBe('');
+    });
+
+    it('should handle missing datasets key', async () => {
+      mockFetchJson({});
+      const datasets = new Datasets();
+
+      const catalog = await datasets.datasetCatalog();
+      expect(catalog).toEqual([]);
+    });
+  });
+
   describe('configuration', () => {
     it('should accept API key in config', async () => {
       mockFetchJson({ reports: [] });

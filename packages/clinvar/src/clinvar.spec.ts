@@ -491,6 +491,452 @@ describe('ClinVar', () => {
     });
   });
 
+  describe('refsnp', () => {
+    it('should build correct URL with rsID', async () => {
+      mockFetchJson({});
+      const clinvar = new ClinVar();
+
+      await clinvar.refsnp(328);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe('https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/328');
+    });
+
+    it('should map RefSNP response with placements and alleles', async () => {
+      mockFetchJson({
+        primary_snapshot_data: {
+          variant_type: 'snv',
+          placements_with_allele: [
+            {
+              seq_id: 'NC_000001.11',
+              alleles: [
+                {
+                  allele: {
+                    spdi: {
+                      seq_id: 'NC_000001.11',
+                      position: 1014042,
+                      deleted_sequence: 'C',
+                      inserted_sequence: 'T',
+                    },
+                  },
+                  hgvs: 'NC_000001.11:g.1014043C>T',
+                },
+              ],
+            },
+          ],
+        },
+      });
+      const clinvar = new ClinVar();
+
+      const report = await clinvar.refsnp(328);
+
+      expect(report.rsid).toBe(328);
+      expect(report.variantType).toBe('snv');
+      expect(report.placements).toHaveLength(1);
+      expect(report.placements[0]!.sequenceAccession).toBe('NC_000001.11');
+      expect(report.placements[0]!.alleles).toHaveLength(1);
+      expect(report.placements[0]!.alleles[0]!.spdi).toBe('NC_000001.11:1014042:C:T');
+      expect(report.placements[0]!.alleles[0]!.hgvs).toBe('NC_000001.11:g.1014043C>T');
+    });
+
+    it('should handle missing primary_snapshot_data', async () => {
+      mockFetchJson({});
+      const clinvar = new ClinVar();
+
+      const report = await clinvar.refsnp(328);
+
+      expect(report.rsid).toBe(328);
+      expect(report.variantType).toBe('');
+      expect(report.placements).toEqual([]);
+    });
+
+    it('should handle missing variant_type and placements', async () => {
+      mockFetchJson({ primary_snapshot_data: {} });
+      const clinvar = new ClinVar();
+
+      const report = await clinvar.refsnp(328);
+
+      expect(report.variantType).toBe('');
+      expect(report.placements).toEqual([]);
+    });
+
+    it('should handle placement with missing fields', async () => {
+      mockFetchJson({
+        primary_snapshot_data: {
+          placements_with_allele: [{}],
+        },
+      });
+      const clinvar = new ClinVar();
+
+      const report = await clinvar.refsnp(328);
+
+      expect(report.placements[0]!.sequenceAccession).toBe('');
+      expect(report.placements[0]!.alleles).toEqual([]);
+    });
+
+    it('should handle allele with missing spdi and hgvs', async () => {
+      mockFetchJson({
+        primary_snapshot_data: {
+          placements_with_allele: [{ alleles: [{}] }],
+        },
+      });
+      const clinvar = new ClinVar();
+
+      const report = await clinvar.refsnp(328);
+
+      expect(report.placements[0]!.alleles[0]!.spdi).toBe('');
+      expect(report.placements[0]!.alleles[0]!.hgvs).toBe('');
+    });
+
+    it('should handle allele with empty spdi object', async () => {
+      mockFetchJson({
+        primary_snapshot_data: {
+          placements_with_allele: [{ alleles: [{ allele: { spdi: {} } }] }],
+        },
+      });
+      const clinvar = new ClinVar();
+
+      const report = await clinvar.refsnp(328);
+
+      expect(report.placements[0]!.alleles[0]!.spdi).toBe(':0::');
+    });
+
+    it('should handle allele with allele object but no spdi', async () => {
+      mockFetchJson({
+        primary_snapshot_data: {
+          placements_with_allele: [{ alleles: [{ allele: {} }] }],
+        },
+      });
+      const clinvar = new ClinVar();
+
+      const report = await clinvar.refsnp(328);
+
+      expect(report.placements[0]!.alleles[0]!.spdi).toBe('');
+    });
+  });
+
+  describe('spdi', () => {
+    it('should build correct URL with encoded SPDI expression', async () => {
+      mockFetchJson({});
+      const clinvar = new ClinVar();
+
+      await clinvar.spdi('NC_000001.11:1014042:C:T');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe(
+        'https://api.ncbi.nlm.nih.gov/variation/v0/spdi/NC_000001.11%3A1014042%3AC%3AT',
+      );
+    });
+
+    it('should map SPDI response fields', async () => {
+      mockFetchJson({
+        data: {
+          seq_id: 'NC_000001.11',
+          position: 1014042,
+          deleted_sequence: 'C',
+          inserted_sequence: 'T',
+        },
+      });
+      const clinvar = new ClinVar();
+
+      const result = await clinvar.spdi('NC_000001.11:1014042:C:T');
+
+      expect(result.sequenceAccession).toBe('NC_000001.11');
+      expect(result.position).toBe(1014042);
+      expect(result.deletedSequence).toBe('C');
+      expect(result.insertedSequence).toBe('T');
+    });
+
+    it('should handle missing data', async () => {
+      mockFetchJson({});
+      const clinvar = new ClinVar();
+
+      const result = await clinvar.spdi('NC_000001.11:1014042:C:T');
+
+      expect(result.sequenceAccession).toBe('');
+      expect(result.position).toBe(0);
+      expect(result.deletedSequence).toBe('');
+      expect(result.insertedSequence).toBe('');
+    });
+
+    it('should handle data with missing fields', async () => {
+      mockFetchJson({ data: {} });
+      const clinvar = new ClinVar();
+
+      const result = await clinvar.spdi('NC_000001.11:1014042:C:T');
+
+      expect(result.sequenceAccession).toBe('');
+      expect(result.position).toBe(0);
+      expect(result.deletedSequence).toBe('');
+      expect(result.insertedSequence).toBe('');
+    });
+  });
+
+  describe('spdiToHgvs', () => {
+    it('should build correct URL with encoded SPDI expression', async () => {
+      mockFetchJson({});
+      const clinvar = new ClinVar();
+
+      await clinvar.spdiToHgvs('NC_000001.11:1014042:C:T');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe(
+        'https://api.ncbi.nlm.nih.gov/variation/v0/spdi/NC_000001.11%3A1014042%3AC%3AT/hgvs',
+      );
+    });
+
+    it('should return HGVS expressions', async () => {
+      mockFetchJson({
+        data: {
+          hgvsExpression: ['NC_000001.11:g.1014043C>T', 'NG_007400.1:g.7894C>T'],
+        },
+      });
+      const clinvar = new ClinVar();
+
+      const result = await clinvar.spdiToHgvs('NC_000001.11:1014042:C:T');
+
+      expect(result).toEqual(['NC_000001.11:g.1014043C>T', 'NG_007400.1:g.7894C>T']);
+    });
+
+    it('should handle missing data', async () => {
+      mockFetchJson({});
+      const clinvar = new ClinVar();
+
+      const result = await clinvar.spdiToHgvs('NC_000001.11:1014042:C:T');
+
+      expect(result).toEqual([]);
+    });
+
+    it('should handle data with missing hgvsExpression', async () => {
+      mockFetchJson({ data: {} });
+      const clinvar = new ClinVar();
+
+      const result = await clinvar.spdiToHgvs('NC_000001.11:1014042:C:T');
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('hgvsToSpdi', () => {
+    it('should build correct URL with encoded HGVS expression', async () => {
+      mockFetchJson({});
+      const clinvar = new ClinVar();
+
+      await clinvar.hgvsToSpdi('NC_000001.11:g.1014043C>T');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe(
+        'https://api.ncbi.nlm.nih.gov/variation/v0/hgvs/NC_000001.11%3Ag.1014043C%3ET/contextuals',
+      );
+    });
+
+    it('should include assembly parameter when provided', async () => {
+      mockFetchJson({});
+      const clinvar = new ClinVar();
+
+      await clinvar.hgvsToSpdi('NC_000001.11:g.1014043C>T', 'GCF_000001405.40');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toContain('?assembly=GCF_000001405.40');
+    });
+
+    it('should not include assembly parameter when omitted', async () => {
+      mockFetchJson({});
+      const clinvar = new ClinVar();
+
+      await clinvar.hgvsToSpdi('NC_000001.11:g.1014043C>T');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).not.toContain('assembly');
+    });
+
+    it('should map contextual SPDI alleles', async () => {
+      mockFetchJson({
+        data: {
+          spdis: [
+            {
+              seq_id: 'NC_000001.11',
+              position: 1014042,
+              deleted_sequence: 'C',
+              inserted_sequence: 'T',
+            },
+          ],
+        },
+      });
+      const clinvar = new ClinVar();
+
+      const result = await clinvar.hgvsToSpdi('NC_000001.11:g.1014043C>T');
+
+      expect(result).toHaveLength(1);
+      expect(result[0]!.sequenceAccession).toBe('NC_000001.11');
+      expect(result[0]!.position).toBe(1014042);
+      expect(result[0]!.deletedSequence).toBe('C');
+      expect(result[0]!.insertedSequence).toBe('T');
+    });
+
+    it('should handle missing data', async () => {
+      mockFetchJson({});
+      const clinvar = new ClinVar();
+
+      const result = await clinvar.hgvsToSpdi('NC_000001.11:g.1014043C>T');
+
+      expect(result).toEqual([]);
+    });
+
+    it('should handle data with missing spdis', async () => {
+      mockFetchJson({ data: {} });
+      const clinvar = new ClinVar();
+
+      const result = await clinvar.hgvsToSpdi('NC_000001.11:g.1014043C>T');
+
+      expect(result).toEqual([]);
+    });
+
+    it('should handle SPDI entry with missing fields', async () => {
+      mockFetchJson({ data: { spdis: [{}] } });
+      const clinvar = new ClinVar();
+
+      const result = await clinvar.hgvsToSpdi('NC_000001.11:g.1014043C>T');
+
+      expect(result[0]!.sequenceAccession).toBe('');
+      expect(result[0]!.position).toBe(0);
+      expect(result[0]!.deletedSequence).toBe('');
+      expect(result[0]!.insertedSequence).toBe('');
+    });
+  });
+
+  describe('frequency', () => {
+    it('should build correct URL with rsID', async () => {
+      mockFetchJson({});
+      const clinvar = new ClinVar();
+
+      await clinvar.frequency(328);
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe('https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/328/frequency');
+    });
+
+    it('should map frequency response with populations', async () => {
+      mockFetchJson({
+        results: [
+          {
+            study: 'ALFA',
+            populations: [
+              {
+                population: 'European',
+                allele_count: 500,
+                total_count: 1000,
+                frequency: 0.5,
+              },
+              {
+                population: 'African',
+                allele_count: 300,
+                total_count: 800,
+                frequency: 0.375,
+              },
+            ],
+          },
+        ],
+      });
+      const clinvar = new ClinVar();
+
+      const report = await clinvar.frequency(328);
+
+      expect(report.rsid).toBe(328);
+      expect(report.populations).toHaveLength(2);
+      expect(report.populations[0]!.study).toBe('ALFA');
+      expect(report.populations[0]!.population).toBe('European');
+      expect(report.populations[0]!.alleleCount).toBe(500);
+      expect(report.populations[0]!.totalCount).toBe(1000);
+      expect(report.populations[0]!.frequency).toBe(0.5);
+      expect(report.populations[1]!.population).toBe('African');
+    });
+
+    it('should handle missing results', async () => {
+      mockFetchJson({});
+      const clinvar = new ClinVar();
+
+      const report = await clinvar.frequency(328);
+
+      expect(report.rsid).toBe(328);
+      expect(report.populations).toEqual([]);
+    });
+
+    it('should handle empty results array', async () => {
+      mockFetchJson({ results: [] });
+      const clinvar = new ClinVar();
+
+      const report = await clinvar.frequency(328);
+
+      expect(report.populations).toEqual([]);
+    });
+
+    it('should handle result with missing study and populations', async () => {
+      mockFetchJson({ results: [{}] });
+      const clinvar = new ClinVar();
+
+      const report = await clinvar.frequency(328);
+
+      expect(report.populations).toEqual([]);
+    });
+
+    it('should handle population with missing fields', async () => {
+      mockFetchJson({ results: [{ study: 'ALFA', populations: [{}] }] });
+      const clinvar = new ClinVar();
+
+      const report = await clinvar.frequency(328);
+
+      expect(report.populations[0]!.study).toBe('ALFA');
+      expect(report.populations[0]!.population).toBe('');
+      expect(report.populations[0]!.alleleCount).toBe(0);
+      expect(report.populations[0]!.totalCount).toBe(0);
+      expect(report.populations[0]!.frequency).toBe(0);
+    });
+
+    it('should flatten populations across multiple study results', async () => {
+      mockFetchJson({
+        results: [
+          {
+            study: 'ALFA',
+            populations: [
+              { population: 'European', allele_count: 500, total_count: 1000, frequency: 0.5 },
+            ],
+          },
+          {
+            study: 'GnomAD',
+            populations: [
+              { population: 'Global', allele_count: 700, total_count: 2000, frequency: 0.35 },
+            ],
+          },
+        ],
+      });
+      const clinvar = new ClinVar();
+
+      const report = await clinvar.frequency(328);
+
+      expect(report.populations).toHaveLength(2);
+      expect(report.populations[0]!.study).toBe('ALFA');
+      expect(report.populations[1]!.study).toBe('GnomAD');
+    });
+
+    it('should default study to empty string when missing from result', async () => {
+      mockFetchJson({
+        results: [
+          {
+            populations: [
+              { population: 'European', allele_count: 100, total_count: 200, frequency: 0.5 },
+            ],
+          },
+        ],
+      });
+      const clinvar = new ClinVar();
+
+      const report = await clinvar.frequency(328);
+
+      expect(report.populations[0]!.study).toBe('');
+    });
+  });
+
   describe('configuration', () => {
     it('should work without any config', async () => {
       mockFetchJson(buildSearchResponse());

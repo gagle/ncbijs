@@ -44,6 +44,26 @@ Get an annotated PMC article as a parsed JSON document.
 
 Get an annotated PMC article as raw BioC XML.
 
+#### `pubmedBatch(pmids: ReadonlyArray<string>, format?: 'json'): Promise<ReadonlyArray<BioCDocument>>`
+
+Batch fetch BioC annotations for multiple PubMed articles via PubTator3.
+
+#### `pubmedBatch(pmids: ReadonlyArray<string>, format: 'xml'): Promise<string>`
+
+Batch fetch BioC annotations for multiple PubMed articles as raw BioC XML via PubTator3.
+
+#### `pmcBatch(pmcids: ReadonlyArray<string>, format?: 'json'): Promise<ReadonlyArray<BioCDocument>>`
+
+Batch fetch BioC annotations for multiple PMC articles via PubTator3.
+
+#### `pmcBatch(pmcids: ReadonlyArray<string>, format: 'xml'): Promise<string>`
+
+Batch fetch BioC annotations for multiple PMC articles as raw BioC XML via PubTator3.
+
+#### `entitySearch(query: string, type?: string): Promise<ReadonlyArray<EntitySearchResult>>`
+
+Search for biomedical entities by name using the PubTator3 autocomplete API. Optionally filter by entity type (e.g., `'gene'`, `'disease'`, `'chemical'`).
+
 ## Error handling
 
 ```ts
@@ -97,6 +117,16 @@ interface BioCAnnotation {
 interface BioCLocation {
   offset: number;
   length: number;
+}
+```
+
+### `EntitySearchResult`
+
+```ts
+interface EntitySearchResult {
+  identifier: string;
+  name: string;
+  type: string;
 }
 ```
 
