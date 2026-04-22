@@ -10,11 +10,24 @@ function isRelative(specifier) {
   return specifier.startsWith('.');
 }
 
+function hasExternalDeepPath(specifier) {
+  if (specifier.startsWith('@ncbijs/')) {
+    return false;
+  }
+  if (specifier.startsWith('@')) {
+    return specifier.split('/').length > 2;
+  }
+  return specifier.includes('/');
+}
+
 function needsExtension(specifier) {
   if (/\.(m?[jt]sx?|cjs|cts|json)$/.test(specifier)) {
     return false;
   }
-  return isRelative(specifier);
+  if (isRelative(specifier)) {
+    return true;
+  }
+  return hasExternalDeepPath(specifier);
 }
 
 function addJsExtensions(source) {

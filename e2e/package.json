@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
     "@ncbijs/cite": "workspace:*",
     "@ncbijs/eutils": "workspace:*",
     "@ncbijs/id-converter": "workspace:*",
