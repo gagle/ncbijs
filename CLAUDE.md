@@ -133,14 +133,14 @@ See **[docs/adding-a-package.md](./docs/adding-a-package.md)** for the full chec
 8. Update `docs/README.md` with the new package
 9. Register MCP tools if applicable (tool file, register, descriptions, README)
 10. Update global configs: `tsconfig.base.json`, `release-please-config.json`, `commitlint.config.ts`
-11. Run `pnpm install && pnpm lint && pnpm build && pnpm test`
+11. Run `pnpm install && pnpm lint && pnpm build && pnpm typecheck && pnpm test`
 
 ## Verification
 
 After ANY code change, run lint, build, and test before marking work complete:
 
 ```bash
-pnpm lint && pnpm build && pnpm test
+pnpm lint && pnpm build && pnpm typecheck && pnpm test
 ```
 
 ### Self-review loop
@@ -150,7 +150,7 @@ After implementation is complete, run the following skills in sequence. Loop unt
 1. `/review` -- full review (graph structural analysis + project-specific criteria + five-axis enrichment)
 2. `/agent-skills:code-simplify` -- simplify code for clarity without changing behavior
 
-If either skill finds issues, fix them, re-run `pnpm lint && pnpm build && pnpm test`, then repeat the loop.
+If either skill finds issues, fix them, re-run `pnpm lint && pnpm build && pnpm typecheck && pnpm test`, then repeat the loop.
 
 ## MCP Tools: code-review-graph
 
