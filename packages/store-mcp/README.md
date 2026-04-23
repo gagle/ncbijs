@@ -17,8 +17,8 @@ Complementary to `@ncbijs/http-mcp` (live API access). Use `store-mcp` for offli
 1. Download and load NCBI data:
 
 ```bash
-npx tsx scripts/offline-data/download.ts
-npx tsx scripts/offline-data/load.ts
+pnpm exec tsx examples/offline-data/download.ts
+pnpm exec tsx examples/offline-data/load.ts
 ```
 
 2. Add to your Claude Code `.mcp.json`:

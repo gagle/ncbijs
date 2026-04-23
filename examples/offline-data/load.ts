@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Load downloaded NCBI data files into a DuckDB store.
  *

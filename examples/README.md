@@ -77,3 +77,15 @@ pnpm exec tsx examples/search-pubmed.ts
 | `citation-database.ts`        | `pubmed` + `cite` + `id-converter`     | Build publication records with citations and all IDs |
 | `gene-literature-pipeline.ts` | `datasets` + `pubmed` + `pubtator`     | Gene lookup, literature search, entity extraction    |
 | `compound-literature.ts`      | `pubchem` + `pubmed` + `id-converter`  | Compound lookup, find related literature, get DOIs   |
+
+## Offline data pipeline
+
+The `offline-data/` directory contains a 3-step pipeline that downloads NCBI bulk data, loads it into a local DuckDB database, and verifies the result. Once loaded, the data is queryable offline via `@ncbijs/store` or through the `@ncbijs/store-mcp` MCP server.
+
+| Script                     | Packages                                                               | Description                            |
+| -------------------------- | ---------------------------------------------------------------------- | -------------------------------------- |
+| `offline-data/download.ts` | Node.js built-ins                                                      | Download ~4.4 GB from NCBI FTP servers |
+| `offline-data/load.ts`     | `store` + `mesh` + `clinvar` + `datasets` + `pubchem` + `id-converter` | Parse and load into DuckDB             |
+| `offline-data/verify.ts`   | `store`                                                                | Spot-check queries against loaded data |
+
+See [`offline-data/README.md`](./offline-data/README.md) for full setup and MCP server integration instructions.

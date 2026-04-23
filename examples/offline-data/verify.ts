@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Verify a DuckDB store by running spot-check queries per dataset.
  *

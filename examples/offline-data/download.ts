@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Download NCBI bulk data files for offline storage.
  *

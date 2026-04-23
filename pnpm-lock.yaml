@@ -32,9 +32,6 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.1.4
         version: 4.1.4(vitest@4.1.4)
-      add-import-extensions:
-        specifier: file:../add-import-extensions
-        version: file:../add-import-extensions
       eslint:
         specifier: ^10.1.0
         version: 10.2.0(jiti@2.6.1)
@@ -50,6 +47,9 @@ importers:
       prettier:
         specifier: ^3.8.3
         version: 3.8.3
+      tsc-esm-imports:
+        specifier: file:../tsc-esm-imports
+        version: file:../tsc-esm-imports
       typescript:
         specifier: ^6.0.2
         version: 6.0.3
@@ -287,6 +287,9 @@ importers:
       '@ncbijs/sra':
         specifier: workspace:*
         version: link:../packages/sra
+      '@ncbijs/store':
+        specifier: workspace:*
+        version: link:../packages/store
       '@ncbijs/structure':
         specifier: workspace:*
         version: link:../packages/structure
@@ -1937,11 +1940,6 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  add-import-extensions@file:../add-import-extensions:
-    resolution: {directory: ../add-import-extensions, type: directory}
-    engines: {node: '>=20'}
-    hasBin: true
-
   address@1.2.2:
     resolution: {integrity: sha512-4B/qKCfeE/ODUaAUpSwfzazo5x29WD4r3vXiWsB7I2mSDAihwEqKO+g8GELZUQSSAo5e1XTYh3ZVfLyxBc12nA==}
     engines: {node: '>= 10.0.0'}
@@ -3369,6 +3367,11 @@ packages:
     engines: {node: '>=18.12'}
     peerDependencies:
       typescript: '>=4.8.4'
+
+  tsc-esm-imports@file:../tsc-esm-imports:
+    resolution: {directory: ../tsc-esm-imports, type: directory}
+    engines: {node: '>=20'}
+    hasBin: true
 
   tsconfig-paths@4.2.0:
     resolution: {integrity: sha512-NoZ4roiN7LnbKn9QqE1amc9DJfzvZXxF4xDavcOWt1BPkdx+m+0gJuPM+S0vCe7zTJMYUP0R8pO2XMr+Y8oLIg==}
@@ -5082,8 +5085,6 @@ snapshots:
 
   acorn@8.16.0: {}
 
-  add-import-extensions@file:../add-import-extensions: {}
-
   address@1.2.2: {}
 
   ajv-formats@3.0.1(ajv@8.18.0):
@@ -6523,6 +6524,8 @@ snapshots:
   ts-api-utils@2.5.0(typescript@6.0.3):
     dependencies:
       typescript: 6.0.3
+
+  tsc-esm-imports@file:../tsc-esm-imports: {}
 
   tsconfig-paths@4.2.0:
     dependencies:
