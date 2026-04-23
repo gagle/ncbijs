@@ -46,7 +46,7 @@ src/
     parse-{format}.ts    # Pure function: string → typed objects
 ```
 
-Split packages: `mesh`, `snp`, `pubchem`, `clinvar`, `cite`, `id-converter`, `datasets`.
+Split packages: `mesh`, `snp`, `pubchem`, `clinvar`, `cite`, `id-converter`, `datasets`, `icite`, `clinical-trials`, `litvar`, `medgen`, `cdd`, `pmc`.
 
 ## Key Rules
 

@@ -368,7 +368,7 @@ The `@ncbijs/store-mcp` package exposes the stored data via MCP tools, making it
 | -------- | ------------------------------------ | ------ | ---------- |
 | 12       | `@ncbijs/store-mcp` with query tools | Medium | Phase 2    |
 
-### Phase 4: Additional parsers
+### Phase 4: Additional parsers ✅ DONE
 
 | Priority | Package                                      | Effort | Impact                                       |
 | -------- | -------------------------------------------- | ------ | -------------------------------------------- |
@@ -386,6 +386,6 @@ The `@ncbijs/store-mcp` package exposes the stored data via MCP tools, making it
 Phase 1: ~16 files, ~1,320 lines estimated.
 Phase 2: ~20 files, ~1,500 lines estimated.
 Phase 3: ~14 files, ~800 lines estimated.
-Phase 4: ~20 files, ~1,800 lines estimated.
+Phase 4: ~20 files, ~1,800 lines estimated. **Delivered 13 new parsers across 10 packages (21 total offline parsers). 6 packages converted to split layout: `icite`, `clinical-trials`, `litvar`, `medgen`, `cdd`, `pmc`.**
 
 For the exhaustive data inventory, sync engine design, and storage schema details, see [offline-rag-architecture.md](./offline-rag-architecture.md).

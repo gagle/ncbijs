@@ -40,7 +40,7 @@ packages/{name}/src/
     parse-{format}.spec.ts            # Unit tests
 ```
 
-**When to use split layout**: Use the split layout when a package has both HTTP client methods AND offline/bulk file parsers. Currently 7 packages use this layout: `mesh`, `snp`, `pubchem`, `clinvar`, `cite`, `id-converter`, `datasets`.
+**When to use split layout**: Use the split layout when a package has both HTTP client methods AND offline/bulk file parsers. Currently 13 packages use this layout: `mesh`, `snp`, `pubchem`, `clinvar`, `cite`, `id-converter`, `datasets`, `icite`, `clinical-trials`, `litvar`, `medgen`, `cdd`, `pmc`.
 
 ## HTTP Layer (`http/`)
 

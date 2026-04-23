@@ -57,7 +57,7 @@ Packages use one of two layouts. See [Package Architecture](./package-architectu
 
 **Split layout** (HTTP + bulk parsers): `http/`, `bulk-parsers/`, `interfaces/`
 
-Split packages: `mesh`, `snp`, `pubchem`, `clinvar`, `cite`, `id-converter`, `datasets`.
+Split packages: `mesh`, `snp`, `pubchem`, `clinvar`, `cite`, `id-converter`, `datasets`, `icite`, `clinical-trials`, `litvar`, `medgen`, `cdd`, `pmc`.
 
 ## Toolchain
 
