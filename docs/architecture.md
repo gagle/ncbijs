@@ -5,21 +5,59 @@
 ```
 ncbijs/
 ├── packages/
-│   ├── xml/             Zero-dep, shared regex-based XML reader
-│   ├── rate-limiter/    Zero-dep, token bucket rate limiter
-│   ├── eutils/          E-utilities HTTP client (depends on rate-limiter, xml)
-│   ├── pubmed-xml/      PubMed XML/MEDLINE parser (depends on xml)
-│   ├── pubmed/          Depends on eutils + pubmed-xml
-│   ├── jats/            JATS XML full-text parser (depends on xml)
-│   ├── pmc/             Depends on eutils + jats + xml
-│   ├── id-converter/    Zero-dep, PMID/PMCID/DOI converter
-│   ├── pubtator/        Text mining + BioC (depends on xml)
-│   ├── mesh/            Zero-dep, ships ~2MB MeSH tree
-│   └── cite/            Zero-dep, citation formatting
-├── e2e/                 Integration tests against real NCBI APIs
-├── docs/                Technical guides
-└── .github/workflows/   CI + Release
+│   ├── xml/               Zero-dep, shared regex-based XML reader
+│   ├── rate-limiter/      Zero-dep, token bucket rate limiter
+│   ├── fasta/             Zero-dep, FASTA sequence parser
+│   ├── eutils/            E-utilities HTTP client (depends on rate-limiter)
+│   ├── pubmed-xml/        PubMed XML/MEDLINE parser (depends on xml)
+│   ├── jats/              JATS XML full-text parser (depends on xml)
+│   ├── pubmed/            PubMed search + fetch (depends on eutils + pubmed-xml)
+│   ├── pmc/               PMC full-text (depends on eutils + jats + rate-limiter)
+│   ├── id-converter/      PMID/PMCID/DOI converter + bulk CSV parser
+│   ├── pubtator/          PubTator3 text mining (depends on rate-limiter)
+│   ├── mesh/              MeSH vocabulary + bulk XML parser
+│   ├── cite/              Citation formatting + bulk formatter
+│   ├── datasets/          NCBI Datasets API + bulk gene/taxonomy parsers
+│   ├── blast/             BLAST sequence alignment
+│   ├── snp/               dbSNP variant lookup + bulk JSON parser
+│   ├── clinvar/           ClinVar clinical variants + bulk TSV parser
+│   ├── pubchem/           PubChem compounds + bulk extras parser
+│   ├── clinical-trials/   ClinicalTrials.gov
+│   ├── icite/             NIH iCite citation metrics
+│   ├── rxnorm/            RxNorm drug normalization
+│   ├── litvar/            LitVar variant-literature linking
+│   ├── bioc/              BioC annotated text
+│   ├── clinical-tables/   Clinical Table Search (ICD-10, LOINC, SNOMED)
+│   ├── genbank/           GenBank sequence records
+│   ├── nucleotide/        NCBI Nucleotide database
+│   ├── protein/           NCBI Protein database
+│   ├── omim/              OMIM genetic disorders
+│   ├── medgen/            MedGen medical genetics
+│   ├── gtr/               Genetic Testing Registry
+│   ├── geo/               Gene Expression Omnibus
+│   ├── dbvar/             dbVar structural variants
+│   ├── sra/               Sequence Read Archive
+│   ├── structure/         MMDB 3D structures
+│   ├── cdd/               Conserved Domain Database
+│   ├── books/             NCBI Bookshelf
+│   ├── nlm-catalog/       NLM Catalog
+│   └── http-mcp/          MCP server for live API queries
+├── e2e/                   Integration tests against real NCBI APIs
+├── examples/              Runnable TypeScript examples
+├── docs/                  Technical guides
+├── scripts/               Build and utility scripts
+└── .github/workflows/     CI + Release
 ```
+
+## Package Layouts
+
+Packages use one of two layouts. See [Package Architecture](./package-architecture.md) for full details.
+
+**Flat layout** (HTTP client only): `{name}.ts`, `{name}-client.ts`, `interfaces/`
+
+**Split layout** (HTTP + bulk parsers): `http/`, `bulk-parsers/`, `interfaces/`
+
+Split packages: `mesh`, `snp`, `pubchem`, `clinvar`, `cite`, `id-converter`, `datasets`.
 
 ## Toolchain
 
@@ -49,13 +87,13 @@ All packages are ESM-only because:
 
 Nx `dependsOn: ["^build"]` in `nx.json` handles topological ordering:
 
-1. `rate-limiter`, `xml`, `id-converter`, `mesh`, `cite` (parallel, zero-dep)
-2. `eutils` (after rate-limiter + xml), `pubmed-xml` (after xml), `jats` (after xml), `pubtator` (after xml)
-3. `pubmed` (after eutils + pubmed-xml), `pmc` (after eutils + jats)
+1. Zero-dep parallel: `rate-limiter`, `xml`, `fasta`
+2. Internal deps: `eutils`, `pubmed-xml`, `jats`, `pubtator`, and all rate-limiter consumers
+3. Composite: `pubmed` (eutils + pubmed-xml), `pmc` (eutils + jats + rate-limiter)
 
 ## Zero-Dep Philosophy
 
-No external runtime dependencies except `openapi-fetch` in `eutils`. All other dependencies are internal `@ncbijs/*` packages. 5 packages (`xml`, `rate-limiter`, `id-converter`, `mesh`, `cite`) have zero dependencies.
+No external runtime dependencies except `openapi-fetch` in `eutils`. All other dependencies are internal `@ncbijs/*` packages.
 
 - HTTP: native `fetch`
 - Streaming: `ReadableStream` / `AsyncIterableIterator`
@@ -65,9 +103,9 @@ No external runtime dependencies except `openapi-fetch` in `eutils`. All other d
 
 ## Path Resolution Strategy
 
-- `tsconfig.base.json` has `paths` entries for all 10 packages → enables IDE and typecheck
+- `tsconfig.base.json` has `paths` entries for all packages -- enables IDE and typecheck
 - `tsc` does NOT rewrite path aliases in emitted JS
-- At runtime, `@ncbijs/eutils` resolves via pnpm workspace symlinks (dev) or npm (production)
+- At runtime, `@ncbijs/*` resolves via pnpm workspace symlinks (dev) or npm (production)
 - At publish time, `workspace:*` is replaced with real version numbers by pnpm
 
 ## Package.json Conventions

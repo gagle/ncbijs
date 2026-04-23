@@ -15,10 +15,21 @@ Create `packages/{name}/` with:
 
 ## 2. Source files
 
+Use the **flat layout** (default) or the **split layout** depending on whether the package has bulk file parsers. See [Package Architecture](./package-architecture.md) for full details.
+
+**Flat layout** (HTTP client only):
+
 - `src/index.ts` -- single barrel export for the public API
 - `src/interfaces/{name}.interface.ts` -- all public types (readonly, ReadonlyArray)
 - `src/{name}.ts` -- main class or exported functions
 - `src/{name}-client.ts` -- HTTP client helpers (if rate-limited, with `fetchWithRetry` and `{Name}HttpError`)
+
+**Split layout** (HTTP client + bulk parsers):
+
+- `src/index.ts` -- barrel re-exports from both `http/` and `bulk-parsers/`
+- `src/interfaces/{name}.interface.ts` -- shared domain types
+- `src/http/{name}.ts` -- main class, `src/http/{name}-client.ts` -- HTTP helpers
+- `src/bulk-parsers/parse-{format}.ts` -- pure parsing functions
 
 All exported functions, classes, and interfaces must have JSDoc comments. One-line description minimum, with `@param` and `@returns` on functions with non-obvious signatures.
 
@@ -95,7 +106,7 @@ Update these files:
 
 ```bash
 pnpm install
-pnpm lint && pnpm build && pnpm test
+pnpm lint && pnpm build && pnpm typecheck && pnpm test
 ```
 
 Then run the self-review loop:

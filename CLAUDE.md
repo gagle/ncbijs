@@ -71,6 +71,7 @@ This repo includes `.claude/` configuration that Claude reads automatically:
 - **`.claude/skills/explore-codebase/`** -- Knowledge graph navigation
 - **`.claude/skills/debug-issue/`** -- Systematic debugging
 - **`.claude/skills/refactor-safely/`** -- Safe refactoring with dependency analysis
+- **`.claude/skills/package-architecture/`** -- Package layout conventions (flat vs. split with http/bulk-parsers)
 
 See `CONTRIBUTING.md` for the contribution policy.
 
@@ -95,16 +96,30 @@ import type { Config } from './interfaces/x'; // type imports separated
 
 ### File structure (per package)
 
+**Flat layout** (HTTP client only -- most packages):
+
 ```
-packages/{name}/
-  src/
-    index.ts                        # Re-exports public API
-    interfaces/{feature}.interface.ts
-    {feature}.ts
-    {feature}.spec.ts               # Co-located tests
-  package.json, project.json, tsconfig.json, tsconfig.build.json
-  vitest.config.ts, eslint.config.mjs
+packages/{name}/src/
+  index.ts                          # Re-exports public API
+  {name}.ts                         # Main class
+  {name}-client.ts                  # HTTP helpers
+  interfaces/{name}.interface.ts    # All public types
 ```
+
+**Split layout** (HTTP + bulk parsers -- mesh, snp, pubchem, clinvar, cite, id-converter, datasets):
+
+```
+packages/{name}/src/
+  index.ts                          # Barrel re-exports from both subdirectories
+  interfaces/{name}.interface.ts    # Shared domain types
+  http/{name}.ts                    # Main class
+  http/{name}-client.ts             # HTTP helpers
+  bulk-parsers/parse-{format}.ts    # Pure parsing functions
+```
+
+See [docs/package-architecture.md](./docs/package-architecture.md) for full details.
+
+Common to both layouts: `package.json`, `project.json`, `tsconfig.json`, `tsconfig.build.json`, `vitest.config.ts`, `eslint.config.mjs`.
 
 ### Testing
 
