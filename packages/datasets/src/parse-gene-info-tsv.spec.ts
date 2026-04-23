@@ -25,85 +25,86 @@ describe('parseGeneInfoTsv', () => {
   it('extracts GeneID', () => {
     const result = parseGeneInfoTsv(SAMPLE_TSV);
 
-    expect(result[0].geneId).toBe(675);
-    expect(result[1].geneId).toBe(7157);
+    expect(result[0]!.geneId).toBe(675);
+    expect(result[1]!.geneId).toBe(7157);
   });
 
   it('extracts Symbol', () => {
     const result = parseGeneInfoTsv(SAMPLE_TSV);
 
-    expect(result[0].symbol).toBe('BRCA2');
+    expect(result[0]!.symbol).toBe('BRCA2');
   });
 
   it('prefers Full_name over description', () => {
     const result = parseGeneInfoTsv(SAMPLE_TSV);
 
-    expect(result[0].description).toBe('BRCA2 DNA repair associated');
+    expect(result[0]!.description).toBe('BRCA2 DNA repair associated');
   });
 
   it('extracts tax_id', () => {
     const result = parseGeneInfoTsv(SAMPLE_TSV);
 
-    expect(result[0].taxId).toBe(9606);
-    expect(result[2].taxId).toBe(10090);
+    expect(result[0]!.taxId).toBe(9606);
+    expect(result[2]!.taxId).toBe(10090);
   });
 
   it('extracts type_of_gene', () => {
     const result = parseGeneInfoTsv(SAMPLE_TSV);
 
-    expect(result[0].type).toBe('protein-coding');
+    expect(result[0]!.type).toBe('protein-coding');
   });
 
   it('extracts chromosome', () => {
     const result = parseGeneInfoTsv(SAMPLE_TSV);
 
-    expect(result[0].chromosomes).toEqual(['13']);
-    expect(result[1].chromosomes).toEqual(['17']);
+    expect(result[0]!.chromosomes).toEqual(['13']);
+    expect(result[1]!.chromosomes).toEqual(['17']);
   });
 
   it('extracts pipe-delimited synonyms', () => {
     const result = parseGeneInfoTsv(SAMPLE_TSV);
 
-    expect(result[0].synonyms).toEqual(['BRCC2', 'FANCD1', 'FAD', 'FAD1', 'BRCC2']);
+    expect(result[0]!.synonyms).toEqual(['BRCC2', 'FANCD1', 'FAD', 'FAD1', 'BRCC2']);
   });
 
   it('parses Swiss-Prot accessions from dbXrefs', () => {
     const result = parseGeneInfoTsv(SAMPLE_TSV);
 
-    expect(result[0].swissProtAccessions).toEqual(['P51587']);
+    expect(result[0]!.swissProtAccessions).toEqual(['P51587']);
   });
 
   it('parses Ensembl gene IDs from dbXrefs', () => {
     const result = parseGeneInfoTsv(SAMPLE_TSV);
 
-    expect(result[0].ensemblGeneIds).toEqual(['ENSG00000139618']);
-    expect(result[1].ensemblGeneIds).toEqual(['ENSG00000141510']);
+    expect(result[0]!.ensemblGeneIds).toEqual(['ENSG00000139618']);
+    expect(result[1]!.ensemblGeneIds).toEqual(['ENSG00000141510']);
   });
 
   it('parses OMIM IDs from dbXrefs', () => {
     const result = parseGeneInfoTsv(SAMPLE_TSV);
 
-    expect(result[0].omimIds).toEqual(['600185']);
-    expect(result[1].omimIds).toEqual(['191170']);
+    expect(result[0]!.omimIds).toEqual(['600185']);
+    expect(result[1]!.omimIds).toEqual(['191170']);
   });
 
   it('handles dash (empty) dbXrefs', () => {
     const result = parseGeneInfoTsv(SAMPLE_TSV);
 
-    expect(result[2].swissProtAccessions).toEqual([]);
-    expect(result[2].ensemblGeneIds).toEqual([]);
-    expect(result[2].omimIds).toEqual([]);
+    expect(result[2]!.swissProtAccessions).toEqual([]);
+    expect(result[2]!.ensemblGeneIds).toEqual([]);
+    expect(result[2]!.omimIds).toEqual([]);
   });
 
   it('sets unavailable fields to defaults', () => {
     const result = parseGeneInfoTsv(SAMPLE_TSV);
+    const gene = result[0]!;
 
-    expect(result[0].taxName).toBe('');
-    expect(result[0].commonName).toBe('');
-    expect(result[0].summary).toBe('');
-    expect(result[0].transcriptCount).toBe(0);
-    expect(result[0].proteinCount).toBe(0);
-    expect(result[0].geneOntology).toEqual({
+    expect(gene.taxName).toBe('');
+    expect(gene.commonName).toBe('');
+    expect(gene.summary).toBe('');
+    expect(gene.transcriptCount).toBe(0);
+    expect(gene.proteinCount).toBe(0);
+    expect(gene.geneOntology).toEqual({
       molecularFunctions: [],
       biologicalProcesses: [],
       cellularComponents: [],
@@ -136,7 +137,7 @@ describe('parseGeneInfoTsv', () => {
     const tsv = [HEADER, noSynonyms].join('\n');
     const result = parseGeneInfoTsv(tsv);
 
-    expect(result[0].synonyms).toEqual([]);
+    expect(result[0]!.synonyms).toEqual([]);
   });
 
   it('handles dash chromosome as empty array', () => {
@@ -144,7 +145,7 @@ describe('parseGeneInfoTsv', () => {
     const tsv = [HEADER, noChr].join('\n');
     const result = parseGeneInfoTsv(tsv);
 
-    expect(result[0].chromosomes).toEqual([]);
+    expect(result[0]!.chromosomes).toEqual([]);
   });
 
   it('falls back to description when Full_name is dash', () => {
@@ -152,6 +153,6 @@ describe('parseGeneInfoTsv', () => {
     const tsv = [HEADER, noFullName].join('\n');
     const result = parseGeneInfoTsv(tsv);
 
-    expect(result[0].description).toBe('BRCA2 DNA repair associated');
+    expect(result[0]!.description).toBe('BRCA2 DNA repair associated');
   });
 });

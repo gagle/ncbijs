@@ -116,7 +116,7 @@ describe('parseMeshDescriptorXml', () => {
 
   it('extracts descriptor UI and name', () => {
     const result = parseMeshDescriptorXml(DESCRIPTOR_XML);
-    const calcimycin = result.descriptors[0];
+    const calcimycin = result.descriptors[0]!;
 
     expect(calcimycin.id).toBe('D000001');
     expect(calcimycin.name).toBe('Calcimycin');
@@ -124,28 +124,28 @@ describe('parseMeshDescriptorXml', () => {
 
   it('decodes XML entities in names', () => {
     const result = parseMeshDescriptorXml(DESCRIPTOR_XML);
-    const calcimycin = result.descriptors[0];
+    const calcimycin = result.descriptors[0]!;
 
-    expect(calcimycin.qualifiers[0].name).toBe('administration & dosage');
+    expect(calcimycin.qualifiers[0]!.name).toBe('administration & dosage');
   });
 
   it('extracts tree numbers', () => {
     const result = parseMeshDescriptorXml(DESCRIPTOR_XML);
-    const calcimycin = result.descriptors[0];
+    const calcimycin = result.descriptors[0]!;
 
     expect(calcimycin.treeNumbers).toEqual(['D03.633.100.221.173']);
   });
 
   it('extracts multiple tree numbers', () => {
     const result = parseMeshDescriptorXml(DESCRIPTOR_XML);
-    const face = result.descriptors[1];
+    const face = result.descriptors[1]!;
 
     expect(face.treeNumbers).toEqual(['A01.236.500', 'A17.360']);
   });
 
   it('extracts allowable qualifiers', () => {
     const result = parseMeshDescriptorXml(DESCRIPTOR_XML);
-    const calcimycin = result.descriptors[0];
+    const calcimycin = result.descriptors[0]!;
 
     expect(calcimycin.qualifiers).toEqual([
       { name: 'administration & dosage', abbreviation: 'AD' },
@@ -155,14 +155,14 @@ describe('parseMeshDescriptorXml', () => {
 
   it('returns empty qualifiers when none present', () => {
     const result = parseMeshDescriptorXml(DESCRIPTOR_XML);
-    const face = result.descriptors[1];
+    const face = result.descriptors[1]!;
 
     expect(face.qualifiers).toEqual([]);
   });
 
   it('extracts pharmacological actions', () => {
     const result = parseMeshDescriptorXml(DESCRIPTOR_XML);
-    const calcimycin = result.descriptors[0];
+    const calcimycin = result.descriptors[0]!;
 
     expect(calcimycin.pharmacologicalActions).toEqual([
       'Anti-Bacterial Agents',
@@ -172,7 +172,7 @@ describe('parseMeshDescriptorXml', () => {
 
   it('returns empty pharmacological actions when none present', () => {
     const result = parseMeshDescriptorXml(DESCRIPTOR_XML);
-    const face = result.descriptors[1];
+    const face = result.descriptors[1]!;
 
     expect(face.pharmacologicalActions).toEqual([]);
   });
@@ -221,7 +221,7 @@ describe('parseMeshDescriptorXml', () => {
 
   it('handles single qualifier correctly', () => {
     const result = parseMeshDescriptorXml(DESCRIPTOR_XML);
-    const head = result.descriptors[2];
+    const head = result.descriptors[2]!;
 
     expect(head.qualifiers).toEqual([{ name: 'analysis', abbreviation: 'AN' }]);
   });
@@ -236,7 +236,7 @@ describe('parseMeshDescriptorXml', () => {
 
     const result = parseMeshDescriptorXml(xml);
 
-    expect(result.descriptors[0].name).toBe('');
+    expect(result.descriptors[0]!.name).toBe('');
   });
 
   it('defaults name to empty string when DescriptorName block is missing', () => {
@@ -248,7 +248,7 @@ describe('parseMeshDescriptorXml', () => {
 
     const result = parseMeshDescriptorXml(xml);
 
-    expect(result.descriptors[0].name).toBe('');
+    expect(result.descriptors[0]!.name).toBe('');
   });
 
   it('defaults qualifier name when QualifierReferredTo block is missing', () => {
@@ -266,7 +266,7 @@ describe('parseMeshDescriptorXml', () => {
 
     const result = parseMeshDescriptorXml(xml);
 
-    expect(result.descriptors[0].qualifiers).toEqual([{ name: '', abbreviation: 'XX' }]);
+    expect(result.descriptors[0]!.qualifiers).toEqual([{ name: '', abbreviation: 'XX' }]);
   });
 
   it('defaults qualifier name when QualifierName block is missing inside QualifierReferredTo', () => {
@@ -287,7 +287,7 @@ describe('parseMeshDescriptorXml', () => {
 
     const result = parseMeshDescriptorXml(xml);
 
-    expect(result.descriptors[0].qualifiers).toEqual([{ name: '', abbreviation: 'YY' }]);
+    expect(result.descriptors[0]!.qualifiers).toEqual([{ name: '', abbreviation: 'YY' }]);
   });
 
   it('skips pharmacological actions when DescriptorReferredTo is missing', () => {
@@ -303,7 +303,7 @@ describe('parseMeshDescriptorXml', () => {
 
     const result = parseMeshDescriptorXml(xml);
 
-    expect(result.descriptors[0].pharmacologicalActions).toEqual([]);
+    expect(result.descriptors[0]!.pharmacologicalActions).toEqual([]);
   });
 
   it('skips pharmacological actions when DescriptorName is missing inside DescriptorReferredTo', () => {
@@ -323,7 +323,7 @@ describe('parseMeshDescriptorXml', () => {
 
     const result = parseMeshDescriptorXml(xml);
 
-    expect(result.descriptors[0].pharmacologicalActions).toEqual([]);
+    expect(result.descriptors[0]!.pharmacologicalActions).toEqual([]);
   });
 
   it('defaults qualifier name when QualifierName exists but String tag is missing', () => {
@@ -345,7 +345,7 @@ describe('parseMeshDescriptorXml', () => {
 
     const result = parseMeshDescriptorXml(xml);
 
-    expect(result.descriptors[0].qualifiers).toEqual([{ name: '', abbreviation: 'ZZ' }]);
+    expect(result.descriptors[0]!.qualifiers).toEqual([{ name: '', abbreviation: 'ZZ' }]);
   });
 
   it('defaults abbreviation when Abbreviation tag is missing', () => {
@@ -366,7 +366,7 @@ describe('parseMeshDescriptorXml', () => {
 
     const result = parseMeshDescriptorXml(xml);
 
-    expect(result.descriptors[0].qualifiers).toEqual([
+    expect(result.descriptors[0]!.qualifiers).toEqual([
       { name: 'test qualifier', abbreviation: '' },
     ]);
   });
@@ -389,7 +389,7 @@ describe('parseMeshDescriptorXml', () => {
 
     const result = parseMeshDescriptorXml(xml);
 
-    expect(result.descriptors[0].pharmacologicalActions).toEqual([]);
+    expect(result.descriptors[0]!.pharmacologicalActions).toEqual([]);
   });
 
   it('defaults DescriptorUI to empty string when missing', () => {
@@ -401,6 +401,6 @@ describe('parseMeshDescriptorXml', () => {
 
     const result = parseMeshDescriptorXml(xml);
 
-    expect(result.descriptors[0].id).toBe('');
+    expect(result.descriptors[0]!.id).toBe('');
   });
 });

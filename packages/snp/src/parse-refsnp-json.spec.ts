@@ -83,20 +83,25 @@ describe('parseRefSnpJson', () => {
     const result = parseRefSnpJson(SAMPLE_JSON);
 
     expect(result.placements).toHaveLength(1);
-    expect(result.placements[0].seqId).toBe('NC_000022.11');
+
+    const placement = result.placements[0]!;
+
+    expect(placement.seqId).toBe('NC_000022.11');
   });
 
   it('extracts assembly name from placement', () => {
     const result = parseRefSnpJson(SAMPLE_JSON);
+    const placement = result.placements[0]!;
 
-    expect(result.placements[0].assemblyName).toBe('GRCh38.p14');
+    expect(placement.assemblyName).toBe('GRCh38.p14');
   });
 
   it('extracts SPDI alleles', () => {
     const result = parseRefSnpJson(SAMPLE_JSON);
+    const placement = result.placements[0]!;
 
-    expect(result.placements[0].alleles).toHaveLength(2);
-    expect(result.placements[0].alleles[1]).toEqual({
+    expect(placement.alleles).toHaveLength(2);
+    expect(placement.alleles[1]).toEqual({
       seqId: 'NC_000022.11',
       position: 36265860,
       deletedSequence: 'T',
@@ -106,8 +111,9 @@ describe('parseRefSnpJson', () => {
 
   it('extracts frequency annotations', () => {
     const result = parseRefSnpJson(SAMPLE_JSON);
+    const annotation = result.alleleAnnotations[0]!;
 
-    expect(result.alleleAnnotations[0].frequency[0]).toEqual({
+    expect(annotation.frequency[0]).toEqual({
       studyName: 'ALFA',
       alleleCount: 5000,
       totalCount: 10000,
@@ -119,8 +125,9 @@ describe('parseRefSnpJson', () => {
 
   it('extracts clinical annotations', () => {
     const result = parseRefSnpJson(SAMPLE_JSON);
+    const annotation = result.alleleAnnotations[0]!;
 
-    expect(result.alleleAnnotations[0].clinical[0]).toEqual({
+    expect(annotation.clinical[0]).toEqual({
       significances: ['Benign'],
       diseaseNames: ['not provided'],
       reviewStatus: 'criteria provided, single submitter',
@@ -154,11 +161,13 @@ describe('parseRefSnpJson', () => {
     });
 
     const result = parseRefSnpJson(json);
+    const placement = result.placements[0]!;
+    const annotation = result.alleleAnnotations[0]!;
 
-    expect(result.placements[0].assemblyName).toBe('');
-    expect(result.placements[0].alleles).toEqual([]);
-    expect(result.alleleAnnotations[0].frequency).toEqual([]);
-    expect(result.alleleAnnotations[0].clinical).toEqual([]);
+    expect(placement.assemblyName).toBe('');
+    expect(placement.alleles).toEqual([]);
+    expect(annotation.frequency).toEqual([]);
+    expect(annotation.clinical).toEqual([]);
   });
 
   it('computes frequency as 0 when totalCount is 0', () => {
@@ -174,8 +183,9 @@ describe('parseRefSnpJson', () => {
     });
 
     const result = parseRefSnpJson(json);
+    const annotation = result.alleleAnnotations[0]!;
 
-    expect(result.alleleAnnotations[0].frequency[0].frequency).toBe(0);
+    expect(annotation.frequency[0]!.frequency).toBe(0);
   });
 });
 
@@ -190,8 +200,8 @@ describe('parseRefSnpNdjson', () => {
     const result = parseRefSnpNdjson(ndjson);
 
     expect(result).toHaveLength(3);
-    expect(result[0].refsnpId).toBe('1');
-    expect(result[2].refsnpId).toBe('3');
+    expect(result[0]!.refsnpId).toBe('1');
+    expect(result[2]!.refsnpId).toBe('3');
   });
 
   it('skips blank lines', () => {

@@ -3,7 +3,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-const MCP_PACKAGE_DIR = resolve(import.meta.dirname, '..', 'packages', 'mcp');
+const MCP_PACKAGE_DIR = resolve(import.meta.dirname, '..', 'packages', 'http-mcp');
 const SERVER_PATH = resolve(MCP_PACKAGE_DIR, 'dist', 'index.js');
 
 describe('MCP Server E2E', () => {

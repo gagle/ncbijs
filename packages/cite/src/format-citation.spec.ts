@@ -106,7 +106,7 @@ describe('formatCitation', () => {
     it('omits optional fields when absent', () => {
       const article: PubmedArticle = {
         ...SAMPLE_ARTICLE,
-        journal: { title: '', isoAbbrev: '', volume: undefined, issue: undefined },
+        journal: { title: '', isoAbbrev: '' },
         abstract: { structured: false, text: '' },
         articleIds: { pmid: '12345678' },
         keywords: [],
@@ -217,7 +217,7 @@ describe('formatCitation', () => {
     it('omits optional fields when absent', () => {
       const article: PubmedArticle = {
         ...SAMPLE_ARTICLE,
-        journal: { title: '', isoAbbrev: '', volume: undefined, issue: undefined },
+        journal: { title: '', isoAbbrev: '' },
         abstract: { structured: false, text: '' },
         articleIds: { pmid: '12345678' },
         mesh: [],
@@ -264,7 +264,7 @@ describe('formatCitation', () => {
     it('omits optional CSL fields when absent', () => {
       const article: PubmedArticle = {
         ...SAMPLE_ARTICLE,
-        journal: { title: '', isoAbbrev: '', volume: undefined, issue: undefined },
+        journal: { title: '', isoAbbrev: '' },
         abstract: { structured: false, text: '' },
         articleIds: { pmid: '12345678' },
       };
@@ -383,7 +383,12 @@ describe('formatCitation', () => {
     it('handles volume without issue', () => {
       const article: PubmedArticle = {
         ...SAMPLE_ARTICLE,
-        journal: { ...SAMPLE_ARTICLE.journal, issue: undefined },
+        journal: {
+          title: 'Journal of Clinical Investigation',
+          isoAbbrev: 'J Clin Invest',
+          issn: '0021-9738',
+          volume: '125',
+        },
       };
 
       const result = formatCitation(article, 'citation');
@@ -395,7 +400,11 @@ describe('formatCitation', () => {
     it('omits volume and issue when both absent', () => {
       const article: PubmedArticle = {
         ...SAMPLE_ARTICLE,
-        journal: { ...SAMPLE_ARTICLE.journal, volume: undefined, issue: undefined },
+        journal: {
+          title: 'Journal of Clinical Investigation',
+          isoAbbrev: 'J Clin Invest',
+          issn: '0021-9738',
+        },
       };
 
       const result = formatCitation(article, 'citation');

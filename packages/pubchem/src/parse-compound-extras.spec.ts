@@ -85,6 +85,6 @@ describe('parseCompoundExtras', () => {
     const result = parseCompoundExtras({ cidSmiles: badCid });
 
     expect(result).toHaveLength(1);
-    expect(result[0].cid).toBe(1);
+    expect(result[0]!.cid).toBe(1);
   });
 });

@@ -17,39 +17,41 @@ describe('parsePmcIdsCsv', () => {
 
   it('extracts PMID as string or null', () => {
     const result = parsePmcIdsCsv(SAMPLE_CSV);
+    const firstRecord = result[0]!;
+    const secondRecord = result[1]!;
 
-    expect(result[0].pmid).toBe('15637587');
-    expect(result[1].pmid).toBe('15816890');
+    expect(firstRecord.pmid).toBe('15637587');
+    expect(secondRecord.pmid).toBe('15816890');
   });
 
   it('extracts PMCID', () => {
     const result = parsePmcIdsCsv(SAMPLE_CSV);
 
-    expect(result[0].pmcid).toBe('PMC1464427');
+    expect(result[0]!.pmcid).toBe('PMC1464427');
   });
 
   it('extracts DOI', () => {
     const result = parsePmcIdsCsv(SAMPLE_CSV);
 
-    expect(result[0].doi).toBe('10.1038/nbt0105-2');
+    expect(result[0]!.doi).toBe('10.1038/nbt0105-2');
   });
 
   it('maps empty fields to null', () => {
     const result = parsePmcIdsCsv(SAMPLE_CSV);
 
-    expect(result[0].mid).toBeNull();
+    expect(result[0]!.mid).toBeNull();
   });
 
   it('extracts Manuscript Id when present', () => {
     const result = parsePmcIdsCsv(SAMPLE_CSV);
 
-    expect(result[1].mid).toBe('NIHMS6395');
+    expect(result[1]!.mid).toBe('NIHMS6395');
   });
 
   it('extracts release date', () => {
     const result = parsePmcIdsCsv(SAMPLE_CSV);
 
-    expect(result[0].releaseDate).toBe('2005/01/28 00:00');
+    expect(result[0]!.releaseDate).toBe('2005/01/28 00:00');
   });
 
   it('sets live to true for all records', () => {
@@ -100,7 +102,7 @@ describe('parsePmcIdsCsv', () => {
     const result = parsePmcIdsCsv(csvWithQuotes);
 
     expect(result).toHaveLength(1);
-    expect(result[0].pmcid).toBe('PMC0000001');
+    expect(result[0]!.pmcid).toBe('PMC0000001');
   });
 
   it('handles escaped double quotes in fields', () => {
@@ -112,7 +114,7 @@ describe('parsePmcIdsCsv', () => {
     const result = parsePmcIdsCsv(csvWithEscapedQuotes);
 
     expect(result).toHaveLength(1);
-    expect(result[0].pmid).toBe('88888888');
+    expect(result[0]!.pmid).toBe('88888888');
   });
 
   it('handles missing DOI column gracefully', () => {
@@ -124,10 +126,12 @@ describe('parsePmcIdsCsv', () => {
     const result = parsePmcIdsCsv(noDoi);
 
     expect(result).toHaveLength(1);
-    expect(result[0].doi).toBeNull();
-    expect(result[0].mid).toBeNull();
-    expect(result[0].pmcid).toBe('PMC1464427');
-    expect(result[0].pmid).toBe('15637587');
+    const record = result[0]!;
+
+    expect(record.doi).toBeNull();
+    expect(record.mid).toBeNull();
+    expect(record.pmcid).toBe('PMC1464427');
+    expect(record.pmid).toBe('15637587');
   });
 
   it('handles rows with fewer fields than header', () => {
@@ -139,10 +143,12 @@ describe('parsePmcIdsCsv', () => {
     const result = parsePmcIdsCsv(shortRow);
 
     expect(result).toHaveLength(1);
-    expect(result[0].pmcid).toBe('PMC0000003');
-    expect(result[0].pmid).toBe('77777777');
-    expect(result[0].mid).toBeNull();
-    expect(result[0].releaseDate).toBe('');
+    const record = result[0]!;
+
+    expect(record.pmcid).toBe('PMC0000003');
+    expect(record.pmid).toBe('77777777');
+    expect(record.mid).toBeNull();
+    expect(record.releaseDate).toBe('');
   });
 
   it('trims whitespace from field values', () => {
@@ -153,7 +159,9 @@ describe('parsePmcIdsCsv', () => {
 
     const result = parsePmcIdsCsv(csvWithSpaces);
 
-    expect(result[0].pmcid).toBe('PMC0000004');
-    expect(result[0].pmid).toBe('66666666');
+    const record = result[0]!;
+
+    expect(record.pmcid).toBe('PMC0000004');
+    expect(record.pmid).toBe('66666666');
   });
 });
