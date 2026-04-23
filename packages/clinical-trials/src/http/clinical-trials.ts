@@ -229,6 +229,8 @@ function applySearchFilters(params: URLSearchParams, filter?: StudySearchFilter)
   }
 }
 
+// Mappers below are duplicated in ../bulk-parsers/parse-clinical-trial-json.ts
+// to keep bulk-parsers independent of the HTTP layer. Update both when changing.
 function mapStudyReport(raw: RawStudyResponse): StudyReport {
   const protocol = raw.protocolSection;
   const identification = protocol?.identificationModule;

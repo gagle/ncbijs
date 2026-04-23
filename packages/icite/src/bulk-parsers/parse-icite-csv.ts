@@ -141,7 +141,7 @@ function parseCsvLine(line: string): ReadonlyArray<string> {
 
     if (inQuotes) {
       if (char === '"') {
-        if (charIndex + 1 < line.length && line[charIndex + 1] === '"') {
+        if (charIndex + 1 < line.length && line.charAt(charIndex + 1) === '"') {
           current += '"';
           charIndex++;
         } else {

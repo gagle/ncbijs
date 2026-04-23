@@ -65,7 +65,7 @@ function extractKeyParts(key: string): KeyParts {
   let version = '';
 
   for (const segment of directorySegments) {
-    if (segment.startsWith('PMC')) {
+    if (/^PMC\d+$/.test(segment)) {
       pmcid = segment;
     }
 

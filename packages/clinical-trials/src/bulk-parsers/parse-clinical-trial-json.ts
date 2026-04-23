@@ -64,6 +64,9 @@ function parseNdjson(ndjson: string): ReadonlyArray<StudyReport> {
   return reports;
 }
 
+// Raw interfaces and mappers below are intentionally duplicated from
+// ../http/clinical-trials.ts to keep bulk-parsers independent of the HTTP layer.
+
 interface RawStudyResponse {
   readonly protocolSection?: RawProtocolSection;
 }
