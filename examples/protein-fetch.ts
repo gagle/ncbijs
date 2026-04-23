@@ -5,7 +5,7 @@ import { Protein } from '@ncbijs/protein';
 
 async function main(): Promise<void> {
   const protein = new Protein({
-    apiKey: process.env['NCBI_API_KEY'],
+    ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
   });
 
   console.log('Fetching p53 protein (NP_000537.3) as FASTA...\n');

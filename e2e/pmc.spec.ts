@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { PMC, pmcToChunks, pmcToMarkdown, pmcToPlainText } from '@ncbijs/pmc';
 import type { FullTextArticle } from '@ncbijs/pmc';
+import { ncbiApiKey } from './test-config';
 
 describe('PMC E2E', () => {
   const pmc = new PMC({
     tool: 'ncbijs-e2e',
     email: 'ncbijs-e2e@test.com',
-    apiKey: process.env['NCBI_API_KEY'],
+    apiKey: ncbiApiKey,
   });
 
   let article: FullTextArticle;

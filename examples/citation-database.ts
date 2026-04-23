@@ -3,7 +3,7 @@
 //
 // Packages: @ncbijs/pubmed, @ncbijs/cite, @ncbijs/id-converter
 
-import { citeMany } from '@ncbijs/cite';
+import { Cite } from '@ncbijs/cite';
 import type { CSLData } from '@ncbijs/cite';
 import { convert } from '@ncbijs/id-converter';
 import { PubMed } from '@ncbijs/pubmed';
@@ -11,7 +11,7 @@ import { PubMed } from '@ncbijs/pubmed';
 const NCBI_CONFIG = {
   tool: process.env['NCBI_TOOL'] ?? 'ncbijs-examples',
   email: process.env['NCBI_EMAIL'] ?? 'ncbijs@users.noreply.github.com',
-  apiKey: process.env['NCBI_API_KEY'],
+  ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
 };
 
 interface PublicationRecord {
@@ -27,6 +27,7 @@ interface PublicationRecord {
 
 async function main(): Promise<void> {
   const pubmed = new PubMed(NCBI_CONFIG);
+  const citeClient = new Cite();
 
   // 1. Search for recent systematic reviews
   console.log('1. Searching PubMed for systematic reviews on diabetes...\n');
@@ -45,7 +46,7 @@ async function main(): Promise<void> {
   console.log('2. Fetching CSL-JSON metadata for each article...\n');
 
   const cslEntries = new Map<string, CSLData>();
-  for await (const entry of citeMany(pmids, 'csl')) {
+  for await (const entry of citeClient.citeMany(pmids, 'csl')) {
     cslEntries.set(entry.id, entry.citation as CSLData);
   }
 
@@ -53,7 +54,7 @@ async function main(): Promise<void> {
   console.log('3. Fetching pre-rendered APA citations...\n');
 
   const apaCitations = new Map<string, string>();
-  for await (const entry of citeMany(pmids, 'citation')) {
+  for await (const entry of citeClient.citeMany(pmids, 'citation')) {
     const rendered = entry.citation as { apa: { format: string } };
     apaCitations.set(entry.id, rendered.apa.format);
   }

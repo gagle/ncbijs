@@ -1,14 +1,15 @@
 // Retrieve annotated PubMed and PMC articles from the BioC API.
 // Shows named entity recognition for diseases, chemicals, genes, and mutations.
 
-import { pmc, pubmed } from '@ncbijs/bioc';
+import { BioC } from '@ncbijs/bioc';
 
 async function main(): Promise<void> {
+  const bioc = new BioC();
   const pmid = '33533846';
 
   console.log(`Fetching BioC annotations for PMID ${pmid}...\n`);
 
-  const doc = await pubmed(pmid);
+  const doc = await bioc.pubmed(pmid);
   console.log(`  Document ID: ${doc.id}`);
   console.log(`  Passages: ${doc.passages.length}\n`);
 
@@ -30,12 +31,12 @@ async function main(): Promise<void> {
 
   console.log('\nFetching XML format...\n');
 
-  const xml = await pubmed(pmid, 'xml');
+  const xml = await bioc.pubmed(pmid, 'xml');
   console.log(`  XML length: ${xml.length} characters`);
 
   console.log('\nFetching PMC article (PMC7096724)...\n');
 
-  const pmcDoc = await pmc('PMC7096724');
+  const pmcDoc = await bioc.pmc('PMC7096724');
   console.log(`  Document ID: ${pmcDoc.id}`);
   console.log(`  Passages: ${pmcDoc.passages.length}`);
 }

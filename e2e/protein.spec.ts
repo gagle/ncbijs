@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { Protein } from '@ncbijs/protein';
+import { ncbiApiKey } from './test-config';
 
 const protein = new Protein({
-  apiKey: process.env['NCBI_API_KEY'],
+  apiKey: ncbiApiKey,
 });
 
 describe('Protein E2E', () => {

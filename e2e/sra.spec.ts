@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { Sra } from '@ncbijs/sra';
+import { ncbiApiKey } from './test-config';
 
 const sra = new Sra({
-  apiKey: process.env['NCBI_API_KEY'],
+  apiKey: ncbiApiKey,
 });
 
 describe('Sra E2E', () => {

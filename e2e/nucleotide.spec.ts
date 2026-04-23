@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { Nucleotide } from '@ncbijs/nucleotide';
+import { ncbiApiKey } from './test-config';
 
 const nucleotide = new Nucleotide({
-  apiKey: process.env['NCBI_API_KEY'],
+  apiKey: ncbiApiKey,
 });
 
 describe('Nucleotide E2E', () => {

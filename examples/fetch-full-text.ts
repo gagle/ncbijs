@@ -4,7 +4,7 @@ import { PMC, pmcToMarkdown } from '@ncbijs/pmc';
 
 async function main(): Promise<void> {
   const pmc = new PMC({
-    apiKey: process.env['NCBI_API_KEY'],
+    ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
     tool: process.env['NCBI_TOOL'] ?? 'ncbijs-example',
     email: process.env['NCBI_EMAIL'] ?? 'user@example.com',
   });

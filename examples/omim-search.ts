@@ -5,7 +5,7 @@ import { Omim } from '@ncbijs/omim';
 
 async function main(): Promise<void> {
   const omim = new Omim({
-    apiKey: process.env['NCBI_API_KEY'],
+    ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
   });
 
   console.log('Searching OMIM for "Marfan syndrome"...\n');

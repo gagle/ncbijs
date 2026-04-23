@@ -5,7 +5,7 @@ import { Sra } from '@ncbijs/sra';
 
 async function main(): Promise<void> {
   const sra = new Sra({
-    apiKey: process.env['NCBI_API_KEY'],
+    ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
   });
 
   console.log('Searching SRA for "Homo sapiens RNA-seq"...\n');

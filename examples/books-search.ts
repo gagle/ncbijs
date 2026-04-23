@@ -5,7 +5,7 @@ import { Books } from '@ncbijs/books';
 
 async function main(): Promise<void> {
   const books = new Books({
-    apiKey: process.env['NCBI_API_KEY'],
+    ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
   });
 
   console.log('Searching NCBI Books for "genetics"...\n');

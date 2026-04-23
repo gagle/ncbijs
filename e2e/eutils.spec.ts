@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { EUtils } from '@ncbijs/eutils';
+import { ncbiApiKey } from './test-config';
 
 describe('E-utilities E2E', () => {
   const eutils = new EUtils({
     tool: 'ncbijs-e2e',
     email: 'ncbijs-e2e@test.com',
-    apiKey: process.env['NCBI_API_KEY'],
+    apiKey: ncbiApiKey,
   });
 
   describe('ESearch + EFetch round-trip', () => {

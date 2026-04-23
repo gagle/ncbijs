@@ -5,7 +5,7 @@ import { Cdd } from '@ncbijs/cdd';
 
 async function main(): Promise<void> {
   const cdd = new Cdd({
-    apiKey: process.env['NCBI_API_KEY'],
+    ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
   });
 
   console.log('Searching CDD for "zinc finger"...\n');

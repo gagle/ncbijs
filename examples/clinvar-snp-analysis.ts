@@ -8,12 +8,14 @@ import { Snp } from '@ncbijs/snp';
 const NCBI_CONFIG = {
   tool: process.env['NCBI_TOOL'] ?? 'ncbijs-examples',
   email: process.env['NCBI_EMAIL'] ?? 'user@example.com',
-  apiKey: process.env['NCBI_API_KEY'],
+  ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
 };
 
 async function main(): Promise<void> {
   const clinvar = new ClinVar(NCBI_CONFIG);
-  const snp = new Snp({ apiKey: NCBI_CONFIG.apiKey });
+  const snp = new Snp({
+    ...('apiKey' in NCBI_CONFIG && { apiKey: NCBI_CONFIG.apiKey }),
+  });
 
   console.log('Searching ClinVar for APOE pathogenic variants...\n');
 

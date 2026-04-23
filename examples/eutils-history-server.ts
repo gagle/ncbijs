@@ -7,7 +7,7 @@ async function main(): Promise<void> {
   const eutils = new EUtils({
     tool: 'ncbijs-example',
     email: 'example@university.edu',
-    apiKey: process.env['NCBI_API_KEY'],
+    ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
   });
 
   console.log('searchAndFetch: streaming PubMed abstracts...\n');

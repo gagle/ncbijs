@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { PubMed } from '@ncbijs/pubmed';
+import { ncbiApiKey } from './test-config';
 
 describe('PubMed E2E', () => {
   const pubmed = new PubMed({
     tool: 'ncbijs-e2e',
     email: 'ncbijs-e2e@test.com',
-    apiKey: process.env['NCBI_API_KEY'],
+    apiKey: ncbiApiKey,
   });
 
   describe('search and fetch', () => {

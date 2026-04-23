@@ -5,7 +5,7 @@ import { MedGen } from '@ncbijs/medgen';
 
 async function main(): Promise<void> {
   const medgen = new MedGen({
-    apiKey: process.env['NCBI_API_KEY'],
+    ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
   });
 
   console.log('Searching MedGen for "Marfan syndrome"...\n');

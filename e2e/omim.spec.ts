@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { Omim } from '@ncbijs/omim';
+import { ncbiApiKey } from './test-config';
 
 const omim = new Omim({
-  apiKey: process.env['NCBI_API_KEY'],
+  apiKey: ncbiApiKey,
 });
 
 describe('Omim E2E', () => {

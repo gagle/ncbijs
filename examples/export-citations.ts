@@ -1,15 +1,16 @@
 // Fetch citations for PubMed articles in multiple formats: CSL-JSON for structured
 // metadata and pre-rendered APA/MLA/AMA/NLM styles.
 
-import { cite } from '@ncbijs/cite';
+import { Cite } from '@ncbijs/cite';
 import type { CitationData, CSLData } from '@ncbijs/cite';
 
 async function main(): Promise<void> {
+  const citeClient = new Cite();
   const pmids = ['23193287', '29083299'];
 
   for (const pmid of pmids) {
-    const csl: CSLData = await cite(pmid, 'csl');
-    const rendered: CitationData = await cite(pmid, 'citation');
+    const csl: CSLData = await citeClient.cite(pmid, 'csl');
+    const rendered: CitationData = await citeClient.cite(pmid, 'citation');
 
     console.log(`--- PMID ${pmid} ---\n`);
 

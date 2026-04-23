@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { ClinVar } from '@ncbijs/clinvar';
+import { ncbiApiKey } from './test-config';
 
 const clinvar = new ClinVar({
-  apiKey: process.env['NCBI_API_KEY'],
+  apiKey: ncbiApiKey,
 });
 
 describe('ClinVar E2E', () => {

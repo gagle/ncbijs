@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { MedGen } from '@ncbijs/medgen';
+import { ncbiApiKey } from './test-config';
 
 const medgen = new MedGen({
-  apiKey: process.env['NCBI_API_KEY'],
+  apiKey: ncbiApiKey,
 });
 
 describe('MedGen E2E', () => {

@@ -5,7 +5,7 @@ import { DbVar } from '@ncbijs/dbvar';
 
 async function main(): Promise<void> {
   const dbvar = new DbVar({
-    apiKey: process.env['NCBI_API_KEY'],
+    ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
   });
 
   console.log('Searching dbVar for "BRCA1 deletion"...\n');

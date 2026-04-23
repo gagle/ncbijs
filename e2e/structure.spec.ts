@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { Structure } from '@ncbijs/structure';
+import { ncbiApiKey } from './test-config';
 
 const structure = new Structure({
-  apiKey: process.env['NCBI_API_KEY'],
+  apiKey: ncbiApiKey,
 });
 
 describe('Structure E2E', () => {

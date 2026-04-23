@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { Cdd } from '@ncbijs/cdd';
+import { ncbiApiKey } from './test-config';
 
 const cdd = new Cdd({
-  apiKey: process.env['NCBI_API_KEY'],
+  apiKey: ncbiApiKey,
 });
 
 describe('Cdd E2E', () => {

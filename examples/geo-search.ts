@@ -5,7 +5,7 @@ import { Geo } from '@ncbijs/geo';
 
 async function main(): Promise<void> {
   const geo = new Geo({
-    apiKey: process.env['NCBI_API_KEY'],
+    ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
   });
 
   console.log('Searching GEO for "breast cancer RNA-seq"...\n');

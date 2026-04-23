@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { Datasets } from '@ncbijs/datasets';
+import { ncbiApiKey } from './test-config';
 
 const datasets = new Datasets({
-  apiKey: process.env['NCBI_API_KEY'],
+  apiKey: ncbiApiKey,
 });
 
 describe('NCBI Datasets API v2 E2E', () => {

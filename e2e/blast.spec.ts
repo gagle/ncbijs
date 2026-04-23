@@ -8,7 +8,7 @@ describe('BLAST E2E', () => {
     let result;
     try {
       result = await blast.search('>test\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGC', 'blastn', 'nt', {
-        hitlistSize: 5,
+        hitListSize: 5,
         pollIntervalMs: 15000,
         maxPollAttempts: 40,
       });

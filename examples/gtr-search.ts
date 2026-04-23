@@ -5,7 +5,7 @@ import { Gtr } from '@ncbijs/gtr';
 
 async function main(): Promise<void> {
   const gtr = new Gtr({
-    apiKey: process.env['NCBI_API_KEY'],
+    ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
   });
 
   console.log('Searching GTR for BRCA1 genetic tests...\n');

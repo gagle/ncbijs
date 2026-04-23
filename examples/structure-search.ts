@@ -5,7 +5,7 @@ import { Structure } from '@ncbijs/structure';
 
 async function main(): Promise<void> {
   const structure = new Structure({
-    apiKey: process.env['NCBI_API_KEY'],
+    ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
   });
 
   console.log('Searching Structure for "p53"...\n');

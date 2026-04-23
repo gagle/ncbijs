@@ -29,7 +29,8 @@ describe('MCP Server E2E', () => {
   });
 
   function textContent(result: Awaited<ReturnType<typeof client.callTool>>): string {
-    const first = result.content[0];
+    const { content } = result as { content: Array<{ type: string; text: string }> };
+    const first = content[0];
     if (first === undefined || first.type !== 'text') {
       throw new Error('Expected text content');
     }

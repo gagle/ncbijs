@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { DbVar } from '@ncbijs/dbvar';
+import { ncbiApiKey } from './test-config';
 
 const dbvar = new DbVar({
-  apiKey: process.env['NCBI_API_KEY'],
+  apiKey: ncbiApiKey,
 });
 
 describe('DbVar E2E', () => {

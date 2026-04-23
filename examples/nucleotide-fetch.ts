@@ -5,7 +5,7 @@ import { Nucleotide } from '@ncbijs/nucleotide';
 
 async function main(): Promise<void> {
   const nucleotide = new Nucleotide({
-    apiKey: process.env['NCBI_API_KEY'],
+    ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
   });
 
   console.log('Fetching BRCA1 mRNA (NM_007294.4) as FASTA...\n');

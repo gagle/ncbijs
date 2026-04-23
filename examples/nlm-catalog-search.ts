@@ -5,7 +5,7 @@ import { NlmCatalog } from '@ncbijs/nlm-catalog';
 
 async function main(): Promise<void> {
   const nlmCatalog = new NlmCatalog({
-    apiKey: process.env['NCBI_API_KEY'],
+    ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
   });
 
   console.log('Searching NLM Catalog for "genetics journal"...\n');

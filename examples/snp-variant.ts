@@ -4,7 +4,7 @@
 import { Snp } from '@ncbijs/snp';
 
 const SNP_CONFIG = {
-  apiKey: process.env['NCBI_API_KEY'],
+  ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
 };
 
 async function main(): Promise<void> {

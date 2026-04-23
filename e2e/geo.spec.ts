@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { Geo } from '@ncbijs/geo';
+import { ncbiApiKey } from './test-config';
 
 const geo = new Geo({
-  apiKey: process.env['NCBI_API_KEY'],
+  apiKey: ncbiApiKey,
 });
 
 describe('Geo E2E', () => {

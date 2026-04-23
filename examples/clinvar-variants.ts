@@ -6,7 +6,7 @@ import { ClinVar } from '@ncbijs/clinvar';
 const NCBI_CONFIG = {
   tool: process.env['NCBI_TOOL'] ?? 'ncbijs-examples',
   email: process.env['NCBI_EMAIL'] ?? 'user@example.com',
-  apiKey: process.env['NCBI_API_KEY'],
+  ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
 };
 
 async function main(): Promise<void> {

@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { Books } from '@ncbijs/books';
+import { ncbiApiKey } from './test-config';
 
 const books = new Books({
-  apiKey: process.env['NCBI_API_KEY'],
+  apiKey: ncbiApiKey,
 });
 
 describe('Books E2E', () => {

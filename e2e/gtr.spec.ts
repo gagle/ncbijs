@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { Gtr } from '@ncbijs/gtr';
+import { ncbiApiKey } from './test-config';
 
 const gtr = new Gtr({
-  apiKey: process.env['NCBI_API_KEY'],
+  apiKey: ncbiApiKey,
 });
 
 describe('Gtr E2E', () => {

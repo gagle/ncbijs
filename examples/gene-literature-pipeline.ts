@@ -2,7 +2,7 @@
 // for related literature, and fetch formatted citations. Combines @ncbijs/datasets
 // + @ncbijs/pubmed + @ncbijs/cite.
 
-import { cite } from '@ncbijs/cite';
+import { Cite } from '@ncbijs/cite';
 import type { CSLData } from '@ncbijs/cite';
 import { Datasets } from '@ncbijs/datasets';
 import { PubMed } from '@ncbijs/pubmed';
@@ -10,12 +10,15 @@ import { PubMed } from '@ncbijs/pubmed';
 const NCBI_CONFIG = {
   tool: process.env['NCBI_TOOL'] ?? 'ncbijs-examples',
   email: process.env['NCBI_EMAIL'] ?? 'user@example.com',
-  apiKey: process.env['NCBI_API_KEY'],
+  ...(process.env['NCBI_API_KEY'] !== undefined && { apiKey: process.env['NCBI_API_KEY'] }),
 };
 
 async function main(): Promise<void> {
-  const datasets = new Datasets({ apiKey: NCBI_CONFIG.apiKey });
+  const datasets = new Datasets({
+    ...('apiKey' in NCBI_CONFIG && { apiKey: NCBI_CONFIG.apiKey }),
+  });
   const pubmed = new PubMed(NCBI_CONFIG);
+  const citeClient = new Cite();
 
   console.log('Step 1: Looking up BRCA1 gene metadata...\n');
 
@@ -50,7 +53,7 @@ async function main(): Promise<void> {
   console.log('\nStep 3: Fetching citations for top articles...\n');
 
   for (const article of articles.slice(0, 3)) {
-    const csl: CSLData = await cite(article.pmid, 'csl');
+    const csl: CSLData = await citeClient.cite(article.pmid, 'csl');
     console.log(`  PMID ${article.pmid}:`);
     console.log(`    ${csl.author.map((author) => author.family).join(', ')}`);
     console.log(`    "${csl.title}"`);

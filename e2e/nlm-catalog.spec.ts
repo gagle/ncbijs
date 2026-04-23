@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { NlmCatalog } from '@ncbijs/nlm-catalog';
+import { ncbiApiKey } from './test-config';
 
 const nlmCatalog = new NlmCatalog({
-  apiKey: process.env['NCBI_API_KEY'],
+  apiKey: ncbiApiKey,
 });
 
 describe('NlmCatalog E2E', () => {
