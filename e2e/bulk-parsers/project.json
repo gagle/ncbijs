@@ -9,8 +9,10 @@
         "@ncbijs/clinvar:build",
         "@ncbijs/datasets:build",
         "@ncbijs/icite:build",
+        "@ncbijs/id-converter:build",
         "@ncbijs/litvar:build",
         "@ncbijs/medgen:build",
+        "@ncbijs/mesh:build",
         "@ncbijs/pmc:build",
         "@ncbijs/pubchem:build",
         "@ncbijs/snp:build"

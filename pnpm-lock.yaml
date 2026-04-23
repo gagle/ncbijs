@@ -188,12 +188,18 @@ importers:
       '@ncbijs/icite':
         specifier: workspace:*
         version: link:../../packages/icite
+      '@ncbijs/id-converter':
+        specifier: workspace:*
+        version: link:../../packages/id-converter
       '@ncbijs/litvar':
         specifier: workspace:*
         version: link:../../packages/litvar
       '@ncbijs/medgen':
         specifier: workspace:*
         version: link:../../packages/medgen
+      '@ncbijs/mesh':
+        specifier: workspace:*
+        version: link:../../packages/mesh
       '@ncbijs/pmc':
         specifier: workspace:*
         version: link:../../packages/pmc

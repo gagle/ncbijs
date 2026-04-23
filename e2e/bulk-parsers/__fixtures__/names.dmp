@@ -1,0 +1,24 @@
+1	|	all	|		|	synonym	|
+1	|	root	|		|	scientific name	|
+2	|	Bacteria	|	Bacteria <bacteria>	|	scientific name	|
+2	|	eubacteria	|		|	genbank common name	|
+2	|	Monera	|	Monera <Bacteria>	|	in-part	|
+6	|	Azorhizobium	|		|	scientific name	|
+7	|	Azorhizobium caulinodans	|		|	scientific name	|
+9	|	Buchnera aphidicola	|		|	scientific name	|
+9606	|	Homo sapiens	|		|	scientific name	|
+9606	|	human	|		|	genbank common name	|
+9606	|	man	|		|	common name	|
+10090	|	Mus musculus	|		|	scientific name	|
+10090	|	house mouse	|		|	genbank common name	|
+10090	|	mouse	|		|	common name	|
+7227	|	Drosophila melanogaster	|		|	scientific name	|
+7227	|	fruit fly	|		|	genbank common name	|
+562	|	Escherichia coli	|		|	scientific name	|
+562	|	E. coli	|		|	common name	|
+7711	|	Chordata	|		|	scientific name	|
+40674	|	Mammalia	|		|	scientific name	|
+9443	|	Primates	|		|	scientific name	|
+9526	|	Catarrhini	|		|	scientific name	|
+9604	|	Hominidae	|		|	scientific name	|
+9605	|	Homo	|		|	scientific name	|
