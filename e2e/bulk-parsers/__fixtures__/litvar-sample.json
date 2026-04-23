@@ -1,0 +1,62 @@
+[
+  {
+    "rsid": "rs7412",
+    "hgvs": ["NC_000019.10:g.44908822C>T", "NM_000041.4:c.526C>T", "NP_000032.1:p.Arg176Cys"],
+    "gene": "APOE",
+    "publication_count": 3847
+  },
+  {
+    "rsid": "rs429358",
+    "hgvs": ["NC_000019.10:g.44908684T>C", "NM_000041.4:c.388T>C", "NP_000032.1:p.Cys130Arg"],
+    "gene": "APOE",
+    "publication_count": 5123
+  },
+  {
+    "rsid": "rs1800497",
+    "hgvs": ["NC_000011.10:g.113400106G>A", "NM_000795.4:c.2137G>A", "NP_000786.3:p.Glu713Lys"],
+    "gene": "ANKK1",
+    "publication_count": 1256
+  },
+  {
+    "rsid": "rs334",
+    "hgvs": ["NC_000011.10:g.5227002T>A", "NM_000518.5:c.20A>T", "NP_000509.1:p.Glu7Val"],
+    "gene": "HBB",
+    "publication_count": 2891
+  },
+  {
+    "rsid": "rs1801133",
+    "hgvs": ["NC_000001.11:g.11796321G>A", "NM_005957.5:c.665C>T", "NP_005948.3:p.Ala222Val"],
+    "gene": "MTHFR",
+    "publication_count": 4521
+  },
+  {
+    "rsid": "rs1799945",
+    "hgvs": ["NC_000006.12:g.26090951C>G", "NM_000410.4:c.187C>G", "NP_000401.1:p.His63Asp"],
+    "gene": "HFE",
+    "publication_count": 987
+  },
+  {
+    "rsid": "rs1800562",
+    "hgvs": ["NC_000006.12:g.26092913G>A", "NM_000410.4:c.845G>A", "NP_000401.1:p.Cys282Tyr"],
+    "gene": "HFE",
+    "publication_count": 2134
+  },
+  {
+    "rsid": "rs5082",
+    "hgvs": ["NC_000011.10:g.116835002T>C"],
+    "gene": "APOA1",
+    "publication_count": 342
+  },
+  {
+    "rsid": "rs1042713",
+    "hgvs": ["NC_000005.10:g.148826877G>A", "NM_000024.6:c.46A>G", "NP_000015.3:p.Arg16Gly"],
+    "gene": "ADRB2",
+    "publication_count": 1567
+  },
+  {
+    "rsid": "rs12255372",
+    "hgvs": ["NC_000010.11:g.112998590G>T"],
+    "gene": "TCF7L2",
+    "publication_count": 876
+  }
+]

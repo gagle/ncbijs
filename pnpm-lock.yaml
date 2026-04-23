@@ -171,6 +171,39 @@ importers:
         specifier: workspace:*
         version: link:../packages/xml
 
+  e2e/bulk-parsers:
+    dependencies:
+      '@ncbijs/cdd':
+        specifier: workspace:*
+        version: link:../../packages/cdd
+      '@ncbijs/clinical-trials':
+        specifier: workspace:*
+        version: link:../../packages/clinical-trials
+      '@ncbijs/clinvar':
+        specifier: workspace:*
+        version: link:../../packages/clinvar
+      '@ncbijs/datasets':
+        specifier: workspace:*
+        version: link:../../packages/datasets
+      '@ncbijs/icite':
+        specifier: workspace:*
+        version: link:../../packages/icite
+      '@ncbijs/litvar':
+        specifier: workspace:*
+        version: link:../../packages/litvar
+      '@ncbijs/medgen':
+        specifier: workspace:*
+        version: link:../../packages/medgen
+      '@ncbijs/pmc':
+        specifier: workspace:*
+        version: link:../../packages/pmc
+      '@ncbijs/pubchem':
+        specifier: workspace:*
+        version: link:../../packages/pubchem
+      '@ncbijs/snp':
+        specifier: workspace:*
+        version: link:../../packages/snp
+
   examples:
     dependencies:
       '@ncbijs/blast':

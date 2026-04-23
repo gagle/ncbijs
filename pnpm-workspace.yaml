@@ -1,4 +1,5 @@
 packages:
   - packages/*
   - e2e
+  - e2e/bulk-parsers
   - examples
