@@ -119,6 +119,36 @@ console.log(freq.populations[0].population); // 'European'
 console.log(freq.populations[0].frequency); // 0.234
 ```
 
+## Bulk parsers
+
+### `parseVariantSummaryTsv(tsv)`
+
+Parses a ClinVar `variant_summary.txt` TSV file into an array of `VariantReport` records.
+
+```ts
+import { parseVariantSummaryTsv } from '@ncbijs/clinvar';
+import fs from 'node:fs';
+
+const variants = parseVariantSummaryTsv(fs.readFileSync('variant_summary.txt', 'utf-8'));
+console.log(variants[0].clinicalSignificance); // 'Pathogenic'
+```
+
+### `parseClinVarVcf(vcf)`
+
+Parses a ClinVar VCF file (`clinvar.vcf.gz`) into an array of `ClinVarVcfVariant` records.
+
+```ts
+import { parseClinVarVcf } from '@ncbijs/clinvar';
+import fs from 'node:fs';
+
+const variants = parseClinVarVcf(fs.readFileSync('clinvar.vcf', 'utf-8'));
+console.log(variants[0].chrom); // '1'
+console.log(variants[0].clinicalSignificance); // 'Pathogenic'
+console.log(variants[0].geneInfo); // 'BRCA1:672'
+```
+
+Returns `ReadonlyArray<ClinVarVcfVariant>` with fields: `chrom`, `pos`, `id`, `ref`, `alt`, `qual`, `filter`, `clinicalSignificance`, `diseaseNames`, `geneInfo`, `rsId`, `variantClass`.
+
 ## Error handling
 
 ```ts
@@ -249,5 +279,24 @@ interface PopulationFrequency {
   alleleCount: number;
   totalCount: number;
   frequency: number;
+}
+```
+
+### `ClinVarVcfVariant`
+
+```ts
+interface ClinVarVcfVariant {
+  chrom: string;
+  pos: number;
+  id: string;
+  ref: string;
+  alt: string;
+  qual: string;
+  filter: string;
+  clinicalSignificance: string;
+  diseaseNames: string;
+  geneInfo: string;
+  rsId: string;
+  variantClass: string;
 }
 ```

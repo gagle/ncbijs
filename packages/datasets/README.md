@@ -118,6 +118,100 @@ try {
 
 The client automatically retries on HTTP 429, 500, 502, 503 and network errors with exponential backoff + jitter.
 
+## Bulk parsers
+
+Parse large NCBI gene annotation flat files without making HTTP requests.
+
+### `parseGeneInfoTsv(tsv)`
+
+Parses `gene_info.gz` into an array of gene records.
+
+```ts
+import { parseGeneInfoTsv } from '@ncbijs/datasets';
+import { readFileSync } from 'fs';
+
+const tsv = readFileSync('gene_info.gz.decompressed', 'utf8');
+const genes = parseGeneInfoTsv(tsv);
+console.log(genes[0].symbol); // 'A1BG'
+console.log(genes[0].geneId); // 1
+```
+
+### `parseTaxonomyDump(tsv)`
+
+Parses `names.dmp` + `nodes.dmp` from the NCBI taxonomy dump.
+
+```ts
+import { parseTaxonomyDump } from '@ncbijs/datasets';
+import { readFileSync } from 'fs';
+
+const names = readFileSync('names.dmp', 'utf8');
+const nodes = readFileSync('nodes.dmp', 'utf8');
+const taxonomy = parseTaxonomyDump(names, nodes);
+console.log(taxonomy[0].scientificName); // 'root'
+```
+
+### `parseGene2PubmedTsv(tsv)`
+
+Parses `gene2pubmed.gz` into gene-to-PubMed links.
+
+```ts
+import { parseGene2PubmedTsv } from '@ncbijs/datasets';
+import { readFileSync } from 'fs';
+
+const tsv = readFileSync('gene2pubmed.gz.decompressed', 'utf8');
+const links = parseGene2PubmedTsv(tsv);
+console.log(links[0].taxId); // 9606
+console.log(links[0].geneId); // 672
+console.log(links[0].pmid); // 7566098
+```
+
+### `parseGene2GoTsv(tsv)`
+
+Parses `gene2go.gz` into Gene Ontology annotations.
+
+```ts
+import { parseGene2GoTsv } from '@ncbijs/datasets';
+import { readFileSync } from 'fs';
+
+const tsv = readFileSync('gene2go.gz.decompressed', 'utf8');
+const annotations = parseGene2GoTsv(tsv);
+console.log(annotations[0].geneId); // 672
+console.log(annotations[0].goId); // 'GO:0003674'
+console.log(annotations[0].evidence); // 'ND'
+console.log(annotations[0].category); // 'Function'
+```
+
+### `parseGeneOrthologsTsv(tsv)`
+
+Parses `gene_orthologs.gz` into ortholog relationships between genes across taxa.
+
+```ts
+import { parseGeneOrthologsTsv } from '@ncbijs/datasets';
+import { readFileSync } from 'fs';
+
+const tsv = readFileSync('gene_orthologs.gz.decompressed', 'utf8');
+const orthologs = parseGeneOrthologsTsv(tsv);
+console.log(orthologs[0].geneId); // 672
+console.log(orthologs[0].relationship); // 'Ortholog'
+console.log(orthologs[0].otherTaxId); // 10090
+console.log(orthologs[0].otherGeneId); // 12189
+```
+
+### `parseGeneHistoryTsv(tsv)`
+
+Parses `gene_history.gz` into a record of discontinued or merged gene IDs.
+
+```ts
+import { parseGeneHistoryTsv } from '@ncbijs/datasets';
+import { readFileSync } from 'fs';
+
+const tsv = readFileSync('gene_history.gz.decompressed', 'utf8');
+const history = parseGeneHistoryTsv(tsv);
+console.log(history[0].discontinuedGeneId); // 11
+console.log(history[0].discontinuedSymbol); // 'NAIP'
+console.log(history[0].discontinueDate); // '20040515'
+```
+
 ## Response types
 
 ### `GeneReport`
@@ -266,5 +360,54 @@ interface DatasetInfo {
   name: string;
   description: string;
   version: string;
+}
+```
+
+### `Gene2PubmedLink`
+
+```ts
+interface Gene2PubmedLink {
+  taxId: number;
+  geneId: number;
+  pmid: number;
+}
+```
+
+### `Gene2GoAnnotation`
+
+```ts
+interface Gene2GoAnnotation {
+  taxId: number;
+  geneId: number;
+  goId: string;
+  goTerm: string;
+  evidence: string;
+  qualifier: string;
+  category: string;
+  pmids: ReadonlyArray<number>;
+}
+```
+
+### `GeneOrtholog`
+
+```ts
+interface GeneOrtholog {
+  taxId: number;
+  geneId: number;
+  relationship: string;
+  otherTaxId: number;
+  otherGeneId: number;
+}
+```
+
+### `GeneHistoryEntry`
+
+```ts
+interface GeneHistoryEntry {
+  taxId: number;
+  geneId: number;
+  discontinuedGeneId: number;
+  discontinuedSymbol: string;
+  discontinueDate: string;
 }
 ```

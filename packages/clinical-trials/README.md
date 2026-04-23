@@ -99,6 +99,17 @@ Fetch valid enum values for a specific study field.
 
 Get total count of studies matching a query without fetching results.
 
+## Bulk parsing
+
+Parse a ClinicalTrials.gov AllAPIJSON bulk download without making any HTTP requests.
+
+```ts
+import { parseClinicalTrialJson } from '@ncbijs/clinical-trials';
+const studies = parseClinicalTrialJson(fs.readFileSync('studies.json', 'utf-8'));
+```
+
+Accepts both a JSON array (`[{...}, {...}]`) and newline-delimited JSON (one study object per line). Returns `ReadonlyArray<StudyReport>` using the same type as the HTTP client.
+
 ## Error handling
 
 ```ts

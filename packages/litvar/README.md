@@ -40,6 +40,17 @@ Search LitVar for variants matching a text query (gene name, rsID prefix, HGVS n
 
 Get detailed annotations for a variant, including disease associations, related genes, and supporting PMIDs.
 
+## Bulk parsing
+
+#### `parseLitVarJson(json: string): ReadonlyArray<LitVarVariant>`
+
+Parses a LitVar2 bulk variant file. Accepts either a JSON array or NDJSON format (e.g. `litvar2_variants.json.gz` after decompression).
+
+```ts
+import { parseLitVarJson } from '@ncbijs/litvar';
+const variants = parseLitVarJson(fs.readFileSync('litvar2_variants.json', 'utf-8'));
+```
+
 ## Error handling
 
 ```ts

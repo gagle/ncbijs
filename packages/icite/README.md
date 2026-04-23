@@ -45,6 +45,23 @@ Fetch full citation metrics for all publications that cite a given article. Retr
 
 Fetch full citation metrics for all publications referenced by a given article. Retrieves the source article first, then batch-fetches metrics for every referenced PMID.
 
+## Bulk CSV parsing
+
+Parse iCite Figshare monthly CSV snapshots without making any API calls:
+
+```ts
+import { parseIciteCsv } from '@ncbijs/icite';
+import * as fs from 'node:fs';
+
+const publications = parseIciteCsv(fs.readFileSync('icite.csv', 'utf-8'));
+```
+
+### `parseIciteCsv(csv)`
+
+Parses an iCite Figshare monthly CSV snapshot and returns `ReadonlyArray<ICitePublication>`.
+
+Download snapshots from [figshare.com/articles/dataset/iCite_Database_Snapshots](https://figshare.com/articles/dataset/iCite_Database_Snapshots_NIH_Open_Citation_Collection_/4586573).
+
 ## Error handling
 
 ```ts

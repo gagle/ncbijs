@@ -83,6 +83,17 @@ const vcf = await snp.spdiToVcfFields('NC_000001.11:1014042:C:T');
 console.log(`${vcf.chrom}:${vcf.pos} ${vcf.ref}>${vcf.alt}`);
 ```
 
+## Bulk parsers
+
+### `parseDbSnpVcf(vcf: string): ReadonlyArray<DbSnpVcfVariant>`
+
+Parses a dbSNP VCF file from the NCBI FTP release (`/snp/latest_release/VCF/`). Each non-header, non-empty line is decoded into a `DbSnpVcfVariant` record.
+
+```ts
+import { parseDbSnpVcf } from '@ncbijs/snp';
+const variants = parseDbSnpVcf(fs.readFileSync('dbsnp.vcf', 'utf-8'));
+```
+
 ## Error handling
 
 ```ts
@@ -192,5 +203,22 @@ interface VcfFields {
   pos: number;
   ref: string;
   alt: string;
+}
+```
+
+### `DbSnpVcfVariant`
+
+```ts
+interface DbSnpVcfVariant {
+  chrom: string;
+  pos: number;
+  rsId: string;
+  ref: string;
+  alt: ReadonlyArray<string>;
+  qual: string;
+  filter: string;
+  geneInfo: string;
+  variantClass: string;
+  dbSnpBuildId: string;
 }
 ```

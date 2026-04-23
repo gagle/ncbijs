@@ -191,6 +191,19 @@ for (const chunk of chunks) {
 
 Returns `ReadonlyArray<Chunk>`.
 
+## Bulk parsers
+
+### `parsePmcS3Inventory(csv)`
+
+Parses a PMC Open Access S3 inventory CSV file from `s3://pmc-oa-opendata/inventory-reports/` into structured records. PMC IDs, versions, and formats are extracted from the S3 key path.
+
+```typescript
+import { parsePmcS3Inventory } from '@ncbijs/pmc';
+const records = parsePmcS3Inventory(fs.readFileSync('inventory.csv', 'utf-8'));
+```
+
+Returns `ReadonlyArray<PmcS3Record>`.
+
 ## Types
 
 All types are exported for use in your own interfaces:
@@ -206,6 +219,7 @@ import type {
   ChunkOptions,
   OAListOptions,
   OAIListOptions,
+  PmcS3Record,
 } from '@ncbijs/pmc';
 ```
 
@@ -251,5 +265,21 @@ interface OAIRecord {
   readonly datestamp: string;
   readonly setSpec: string;
   readonly metadata: string;
+}
+```
+
+### `PmcS3Record`
+
+```typescript
+interface PmcS3Record {
+  readonly bucket: string;
+  readonly key: string;
+  readonly sizeBytes: number;
+  readonly lastModified: string;
+  readonly eTag: string;
+  readonly storageClass: string;
+  readonly pmcid: string;
+  readonly version: string;
+  readonly format: string;
 }
 ```

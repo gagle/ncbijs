@@ -60,6 +60,20 @@ Fetch domain details by UIDs. Entries with errors are automatically skipped.
 
 Search and fetch in one call. Combines `search` + `fetch`. Returns empty array if no results.
 
+## Bulk parser
+
+### `parseCddDomains(tsv: string): ReadonlyArray<ConservedDomain>`
+
+Parses CDD tab-separated domain list files from the NCBI FTP site (`/pub/mmdb/cdd/`, e.g. `cddid.tbl`). Each row yields a `ConservedDomain` with accession, short name, description, PSSM length, and source database.
+
+```ts
+import { parseCddDomains } from '@ncbijs/cdd';
+const domains = parseCddDomains(fs.readFileSync('cddid.tbl', 'utf-8'));
+console.log(domains[0].accession); // 'cd00001'
+console.log(domains[0].shortName); // 'CBS'
+console.log(domains[0].database); // 'CDD'
+```
+
 ## Error handling
 
 ```ts
@@ -77,6 +91,18 @@ try {
 The client automatically retries on HTTP 429, 500, 502, 503 and network errors with exponential backoff + jitter.
 
 ## Response types
+
+### `ConservedDomain`
+
+```ts
+interface ConservedDomain {
+  accession: string;
+  shortName: string;
+  description: string;
+  pssmLength: number;
+  database: string;
+}
+```
 
 ### `CddSearchResult`
 

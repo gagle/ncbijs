@@ -23,7 +23,7 @@ pnpm nx run ncbijs-e2e:e2e
 - **Monorepo**: Nx 22 + pnpm 10.15 workspaces
 - **Language**: TypeScript 6, ES2022 target, `strict: true`
 - **Module**: ESM-only (`"type": "module"`), `moduleResolution: "bundler"`, no `.js` in source imports
-- **Build**: `tsc` + post-build script (`scripts/add-import-extensions.mjs`) adds `.js` to compiled output
+- **Build**: `tsc` + `add-import-extensions` CLI (devDep, linked from `../add-import-extensions`) adds `.js` to compiled output
 - **Zero-dep philosophy**: Most packages have zero runtime dependencies. `eutils` depends on `rate-limiter` + `openapi-fetch`. `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `clinical-trials`, `icite`, `rxnorm`, `litvar`, `bioc`, `cite`, `mesh`, `id-converter`, `pubtator`, `clinical-tables` depend on `rate-limiter`. `pubmed` and `pmc` depend only on internal `@ncbijs/*` packages.
 - **`rate-limiter` is project-agnostic**: This package must contain zero NCBI-specific code, zero business logic, and zero coupling to any other `@ncbijs/*` package. It is designed to be extractable into a standalone published library with no changes. Never add domain-specific constants, NCBI URLs, credential helpers, or API-specific retry logic to it. All NCBI-specific infrastructure belongs in the consuming packages (e.g., `*-client.ts` files).
 
@@ -132,7 +132,7 @@ Common to both layouts: `package.json`, `project.json`, `tsconfig.json`, `tsconf
 
 - Prettier: 100 width, single quotes, trailing commas, 2-space indent, LF
 - Commit: `{type}({scope}): {subject}` (conventional commits via commitlint)
-- Scopes: `eutils`, `pubmed-xml`, `pubmed`, `jats`, `pmc`, `id-converter`, `pubtator`, `mesh`, `cite`, `http-mcp`, `store`, `store-mcp`, `rate-limiter`, `xml`, `fasta`, `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `clinical-trials`, `icite`, `rxnorm`, `litvar`, `bioc`, `clinical-tables`, `workspace`
+- Scopes: `eutils`, `pubmed-xml`, `pubmed`, `jats`, `pmc`, `id-converter`, `pubtator`, `mesh`, `cite`, `http-mcp`, `store`, `store-mcp`, `rate-limiter`, `xml`, `fasta`, `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `genbank`, `protein`, `nucleotide`, `omim`, `medgen`, `gtr`, `geo`, `dbvar`, `sra`, `structure`, `cdd`, `books`, `nlm-catalog`, `clinical-trials`, `icite`, `rxnorm`, `litvar`, `bioc`, `clinical-tables`, `workspace`
 
 ### Adding a new package
 

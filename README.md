@@ -225,6 +225,7 @@ I want to...
 | Zero dependencies | `cite`, `id-converter`, `mesh`, `fasta`, `genbank`, `litvar`, `bioc`, `clinical-tables`                                                                                                                         |
 | Async iterators   | `eutils` (efetchBatches, searchAndFetch, searchAndSummarize), `pubmed` (batch), `clinical-trials` (searchStudies), `cite` (citeMany)                                                                            |
 | XML parsing       | `eutils`, `pubmed-xml`, `jats`, `pubtator`, `xml`                                                                                                                                                               |
+| Bulk parsers      | `mesh`, `cite`, `id-converter`, `clinvar`, `datasets`, `pubchem`, `snp`, `icite`, `clinical-trials`, `litvar`, `medgen`, `cdd`, `pmc`                                                                           |
 
 ## Architecture
 

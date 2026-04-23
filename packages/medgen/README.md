@@ -61,6 +61,24 @@ Fetch concept details by UIDs. Entries with errors are automatically skipped.
 
 Search and fetch in one call. Combines `search` + `fetch`. Returns empty array if no results.
 
+## Bulk parsing (RRF files)
+
+### `parseMedGenRrf(files): ReadonlyArray<MedGenConcept>`
+
+Parses MedGen RRF bulk data files downloaded from the [NCBI FTP server](https://ftp.ncbi.nlm.nih.gov/pub/medgen/). `MGCONSO.RRF` is required; `MGDEF.RRF` and `MGSTY.RRF` are optional.
+
+```ts
+import { parseMedGenRrf } from '@ncbijs/medgen';
+
+const concepts = parseMedGenRrf({
+  mgconso: fs.readFileSync('MGCONSO.RRF', 'utf-8'),
+  mgdef: fs.readFileSync('MGDEF.RRF', 'utf-8'),
+  mgsty: fs.readFileSync('MGSTY.RRF', 'utf-8'),
+});
+```
+
+Returns the same `MedGenConcept` shape as the HTTP `fetch()` method.
+
 ## Error handling
 
 ```ts
@@ -152,5 +170,15 @@ interface MedGenName {
   name: string;
   source: string;
   type: string;
+}
+```
+
+### `MedGenRrfInput`
+
+```ts
+interface MedGenRrfInput {
+  mgconso: string;
+  mgdef?: string;
+  mgsty?: string;
 }
 ```

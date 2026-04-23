@@ -194,6 +194,17 @@ const ghs = await pubchem.compoundAnnotations(2244, 'GHS Classification');
 console.log(ghs.sections[0].tocHeading);
 ```
 
+## Bulk parsers
+
+### `parsePubchemLiteratureTsv(tsv: string): ReadonlyArray<CompoundLiteratureLink>`
+
+Parses a PubChem compound-to-literature link TSV file from the NCBI FTP release (`/pubchem/Compound/Extras/CID-PMID.gz`). Each non-comment, non-empty line is decoded into a `CompoundLiteratureLink` record with `cid`, `pmid`, and `type`.
+
+```ts
+import { parsePubchemLiteratureTsv } from '@ncbijs/pubchem';
+const links = parsePubchemLiteratureTsv(fs.readFileSync('CID-PMID', 'utf-8'));
+```
+
 ## Error handling
 
 ```ts
@@ -373,5 +384,15 @@ interface PatentRecord {
   title: string;
   inventorNames: Array<string>;
   assigneeNames: Array<string>;
+}
+```
+
+### `CompoundLiteratureLink`
+
+```ts
+interface CompoundLiteratureLink {
+  cid: number;
+  pmid: number;
+  type: string;
 }
 ```
