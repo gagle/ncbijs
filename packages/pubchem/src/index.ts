@@ -6,6 +6,7 @@ export type {
   AssaySummary,
   ClassificationNode,
   CompoundDescription,
+  CompoundLiteratureLink,
   CompoundProperty,
   CompoundSynonyms,
   GeneRecord,
@@ -22,3 +23,4 @@ export type {
   CompoundExtrasInput,
   CompoundExtrasProperty,
 } from './bulk-parsers/parse-compound-extras';
+export { parsePubchemLiteratureTsv } from './bulk-parsers/parse-pubchem-literature-tsv';

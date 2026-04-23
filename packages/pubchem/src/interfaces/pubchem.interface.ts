@@ -124,3 +124,10 @@ export interface PatentRecord {
   readonly inventorNames: ReadonlyArray<string>;
   readonly assigneeNames: ReadonlyArray<string>;
 }
+
+/** Link between a PubChem compound/gene/protein and a PubMed article. */
+export interface CompoundLiteratureLink {
+  readonly cid: number;
+  readonly pmid: number;
+  readonly type: string;
+}
