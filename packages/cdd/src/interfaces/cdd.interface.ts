@@ -12,6 +12,15 @@ export interface CddSearchResult {
   readonly ids: ReadonlyArray<string>;
 }
 
+/** A conserved domain parsed from the CDD bulk domain list file. */
+export interface ConservedDomain {
+  readonly accession: string;
+  readonly shortName: string;
+  readonly description: string;
+  readonly pssmLength: number;
+  readonly database: string;
+}
+
 /** A conserved domain record with PSSM and structure metadata. */
 export interface CddRecord {
   readonly uid: string;
