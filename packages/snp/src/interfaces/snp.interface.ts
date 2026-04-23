@@ -70,3 +70,17 @@ export interface VcfFields {
   readonly ref: string;
   readonly alt: string;
 }
+
+/** dbSNP variant parsed from a VCF file. */
+export interface DbSnpVcfVariant {
+  readonly chrom: string;
+  readonly pos: number;
+  readonly rsId: string;
+  readonly ref: string;
+  readonly alt: ReadonlyArray<string>;
+  readonly qual: string;
+  readonly filter: string;
+  readonly geneInfo: string;
+  readonly variantClass: string;
+  readonly dbSnpBuildId: number;
+}
