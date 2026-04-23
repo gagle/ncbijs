@@ -64,3 +64,16 @@ export interface PMCConfig {
   readonly email: string;
   readonly maxRetries?: number;
 }
+
+/** A record from the PMC Open Access S3 inventory CSV. */
+export interface PmcS3Record {
+  readonly bucket: string;
+  readonly key: string;
+  readonly sizeBytes: number;
+  readonly lastModified: string;
+  readonly eTag: string;
+  readonly storageClass: string;
+  readonly pmcid: string;
+  readonly version: string;
+  readonly format: string;
+}
