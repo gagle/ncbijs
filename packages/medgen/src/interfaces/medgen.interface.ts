@@ -60,3 +60,10 @@ export interface MedGenName {
   readonly source: string;
   readonly type: string;
 }
+
+/** Input files for the MedGen RRF bulk parser. */
+export interface MedGenRrfInput {
+  readonly mgconso: string;
+  readonly mgdef?: string;
+  readonly mgsty?: string;
+}
