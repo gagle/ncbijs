@@ -7,7 +7,7 @@ import type {
   CitationSource,
   CiteConfig,
   CSLData,
-} from './interfaces/cite.interface';
+} from '../interfaces/cite.interface';
 
 const BASE_URL = 'https://pmc.ncbi.nlm.nih.gov/api/ctxp/v1';
 const REQUEST_DELAY_MS = 334;

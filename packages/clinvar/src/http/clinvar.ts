@@ -21,7 +21,7 @@ import type {
   TraitXref,
   VariantLocation,
   VariantReport,
-} from './interfaces/clinvar.interface';
+} from '../interfaces/clinvar.interface';
 
 const VARIATION_BASE_URL = 'https://api.ncbi.nlm.nih.gov/variation/v0';
 

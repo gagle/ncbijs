@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MeSH } from './mesh';
-import type { MeshTreeData, SparqlResult } from './interfaces/mesh.interface';
+import type { MeshTreeData, SparqlResult } from '../interfaces/mesh.interface';
 
 function mockFetchJson(data: unknown, status = 200): void {
   const text = JSON.stringify(data);

@@ -15,7 +15,10 @@ export type {
   SubstanceRecord,
   SubstanceSynonyms,
 } from './interfaces/pubchem.interface';
-export { PubChemHttpError } from './pubchem-client';
-export { PubChem } from './pubchem';
-export { parseCompoundExtras } from './parse-compound-extras';
-export type { CompoundExtrasInput, CompoundExtrasProperty } from './parse-compound-extras';
+export { PubChemHttpError } from './http/pubchem-client';
+export { PubChem } from './http/pubchem';
+export { parseCompoundExtras } from './bulk-parsers/parse-compound-extras';
+export type {
+  CompoundExtrasInput,
+  CompoundExtrasProperty,
+} from './bulk-parsers/parse-compound-extras';

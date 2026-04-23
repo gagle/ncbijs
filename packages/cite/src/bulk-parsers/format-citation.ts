@@ -1,5 +1,5 @@
 import type { Author, PartialDate, PubmedArticle } from '@ncbijs/pubmed-xml';
-import type { CitationFormat, CSLData } from './interfaces/cite.interface';
+import type { CitationFormat, CSLData } from '../interfaces/cite.interface';
 
 /** Format a {@link PubmedArticle} as a citation string in the given format. */
 export function formatCitation(article: PubmedArticle, format: CitationFormat): string {

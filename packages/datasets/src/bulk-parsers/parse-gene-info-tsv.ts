@@ -1,4 +1,4 @@
-import type { GeneReport } from './interfaces/datasets.interface';
+import type { GeneReport } from '../interfaces/datasets.interface';
 
 /** Parse an NCBI gene_info TSV file into an array of {@link GeneReport} records. */
 export function parseGeneInfoTsv(tsv: string): ReadonlyArray<GeneReport> {

@@ -12,7 +12,7 @@ import type {
   SnpPlacement,
   SpdiContextual,
   VcfFields,
-} from './interfaces/snp.interface';
+} from '../interfaces/snp.interface';
 
 const BASE_URL = 'https://api.ncbi.nlm.nih.gov/variation/v0';
 const REQUESTS_PER_SECOND = 5;

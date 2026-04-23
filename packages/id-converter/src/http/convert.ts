@@ -5,7 +5,7 @@ import type {
   ConvertedId,
   ConvertParams,
   IdConverterConfig,
-} from './interfaces/id-converter.interface';
+} from '../interfaces/id-converter.interface';
 import type { paths } from './schema';
 
 type ApiRecord =

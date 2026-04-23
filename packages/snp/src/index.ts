@@ -1,6 +1,6 @@
-export { Snp } from './snp';
-export { SnpHttpError } from './snp-client';
-export { parseRefSnpJson, parseRefSnpNdjson } from './parse-refsnp-json';
+export { Snp } from './http/snp';
+export { SnpHttpError } from './http/snp-client';
+export { parseRefSnpJson, parseRefSnpNdjson } from './bulk-parsers/parse-refsnp-json';
 export type {
   HgvsResult,
   RefSnpReport,

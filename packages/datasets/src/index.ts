@@ -18,8 +18,8 @@ export type {
   TaxonomyReport,
   VirusReport,
 } from './interfaces/datasets.interface';
-export { DatasetsHttpError } from './datasets-client';
-export { Datasets } from './datasets';
-export { parseGeneInfoTsv } from './parse-gene-info-tsv';
-export { parseTaxonomyDump } from './parse-taxonomy-dump';
-export type { TaxonomyDumpInput } from './parse-taxonomy-dump';
+export { DatasetsHttpError } from './http/datasets-client';
+export { Datasets } from './http/datasets';
+export { parseGeneInfoTsv } from './bulk-parsers/parse-gene-info-tsv';
+export { parseTaxonomyDump } from './bulk-parsers/parse-taxonomy-dump';
+export type { TaxonomyDumpInput } from './bulk-parsers/parse-taxonomy-dump';

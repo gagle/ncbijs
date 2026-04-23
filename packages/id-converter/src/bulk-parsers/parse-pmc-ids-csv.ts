@@ -1,4 +1,4 @@
-import type { ConvertedId } from './interfaces/id-converter.interface';
+import type { ConvertedId } from '../interfaces/id-converter.interface';
 
 /**
  * Parse an NCBI PMC-ids.csv file into an array of {@link ConvertedId} records.

@@ -17,7 +17,7 @@ import type {
   PubChemConfig,
   SubstanceRecord,
   SubstanceSynonyms,
-} from './interfaces/pubchem.interface';
+} from '../interfaces/pubchem.interface';
 
 const BASE_URL = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug';
 const PUG_VIEW_BASE_URL = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug_view';

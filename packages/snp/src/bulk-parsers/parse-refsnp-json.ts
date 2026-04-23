@@ -5,7 +5,7 @@ import type {
   SnpClinicalSignificance,
   SnpFrequency,
   SnpPlacement,
-} from './interfaces/snp.interface';
+} from '../interfaces/snp.interface';
 
 /** Parse a single RefSNP JSON record (as from the NCBI FTP) into a {@link RefSnpReport}. */
 export function parseRefSnpJson(json: string): RefSnpReport {

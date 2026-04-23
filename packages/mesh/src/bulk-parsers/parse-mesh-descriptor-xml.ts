@@ -1,5 +1,5 @@
 import { readAllBlocks, readAllTags, readBlock, readTag } from '@ncbijs/xml';
-import type { MeshDescriptor, MeshQualifier, MeshTreeData } from './interfaces/mesh.interface';
+import type { MeshDescriptor, MeshQualifier, MeshTreeData } from '../interfaces/mesh.interface';
 
 /** Parse NLM MeSH descriptor XML (desc20XX.xml) into a {@link MeshTreeData} object. */
 export function parseMeshDescriptorXml(xml: string): MeshTreeData {

@@ -6,6 +6,6 @@ export type {
   SparqlBinding,
   SparqlResult,
 } from './interfaces/mesh.interface';
-export { MeSHHttpError } from './mesh-client';
-export { MeSH } from './mesh';
-export { parseMeshDescriptorXml } from './parse-mesh-descriptor-xml';
+export { MeSHHttpError } from './http/mesh-client';
+export { MeSH } from './http/mesh';
+export { parseMeshDescriptorXml } from './bulk-parsers/parse-mesh-descriptor-xml';

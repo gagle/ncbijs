@@ -1,6 +1,6 @@
-export { ClinVarHttpError } from './clinvar-client';
-export { ClinVar } from './clinvar';
-export { parseVariantSummaryTsv } from './parse-variant-summary-tsv';
+export { ClinVarHttpError } from './http/clinvar-client';
+export { ClinVar } from './http/clinvar';
+export { parseVariantSummaryTsv } from './bulk-parsers/parse-variant-summary-tsv';
 export type {
   ClinVarConfig,
   ClinVarGene,

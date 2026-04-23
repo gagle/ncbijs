@@ -3,7 +3,7 @@ import type {
   ClinVarTrait,
   VariantLocation,
   VariantReport,
-} from './interfaces/clinvar.interface';
+} from '../interfaces/clinvar.interface';
 
 /** Parse a ClinVar variant_summary.txt TSV file into an array of {@link VariantReport} records. */
 export function parseVariantSummaryTsv(tsv: string): ReadonlyArray<VariantReport> {

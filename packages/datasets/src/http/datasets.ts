@@ -20,7 +20,7 @@ import type {
   TaxonomyCount,
   TaxonomyReport,
   VirusReport,
-} from './interfaces/datasets.interface';
+} from '../interfaces/datasets.interface';
 
 const BASE_URL = 'https://api.ncbi.nlm.nih.gov/datasets/v2';
 const REQUESTS_PER_SECOND_DEFAULT = 5;

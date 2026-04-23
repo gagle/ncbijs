@@ -6,6 +6,6 @@ export type {
   CiteConfig,
   CSLData,
 } from './interfaces/cite.interface';
-export { CiteHttpError } from './cite-client';
-export { Cite } from './cite';
-export { formatCitation } from './format-citation';
+export { CiteHttpError } from './http/cite-client';
+export { Cite } from './http/cite';
+export { formatCitation } from './bulk-parsers/format-citation';

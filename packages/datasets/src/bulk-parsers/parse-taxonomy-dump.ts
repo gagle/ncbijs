@@ -1,4 +1,4 @@
-import type { TaxonomyReport } from './interfaces/datasets.interface';
+import type { TaxonomyReport } from '../interfaces/datasets.interface';
 
 /** Input files for parsing an NCBI taxonomy dump (taxdump.tar.gz). */
 export interface TaxonomyDumpInput {
