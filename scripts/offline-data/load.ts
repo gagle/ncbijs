@@ -16,6 +16,7 @@ import { parseVariantSummaryTsv } from '@ncbijs/clinvar';
 import { parseGeneInfoTsv } from '@ncbijs/datasets';
 import { parseTaxonomyDump } from '@ncbijs/datasets';
 import { parseCompoundExtras } from '@ncbijs/pubchem';
+import type { CompoundExtrasInput } from '@ncbijs/pubchem';
 import { DuckDbFileStorage } from '@ncbijs/store';
 import type { DatasetType } from '@ncbijs/store';
 
@@ -86,16 +87,18 @@ const LOAD_STEPS: ReadonlyArray<LoadStep> = [
     dataset: 'compounds',
     requiredFiles: ['CID-SMILES.tsv', 'CID-InChI-Key.tsv', 'CID-IUPAC.tsv'],
     load: (inputDir) => {
-      const cidSmiles = existsSync(join(inputDir, 'CID-SMILES.tsv'))
-        ? readFile(inputDir, 'CID-SMILES.tsv')
-        : undefined;
-      const cidInchiKey = existsSync(join(inputDir, 'CID-InChI-Key.tsv'))
-        ? readFile(inputDir, 'CID-InChI-Key.tsv')
-        : undefined;
-      const cidIupac = existsSync(join(inputDir, 'CID-IUPAC.tsv'))
-        ? readFile(inputDir, 'CID-IUPAC.tsv')
-        : undefined;
-      return parseCompoundExtras({ cidSmiles, cidInchiKey, cidIupac });
+      const input: CompoundExtrasInput = {
+        ...(existsSync(join(inputDir, 'CID-SMILES.tsv')) && {
+          cidSmiles: readFile(inputDir, 'CID-SMILES.tsv'),
+        }),
+        ...(existsSync(join(inputDir, 'CID-InChI-Key.tsv')) && {
+          cidInchiKey: readFile(inputDir, 'CID-InChI-Key.tsv'),
+        }),
+        ...(existsSync(join(inputDir, 'CID-IUPAC.tsv')) && {
+          cidIupac: readFile(inputDir, 'CID-IUPAC.tsv'),
+        }),
+      };
+      return parseCompoundExtras(input);
     },
   },
 ];
