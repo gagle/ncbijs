@@ -93,3 +93,19 @@ export interface PopulationFrequency {
   readonly totalCount: number;
   readonly frequency: number;
 }
+
+/** ClinVar variant parsed from a VCF file. */
+export interface ClinVarVcfVariant {
+  readonly chrom: string;
+  readonly pos: number;
+  readonly id: string;
+  readonly ref: string;
+  readonly alt: string;
+  readonly qual: string;
+  readonly filter: string;
+  readonly clinicalSignificance: string;
+  readonly diseaseNames: string;
+  readonly geneInfo: string;
+  readonly rsId: string;
+  readonly variantClass: string;
+}
