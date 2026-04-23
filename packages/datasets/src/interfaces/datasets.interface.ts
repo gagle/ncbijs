@@ -172,3 +172,40 @@ export interface DatasetInfo {
   readonly description: string;
   readonly version: string;
 }
+
+/** Link between a gene and a PubMed article from the gene2pubmed bulk file. */
+export interface Gene2PubmedLink {
+  readonly taxId: number;
+  readonly geneId: number;
+  readonly pmid: number;
+}
+
+/** Gene Ontology annotation from the gene2go bulk file. */
+export interface Gene2GoAnnotation {
+  readonly taxId: number;
+  readonly geneId: number;
+  readonly goId: string;
+  readonly goTerm: string;
+  readonly evidence: string;
+  readonly qualifier: string;
+  readonly category: string;
+  readonly pmids: ReadonlyArray<number>;
+}
+
+/** Ortholog pair from the gene_orthologs bulk file. */
+export interface GeneOrtholog {
+  readonly taxId: number;
+  readonly geneId: number;
+  readonly relationship: string;
+  readonly otherTaxId: number;
+  readonly otherGeneId: number;
+}
+
+/** Discontinued or replaced gene record from the gene_history bulk file. */
+export interface GeneHistoryEntry {
+  readonly taxId: number;
+  readonly geneId: number;
+  readonly discontinuedGeneId: number;
+  readonly discontinuedSymbol: string;
+  readonly discontinueDate: string;
+}
