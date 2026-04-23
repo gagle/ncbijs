@@ -5,7 +5,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p packages/pubmed/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/pubmed/dist"
+        "command": "tsc -p packages/pubmed/tsconfig.build.json && add-import-extensions packages/pubmed/dist --external-deep --ignore '@ncbijs/*'"
       },
       "outputs": ["{projectRoot}/dist"]
     },

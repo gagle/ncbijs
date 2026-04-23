@@ -32,6 +32,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.1.4
         version: 4.1.4(vitest@4.1.4)
+      add-import-extensions:
+        specifier: file:../add-import-extensions
+        version: file:../add-import-extensions
       eslint:
         specifier: ^10.1.0
         version: 10.2.0(jiti@2.6.1)
@@ -1893,6 +1896,11 @@ packages:
   acorn@8.16.0:
     resolution: {integrity: sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw==}
     engines: {node: '>=0.4.0'}
+    hasBin: true
+
+  add-import-extensions@file:../add-import-extensions:
+    resolution: {directory: ../add-import-extensions, type: directory}
+    engines: {node: '>=20'}
     hasBin: true
 
   address@1.2.2:
@@ -5034,6 +5042,8 @@ snapshots:
       acorn: 8.16.0
 
   acorn@8.16.0: {}
+
+  add-import-extensions@file:../add-import-extensions: {}
 
   address@1.2.2: {}
 

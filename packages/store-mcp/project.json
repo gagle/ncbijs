@@ -5,7 +5,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p packages/store-mcp/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/store-mcp/dist"
+        "command": "tsc -p packages/store-mcp/tsconfig.build.json && add-import-extensions packages/store-mcp/dist --external-deep --ignore '@ncbijs/*'"
       },
       "outputs": ["{projectRoot}/dist"]
     },

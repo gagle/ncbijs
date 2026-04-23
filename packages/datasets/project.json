@@ -5,7 +5,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p packages/datasets/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/datasets/dist"
+        "command": "tsc -p packages/datasets/tsconfig.build.json && add-import-extensions packages/datasets/dist --external-deep --ignore '@ncbijs/*'"
       },
       "outputs": ["{projectRoot}/dist"]
     },

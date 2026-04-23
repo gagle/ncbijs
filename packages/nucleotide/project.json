@@ -5,7 +5,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p packages/nucleotide/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/nucleotide/dist"
+        "command": "tsc -p packages/nucleotide/tsconfig.build.json && add-import-extensions packages/nucleotide/dist --external-deep --ignore '@ncbijs/*'"
       },
       "outputs": ["{projectRoot}/dist"]
     },

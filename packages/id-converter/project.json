@@ -5,7 +5,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p packages/id-converter/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/id-converter/dist"
+        "command": "tsc -p packages/id-converter/tsconfig.build.json && add-import-extensions packages/id-converter/dist --external-deep --ignore '@ncbijs/*'"
       },
       "outputs": ["{projectRoot}/dist"]
     },

@@ -5,7 +5,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p packages/fasta/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/fasta/dist"
+        "command": "tsc -p packages/fasta/tsconfig.build.json && add-import-extensions packages/fasta/dist --external-deep --ignore '@ncbijs/*'"
       },
       "outputs": ["{projectRoot}/dist"]
     },

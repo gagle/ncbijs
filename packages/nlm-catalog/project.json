@@ -5,7 +5,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p packages/nlm-catalog/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/nlm-catalog/dist"
+        "command": "tsc -p packages/nlm-catalog/tsconfig.build.json && add-import-extensions packages/nlm-catalog/dist --external-deep --ignore '@ncbijs/*'"
       },
       "outputs": ["{projectRoot}/dist"]
     },

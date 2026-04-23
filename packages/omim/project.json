@@ -5,7 +5,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p packages/omim/tsconfig.build.json && node scripts/add-import-extensions.mjs packages/omim/dist"
+        "command": "tsc -p packages/omim/tsconfig.build.json && add-import-extensions packages/omim/dist --external-deep --ignore '@ncbijs/*'"
       },
       "outputs": ["{projectRoot}/dist"]
     },
