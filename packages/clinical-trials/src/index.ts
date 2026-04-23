@@ -11,5 +11,6 @@ export type {
   StudySponsor,
   StudyStats,
 } from './interfaces/clinical-trials.interface';
-export { ClinicalTrialsHttpError } from './clinical-trials-client';
-export { ClinicalTrials } from './clinical-trials';
+export { ClinicalTrialsHttpError } from './http/clinical-trials-client';
+export { ClinicalTrials } from './http/clinical-trials';
+export { parseClinicalTrialJson } from './bulk-parsers/parse-clinical-trial-json';
