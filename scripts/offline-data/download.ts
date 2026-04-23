@@ -126,12 +126,18 @@ async function downloadFile(source: DownloadSource, outputDir: string): Promise<
   console.log(`  [done] Saved to ${outputPath}`);
 }
 
+function parseArgValue(flag: string): string | undefined {
+  const flagIndex = process.argv.indexOf(flag);
+
+  if (flagIndex === -1) {
+    return undefined;
+  }
+
+  return process.argv[flagIndex + 1];
+}
+
 async function main(): Promise<void> {
-  const outputDirArg = process.argv.indexOf('--output-dir');
-  const outputDir =
-    outputDirArg !== -1 && process.argv[outputDirArg + 1] !== undefined
-      ? process.argv[outputDirArg + 1]
-      : join(process.cwd(), 'data', 'raw');
+  const outputDir = parseArgValue('--output-dir') ?? join(process.cwd(), 'data', 'raw');
 
   console.log(`Output directory: ${outputDir}\n`);
 

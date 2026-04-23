@@ -121,18 +121,19 @@ async function writeBatched(
   process.stdout.write('\n');
 }
 
-async function main(): Promise<void> {
-  const inputDirArg = process.argv.indexOf('--input-dir');
-  const inputDir =
-    inputDirArg !== -1 && process.argv[inputDirArg + 1] !== undefined
-      ? process.argv[inputDirArg + 1]
-      : join(process.cwd(), 'data', 'raw');
+function parseArgValue(flag: string): string | undefined {
+  const flagIndex = process.argv.indexOf(flag);
 
-  const dbPathArg = process.argv.indexOf('--db-path');
-  const dbPath =
-    dbPathArg !== -1 && process.argv[dbPathArg + 1] !== undefined
-      ? process.argv[dbPathArg + 1]
-      : join(process.cwd(), 'data', 'ncbijs.duckdb');
+  if (flagIndex === -1) {
+    return undefined;
+  }
+
+  return process.argv[flagIndex + 1];
+}
+
+async function main(): Promise<void> {
+  const inputDir = parseArgValue('--input-dir') ?? join(process.cwd(), 'data', 'raw');
+  const dbPath = parseArgValue('--db-path') ?? join(process.cwd(), 'data', 'ncbijs.duckdb');
 
   console.log(`Input directory: ${inputDir}`);
   console.log(`Database path:   ${dbPath}\n`);

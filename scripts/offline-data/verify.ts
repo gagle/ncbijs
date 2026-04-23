@@ -134,12 +134,18 @@ const CHECKS: ReadonlyArray<VerificationCheck> = [
   },
 ];
 
+function parseArgValue(flag: string): string | undefined {
+  const flagIndex = process.argv.indexOf(flag);
+
+  if (flagIndex === -1) {
+    return undefined;
+  }
+
+  return process.argv[flagIndex + 1];
+}
+
 async function main(): Promise<void> {
-  const dbPathArg = process.argv.indexOf('--db-path');
-  const dbPath =
-    dbPathArg !== -1 && process.argv[dbPathArg + 1] !== undefined
-      ? process.argv[dbPathArg + 1]
-      : join(process.cwd(), 'data', 'ncbijs.duckdb');
+  const dbPath = parseArgValue('--db-path') ?? join(process.cwd(), 'data', 'ncbijs.duckdb');
 
   console.log(`Database: ${dbPath}\n`);
 
