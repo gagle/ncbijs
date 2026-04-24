@@ -1,5 +1,5 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
-import type { Storage } from '@ncbijs/store';
+import type { ReadableStorage } from '@ncbijs/store';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('./tools/clinvar-tools', () => ({ registerClinVarTools: vi.fn() }));
@@ -21,11 +21,11 @@ import { registerAllTools } from './register-tools';
 
 describe('registerAllTools', () => {
   let mockServer: McpServer;
-  let getStorage: () => Storage;
+  let getStorage: () => ReadableStorage;
 
   beforeEach(() => {
     mockServer = {} as McpServer;
-    getStorage = vi.fn() as unknown as () => Storage;
+    getStorage = vi.fn() as unknown as () => ReadableStorage;
   });
 
   it('delegates to all seven register functions', () => {

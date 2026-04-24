@@ -1,7 +1,7 @@
 /**
  * Verify a DuckDB store by running spot-check queries per dataset.
  *
- * Usage: npx tsx scripts/offline-data/verify.ts [--db-path <path>]
+ * Usage: npx tsx examples/data-pipeline/verify.ts [--db-path <path>]
  */
 
 import { join } from 'node:path';

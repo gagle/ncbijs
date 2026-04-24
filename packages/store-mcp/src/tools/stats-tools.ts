@@ -1,8 +1,8 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
-import type { Storage } from '@ncbijs/store';
+import type { ReadableStorage } from '@ncbijs/store';
 
 /** Register storage stats tool on the MCP server. */
-export function registerStatsTools(server: McpServer, getStorage: () => Storage): void {
+export function registerStatsTools(server: McpServer, getStorage: () => ReadableStorage): void {
   server.registerTool(
     'store-stats',
     {

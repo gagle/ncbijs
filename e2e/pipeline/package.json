@@ -1,0 +1,14 @@
+{
+  "name": "ncbijs-e2e-pipeline",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@ncbijs/clinvar": "workspace:*",
+    "@ncbijs/datasets": "workspace:*",
+    "@ncbijs/id-converter": "workspace:*",
+    "@ncbijs/mesh": "workspace:*",
+    "@ncbijs/pipeline": "workspace:*",
+    "@ncbijs/store": "workspace:*"
+  }
+}

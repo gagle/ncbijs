@@ -2,4 +2,5 @@ packages:
   - packages/*
   - e2e
   - e2e/bulk-parsers
+  - e2e/pipeline
   - examples

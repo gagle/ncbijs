@@ -1,4 +1,4 @@
-/** Supported dataset types for offline storage. */
+/** Supported dataset types for local storage. */
 export type DatasetType = 'mesh' | 'clinvar' | 'genes' | 'taxonomy' | 'compounds' | 'id-mappings';
 
 /** Query parameters for searching records in a dataset. */
@@ -17,9 +17,8 @@ export interface DatasetStats {
   readonly lastUpdated?: string;
 }
 
-/** Base storage contract for reading and writing NCBI dataset records. */
-export interface Storage {
-  readonly writeRecords: (dataset: DatasetType, records: ReadonlyArray<unknown>) => Promise<void>;
+/** Read-only storage contract for querying NCBI dataset records. */
+export interface ReadableStorage {
   readonly getRecord: <T>(dataset: DatasetType, key: string) => Promise<T | undefined>;
   readonly searchRecords: <T>(
     dataset: DatasetType,
@@ -27,6 +26,14 @@ export interface Storage {
   ) => Promise<ReadonlyArray<T>>;
   readonly getStats: () => Promise<ReadonlyArray<DatasetStats>>;
 }
+
+/** Write-only storage contract for persisting NCBI dataset records. */
+export interface WritableStorage {
+  readonly writeRecords: (dataset: DatasetType, records: ReadonlyArray<unknown>) => Promise<void>;
+}
+
+/** Combined read/write storage contract for NCBI dataset records. */
+export interface Storage extends ReadableStorage, WritableStorage {}
 
 /** File-based storage with filesystem lifecycle concerns. */
 export interface FileStorage extends Storage {

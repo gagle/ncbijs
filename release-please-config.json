@@ -48,7 +48,9 @@
         "@ncbijs/bioc",
         "@ncbijs/clinical-tables",
         "@ncbijs/store",
-        "@ncbijs/store-mcp"
+        "@ncbijs/store-mcp",
+        "@ncbijs/pipeline",
+        "@ncbijs/sync"
       ]
     }
   ],
@@ -208,6 +210,14 @@
     "packages/store-mcp": {
       "release-type": "node",
       "component": "@ncbijs/store-mcp"
+    },
+    "packages/pipeline": {
+      "release-type": "node",
+      "component": "@ncbijs/pipeline"
+    },
+    "packages/sync": {
+      "release-type": "node",
+      "component": "@ncbijs/sync"
     }
   }
 }

@@ -62,7 +62,9 @@
       "@ncbijs/bioc": ["./packages/bioc/src/index.ts"],
       "@ncbijs/clinical-tables": ["./packages/clinical-tables/src/index.ts"],
       "@ncbijs/store": ["./packages/store/src/index.ts"],
-      "@ncbijs/store-mcp": ["./packages/store-mcp/src/index.ts"]
+      "@ncbijs/store-mcp": ["./packages/store-mcp/src/index.ts"],
+      "@ncbijs/pipeline": ["./packages/pipeline/src/index.ts"],
+      "@ncbijs/sync": ["./packages/sync/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "dist"]

@@ -1,9 +1,9 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
-import type { Storage } from '@ncbijs/store';
+import type { ReadableStorage } from '@ncbijs/store';
 import { z } from 'zod';
 
 /** Register ClinVar variant query tools on the MCP server. */
-export function registerClinVarTools(server: McpServer, getStorage: () => Storage): void {
+export function registerClinVarTools(server: McpServer, getStorage: () => ReadableStorage): void {
   server.registerTool(
     'store-lookup-variant',
     {

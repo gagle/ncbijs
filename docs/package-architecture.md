@@ -22,7 +22,7 @@ packages/{name}/src/
 
 ### Split layout (http + bulk-parsers)
 
-For packages that have both an HTTP client AND offline/bulk file parsers:
+For packages that have both an HTTP client AND bulk file parsers:
 
 ```
 packages/{name}/src/
@@ -40,7 +40,7 @@ packages/{name}/src/
     parse-{format}.spec.ts            # Unit tests
 ```
 
-**When to use split layout**: Use the split layout when a package has both HTTP client methods AND offline/bulk file parsers. Currently 13 packages use this layout: `mesh`, `snp`, `pubchem`, `clinvar`, `cite`, `id-converter`, `datasets`, `icite`, `clinical-trials`, `litvar`, `medgen`, `cdd`, `pmc`.
+**When to use split layout**: Use the split layout when a package has both HTTP client methods AND bulk file parsers. Currently 13 packages use this layout: `mesh`, `snp`, `pubchem`, `clinvar`, `cite`, `id-converter`, `datasets`, `icite`, `clinical-trials`, `litvar`, `medgen`, `cdd`, `pmc`.
 
 ## HTTP Layer (`http/`)
 

@@ -1,6 +1,7 @@
 import { DuckDBInstance } from '@duckdb/node-api';
 import type { DuckDBConnection, DuckDBValue } from '@duckdb/node-api';
 import { DATASET_SCHEMAS } from './dataset-schema';
+import { DuckDbSink } from './duckdb-sink';
 import type {
   DatasetStats,
   DatasetType,
@@ -138,6 +139,11 @@ export class DuckDbFileStorage implements FileStorage {
     }
 
     return stats;
+  }
+
+  /** Create a sink for writing records to the given dataset via the pipeline API. */
+  public createSink(dataset: DatasetType): DuckDbSink {
+    return new DuckDbSink(this._connection, DATASET_SCHEMAS[dataset]);
   }
 
   /** Close the DuckDB connection. */

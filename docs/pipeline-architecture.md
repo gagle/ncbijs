@@ -1,4 +1,4 @@
-# Offline RAG Architecture
+# Pipeline Architecture
 
 Storage-agnostic architecture for running ncbijs against local NCBI data at RAG-pipeline throughput (no API rate limits).
 
@@ -739,7 +739,7 @@ packages/
         clinical-trials-source.ts
 
 examples/
-  offline-duckdb/
+  data-pipeline/
     README.md
     docker-compose.yml
     Dockerfile
@@ -751,9 +751,9 @@ examples/
 
 ## Coverage Matrix: 37 Packages vs NCBI Data Sources
 
-### Fully covered (package + offline parser exist)
+### Fully covered (package + bulk parser exist)
 
-| NCBI Source        | Package        | Offline parser                                                      | Notes                                              |
+| NCBI Source        | Package        | Bulk parser                                                         | Notes                                              |
 | ------------------ | -------------- | ------------------------------------------------------------------- | -------------------------------------------------- |
 | PubMed XML         | `pubmed-xml`   | `parsePubmedXml()`, `createPubmedXmlStream()`, `parseMedlineText()` | Streaming support for 30+ GB baseline              |
 | JATS full-text     | `jats`         | `parseJATS()`, `toMarkdown()`, `toPlainText()`, `toChunks()`        | RAG-ready chunking built in                        |
@@ -761,12 +761,12 @@ examples/
 | GenBank flat files | `genbank`      | `parseGenBank()`, `createEmptyGenBankRecord()`                      | Covers `/genbank/` FTP                             |
 | XML utilities      | `xml`          | `readTag()`, `readBlock()`, `readAllBlocks()`, etc.                 | Foundation for all XML parsers                     |
 | BioC/PubTator TSV  | `pubtator`     | `parseBioC()`, `parsePubTatorTsv()`                                 | Covers `/pub/lu/PubTator3/` TSV + BioC             |
-| MeSH (in-memory)   | `mesh`         | `lookup()`, `expand()`, `ancestors()`, etc.                         | Works offline when constructed with `MeshTreeData` |
+| MeSH (in-memory)   | `mesh`         | `lookup()`, `expand()`, `ancestors()`, etc.                         | Works locally when constructed with `MeshTreeData` |
 | ID validation      | `id-converter` | `isPMID()`, `isPMCID()`, `isDOI()`, `isMID()`                       | Regex validation, no API needed                    |
 
-### Covered via API only (package exists, offline parser planned in offline-mode.md)
+### Covered via API only (package exists, bulk parser planned in data-pipelines.md)
 
-| NCBI Source    | Package        | API function                   | Planned offline parser     | FTP path                           |
+| NCBI Source    | Package        | API function                   | Planned bulk parser        | FTP path                           |
 | -------------- | -------------- | ------------------------------ | -------------------------- | ---------------------------------- |
 | MeSH XML       | `mesh`         | `sparql()`, `lookupOnline()`   | `parseMeshDescriptorXml()` | `nlmpubs.nlm.nih.gov/.../xmlmesh/` |
 | ClinVar TSV    | `clinvar`      | `search()`, `fetch()`          | `parseVariantSummaryTsv()` | `/pub/clinvar/tab_delimited/`      |
@@ -777,9 +777,9 @@ examples/
 | PMC ID CSV     | `id-converter` | `convert()`                    | `parsePmcIdsCsv()`         | `/pub/pmc/PMC-ids.csv.gz`          |
 | Citations      | `cite`         | `cite()`, `citeMany()`         | `formatCitation()`         | N/A (derived from PubMed XML)      |
 
-### Covered via API only (package exists, NEW offline parser needed)
+### Covered via API only (package exists, NEW bulk parser needed)
 
-| NCBI Source         | Package           | API function                  | New offline parser            | FTP path                                  | Size      |
+| NCBI Source         | Package           | API function                  | New bulk parser               | FTP path                                  | Size      |
 | ------------------- | ----------------- | ----------------------------- | ----------------------------- | ----------------------------------------- | --------- |
 | Gene-to-PubMed      | `datasets`        | (via gene API)                | `parseGene2PubmedTsv()`       | `/gene/DATA/gene2pubmed.gz`               | ~249 MB   |
 | Gene-to-GO          | `datasets`        | (via gene API)                | `parseGene2GoTsv()`           | `/gene/DATA/gene2go.gz`                   | ~1.2 GB   |
@@ -834,13 +834,13 @@ These datasets don't warrant dedicated packages — they're consumed directly by
 
 ### Gap summary
 
-| Category                       | Already done | Planned (offline-mode.md) | Newly identified | Total  |
-| ------------------------------ | ------------ | ------------------------- | ---------------- | ------ |
-| Offline parsers in packages    | 8            | 8                         | 13               | 29     |
-| Sync-only sources (no package) | 0            | 0                         | 17               | 17     |
-| **Total data source coverage** | **8**        | **8**                     | **30**           | **46** |
+| Category                       | Already done | Planned (data-pipelines.md) | Newly identified | Total  |
+| ------------------------------ | ------------ | --------------------------- | ---------------- | ------ |
+| Bulk parsers in packages       | 8            | 8                           | 13               | 29     |
+| Sync-only sources (no package) | 0            | 0                           | 17               | 17     |
+| **Total data source coverage** | **8**        | **8**                       | **30**           | **46** |
 
-The 13 newly identified offline parsers that should be added to existing packages:
+The 13 newly identified bulk parsers that should be added to existing packages:
 
 1. `datasets`: `parseGene2PubmedTsv()`, `parseGene2GoTsv()`, `parseGeneOrthologsTsv()`, `parseGeneHistoryTsv()`
 2. `icite`: `parseIciteCsv()`
@@ -855,9 +855,9 @@ The 13 newly identified offline parsers that should be added to existing package
 
 ---
 
-## Relationship to Existing Offline Parsers
+## Relationship to Existing Bulk Parsers
 
-The [offline mode roadmap](./offline-mode.md) describes 8 new parser functions that convert bulk NCBI files into typed objects. The newly identified 13 parsers above extend that list. All parsers are Layer 1 — they are consumed by the sync engine internally:
+The [data pipelines roadmap](./data-pipelines.md) describes 8 new parser functions that convert bulk NCBI files into typed objects. The newly identified 13 parsers above extend that list. All parsers are Layer 1 — they are consumed by the sync engine internally:
 
 ### Tier 1: Literature sources
 
@@ -915,16 +915,16 @@ The [offline mode roadmap](./offline-mode.md) describes 8 new parser functions t
 | --------------------------- | ------------------------------------------------ | ---------------------------------------- | -------- |
 | `clinical-trials-source.ts` | JSON parser (existing `@ncbijs/clinical-trials`) | `clinicaltrials.gov/api/v2/` or bulk ZIP | ~5-10 GB |
 
-The offline parsers from [offline-mode.md](./offline-mode.md) (Phase 1) must be implemented first, then the sync engine and store interface can be built on top.
+The bulk parsers from [data-pipelines.md](./data-pipelines.md) (Phase 1) must be implemented first, then the sync engine and store interface can be built on top.
 
 ## Implementation Order
 
 | Phase | What                                                          | Datasets                                                  | Depends on    |
 | ----- | ------------------------------------------------------------- | --------------------------------------------------------- | ------------- |
-| 1     | Offline parsers (7 new functions per offline-mode.md)         | mesh, cite, id-converter, clinvar, datasets, pubchem, snp | Nothing       |
+| 1     | Bulk parsers (7 new functions per data-pipelines.md)          | mesh, cite, id-converter, clinvar, datasets, pubchem, snp | Nothing       |
 | 2     | `@ncbijs/store` interface package                             | N/A (types only)                                          | Phase 1 types |
 | 3     | `@ncbijs/sync` engine — Tier 1 sources                        | pubmed, pmc-ids                                           | Phase 1 + 2   |
-| 4     | `examples/offline-duckdb/` reference implementation           | Demo with PubMed                                          | Phase 2 + 3   |
+| 4     | `examples/data-pipeline/` reference implementation            | Demo with PubMed                                          | Phase 2 + 3   |
 | 5     | Tier 2 sources: NLP/AI                                        | pubtator, medcpt-embeddings, litvar                       | Phase 3       |
 | 6     | Tier 3-5 sources: vocabularies, variation, gene               | mesh, clinvar, gene, taxonomy                             | Phase 3       |
 | 7     | Tier 6-7 sources: chemistry, clinical                         | pubchem, clinical-trials                                  | Phase 3       |
@@ -943,7 +943,7 @@ These are explicitly out of scope for ncbijs packages — they belong to the use
 - Cloud infrastructure provisioning
 - Data retention policies
 
-The `examples/offline-duckdb/` reference implementation shows one opinionated way to wire these together, but the library stays agnostic.
+The `examples/data-pipeline/` reference implementation shows one opinionated way to wire these together, but the library stays agnostic.
 
 ## NCBI GitHub Repository Resources
 

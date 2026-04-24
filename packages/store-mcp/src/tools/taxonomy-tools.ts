@@ -1,9 +1,9 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
-import type { Storage } from '@ncbijs/store';
+import type { ReadableStorage } from '@ncbijs/store';
 import { z } from 'zod';
 
 /** Register taxonomy query tools on the MCP server. */
-export function registerTaxonomyTools(server: McpServer, getStorage: () => Storage): void {
+export function registerTaxonomyTools(server: McpServer, getStorage: () => ReadableStorage): void {
   server.registerTool(
     'store-lookup-taxonomy',
     {

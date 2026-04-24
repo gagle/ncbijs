@@ -1,12 +1,12 @@
-# Offline Mode Roadmap
+# Data Pipelines Roadmap
 
-How ncbijs can operate with zero internet access using NCBI bulk downloads.
+How ncbijs processes NCBI bulk downloads into local storage using composable data pipelines.
 
 ## Current state
 
 6 packages are already pure computation with zero HTTP:
 
-| Package                | Offline functions                                                                                            |
+| Package                | Bulk functions                                                                                               |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------ |
 | `@ncbijs/fasta`        | `parseFasta()`                                                                                               |
 | `@ncbijs/xml`          | All functions (readTag, readBlock, etc.)                                                                     |
@@ -23,7 +23,7 @@ Every HTTP method in ncbijs follows the same pattern:
 fetch(url) -> raw response (JSON/XML/TSV) -> map to typed interface
 ```
 
-The mapping step is already pure computation. The offline feature exports the mappers so users can feed them local data. No breaking changes. No new classes. No data provider abstraction. Purely additive exports alongside existing HTTP methods.
+The mapping step is already pure computation. The bulk parser feature exports the mappers so users can feed them local data. No breaking changes. No new classes. No data provider abstraction. Purely additive exports alongside existing HTTP methods.
 
 ## NCBI downloadable data inventory
 
@@ -41,7 +41,7 @@ The mapping step is already pure computation. The offline feature exports the ma
 | PMC ID mapping   | `/pub/pmc/PMC-ids.csv.gz`            | CSV      | ~233 MB         | 9.5M mappings    | Regular          |
 | BLAST databases  | `/blast/db/`                         | Binary   | ~700 GB-1 TB    | nr, nt, etc.     | Daily            |
 
-For the **exhaustive inventory** covering all 11 tiers (~2.5 TB RAG-relevant, ~15+ TB total, ~60+ PB including SRA), see [offline-rag-architecture.md](./offline-rag-architecture.md).
+For the **exhaustive inventory** covering all 11 tiers (~2.5 TB RAG-relevant, ~15+ TB total, ~60+ PB including SRA), see [pipeline-architecture.md](./pipeline-architecture.md).
 
 All data is public domain (U.S. government work) except PMC articles which carry per-article Creative Commons licenses. PMC legacy FTP was deprecated April 2026 — use AWS S3 (`pmc-oa-opendata` bucket) instead.
 
@@ -57,7 +57,7 @@ import { MeSH, parseMeshDescriptorXml } from '@ncbijs/mesh';
 const xml = fs.readFileSync('desc2025.xml', 'utf-8');
 const treeData = parseMeshDescriptorXml(xml);
 const mesh = new MeSH(treeData);
-mesh.expand('Asthma'); // fully offline
+mesh.expand('Asthma'); // fully local
 ```
 
 **Source:** `https://nlmpubs.nlm.nih.gov/projects/mesh/MESH_FILES/xmlmesh/desc2025.xml` (~360 MB)
@@ -165,19 +165,19 @@ const articles = parsePubmedXml(localXml);
 const ris = formatCitation(articles[0], 'ris');
 ```
 
-**Source:** None extra. Uses PubmedArticle from pubmed-xml (already offline).
+**Source:** None extra. Uses PubmedArticle from pubmed-xml (already local).
 **New files:** `format-citation.ts` + spec
 **Replaces:** `cite()`, `citeMany()`
 
 ### pubtator
 
-Already has offline parsers: `parseBioC()` and `parsePubTatorTsv()`. No new code needed.
+Already has bulk parsers: `parseBioC()` and `parsePubTatorTsv()`. No new code needed.
 
 **Source:** `https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTator3/bioconcepts2pubtator_offsets.gz` (~12 GB)
 
-## Newly identified offline parsers
+## Newly identified bulk parsers
 
-The [exhaustive data inventory](./offline-rag-architecture.md) uncovered 13 additional bulk data sources that map to existing packages. These parsers follow the same design principle — purely additive exports alongside existing HTTP methods.
+The [exhaustive data inventory](./pipeline-architecture.md) uncovered 13 additional bulk data sources that map to existing packages. These parsers follow the same design principle — purely additive exports alongside existing HTTP methods.
 
 ### datasets (gene sub-files)
 
@@ -248,7 +248,7 @@ NCBI Gene publishes per-relationship TSV files alongside `gene_info.gz`:
 
 With ~2.5 TB of disk (RAG-relevant data only), ncbijs can run with zero internet:
 
-| Component                    | Download size          | Offline?                      |
+| Component                    | Download size          | Local?                        |
 | ---------------------------- | ---------------------- | ----------------------------- |
 | Article metadata (PubMed)    | ~30 GB                 | Yes (parse with pubmed-xml)   |
 | Article search (PubMed)      | Same + local FTS index | Yes (needs search engine)     |
@@ -343,15 +343,15 @@ The `@ncbijs/store-mcp` package exposes the stored data via MCP tools, making it
 
 ### Phase 1: Parsers
 
-| Priority | Package                                         | Effort | Impact                                       |
-| -------- | ----------------------------------------------- | ------ | -------------------------------------------- |
-| 1        | mesh (parseMeshDescriptorXml)                   | Small  | High — enables fully offline MeSH            |
-| 2        | cite (formatCitation)                           | Small  | High — offline citations from local articles |
-| 3        | id-converter (parsePmcIdsCsv)                   | Small  | Medium — offline ID resolution               |
-| 4        | clinvar (parseVariantSummaryTsv)                | Medium | High — offline clinical variants             |
-| 5        | datasets (parseGeneInfoTsv + parseTaxonomyDump) | Medium | High — offline gene and taxonomy             |
-| 6        | pubchem (parseCompoundExtras)                   | Medium | Medium — offline compound lookup             |
-| 7        | snp (parseRefSnpJson)                           | Small  | Low — data too large for most users          |
+| Priority | Package                                         | Effort | Impact                                      |
+| -------- | ----------------------------------------------- | ------ | ------------------------------------------- |
+| 1        | mesh (parseMeshDescriptorXml)                   | Small  | High — enables fully local MeSH             |
+| 2        | cite (formatCitation)                           | Small  | High — local citations from stored articles |
+| 3        | id-converter (parsePmcIdsCsv)                   | Small  | Medium — local ID resolution                |
+| 4        | clinvar (parseVariantSummaryTsv)                | Medium | High — local clinical variants              |
+| 5        | datasets (parseGeneInfoTsv + parseTaxonomyDump) | Medium | High — local gene and taxonomy              |
+| 6        | pubchem (parseCompoundExtras)                   | Medium | Medium — local compound lookup              |
+| 7        | snp (parseRefSnpJson)                           | Small  | Low — data too large for most users         |
 
 ### Phase 2: Storage + loading
 
@@ -374,8 +374,8 @@ The `@ncbijs/store-mcp` package exposes the stored data via MCP tools, making it
 | -------- | -------------------------------------------- | ------ | -------------------------------------------- |
 | 13       | datasets (gene2pubmed + gene2go + orthologs) | Medium | High — gene relationship graphs for RAG      |
 | 14       | icite (parseIciteCsv)                        | Small  | High — citation metrics for result ranking   |
-| 15       | clinical-trials (parseClinicalTrialJson)     | Small  | Medium — offline clinical trial search       |
-| 16       | litvar (parseLitVarJson)                     | Small  | Medium — variant-literature offline mapping  |
+| 15       | clinical-trials (parseClinicalTrialJson)     | Small  | Medium — local clinical trial search         |
+| 16       | litvar (parseLitVarJson)                     | Small  | Medium — variant-literature local mapping    |
 | 17       | medgen (parseMedGenRrf)                      | Medium | Medium — medical genetics concept resolution |
 | 18       | clinvar (parseClinVarVcf)                    | Small  | Medium — VCF alternative to TSV              |
 | 19       | snp (parseDbSnpVcf)                          | Small  | High — VCF is 30x smaller than JSON (~20 GB) |
@@ -386,6 +386,6 @@ The `@ncbijs/store-mcp` package exposes the stored data via MCP tools, making it
 Phase 1: ~16 files, ~1,320 lines estimated.
 Phase 2: ~20 files, ~1,500 lines estimated.
 Phase 3: ~14 files, ~800 lines estimated.
-Phase 4: ~20 files, ~1,800 lines estimated. **Delivered 13 new parsers across 10 packages (21 total offline parsers). 6 packages converted to split layout: `icite`, `clinical-trials`, `litvar`, `medgen`, `cdd`, `pmc`.**
+Phase 4: ~20 files, ~1,800 lines estimated. **Delivered 13 new parsers across 10 packages (21 total bulk parsers). 6 packages converted to split layout: `icite`, `clinical-trials`, `litvar`, `medgen`, `cdd`, `pmc`.**
 
-For the exhaustive data inventory, sync engine design, and storage schema details, see [offline-rag-architecture.md](./offline-rag-architecture.md).
+For the exhaustive data inventory, sync engine design, and storage schema details, see [pipeline-architecture.md](./pipeline-architecture.md).

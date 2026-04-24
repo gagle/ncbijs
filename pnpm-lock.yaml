@@ -210,6 +210,27 @@ importers:
         specifier: workspace:*
         version: link:../../packages/snp
 
+  e2e/pipeline:
+    dependencies:
+      '@ncbijs/clinvar':
+        specifier: workspace:*
+        version: link:../../packages/clinvar
+      '@ncbijs/datasets':
+        specifier: workspace:*
+        version: link:../../packages/datasets
+      '@ncbijs/id-converter':
+        specifier: workspace:*
+        version: link:../../packages/id-converter
+      '@ncbijs/mesh':
+        specifier: workspace:*
+        version: link:../../packages/mesh
+      '@ncbijs/pipeline':
+        specifier: workspace:*
+        version: link:../../packages/pipeline
+      '@ncbijs/store':
+        specifier: workspace:*
+        version: link:../../packages/store
+
   examples:
     dependencies:
       '@ncbijs/blast':
@@ -536,6 +557,8 @@ importers:
         specifier: workspace:*
         version: link:../rate-limiter
 
+  packages/pipeline: {}
+
   packages/pmc:
     dependencies:
       '@ncbijs/eutils':
@@ -648,6 +671,8 @@ importers:
       '@ncbijs/rate-limiter':
         specifier: workspace:*
         version: link:../rate-limiter
+
+  packages/sync: {}
 
   packages/xml: {}
 

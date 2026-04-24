@@ -90,7 +90,7 @@ interface CloudStorage extends Storage {
 Use the download and load scripts to populate the store:
 
 ```bash
-pnpm exec tsx examples/offline-data/download.ts
-pnpm exec tsx examples/offline-data/load.ts
-pnpm exec tsx examples/offline-data/verify.ts
+pnpm exec tsx examples/data-pipeline/download.ts
+pnpm exec tsx examples/data-pipeline/load.ts
+pnpm exec tsx examples/data-pipeline/verify.ts
 ```

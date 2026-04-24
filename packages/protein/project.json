@@ -5,7 +5,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p packages/protein/tsconfig.build.json && add-import-extensions packages/protein/dist --external-deep --ignore '@ncbijs/*'"
+        "command": "tsc -p packages/protein/tsconfig.build.json && tsc-esm-imports packages/protein/dist --external-deep --ignore '@ncbijs/*'"
       },
       "outputs": ["{projectRoot}/dist"]
     },

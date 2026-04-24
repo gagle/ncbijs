@@ -1,5 +1,5 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
-import type { Storage } from '@ncbijs/store';
+import type { ReadableStorage } from '@ncbijs/store';
 
 import { registerClinVarTools } from './tools/clinvar-tools';
 import { registerCompoundTools } from './tools/compound-tools';
@@ -10,7 +10,7 @@ import { registerStatsTools } from './tools/stats-tools';
 import { registerTaxonomyTools } from './tools/taxonomy-tools';
 
 /** Register all store query tools on the given MCP server. */
-export function registerAllTools(server: McpServer, getStorage: () => Storage): void {
+export function registerAllTools(server: McpServer, getStorage: () => ReadableStorage): void {
   registerMeshTools(server, getStorage);
   registerClinVarTools(server, getStorage);
   registerGeneTools(server, getStorage);

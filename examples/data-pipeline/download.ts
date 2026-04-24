@@ -1,7 +1,7 @@
 /**
- * Download NCBI bulk data files for offline storage.
+ * Download NCBI bulk data files for local storage.
  *
- * Usage: npx tsx scripts/offline-data/download.ts [--output-dir <path>]
+ * Usage: npx tsx examples/data-pipeline/download.ts [--output-dir <path>]
  *
  * Downloads ~4.4 GB of compressed data from NCBI FTP servers.
  * Files are saved to data/raw/ by default.

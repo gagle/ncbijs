@@ -47,8 +47,18 @@ These packages have README documentation in their package directories. See each 
 | [`@ncbijs/litvar`](../packages/litvar)                   | LitVar2 variant-literature linking by rsID                  |
 | [`@ncbijs/bioc`](../packages/bioc)                       | BioC annotated text with named entity recognition           |
 | [`@ncbijs/clinical-tables`](../packages/clinical-tables) | Clinical Table Search — ICD-10, LOINC, SNOMED autocomplete  |
+| [`@ncbijs/pipeline`](../packages/pipeline)               | Data pipeline: Source → Parse → Sink with streaming support |
+| [`@ncbijs/sync`](../packages/sync)                       | NCBI update detection and scheduled re-sync                 |
 | [`@ncbijs/store`](../packages/store)                     | Storage interfaces and DuckDB implementation for local data |
 | [`@ncbijs/store-mcp`](../packages/store-mcp)             | MCP server for querying locally stored NCBI data            |
+
+## Data Pipelines
+
+| Guide                                               | Covers                                                            |
+| --------------------------------------------------- | ----------------------------------------------------------------- |
+| [Data Pipeline Guide](./pipeline.md)                | `@ncbijs/pipeline`, `@ncbijs/store`, and `@ncbijs/sync` API guide |
+| [Data Pipelines Roadmap](./data-pipelines.md)       | Bulk parser inventory and NCBI downloadable data catalog          |
+| [Pipeline Architecture](./pipeline-architecture.md) | Storage strategy pattern, sync engine design, data inventory      |
 
 ## Architecture and Development
 

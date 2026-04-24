@@ -10,15 +10,15 @@
 
 An [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that gives AI assistants access to locally stored NCBI data. Query MeSH descriptors, ClinVar variants, genes, taxonomy, PubChem compounds, and article ID mappings without API rate limits.
 
-Complementary to `@ncbijs/http-mcp` (live API access). Use `store-mcp` for offline/local queries and `http-mcp` for real-time API access.
+Complementary to `@ncbijs/http-mcp` (live API access). Use `store-mcp` for local queries and `http-mcp` for real-time API access.
 
 ## Quick start
 
 1. Download and load NCBI data:
 
 ```bash
-pnpm exec tsx examples/offline-data/download.ts
-pnpm exec tsx examples/offline-data/load.ts
+pnpm exec tsx examples/data-pipeline/download.ts
+pnpm exec tsx examples/data-pipeline/load.ts
 ```
 
 2. Add to your Claude Code `.mcp.json`:

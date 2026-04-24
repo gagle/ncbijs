@@ -1,5 +1,5 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
-import type { Storage } from '@ncbijs/store';
+import type { ReadableStorage } from '@ncbijs/store';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { registerIdMappingTools } from './id-mapping-tools';
@@ -16,7 +16,7 @@ describe('registerIdMappingTools', () => {
     getRecord: ReturnType<typeof vi.fn>;
     searchRecords: ReturnType<typeof vi.fn>;
   };
-  let getStorage: () => Storage;
+  let getStorage: () => ReadableStorage;
 
   beforeEach(() => {
     mockServer = createMockServer();
@@ -24,7 +24,7 @@ describe('registerIdMappingTools', () => {
       getRecord: vi.fn(),
       searchRecords: vi.fn(),
     };
-    getStorage = vi.fn().mockReturnValue(mockStorage) as unknown as () => Storage;
+    getStorage = vi.fn().mockReturnValue(mockStorage) as unknown as () => ReadableStorage;
     registerIdMappingTools(mockServer, getStorage);
   });
 

@@ -1,6 +1,6 @@
-# Offline Data Pipeline
+# Data Pipeline
 
-Download NCBI bulk data, parse it with ncbijs bulk parsers, and load it into a local DuckDB database for offline querying with zero API rate limits.
+Download NCBI bulk data, parse it with ncbijs bulk parsers, and load it into a local DuckDB database for local querying with zero API rate limits.
 
 ## Datasets
 
@@ -25,7 +25,7 @@ pnpm build
 ## Step 1: Download
 
 ```bash
-pnpm exec tsx examples/offline-data/download.ts
+pnpm exec tsx examples/data-pipeline/download.ts
 ```
 
 Downloads all datasets to `data/raw/` by default. Use `--output-dir <path>` to change the destination.
@@ -41,7 +41,7 @@ Already-downloaded files are skipped, so you can safely re-run the script to res
 ## Step 2: Load into DuckDB
 
 ```bash
-pnpm exec tsx examples/offline-data/load.ts
+pnpm exec tsx examples/data-pipeline/load.ts
 ```
 
 Parses raw files with ncbijs bulk parsers and writes records into `data/ncbijs.duckdb`. Use `--input-dir <path>` and `--db-path <path>` to customize paths.
@@ -51,7 +51,7 @@ Missing datasets are skipped automatically. You can load a subset by downloading
 ## Step 3: Verify
 
 ```bash
-pnpm exec tsx examples/offline-data/verify.ts
+pnpm exec tsx examples/data-pipeline/verify.ts
 ```
 
 Runs spot-check queries against each loaded dataset: record lookups by primary key, searches by field, and record count summaries. Use `--db-path <path>` to point at a custom database.

@@ -1,5 +1,5 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
-import type { Storage } from '@ncbijs/store';
+import type { ReadableStorage } from '@ncbijs/store';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { registerStatsTools } from './stats-tools';
@@ -15,14 +15,14 @@ describe('registerStatsTools', () => {
   let mockStorage: {
     getStats: ReturnType<typeof vi.fn>;
   };
-  let getStorage: () => Storage;
+  let getStorage: () => ReadableStorage;
 
   beforeEach(() => {
     mockServer = createMockServer();
     mockStorage = {
       getStats: vi.fn(),
     };
-    getStorage = vi.fn().mockReturnValue(mockStorage) as unknown as () => Storage;
+    getStorage = vi.fn().mockReturnValue(mockStorage) as unknown as () => ReadableStorage;
     registerStatsTools(mockServer, getStorage);
   });
 

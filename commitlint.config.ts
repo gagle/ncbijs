@@ -44,6 +44,8 @@ export default {
         'clinical-tables',
         'store',
         'store-mcp',
+        'pipeline',
+        'sync',
         'workspace',
       ],
     ],

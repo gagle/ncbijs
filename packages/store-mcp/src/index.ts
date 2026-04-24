@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio';
 import { DuckDbFileStorage } from '@ncbijs/store';
-import type { Storage } from '@ncbijs/store';
+import type { ReadableStorage } from '@ncbijs/store';
 
 import { registerAllTools } from './register-tools';
 
@@ -13,9 +13,9 @@ const SERVER_VERSION = '0.0.1';
 
 const dbPath = process.env['NCBIJS_DB_PATH'] ?? join(process.cwd(), 'data', 'ncbijs.duckdb');
 
-let storage: Storage | undefined;
+let storage: ReadableStorage | undefined;
 
-async function getStorage(): Promise<Storage> {
+async function getStorage(): Promise<ReadableStorage> {
   if (storage === undefined) {
     storage = await DuckDbFileStorage.open(dbPath);
   }

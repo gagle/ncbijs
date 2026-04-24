@@ -46,7 +46,7 @@ It is designed for two audiences:
 | Retrieve compound, substance, and assay data          | `@ncbijs/pubchem`                   |
 | Fetch protein sequences in FASTA or GenBank format    | `@ncbijs/protein`                   |
 | Fetch nucleotide sequences in FASTA or GenBank format | `@ncbijs/nucleotide`                |
-| Parse GenBank flat file records offline               | `@ncbijs/genbank`                   |
+| Parse GenBank flat file records locally               | `@ncbijs/genbank`                   |
 | Look up genetic disorders from OMIM                   | `@ncbijs/omim`                      |
 | Query medical genetics concepts from MedGen           | `@ncbijs/medgen`                    |
 | Search genetic tests from GTR                         | `@ncbijs/gtr`                       |
@@ -67,6 +67,8 @@ It is designed for two audiences:
 | Get annotated text with entity recognition            | `@ncbijs/bioc`                      |
 | Autocomplete ICD-10, LOINC, SNOMED codes              | `@ncbijs/clinical-tables`           |
 | Store NCBI data locally in DuckDB                     | `@ncbijs/store`                     |
+| Build data pipelines (Source → Parse → Sink)          | `@ncbijs/pipeline`                  |
+| Watch NCBI sources for updates and re-sync            | `@ncbijs/sync`                      |
 | Expose all tools to LLM agents via MCP                | `@ncbijs/http-mcp`                  |
 | Query local NCBI data via MCP                         | `@ncbijs/store-mcp`                 |
 
@@ -110,6 +112,8 @@ It is designed for two audiences:
 | [`@ncbijs/fasta`](./packages/fasta)                     | Zero-dependency FASTA format parser for sequences                   | [![npm](https://img.shields.io/npm/v/@ncbijs/fasta)](https://www.npmjs.com/package/@ncbijs/fasta)                     |
 | [`@ncbijs/xml`](./packages/xml)                         | Zero-dependency regex-based XML reader for NCBI formats             | [![npm](https://img.shields.io/npm/v/@ncbijs/xml)](https://www.npmjs.com/package/@ncbijs/xml)                         |
 | [`@ncbijs/store`](./packages/store)                     | Storage interfaces and DuckDB implementation for local NCBI data    | [![npm](https://img.shields.io/npm/v/@ncbijs/store)](https://www.npmjs.com/package/@ncbijs/store)                     |
+| [`@ncbijs/pipeline`](./packages/pipeline)               | Composable data pipelines: Source → Parse → Sink                    | [![npm](https://img.shields.io/npm/v/@ncbijs/pipeline)](https://www.npmjs.com/package/@ncbijs/pipeline)               |
+| [`@ncbijs/sync`](./packages/sync)                       | NCBI update detection and scheduled re-sync                         | [![npm](https://img.shields.io/npm/v/@ncbijs/sync)](https://www.npmjs.com/package/@ncbijs/sync)                       |
 | [`@ncbijs/http-mcp`](./packages/http-mcp)               | MCP server exposing all ncbijs tools for LLM agents                 | [![npm](https://img.shields.io/npm/v/@ncbijs/http-mcp)](https://www.npmjs.com/package/@ncbijs/http-mcp)               |
 | [`@ncbijs/store-mcp`](./packages/store-mcp)             | MCP server for querying locally stored NCBI data via DuckDB         | [![npm](https://img.shields.io/npm/v/@ncbijs/store-mcp)](https://www.npmjs.com/package/@ncbijs/store-mcp)             |
 | [`@ncbijs/rate-limiter`](./packages/rate-limiter)       | Token bucket rate limiter for browser and Node.js                   | [![npm](https://img.shields.io/npm/v/@ncbijs/rate-limiter)](https://www.npmjs.com/package/@ncbijs/rate-limiter)       |
@@ -119,6 +123,32 @@ It is designed for two audiences:
 ncbijs is built to power biomedical RAG (Retrieval-Augmented Generation) pipelines. Use it to enrich document chunks with named entities, normalize terminology via MeSH, validate claims against PubMed, and inject formatted citations into generated answers. The MCP server (`@ncbijs/http-mcp`) lets LLM agents call any ncbijs tool directly during generation with zero glue code.
 
 See **[RAG Integration Guide](./docs/rag-integration.md)** for a full architecture walkthrough covering ingestion enrichment, query-time augmentation, generation-time citation, and priority assessment.
+
+## Data pipelines
+
+ncbijs includes a composable pipeline system for processing bulk NCBI data. Download files from NCBI FTP, parse them with existing bulk parsers, and store results in DuckDB — all with a single `pipeline()` call.
+
+```typescript
+import { pipeline, createFileSource } from '@ncbijs/pipeline';
+import { parseMeshDescriptorXml } from '@ncbijs/mesh';
+import { DuckDbFileStorage } from '@ncbijs/store';
+
+const storage = await DuckDbFileStorage.open('ncbijs.duckdb');
+
+await pipeline(
+  createFileSource('desc2025.xml'),
+  (xml) => parseMeshDescriptorXml(xml).descriptors,
+  storage.createSink('mesh'),
+);
+```
+
+Three packages work together:
+
+- **`@ncbijs/pipeline`** — Source, Sink, and streaming primitives built on `AsyncIterable`. Includes file, HTTP, and composite sources, plus JSON and custom sinks.
+- **`@ncbijs/store`** — `ReadableStorage` / `WritableStorage` interfaces with a `DuckDbFileStorage` implementation. `DuckDbSink` integrates directly with the pipeline.
+- **`@ncbijs/sync`** — Watches NCBI FTP sources for updates via HTTP `Last-Modified` timestamps and triggers re-sync on a configurable interval.
+
+See **[Data Pipeline Guide](./docs/pipeline.md)** for the full API walkthrough, streaming parsers, error handling, and sync scheduling.
 
 ## Quick start
 
@@ -210,9 +240,11 @@ I want to...
 │   ├── Books/textbooks ───────────────────→ @ncbijs/books
 │   └── Journal records (NLM Catalog) ─────→ @ncbijs/nlm-catalog
 │
-├── Store NCBI data locally (offline) ─────→ @ncbijs/store
+├── Store NCBI data locally ───────────────→ @ncbijs/store
+├── Data pipeline (Source → Parse → Sink) ─→ @ncbijs/pipeline
+├── Watch NCBI sources for updates ────────→ @ncbijs/sync
 ├── Expose tools to LLM agents (live API) ─→ @ncbijs/http-mcp
-└── Query local data via MCP (offline) ────→ @ncbijs/store-mcp
+└── Query local data via MCP ─────────────→ @ncbijs/store-mcp
 ```
 
 ### Package capabilities
@@ -222,10 +254,11 @@ I want to...
 | Supports API key  | `eutils`, `pubmed`, `pmc`, `clinvar`, `snp`, `datasets`, `omim`, `medgen`, `gtr`, `geo`, `dbvar`, `sra`, `structure`, `cdd`, `books`, `nlm-catalog`, `protein`, `nucleotide` (optional, for higher rate limits) |
 | No API key needed | All others (non-NCBI APIs)                                                                                                                                                                                      |
 | Rate-limited      | `eutils`, `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `clinical-trials`, `icite`, `rxnorm`, + all that depend on `rate-limiter`                                                                           |
-| Zero dependencies | `cite`, `id-converter`, `mesh`, `fasta`, `genbank`, `litvar`, `bioc`, `clinical-tables`                                                                                                                         |
-| Async iterators   | `eutils` (efetchBatches, searchAndFetch, searchAndSummarize), `pubmed` (batch), `clinical-trials` (searchStudies), `cite` (citeMany)                                                                            |
+| Zero dependencies | `pipeline`, `sync`, `cite`, `id-converter`, `mesh`, `fasta`, `genbank`, `litvar`, `bioc`, `clinical-tables`                                                                                                     |
+| Async iterators   | `eutils` (efetchBatches, searchAndFetch, searchAndSummarize), `pubmed` (batch), `clinical-trials` (searchStudies), `cite` (citeMany), `pipeline` (Source, streamParser)                                         |
 | XML parsing       | `eutils`, `pubmed-xml`, `jats`, `pubtator`, `xml`                                                                                                                                                               |
 | Bulk parsers      | `mesh`, `cite`, `id-converter`, `clinvar`, `datasets`, `pubchem`, `snp`, `icite`, `clinical-trials`, `litvar`, `medgen`, `cdd`, `pmc`                                                                           |
+| Data pipelines    | `pipeline` (Source → Parse → Sink), `store` (DuckDbSink), `sync` (update detection)                                                                                                                             |
 
 ## Architecture
 
@@ -261,12 +294,12 @@ rate-limiter ─────┤               │
 
 protein (rate-limiter + fasta + genbank)
 nucleotide (rate-limiter + fasta + genbank)
-genbank, fasta, id-converter, mesh, cite, litvar, bioc, clinical-tables  (zero-dep, independent)
+pipeline, sync, genbank, fasta, id-converter, mesh, cite, litvar, bioc, clinical-tables  (zero-dep, independent)
 ```
 
 ### Build order
 
-1. **Parallel**: `rate-limiter`, `xml`, `id-converter`, `mesh`, `cite`, `fasta`, `genbank`, `litvar`, `bioc`, `clinical-tables`
+1. **Parallel**: `rate-limiter`, `xml`, `pipeline`, `sync`, `id-converter`, `mesh`, `cite`, `fasta`, `genbank`, `litvar`, `bioc`, `clinical-tables`
 2. **After deps**: `eutils`, `datasets`, `blast`, `snp`, `pubchem`, `pubmed-xml`, `jats`, `pubtator`, `omim`, `medgen`, `gtr`, `geo`, `dbvar`, `sra`, `structure`, `cdd`, `books`, `nlm-catalog`, `clinical-trials`, `icite`, `rxnorm`, `protein`, `nucleotide`
 3. **After eutils**: `pubmed`, `pmc`, `clinvar`
 

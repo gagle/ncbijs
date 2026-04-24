@@ -5,7 +5,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p packages/icite/tsconfig.build.json && add-import-extensions packages/icite/dist --external-deep --ignore '@ncbijs/*'"
+        "command": "tsc -p packages/icite/tsconfig.build.json && tsc-esm-imports packages/icite/dist --external-deep --ignore '@ncbijs/*'"
       },
       "outputs": ["{projectRoot}/dist"]
     },

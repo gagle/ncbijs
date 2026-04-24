@@ -5,7 +5,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p packages/snp/tsconfig.build.json && add-import-extensions packages/snp/dist --external-deep --ignore '@ncbijs/*'"
+        "command": "tsc -p packages/snp/tsconfig.build.json && tsc-esm-imports packages/snp/dist --external-deep --ignore '@ncbijs/*'"
       },
       "outputs": ["{projectRoot}/dist"]
     },
