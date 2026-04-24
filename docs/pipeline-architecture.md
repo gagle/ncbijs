@@ -1,6 +1,6 @@
 # Pipeline Architecture
 
-Storage-agnostic architecture for running ncbijs against local NCBI data at RAG-pipeline throughput (no API rate limits).
+Storage-agnostic architecture for running ncbijs against local NCBI data at RAG-pipeline throughput (no API rate limits). For the pipeline API guide (Source, Sink, streaming, error handling), see [pipeline.md](./pipeline.md).
 
 ## Problem
 

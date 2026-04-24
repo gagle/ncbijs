@@ -126,26 +126,26 @@ See **[RAG Integration Guide](./docs/rag-integration.md)** for a full architectu
 
 ## Data pipelines
 
-ncbijs includes a composable pipeline system for processing bulk NCBI data. Download files from NCBI FTP, parse them with existing bulk parsers, and store results in DuckDB — all with a single `pipeline()` call.
+ncbijs includes a composable pipeline system for processing bulk NCBI data. Wire any source, parser, and sink together with a single `pipeline()` call. Built-in sources read from local files or HTTP; built-in sinks write to DuckDB or NDJSON — or bring your own with `createSink()`.
 
 ```typescript
-import { pipeline, createFileSource } from '@ncbijs/pipeline';
+import { pipeline, createFileSource, createSink } from '@ncbijs/pipeline';
 import { parseMeshDescriptorXml } from '@ncbijs/mesh';
-import { DuckDbFileStorage } from '@ncbijs/store';
 
-const storage = await DuckDbFileStorage.open('ncbijs.duckdb');
-
+// Write to any destination — DuckDB, a REST API, a file, or your own logic
 await pipeline(
   createFileSource('desc2025.xml'),
   (xml) => parseMeshDescriptorXml(xml).descriptors,
-  storage.createSink('mesh'),
+  createSink(async (records) => {
+    console.log(`Received ${records.length} MeSH descriptors`);
+  }),
 );
 ```
 
 Three packages work together:
 
-- **`@ncbijs/pipeline`** — Source, Sink, and streaming primitives built on `AsyncIterable`. Includes file, HTTP, and composite sources, plus JSON and custom sinks.
-- **`@ncbijs/store`** — `ReadableStorage` / `WritableStorage` interfaces with a `DuckDbFileStorage` implementation. `DuckDbSink` integrates directly with the pipeline.
+- **`@ncbijs/pipeline`** — Composable Source/Sink primitives built on `AsyncIterable`. File, HTTP, and composite sources; DuckDB, JSON, and custom sinks. Streaming support, backpressure, abort signals, error strategies, and progress reporting.
+- **`@ncbijs/store`** — `ReadableStorage` / `WritableStorage` interfaces with a `DuckDbFileStorage` reference implementation. `DuckDbSink` plugs directly into the pipeline as one of many possible sinks.
 - **`@ncbijs/sync`** — Watches NCBI FTP sources for updates via HTTP `Last-Modified` timestamps and triggers re-sync on a configurable interval.
 
 See **[Data Pipeline Guide](./docs/pipeline.md)** for the full API walkthrough, streaming parsers, error handling, and sync scheduling.

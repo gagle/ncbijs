@@ -434,6 +434,6 @@ It processes all available datasets in sequence, reports progress, and prints st
 
 ## Related docs
 
-- [Data Pipelines Roadmap](./data-pipelines.md) — Bulk parser inventory and implementation phases
+- [Bulk Parser Catalog](./data-pipelines.md) — 21 bulk parsers and NCBI downloadable data inventory
 - [Pipeline Architecture](./pipeline-architecture.md) — Storage strategy pattern, sync engine design, NCBI data inventory
 - [RAG Integration](./rag-integration.md) — How pipelines feed into RAG workflows
