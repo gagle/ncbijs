@@ -1,5 +1,7 @@
 <h1 align="center">@ncbijs/jats</h1>
 
+> **Runtime**: Browser + Node.js
+
 <p align="center">
   <a href="https://www.npmjs.com/package/@ncbijs/jats"><img src="https://img.shields.io/npm/v/@ncbijs/jats" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/@ncbijs/jats"><img src="https://img.shields.io/npm/dm/@ncbijs/jats" alt="npm downloads" /></a>

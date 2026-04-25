@@ -1,5 +1,7 @@
 # @ncbijs/fasta
 
+> **Runtime**: Browser + Node.js
+
 Parse FASTA format sequences into typed records. Zero dependencies.
 
 ## Installation

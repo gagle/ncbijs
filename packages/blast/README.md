@@ -1,5 +1,7 @@
 # @ncbijs/blast
 
+> **Runtime**: Browser + Node.js
+
 Typed client for the NCBI BLAST URL API. Submit sequence alignment searches, poll for results, and retrieve structured hits with a simple async workflow.
 
 ## Installation

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ncbijs Data Explorer</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="header">
+      <h1 class="header-title">ncbijs Data Explorer</h1>
+      <p class="header-subtitle">
+        Query NCBI biomedical data live or explore pre-loaded local datasets
+      </p>
+    </header>
+
+    <main class="main">
+      <div class="mode-tabs">
+        <button class="mode-tab mode-tab--active" data-mode="live">Live API</button>
+        <button class="mode-tab" data-mode="local">Local Data</button>
+      </div>
+
+      <section class="query-section">
+        <div class="examples" id="examples"></div>
+
+        <div class="search-bar">
+          <input
+            type="text"
+            id="search-input"
+            class="search-input"
+            placeholder="Search PubMed for BRCA1..."
+            autocomplete="off"
+          />
+          <button id="search-btn" class="search-btn">Run</button>
+        </div>
+
+        <div class="sql-preview" id="sql-preview" hidden></div>
+      </section>
+
+      <section class="results-section">
+        <div class="results-header" id="results-header" hidden>
+          <span class="results-badge" id="results-badge"></span>
+          <span class="results-stats" id="results-stats"></span>
+        </div>
+        <div class="results-table-wrap" id="results-table-wrap">
+          <p class="results-placeholder">Select an example or type a query to get started.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <a href="https://github.com/gagle/ncbijs" target="_blank" rel="noopener">GitHub</a>
+      <span class="footer-sep">|</span>
+      <a href="https://www.npmjs.com/org/ncbijs" target="_blank" rel="noopener">npm</a>
+    </footer>
+
+    <script type="module" src="./app.ts"></script>
+  </body>
+</html>

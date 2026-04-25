@@ -1,5 +1,7 @@
 <h1 align="center">@ncbijs/http-mcp</h1>
 
+> **Runtime**: Node.js only (MCP server CLI)
+
 <p align="center">
   <a href="https://www.npmjs.com/package/@ncbijs/http-mcp"><img src="https://img.shields.io/npm/v/@ncbijs/http-mcp" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/@ncbijs/http-mcp"><img src="https://img.shields.io/npm/dm/@ncbijs/http-mcp" alt="npm downloads" /></a>

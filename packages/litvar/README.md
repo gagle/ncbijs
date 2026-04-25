@@ -1,5 +1,7 @@
 # @ncbijs/litvar
 
+> **Runtime**: Browser + Node.js
+
 Typed client for the LitVar2 API. Find literature linked to genetic variants and retrieve publications mentioning specific rsIDs.
 
 ## Installation

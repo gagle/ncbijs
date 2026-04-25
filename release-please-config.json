@@ -50,7 +50,8 @@
         "@ncbijs/store",
         "@ncbijs/store-mcp",
         "@ncbijs/pipeline",
-        "@ncbijs/sync"
+        "@ncbijs/sync",
+        "@ncbijs/etl"
       ]
     }
   ],
@@ -218,6 +219,10 @@
     "packages/sync": {
       "release-type": "node",
       "component": "@ncbijs/sync"
+    },
+    "packages/etl": {
+      "release-type": "node",
+      "component": "@ncbijs/etl"
     }
   }
 }

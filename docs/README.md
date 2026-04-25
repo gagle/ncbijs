@@ -73,6 +73,7 @@ These packages have README documentation in their package directories. See each 
 | [`@ncbijs/sync`](../packages/sync)           | NCBI update detection and scheduled re-sync                 |
 | [`@ncbijs/store`](../packages/store)         | Storage interfaces and DuckDB implementation for local data |
 | [`@ncbijs/store-mcp`](../packages/store-mcp) | MCP server for querying locally stored NCBI data            |
+| [`@ncbijs/etl`](../packages/etl)             | Pre-wired NCBI data loaders: `load('mesh', mySink)`         |
 
 ## Architecture and Development
 

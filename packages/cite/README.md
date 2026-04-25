@@ -1,5 +1,7 @@
 <h1 align="center">@ncbijs/cite</h1>
 
+> **Runtime**: Browser + Node.js
+
 <p align="center">
   <a href="https://www.npmjs.com/package/@ncbijs/cite"><img src="https://img.shields.io/npm/v/@ncbijs/cite" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/@ncbijs/cite"><img src="https://img.shields.io/npm/dm/@ncbijs/cite" alt="npm downloads" /></a>

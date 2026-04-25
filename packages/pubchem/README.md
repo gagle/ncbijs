@@ -1,5 +1,7 @@
 # @ncbijs/pubchem
 
+> **Runtime**: Browser + Node.js
+
 Typed client for the PubChem PUG REST API. Look up compounds, substances, and bioassays by ID or name with automatic rate limiting and retry logic.
 
 ## Installation

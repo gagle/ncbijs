@@ -1,5 +1,7 @@
 # @ncbijs/clinical-trials
 
+> **Runtime**: Browser + Node.js
+
 Typed client for the ClinicalTrials.gov v2 API. Search clinical trials, retrieve study details, and query database statistics with automatic rate limiting and retry logic.
 
 ## Installation

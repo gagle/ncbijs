@@ -1,5 +1,7 @@
 <h1 align="center">@ncbijs/xml</h1>
 
+> **Runtime**: Browser + Node.js
+
 <p align="center">
   <a href="https://www.npmjs.com/package/@ncbijs/xml"><img src="https://img.shields.io/npm/v/@ncbijs/xml" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/@ncbijs/xml"><img src="https://img.shields.io/npm/dm/@ncbijs/xml" alt="npm downloads" /></a>

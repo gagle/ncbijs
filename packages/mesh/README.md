@@ -1,5 +1,7 @@
 <h1 align="center">@ncbijs/mesh</h1>
 
+> **Runtime**: Browser + Node.js
+
 <p align="center">
   <a href="https://www.npmjs.com/package/@ncbijs/mesh"><img src="https://img.shields.io/npm/v/@ncbijs/mesh" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/@ncbijs/mesh"><img src="https://img.shields.io/npm/dm/@ncbijs/mesh" alt="npm downloads" /></a>

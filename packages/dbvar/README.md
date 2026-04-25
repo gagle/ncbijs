@@ -1,5 +1,7 @@
 # @ncbijs/dbvar
 
+> **Runtime**: Browser + Node.js
+
 Typed client for NCBI Database of Structural Variation (dbVar). Search structural variants and fetch detailed reports with automatic rate limiting and retry logic.
 
 ## Installation

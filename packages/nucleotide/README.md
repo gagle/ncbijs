@@ -1,5 +1,7 @@
 # @ncbijs/nucleotide
 
+> **Runtime**: Browser + Node.js
+
 Typed client for NCBI Nucleotide database. Fetch nucleotide sequences in FASTA and GenBank formats with automatic rate limiting and retry logic.
 
 ## Installation

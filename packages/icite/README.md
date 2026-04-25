@@ -1,5 +1,7 @@
 # @ncbijs/icite
 
+> **Runtime**: Browser + Node.js
+
 Typed client for the NIH iCite API. Retrieve citation metrics including Relative Citation Ratio (RCR), NIH percentile, and clinical citation data for PubMed articles.
 
 ## Installation

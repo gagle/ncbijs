@@ -1,5 +1,7 @@
 <h1 align="center">@ncbijs/pmc</h1>
 
+> **Runtime**: Browser + Node.js
+
 <p align="center">
   <a href="https://www.npmjs.com/package/@ncbijs/pmc"><img src="https://img.shields.io/npm/v/@ncbijs/pmc" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/@ncbijs/pmc"><img src="https://img.shields.io/npm/dm/@ncbijs/pmc" alt="npm downloads" /></a>

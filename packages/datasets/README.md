@@ -1,5 +1,7 @@
 # @ncbijs/datasets
 
+> **Runtime**: Browser + Node.js
+
 Typed client for the NCBI Datasets API v2. Access genes, genomes, taxonomy, viruses, BioProjects, and BioSamples with zero XML parsing.
 
 ## Installation

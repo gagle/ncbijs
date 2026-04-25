@@ -46,6 +46,7 @@ export default {
         'store-mcp',
         'pipeline',
         'sync',
+        'etl',
         'workspace',
       ],
     ],

@@ -1,5 +1,7 @@
 # @ncbijs/cdd
 
+> **Runtime**: Browser + Node.js
+
 Typed client for NCBI Conserved Domain Database (CDD). Search conserved domains and fetch detailed records with automatic rate limiting and retry logic.
 
 ## Installation

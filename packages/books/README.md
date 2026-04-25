@@ -1,5 +1,7 @@
 # @ncbijs/books
 
+> **Runtime**: Browser + Node.js
+
 Typed client for NCBI Books (Bookshelf). Search books and chapters and fetch detailed records with automatic rate limiting and retry logic.
 
 ## Installation

@@ -27,6 +27,8 @@ It is designed for two audiences:
 - **Developers and researchers** building biomedical applications, literature review tools, or clinical decision support systems.
 - **LLM and AI agents** that need structured, programmatic access to biomedical literature for retrieval-augmented generation (RAG), entity extraction, and citation management.
 
+**Built for LLM consumption.** Every package follows consistent naming, consistent interfaces, and has a self-documenting API with full JSDoc. The [MCP server](./packages/http-mcp) exposes 18 tools that any LLM agent can call directly. The workflow table below and the "Which package do I need?" decision tree make it easy for agents to discover the right package without reading source code. 39 of 42 packages run in the browser — ideal for agentic web apps that query NCBI without a backend.
+
 ### What can you do with ncbijs?
 
 | Workflow                                              | Packages                            |
@@ -68,6 +70,7 @@ It is designed for two audiences:
 | Autocomplete ICD-10, LOINC, SNOMED codes              | `@ncbijs/clinical-tables`           |
 | Store NCBI data locally in DuckDB                     | `@ncbijs/store`                     |
 | Build data pipelines (Source → Parse → Sink)          | `@ncbijs/pipeline`                  |
+| Load any NCBI dataset with one function call          | `@ncbijs/etl`                       |
 | Watch NCBI sources for updates and re-sync            | `@ncbijs/sync`                      |
 | Expose all tools to LLM agents via MCP                | `@ncbijs/http-mcp`                  |
 | Query local NCBI data via MCP                         | `@ncbijs/store-mcp`                 |
@@ -113,6 +116,7 @@ It is designed for two audiences:
 | [`@ncbijs/xml`](./packages/xml)                         | Zero-dependency regex-based XML reader for NCBI formats             | [![npm](https://img.shields.io/npm/v/@ncbijs/xml)](https://www.npmjs.com/package/@ncbijs/xml)                         |
 | [`@ncbijs/store`](./packages/store)                     | Storage interfaces and DuckDB implementation for local NCBI data    | [![npm](https://img.shields.io/npm/v/@ncbijs/store)](https://www.npmjs.com/package/@ncbijs/store)                     |
 | [`@ncbijs/pipeline`](./packages/pipeline)               | Composable data pipelines: Source → Parse → Sink                    | [![npm](https://img.shields.io/npm/v/@ncbijs/pipeline)](https://www.npmjs.com/package/@ncbijs/pipeline)               |
+| [`@ncbijs/etl`](./packages/etl)                         | Pre-wired NCBI data loaders: `load('mesh', mySink)`                 | [![npm](https://img.shields.io/npm/v/@ncbijs/etl)](https://www.npmjs.com/package/@ncbijs/etl)                         |
 | [`@ncbijs/sync`](./packages/sync)                       | NCBI update detection and scheduled re-sync                         | [![npm](https://img.shields.io/npm/v/@ncbijs/sync)](https://www.npmjs.com/package/@ncbijs/sync)                       |
 | [`@ncbijs/http-mcp`](./packages/http-mcp)               | MCP server exposing all ncbijs tools for LLM agents                 | [![npm](https://img.shields.io/npm/v/@ncbijs/http-mcp)](https://www.npmjs.com/package/@ncbijs/http-mcp)               |
 | [`@ncbijs/store-mcp`](./packages/store-mcp)             | MCP server for querying locally stored NCBI data via DuckDB         | [![npm](https://img.shields.io/npm/v/@ncbijs/store-mcp)](https://www.npmjs.com/package/@ncbijs/store-mcp)             |
@@ -126,15 +130,15 @@ See **[RAG Integration Guide](./docs/rag-integration.md)** for a full architectu
 
 ## Data pipelines
 
-ncbijs includes a composable pipeline system for processing bulk NCBI data. Wire any source, parser, and sink together with a single `pipeline()` call. Built-in sources read from local files or HTTP; built-in sinks write to DuckDB or NDJSON — or bring your own with `createSink()`.
+ncbijs includes a composable pipeline system for processing bulk NCBI data. Wire any source, parser, and sink together with a single `pipeline()` call. The pipeline package is 100% browser-compatible — every export uses standard Web APIs (`fetch`, `DecompressionStream`).
 
 ```typescript
-import { pipeline, createFileSource, createSink } from '@ncbijs/pipeline';
+import { pipeline, createHttpSource, createSink } from '@ncbijs/pipeline';
 import { parseMeshDescriptorXml } from '@ncbijs/mesh';
 
-// Write to any destination — DuckDB, a REST API, a file, or your own logic
+// Download from NCBI HTTP → parse → write to any destination
 await pipeline(
-  createFileSource('desc2025.xml'),
+  createHttpSource('https://nlmpubs.nlm.nih.gov/projects/mesh/MESH_FILES/xmlmesh/desc2025.xml'),
   (xml) => parseMeshDescriptorXml(xml).descriptors,
   createSink(async (records) => {
     console.log(`Received ${records.length} MeSH descriptors`);
@@ -142,13 +146,59 @@ await pipeline(
 );
 ```
 
-Three packages work together:
+Or skip the wiring entirely with `@ncbijs/etl` — one function call to download, parse, and sink any dataset:
 
-- **`@ncbijs/pipeline`** — Composable Source/Sink primitives built on `AsyncIterable`. File, HTTP, and composite sources; DuckDB, JSON, and custom sinks. Streaming support, backpressure, abort signals, error strategies, and progress reporting.
-- **`@ncbijs/store`** — `ReadableStorage` / `WritableStorage` interfaces with a `DuckDbFileStorage` reference implementation. `DuckDbSink` plugs directly into the pipeline as one of many possible sinks.
+```typescript
+import { load, loadAll } from '@ncbijs/etl';
+import { createSink } from '@ncbijs/pipeline';
+
+// Load a single dataset
+await load(
+  'mesh',
+  createSink(async (records) => {
+    console.log(`${records.length} MeSH descriptors`);
+  }),
+);
+
+// Load all 6 datasets into any sink
+await loadAll((dataset) =>
+  createSink(async (records) => {
+    console.log(`${dataset}: ${records.length} records`);
+  }),
+);
+```
+
+Four packages work together:
+
+- **`@ncbijs/pipeline`** — Composable Source/Sink primitives built on `AsyncIterable`. HTTP and composite sources; custom sinks. Streaming support, backpressure, abort signals, error strategies, and progress reporting. Works in browsers and Node.js.
+- **`@ncbijs/etl`** — Pre-wired loaders for 6 NCBI bulk datasets. Encapsulates URLs, parsers, and source constructors so `load('mesh', mySink)` is all the user needs. Accepts any `Sink<object>`.
+- **`@ncbijs/store`** — `ReadableStorage` / `WritableStorage` interfaces with a `DuckDbFileStorage` reference implementation. `DuckDbSink` plugs directly into the pipeline as one of many possible sinks. Node.js only (requires `@duckdb/node-api`).
 - **`@ncbijs/sync`** — Watches NCBI FTP sources for updates via HTTP `Last-Modified` timestamps and triggers re-sync on a configurable interval.
 
 See **[Data Pipeline Guide](./docs/pipeline.md)** for the full API walkthrough, streaming parsers, error handling, and sync scheduling.
+
+## Browser compatibility
+
+39 of 42 packages work in both browsers and Node.js. Only 3 infrastructure packages require Node.js:
+
+| Runtime               | Packages                                                                                        | Why                                                            |
+| --------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| **Browser + Node.js** | All HTTP clients, parsers, rate-limiter, xml, fasta, genbank, pipeline, etl, sync (39 packages) | Only uses `fetch`, `DecompressionStream`, and pure computation |
+| **Node.js only**      | `@ncbijs/store`                                                                                 | Requires `@duckdb/node-api` (native binding)                   |
+| **Node.js only**      | `@ncbijs/store-mcp`, `@ncbijs/http-mcp`                                                         | MCP server CLIs (stdio transport)                              |
+
+Use ncbijs directly in frontend apps — search PubMed, look up genes, query MeSH, and more with zero server-side code:
+
+```typescript
+import { PubMed } from '@ncbijs/pubmed';
+import { Datasets } from '@ncbijs/datasets';
+
+const pubmed = new PubMed();
+const articles = await pubmed.search({ term: 'CRISPR therapy', retmax: 10 });
+
+const datasets = new Datasets();
+const gene = await datasets.geneBySymbol('BRCA1');
+```
 
 ## Quick start
 
@@ -242,6 +292,7 @@ I want to...
 │
 ├── Store NCBI data locally ───────────────→ @ncbijs/store
 ├── Data pipeline (Source → Parse → Sink) ─→ @ncbijs/pipeline
+├── Load any NCBI dataset in one call ─────→ @ncbijs/etl
 ├── Watch NCBI sources for updates ────────→ @ncbijs/sync
 ├── Expose tools to LLM agents (live API) ─→ @ncbijs/http-mcp
 └── Query local data via MCP ─────────────→ @ncbijs/store-mcp
@@ -259,49 +310,6 @@ I want to...
 | XML parsing       | `eutils`, `pubmed-xml`, `jats`, `pubtator`, `xml`                                                                                                                                                               |
 | Bulk parsers      | `mesh`, `cite`, `id-converter`, `clinvar`, `datasets`, `pubchem`, `snp`, `icite`, `clinical-trials`, `litvar`, `medgen`, `cdd`, `pmc`                                                                           |
 | Data pipelines    | `pipeline` (Source → Parse → Sink), `store` (DuckDbSink), `sync` (update detection)                                                                                                                             |
-
-## Architecture
-
-Zero-dependency philosophy — most packages have zero runtime dependencies. `eutils` depends on `rate-limiter` + `openapi-fetch`. `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `omim`, `medgen`, `gtr`, `geo`, `dbvar`, `sra`, `structure`, `cdd`, `books`, `nlm-catalog`, `clinical-trials`, `icite`, and `rxnorm` depend on `rate-limiter`. `sra` also depends on `xml`. High-level packages (`pubmed`, `pmc`, `protein`, `nucleotide`) depend only on internal `@ncbijs/*` packages. `litvar`, `bioc`, and `clinical-tables` are zero-dep.
-
-### Dependency graph
-
-```
-xml ──────────────┬─ pubmed-xml ──┐
-                  ├─ jats ────────┤
-rate-limiter ─────┤               │
-                  ├─ eutils ──┬─ pubmed (+ pubmed-xml)
-                  │           ├─ pmc (+ jats)
-                  │           └─ clinvar
-                  ├─ pubtator
-                  ├─ datasets
-                  ├─ blast
-                  ├─ snp
-                  ├─ pubchem
-                  ├─ omim
-                  ├─ medgen
-                  ├─ gtr
-                  ├─ geo
-                  ├─ dbvar
-                  ├─ sra (+ xml)
-                  ├─ structure
-                  ├─ cdd
-                  ├─ books
-                  ├─ nlm-catalog
-                  ├─ clinical-trials
-                  ├─ icite
-                  └─ rxnorm
-
-protein (rate-limiter + fasta + genbank)
-nucleotide (rate-limiter + fasta + genbank)
-pipeline, sync, genbank, fasta, id-converter, mesh, cite, litvar, bioc, clinical-tables  (zero-dep, independent)
-```
-
-### Build order
-
-1. **Parallel**: `rate-limiter`, `xml`, `pipeline`, `sync`, `id-converter`, `mesh`, `cite`, `fasta`, `genbank`, `litvar`, `bioc`, `clinical-tables`
-2. **After deps**: `eutils`, `datasets`, `blast`, `snp`, `pubchem`, `pubmed-xml`, `jats`, `pubtator`, `omim`, `medgen`, `gtr`, `geo`, `dbvar`, `sra`, `structure`, `cdd`, `books`, `nlm-catalog`, `clinical-trials`, `icite`, `rxnorm`, `protein`, `nucleotide`
-3. **After eutils**: `pubmed`, `pmc`, `clinvar`
 
 ## Development
 

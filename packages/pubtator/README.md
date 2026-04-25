@@ -1,5 +1,7 @@
 <h1 align="center">@ncbijs/pubtator</h1>
 
+> **Runtime**: Browser + Node.js
+
 <p align="center">
   <a href="https://www.npmjs.com/package/@ncbijs/pubtator"><img src="https://img.shields.io/npm/v/@ncbijs/pubtator" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/@ncbijs/pubtator"><img src="https://img.shields.io/npm/dm/@ncbijs/pubtator" alt="npm downloads" /></a>

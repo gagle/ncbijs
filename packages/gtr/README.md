@@ -1,5 +1,7 @@
 # @ncbijs/gtr
 
+> **Runtime**: Browser + Node.js
+
 Typed client for NCBI GTR (Genetic Testing Registry). Search genetic tests and fetch detailed test reports including conditions, analytes, methods, and certifications with automatic rate limiting and retry logic.
 
 ## Installation

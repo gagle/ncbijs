@@ -1,5 +1,7 @@
 <h1 align="center">@ncbijs/store-mcp</h1>
 
+> **Runtime**: Node.js only (MCP server CLI)
+
 <p align="center">
   MCP server for querying locally stored NCBI data via DuckDB.
 </p>

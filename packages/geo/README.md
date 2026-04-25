@@ -1,5 +1,7 @@
 # @ncbijs/geo
 
+> **Runtime**: Browser + Node.js
+
 Typed client for NCBI Gene Expression Omnibus (GEO) datasets. Search GEO records and fetch detailed dataset summaries with automatic rate limiting and retry logic.
 
 ## Installation

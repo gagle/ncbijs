@@ -1,5 +1,7 @@
 <h1 align="center">@ncbijs/id-converter</h1>
 
+> **Runtime**: Browser + Node.js
+
 <p align="center">
   <a href="https://www.npmjs.com/package/@ncbijs/id-converter"><img src="https://img.shields.io/npm/v/@ncbijs/id-converter" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/@ncbijs/id-converter"><img src="https://img.shields.io/npm/dm/@ncbijs/id-converter" alt="npm downloads" /></a>

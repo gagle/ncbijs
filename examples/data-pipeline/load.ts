@@ -1,12 +1,13 @@
 /**
  * Load downloaded NCBI data files into a DuckDB store via the pipeline API.
  *
- * Usage: npx tsx examples/data-pipeline/load.ts [--input-dir <path>] [--db-path <path>]
+ * Usage: pnpm exec tsx examples/data-pipeline/load.ts [--input-dir <path>] [--db-path <path>]
  *
  * Reads raw files from data/raw/, parses them with bulk parsers through
  * @ncbijs/pipeline, and writes records to DuckDB via DuckDbSink.
  */
 
+import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseMeshDescriptorXml } from '@ncbijs/mesh';
@@ -15,10 +16,18 @@ import { parseVariantSummaryTsv } from '@ncbijs/clinvar';
 import { parseGeneInfoTsv, parseTaxonomyDump } from '@ncbijs/datasets';
 import { parseCompoundExtras } from '@ncbijs/pubchem';
 import type { CompoundExtrasInput } from '@ncbijs/pubchem';
-import { pipeline, createFileSource, createCompositeSource } from '@ncbijs/pipeline';
+import { pipeline, createCompositeSource } from '@ncbijs/pipeline';
 import type { Source } from '@ncbijs/pipeline';
 import { DuckDbFileStorage } from '@ncbijs/store';
 import type { DatasetType } from '@ncbijs/store';
+
+function createFileSource(filePath: string): Source<string> {
+  return {
+    async *open(_signal: AbortSignal): AsyncIterable<string> {
+      yield await readFile(filePath, 'utf-8');
+    },
+  };
+}
 
 interface PipelineStep {
   readonly name: string;

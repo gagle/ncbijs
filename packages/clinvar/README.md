@@ -1,5 +1,7 @@
 # @ncbijs/clinvar
 
+> **Runtime**: Browser + Node.js
+
 Typed client for NCBI ClinVar clinical variant data. Search variants and fetch detailed reports with automatic rate limiting and retry logic.
 
 ## Installation

@@ -22,6 +22,18 @@ pnpm install
 pnpm build
 ```
 
+## HTTP-to-DuckDB (no download step)
+
+Stream data directly from NCBI HTTP into DuckDB — skips the download-to-disk step entirely:
+
+```bash
+pnpm exec tsx examples/data-pipeline/http-to-duckdb.ts
+```
+
+Supports `--db-path <path>` and `--dataset <name>` (clinvar, id-mappings, genes) flags.
+
+This approach uses `createHttpSource()` from `@ncbijs/pipeline` which auto-decompresses `.gz` responses via the Web Streams API (`DecompressionStream`). It works in both Node.js and browsers.
+
 ## Step 1: Download
 
 ```bash

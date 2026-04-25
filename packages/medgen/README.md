@@ -1,5 +1,7 @@
 # @ncbijs/medgen
 
+> **Runtime**: Browser + Node.js
+
 Typed client for NCBI MedGen medical genetics concepts. Search conditions and fetch detailed concept reports including genes, inheritance modes, clinical features, and definitions with automatic rate limiting and retry logic.
 
 ## Installation

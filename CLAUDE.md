@@ -16,6 +16,10 @@ pnpm nx run @ncbijs/eutils:typecheck
 
 # E2E (requires NCBI_API_KEY env var)
 pnpm nx run ncbijs-e2e:e2e
+
+# Demo (Vite app at demo/)
+cd demo && pnpm dev           # Start dev server at http://localhost:5173
+cd demo && pnpm build         # Production build to demo/dist/
 ```
 
 ## Architecture
@@ -49,11 +53,12 @@ rate-limiter ─────┤               │
                   ├─ cite
                   ├─ mesh
                   ├─ id-converter
-                  ├─ pubtator
                   └─ clinical-tables
 pipeline  (zero-dep, independent)
 sync      (zero-dep, independent)
 fasta     (zero-dep, independent)
+etl ──────────────── pipeline, mesh, clinvar, datasets, pubchem, id-converter
+demo (private) ────── pubmed, mesh, datasets, clinvar, snp, pubchem, id-converter, etl + @duckdb/duckdb-wasm
 ```
 
 ### Build order (Nx topological)
@@ -61,6 +66,7 @@ fasta     (zero-dep, independent)
 1. Zero-dep parallel: `rate-limiter`, `xml`, `fasta`, `pipeline`, `sync`
 2. `id-converter`, `mesh`, `cite`, `litvar`, `bioc`, `clinical-tables`, `eutils`, `datasets`, `blast`, `snp`, `pubchem`, `pubmed-xml`, `jats`, `pubtator`, `clinvar`, `clinical-trials`, `icite`, `rxnorm`
 3. `pubmed` (after `eutils` + `pubmed-xml`), `pmc` (after `eutils` + `jats` + `rate-limiter`)
+4. `etl` (after `pipeline` + `mesh` + `clinvar` + `datasets` + `pubchem` + `id-converter`)
 
 ## Rules and Skills
 
@@ -76,6 +82,17 @@ This repo includes `.claude/` configuration that Claude reads automatically:
 - **`.claude/skills/package-architecture/`** -- Package layout conventions (flat vs. split with http/bulk-parsers)
 
 See `CONTRIBUTING.md` for the contribution policy.
+
+### Demo app (`demo/`)
+
+Static Vite app deployed to GitHub Pages with two query modes:
+
+- **Live API mode** -- imports browser-safe `@ncbijs/*` packages and queries NCBI HTTP APIs directly from the browser (PubMed, MeSH, Datasets, ClinVar, SNP, PubChem, ID converter)
+- **Local Data mode** -- uses DuckDB-Wasm to query pre-loaded Parquet files with SQL (no network required)
+
+Key files: `demo/src/app.ts` (mode switcher), `demo/src/live-api.ts` (NCBI API calls), `demo/src/local-data.ts` (DuckDB-Wasm), `demo/src/query-catalog.ts` (example queries). Deployed via `.github/workflows/demo.yml`.
+
+After any demo changes, verify visually: `cd demo && pnpm dev`, open `http://localhost:5173`, test both Live API and Local Data tabs.
 
 ## Conventions
 
@@ -134,7 +151,7 @@ Common to both layouts: `package.json`, `project.json`, `tsconfig.json`, `tsconf
 
 - Prettier: 100 width, single quotes, trailing commas, 2-space indent, LF
 - Commit: `{type}({scope}): {subject}` (conventional commits via commitlint)
-- Scopes: `eutils`, `pubmed-xml`, `pubmed`, `jats`, `pmc`, `id-converter`, `pubtator`, `mesh`, `cite`, `http-mcp`, `store`, `store-mcp`, `pipeline`, `sync`, `rate-limiter`, `xml`, `fasta`, `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `genbank`, `protein`, `nucleotide`, `omim`, `medgen`, `gtr`, `geo`, `dbvar`, `sra`, `structure`, `cdd`, `books`, `nlm-catalog`, `clinical-trials`, `icite`, `rxnorm`, `litvar`, `bioc`, `clinical-tables`, `workspace`
+- Scopes: `eutils`, `pubmed-xml`, `pubmed`, `jats`, `pmc`, `id-converter`, `pubtator`, `mesh`, `cite`, `http-mcp`, `store`, `store-mcp`, `pipeline`, `sync`, `rate-limiter`, `xml`, `fasta`, `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `genbank`, `protein`, `nucleotide`, `omim`, `medgen`, `gtr`, `geo`, `dbvar`, `sra`, `structure`, `cdd`, `books`, `nlm-catalog`, `clinical-trials`, `icite`, `rxnorm`, `litvar`, `bioc`, `clinical-tables`, `etl`, `workspace`
 
 ### Adding a new package
 

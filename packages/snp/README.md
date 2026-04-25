@@ -1,5 +1,7 @@
 # @ncbijs/snp
 
+> **Runtime**: Browser + Node.js
+
 Typed client for the NCBI Variation Services API (dbSNP). Look up RefSNP reports by RS ID with allele placements, population frequencies, and clinical significance annotations.
 
 ## Installation

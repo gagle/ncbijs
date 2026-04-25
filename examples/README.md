@@ -82,10 +82,11 @@ pnpm exec tsx examples/search-pubmed.ts
 
 The `data-pipeline/` directory contains a 3-step pipeline that downloads NCBI bulk data, loads it into a local DuckDB database, and verifies the result. Once loaded, the data is queryable locally via `@ncbijs/store` or through the `@ncbijs/store-mcp` MCP server.
 
-| Script                      | Packages                                                               | Description                            |
-| --------------------------- | ---------------------------------------------------------------------- | -------------------------------------- |
-| `data-pipeline/download.ts` | Node.js built-ins                                                      | Download ~4.4 GB from NCBI FTP servers |
-| `data-pipeline/load.ts`     | `store` + `mesh` + `clinvar` + `datasets` + `pubchem` + `id-converter` | Parse and load into DuckDB             |
-| `data-pipeline/verify.ts`   | `store`                                                                | Spot-check queries against loaded data |
+| Script                            | Packages                                                       | Description                                |
+| --------------------------------- | -------------------------------------------------------------- | ------------------------------------------ |
+| `data-pipeline/http-to-duckdb.ts` | `pipeline` + `clinvar` + `datasets` + `id-converter` + `store` | Stream HTTP → parse → DuckDB (no download) |
+| `data-pipeline/download.ts`       | Node.js built-ins                                              | Download ~4.4 GB from NCBI FTP servers     |
+| `data-pipeline/load.ts`           | `pipeline` + `store` + parsers                                 | Parse local files and load into DuckDB     |
+| `data-pipeline/verify.ts`         | `store`                                                        | Spot-check queries against loaded data     |
 
 See [`data-pipeline/README.md`](./data-pipeline/README.md) for full setup and MCP server integration instructions.

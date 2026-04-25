@@ -1,5 +1,7 @@
 # @ncbijs/genbank
 
+> **Runtime**: Browser + Node.js
+
 Zero-dependency parser for NCBI GenBank flat file format. Extracts locus metadata, features, qualifiers, references and nucleotide/protein sequences into typed records.
 
 ## Installation

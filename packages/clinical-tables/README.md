@@ -1,5 +1,7 @@
 # @ncbijs/clinical-tables
 
+> **Runtime**: Browser + Node.js
+
 Typed client for the Clinical Table Search API. Autocomplete ICD-10, LOINC, SNOMED, RxTerms, and other medical code systems with optional extra field retrieval.
 
 ## Installation

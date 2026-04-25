@@ -1,5 +1,7 @@
 # @ncbijs/omim
 
+> **Runtime**: Browser + Node.js
+
 Typed client for NCBI OMIM (Online Mendelian Inheritance in Man). Search genetic disorders and genes, and fetch detailed entry reports with automatic rate limiting and retry logic.
 
 ## Installation

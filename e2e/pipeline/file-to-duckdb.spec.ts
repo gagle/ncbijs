@@ -1,6 +1,8 @@
+import { readFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { pipeline, createFileSource, createCompositeSource } from '@ncbijs/pipeline';
+import { pipeline, createCompositeSource } from '@ncbijs/pipeline';
+import type { Source } from '@ncbijs/pipeline';
 import { DuckDbFileStorage } from '@ncbijs/store';
 import { parseMeshDescriptorXml } from '@ncbijs/mesh';
 import { parseVariantSummaryTsv } from '@ncbijs/clinvar';
@@ -11,6 +13,14 @@ const fixturesDir = resolve(
   dirname(fileURLToPath(import.meta.url)),
   '../bulk-parsers/__fixtures__',
 );
+
+function createFileSource(filePath: string): Source<string> {
+  return {
+    async *open(_signal: AbortSignal): AsyncIterable<string> {
+      yield await readFile(filePath, 'utf-8');
+    },
+  };
+}
 
 describe('pipeline: file → parse → DuckDB', () => {
   let storage: DuckDbFileStorage;

@@ -1,5 +1,7 @@
 # @ncbijs/bioc
 
+> **Runtime**: Browser + Node.js
+
 Typed client for the BioC RESTful API. Retrieve annotated PubMed and PMC articles with named entity recognition (diseases, chemicals, genes, mutations).
 
 ## Installation

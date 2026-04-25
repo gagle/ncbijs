@@ -1,5 +1,7 @@
 # @ncbijs/rxnorm
 
+> **Runtime**: Browser + Node.js
+
 Typed client for the RxNorm REST API. Normalize drug names, look up concept properties, check drug-drug interactions, and map NDC codes with automatic rate limiting and retry logic.
 
 ## Installation

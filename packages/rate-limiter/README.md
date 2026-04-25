@@ -1,5 +1,7 @@
 <h1 align="center">@ncbijs/rate-limiter</h1>
 
+> **Runtime**: Browser + Node.js
+
 <p align="center">
   <a href="https://www.npmjs.com/package/@ncbijs/rate-limiter"><img src="https://img.shields.io/npm/v/@ncbijs/rate-limiter" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/@ncbijs/rate-limiter"><img src="https://img.shields.io/npm/dm/@ncbijs/rate-limiter" alt="npm downloads" /></a>

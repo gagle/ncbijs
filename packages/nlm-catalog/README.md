@@ -1,5 +1,7 @@
 # @ncbijs/nlm-catalog
 
+> **Runtime**: Browser + Node.js
+
 Typed client for the NLM Catalog (journal and serial records). Search catalog entries and fetch detailed records with automatic rate limiting and retry logic.
 
 ## Installation

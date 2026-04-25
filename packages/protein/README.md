@@ -1,5 +1,7 @@
 # @ncbijs/protein
 
+> **Runtime**: Browser + Node.js
+
 Typed client for NCBI Protein database. Fetch protein sequences in FASTA and GenBank formats with automatic rate limiting and retry logic.
 
 ## Installation

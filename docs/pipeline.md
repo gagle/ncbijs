@@ -7,12 +7,12 @@ How to use `@ncbijs/pipeline`, `@ncbijs/store`, and `@ncbijs/sync` to build comp
 NCBI publishes bulk data files on their FTP servers — MeSH descriptors in XML, ClinVar variants in TSV, gene info in tab-delimited format, and more. The pipeline system lets you process these files with a single function call:
 
 ```
-Source (file, HTTP, composite)
+Source (HTTP, composite, or custom)
   → Parser (batch or streaming)
-    → Sink (DuckDB, JSON, custom)
+    → Sink (DuckDB, custom callback, or any)
 ```
 
-All three steps are composable. Mix any source with any parser and any sink.
+All three steps are composable. Mix any source with any parser and any sink. The entire package is browser-compatible — every export uses only standard Web APIs (`fetch`, `DecompressionStream`, `TextDecoderStream`).
 
 ## Core concepts
 
@@ -30,9 +30,23 @@ Built-in sources:
 
 | Source                           | Import             | Use case                                                            |
 | -------------------------------- | ------------------ | ------------------------------------------------------------------- |
-| `createFileSource(path)`         | `@ncbijs/pipeline` | Read local files, auto-decompresses `.gz`                           |
-| `createHttpSource(url)`          | `@ncbijs/pipeline` | Download from HTTP/HTTPS, supports gzip                             |
+| `createHttpSource(url)`          | `@ncbijs/pipeline` | Download from HTTP/HTTPS, auto-decompresses `.gz`                   |
 | `createCompositeSource(sources)` | `@ncbijs/pipeline` | Multi-file parsers (e.g., taxonomy needs `names.dmp` + `nodes.dmp`) |
+
+Need to read local files? Implement the `Source<string>` interface directly:
+
+```typescript
+import { readFile } from 'node:fs/promises';
+import type { Source } from '@ncbijs/pipeline';
+
+function createFileSource(path: string): Source<string> {
+  return {
+    async *open(_signal: AbortSignal): AsyncIterable<string> {
+      yield await readFile(path, 'utf-8');
+    },
+  };
+}
+```
 
 ### Parser
 
@@ -77,7 +91,6 @@ Built-in sinks:
 | Sink                          | Import             | Use case                                         |
 | ----------------------------- | ------------------ | ------------------------------------------------ |
 | `createSink(fn)`              | `@ncbijs/pipeline` | Wrap any callback into a sink                    |
-| `createJsonSink(path)`        | `@ncbijs/pipeline` | Write NDJSON (newline-delimited JSON) to a file  |
 | `storage.createSink(dataset)` | `@ncbijs/store`    | Write directly to DuckDB via `DuckDbFileStorage` |
 
 ### Pipeline function
@@ -103,17 +116,17 @@ interface PipelineResult {
 
 ## Usage examples
 
-### Load MeSH descriptors from XML into DuckDB
+### Download MeSH descriptors from HTTP into DuckDB
 
 ```typescript
-import { pipeline, createFileSource } from '@ncbijs/pipeline';
+import { pipeline, createHttpSource } from '@ncbijs/pipeline';
 import { parseMeshDescriptorXml } from '@ncbijs/mesh';
 import { DuckDbFileStorage } from '@ncbijs/store';
 
 const storage = await DuckDbFileStorage.open('ncbijs.duckdb');
 
 const result = await pipeline(
-  createFileSource('desc2025.xml'),
+  createHttpSource('https://nlmpubs.nlm.nih.gov/projects/mesh/MESH_FILES/xmlmesh/desc2025.xml'),
   (xml) => parseMeshDescriptorXml(xml).descriptors,
   storage.createSink('mesh'),
 );
@@ -122,12 +135,12 @@ console.log(`${result.recordsProcessed} descriptors in ${result.durationMs}ms`);
 await storage.close();
 ```
 
-### Load taxonomy from multiple files
+### Load taxonomy from multiple HTTP sources
 
-Taxonomy requires two files (`names.dmp` and `nodes.dmp`). Use `createCompositeSource` to read them concurrently:
+Taxonomy requires two files (`names.dmp` and `nodes.dmp`). Use `createCompositeSource` to download them concurrently:
 
 ```typescript
-import { pipeline, createFileSource, createCompositeSource } from '@ncbijs/pipeline';
+import { pipeline, createHttpSource, createCompositeSource } from '@ncbijs/pipeline';
 import { parseTaxonomyDump } from '@ncbijs/datasets';
 import { DuckDbFileStorage } from '@ncbijs/store';
 
@@ -135,8 +148,8 @@ const storage = await DuckDbFileStorage.open('ncbijs.duckdb');
 
 await pipeline(
   createCompositeSource({
-    namesDmp: createFileSource('names.dmp'),
-    nodesDmp: createFileSource('nodes.dmp'),
+    namesDmp: createHttpSource('https://example.com/names.dmp'),
+    nodesDmp: createHttpSource('https://example.com/nodes.dmp'),
   }),
   (composite) =>
     parseTaxonomyDump({
@@ -149,18 +162,20 @@ await pipeline(
 await storage.close();
 ```
 
-### Stream PubMed XML into NDJSON
+### Stream PubMed XML into a custom sink
 
 For large files that don't fit in memory, use a streaming parser:
 
 ```typescript
-import { pipeline, createHttpSource, createJsonSink, streamParser } from '@ncbijs/pipeline';
+import { pipeline, createHttpSource, createSink, streamParser } from '@ncbijs/pipeline';
 import { createPubmedXmlStream } from '@ncbijs/pubmed-xml';
 
 await pipeline(
   createHttpSource('https://ftp.ncbi.nlm.nih.gov/pubmed/updatefiles/pubmed26n1500.xml.gz'),
   streamParser(createPubmedXmlStream),
-  createJsonSink('articles.ndjson'),
+  createSink(async (articles) => {
+    console.log(`Batch of ${articles.length} articles`);
+  }),
 );
 ```
 
@@ -169,11 +184,11 @@ await pipeline(
 Wrap any callback function into a sink:
 
 ```typescript
-import { pipeline, createFileSource, createSink } from '@ncbijs/pipeline';
+import { pipeline, createHttpSource, createSink } from '@ncbijs/pipeline';
 import { parseGeneInfoTsv } from '@ncbijs/datasets';
 
 await pipeline(
-  createFileSource('gene_info.tsv'),
+  createHttpSource('https://ftp.ncbi.nlm.nih.gov/gene/DATA/gene_info.gz'),
   parseGeneInfoTsv,
   createSink(async (genes) => {
     await fetch('https://my-api.com/genes', {
@@ -422,7 +437,7 @@ interface DatasetSyncState {
 The `examples/data-pipeline/load.ts` script demonstrates the complete workflow — reading raw files, parsing them through the pipeline, and writing to DuckDB:
 
 ```bash
-npx tsx examples/data-pipeline/load.ts --input-dir ./data/raw --db-path ./data/ncbijs.duckdb
+pnpm exec tsx examples/data-pipeline/load.ts --input-dir ./data/raw --db-path ./data/ncbijs.duckdb
 ```
 
 It processes all available datasets in sequence, reports progress, and prints storage stats at the end.

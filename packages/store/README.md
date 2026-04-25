@@ -1,5 +1,7 @@
 <h1 align="center">@ncbijs/store</h1>
 
+> **Runtime**: Node.js only (requires `@duckdb/node-api`)
+
 <p align="center">
   Storage interfaces and DuckDB implementation for local NCBI data.
 </p>

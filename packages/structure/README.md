@@ -1,5 +1,7 @@
 # @ncbijs/structure
 
+> **Runtime**: Browser + Node.js
+
 Typed client for NCBI Structure (MMDB/PDB) macromolecular data. Search structures and fetch detailed records with automatic rate limiting and retry logic.
 
 ## Installation

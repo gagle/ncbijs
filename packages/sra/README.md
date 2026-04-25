@@ -1,5 +1,7 @@
 # @ncbijs/sra
 
+> **Runtime**: Browser + Node.js
+
 Typed client for NCBI Sequence Read Archive (SRA). Search sequencing experiments and fetch detailed metadata with automatic rate limiting, retry logic, and built-in XML parsing of embedded experiment descriptors.
 
 ## Installation
