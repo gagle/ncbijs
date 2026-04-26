@@ -48,8 +48,8 @@ importers:
         specifier: ^3.8.3
         version: 3.8.3
       tsc-esm-imports:
-        specifier: file:../tsc-esm-imports
-        version: file:../tsc-esm-imports
+        specifier: 0.0.0
+        version: 0.0.0
       typescript:
         specifier: ^6.0.2
         version: 6.0.3
@@ -91,8 +91,8 @@ importers:
         version: link:../packages/snp
     devDependencies:
       typescript:
-        specifier: ^5.8.3
-        version: 5.9.3
+        specifier: ^6.0.2
+        version: 6.0.3
       vite:
         specifier: ^6.3.4
         version: 6.4.2(@types/node@20.19.39)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.3)
@@ -415,6 +415,12 @@ importers:
       '@ncbijs/eutils':
         specifier: workspace:*
         version: link:../eutils
+      '@ncbijs/rate-limiter':
+        specifier: workspace:*
+        version: link:../rate-limiter
+
+  packages/dailymed:
+    dependencies:
       '@ncbijs/rate-limiter':
         specifier: workspace:*
         version: link:../rate-limiter
@@ -3799,8 +3805,8 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
-  tsc-esm-imports@file:../tsc-esm-imports:
-    resolution: {directory: ../tsc-esm-imports, type: directory}
+  tsc-esm-imports@0.0.0:
+    resolution: {integrity: sha512-du2K0kyyqnNak2xH4co8XTkhWsNxM1wiAJaj8WJT0XxA5Hb9A59vaLDuvjGvX8qIOUQy2tEHzPpnZeb1ZetLpw==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -7280,7 +7286,7 @@ snapshots:
     dependencies:
       typescript: 6.0.3
 
-  tsc-esm-imports@file:../tsc-esm-imports: {}
+  tsc-esm-imports@0.0.0: {}
 
   tsconfig-paths@4.2.0:
     dependencies:

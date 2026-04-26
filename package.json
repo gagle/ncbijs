@@ -22,7 +22,7 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "tsc-esm-imports": "file:../tsc-esm-imports",
+    "tsc-esm-imports": "0.0.0",
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
     "@eslint/js": "^10.0.1",
