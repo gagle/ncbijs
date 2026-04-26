@@ -9,7 +9,7 @@
   <a href="https://github.com/gagle/ncbijs/actions"><img src="https://img.shields.io/github/actions/workflow/status/gagle/ncbijs/ci.yml" alt="CI" /></a>
   <a href="./docs/rag-integration.md"><img src="https://img.shields.io/badge/RAG-Ready-blueviolet" alt="RAG Ready" /></a>
   <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-Server-blue" alt="MCP Server" /></a>
-  <a href="./packages/http-mcp"><img src="https://img.shields.io/badge/LLM_Tools-18_tools-green" alt="LLM Tools" /></a>
+  <a href="./packages/http-mcp"><img src="https://img.shields.io/badge/LLM_Tools-29_tools-green" alt="LLM Tools" /></a>
 </p>
 
 ---
@@ -27,7 +27,7 @@ It is designed for two audiences:
 - **Developers and researchers** building biomedical applications, literature review tools, or clinical decision support systems.
 - **LLM and AI agents** that need structured, programmatic access to biomedical literature for retrieval-augmented generation (RAG), entity extraction, and citation management.
 
-**Built for LLM consumption.** Every package follows consistent naming, consistent interfaces, and has a self-documenting API with full JSDoc. The [MCP server](./packages/http-mcp) exposes 18 tools that any LLM agent can call directly. The workflow table below and the "Which package do I need?" decision tree make it easy for agents to discover the right package without reading source code. 39 of 42 packages run in the browser — ideal for agentic web apps that query NCBI without a backend.
+**Built for LLM consumption.** Every package follows consistent naming, consistent interfaces, and has a self-documenting API with full JSDoc. The [MCP server](./packages/http-mcp) exposes 29 tools that any LLM agent can call directly. The workflow table below and the "Which package do I need?" decision tree make it easy for agents to discover the right package without reading source code. 39 of 42 packages run in the browser — ideal for agentic web apps that query NCBI without a backend.
 
 ### What can you do with ncbijs?
 
@@ -168,12 +168,12 @@ await loadAll((dataset) =>
 );
 ```
 
-The pipeline has two phases: **initial load** and **watch & sync**:
+The pipeline has three phases: **load**, **sync**, and **query**:
 
 ```
-Phase 1: Initial Load               Phase 2: Watch & Sync
-  NCBI FTP ──→ DuckDB                Poll NCBI → detect changes → re-load
-  (one-time bulk download)            (long-running background process)
+Phase 1: Initial Load        Phase 2: Watch & Sync       Phase 3: Query via MCP
+  NCBI FTP ──→ DuckDB          Poll NCBI → re-load         store-mcp ──→ Claude
+  (one-time bulk download)      (long-running process)      (zero rate limits)
 ```
 
 ### Phase 1: Load data with `@ncbijs/etl`
@@ -210,7 +210,34 @@ const scheduler = new SyncScheduler(new InMemorySyncState(), createCheckers(), {
 await scheduler.start(); // checks immediately, then every hour
 ```
 
-See [`examples/data-pipeline/`](./examples/data-pipeline/) for complete scripts covering both phases.
+### Phase 3: Query via MCP
+
+Once data is loaded, expose it to Claude (or any MCP-compatible agent) with `@ncbijs/store-mcp`:
+
+```json
+{
+  "mcpServers": {
+    "ncbijs-store": {
+      "command": "npx",
+      "args": ["-y", "@ncbijs/store-mcp"],
+      "env": {
+        "NCBIJS_DB_PATH": "/absolute/path/to/ncbi.duckdb"
+      }
+    }
+  }
+}
+```
+
+Now your agent can query the local data directly:
+
+- _"Search for pathogenic BRCA1 variants in ClinVar"_
+- _"Look up the MeSH descriptor for Alzheimer's disease"_
+- _"What genes are on chromosome 17 in the local store?"_
+- _"Convert PMID 33024307 to a DOI"_
+
+No network, no rate limits, no API keys. See [`@ncbijs/store-mcp`](./packages/store-mcp) for the full list of 13 query tools.
+
+See [`examples/data-pipeline/`](./examples/data-pipeline/) for complete scripts covering all three phases.
 
 ### Packages
 
@@ -220,6 +247,80 @@ See [`examples/data-pipeline/`](./examples/data-pipeline/) for complete scripts 
 - **`@ncbijs/sync`** — Watches NCBI FTP for updates via MD5 checksums or HTTP `Last-Modified`. Pluggable checkers, configurable interval, abort signal.
 
 See **[Data Pipeline Guide](./docs/pipeline.md)** for the full API walkthrough, streaming parsers, error handling, and sync scheduling.
+
+## MCP servers
+
+ncbijs ships two MCP servers that give AI agents direct access to NCBI data. Pick the one that fits your use case — or use both:
+
+|                    | Live API (`http-mcp`)                     | Local data (`store-mcp`)     |
+| ------------------ | ----------------------------------------- | ---------------------------- |
+| **Setup**          | Zero — just add the config                | Load data first (Phases 1-2) |
+| **Network**        | Required (queries NCBI APIs in real time) | Offline after initial load   |
+| **Rate limits**    | NCBI limits apply (3-10 req/s)            | None                         |
+| **Data freshness** | Always current                            | As fresh as last sync        |
+| **Tools**          | 29                                        | 13                           |
+
+### Live API access (`@ncbijs/http-mcp`)
+
+Query NCBI APIs in real time — PubMed, PMC full text, BLAST, ClinVar, PubChem, MeSH, and more. No data loading required.
+
+```json
+{
+  "mcpServers": {
+    "ncbijs": {
+      "command": "npx",
+      "args": ["-y", "@ncbijs/http-mcp"],
+      "env": {
+        "NCBI_API_KEY": ""
+      }
+    }
+  }
+}
+```
+
+29 tools covering: PubMed search, PMC full text, PubTator entity recognition, gene/genome/taxonomy lookup, BLAST alignment, SNP/ClinVar variant queries, PubChem compounds, citation formatting, ID conversion, MeSH vocabulary, iCite metrics, RxNorm drug data, and LitVar variant-literature linking.
+
+Example prompts:
+
+- _"Search PubMed for recent CRISPR gene therapy reviews"_
+- _"Get the full text of PMC7886120 and summarize the methods"_
+- _"What genes and diseases are mentioned in PMID 33024307?"_
+- _"Run a BLAST search for the sequence ATCGATCGATCG"_
+
+See [`@ncbijs/http-mcp`](./packages/http-mcp) for details. Get a free API key at [ncbi.nlm.nih.gov/account/settings](https://www.ncbi.nlm.nih.gov/account/settings/).
+
+### Local data queries (`@ncbijs/store-mcp`)
+
+Query your local DuckDB database — MeSH, ClinVar, genes, taxonomy, PubChem, and ID mappings. No network needed after loading.
+
+```
+Phase 1: load data ──→ Phase 2: sync ──→ Phase 3: query via store-mcp
+(see Data pipelines)    (optional)        (this section)
+```
+
+```json
+{
+  "mcpServers": {
+    "ncbijs-store": {
+      "command": "npx",
+      "args": ["-y", "@ncbijs/store-mcp"],
+      "env": {
+        "NCBIJS_DB_PATH": "/absolute/path/to/ncbi.duckdb"
+      }
+    }
+  }
+}
+```
+
+13 tools available: `store-lookup-mesh`, `store-search-mesh`, `store-lookup-variant`, `store-search-variants`, `store-lookup-gene`, `store-search-genes`, `store-lookup-taxonomy`, `store-search-taxonomy`, `store-lookup-compound`, `store-search-compounds`, `store-convert-ids`, `store-search-ids`, `store-stats`.
+
+Example prompts:
+
+- _"Search for pathogenic BRCA1 variants in the local ClinVar data"_
+- _"What compounds have an InChI key starting with BSYNRYMUT?"_
+- _"How many records are loaded in each dataset?"_
+
+See [`@ncbijs/store-mcp`](./packages/store-mcp) for details. See [Data pipelines](#data-pipelines) above to load the data.
 
 ## Browser compatibility
 

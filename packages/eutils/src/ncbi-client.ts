@@ -85,6 +85,7 @@ function createRetryFetch(
       { maxRetries, rateLimiter },
       {
         createError: (status, body) => new EUtilsHttpError(status, body),
+        sensitiveParams: ['api_key'],
       },
     );
   };

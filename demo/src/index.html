@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://*.ncbi.nlm.nih.gov https://*.nlm.nih.gov https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; worker-src 'self' blob: https://cdn.jsdelivr.net;"
+    />
     <title>ncbijs Data Explorer</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>

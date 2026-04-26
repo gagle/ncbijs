@@ -75,9 +75,26 @@ export function getExamplesForMode(mode: 'live' | 'local'): ReadonlyArray<QueryE
   return QUERY_CATALOG.filter((example) => example.mode === mode || example.mode === 'both');
 }
 
-export function buildSql(example: QueryExample, input: string): string | undefined {
+export interface BuiltQuery {
+  readonly sql: string;
+  readonly params: ReadonlyArray<unknown>;
+}
+
+export function buildQuery(example: QueryExample, input: string): BuiltQuery | undefined {
   if (example.localSql === undefined) {
     return undefined;
   }
-  return example.localSql.replace(/\{\{input\}\}/g, input.replace(/'/g, "''"));
+
+  if (!example.localSql.includes('{{input}}')) {
+    return { sql: example.localSql, params: [] };
+  }
+
+  if (example.localSql === '{{input}}') {
+    return { sql: input, params: [] };
+  }
+
+  return {
+    sql: example.localSql.replace(/\{\{input\}\}/g, '?'),
+    params: [input],
+  };
 }

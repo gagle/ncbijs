@@ -1,4 +1,4 @@
-import { getExamplesForMode, buildSql } from './query-catalog';
+import { getExamplesForMode, buildQuery } from './query-catalog';
 import type { QueryExample } from './query-catalog';
 import { queryLive } from './live-api';
 import { queryLocal } from './local-data';
@@ -54,9 +54,9 @@ function selectExample(example: QueryExample, chip: HTMLButtonElement): void {
 
 function updateSqlPreview(): void {
   if (currentMode === 'local' && activeExample !== undefined) {
-    const sql = buildSql(activeExample, searchInput.value);
-    if (sql !== undefined) {
-      sqlPreview.textContent = sql;
+    const built = buildQuery(activeExample, searchInput.value);
+    if (built !== undefined) {
+      sqlPreview.textContent = built.sql;
       sqlPreview.hidden = false;
       return;
     }
@@ -71,8 +71,9 @@ function showLoading(): void {
 }
 
 function showError(error: unknown): void {
+  console.error('Query error:', error);
   resultsHeader.hidden = true;
-  const message = error instanceof Error ? error.message : String(error);
+  const message = error instanceof Error ? error.message : 'An unexpected error occurred';
   resultsWrap.innerHTML = `<div class="results-error">${escapeHtml(message)}</div>`;
 }
 
@@ -119,11 +120,11 @@ async function runQuery(): Promise<void> {
       const result = await queryLive(activeExample.liveHandler, input);
       showResults(result.records, 'live', result.latencyMs, result.endpoint);
     } else {
-      const sql = activeExample !== undefined ? buildSql(activeExample, input) : input;
-      if (sql === undefined) {
+      const built = activeExample !== undefined ? buildQuery(activeExample, input) : undefined;
+      if (built === undefined) {
         throw new Error('This query type is not available in local mode');
       }
-      const result = await queryLocal(sql);
+      const result = await queryLocal(built.sql, built.params);
       showResults(result.records, 'local', result.latencyMs);
     }
   } catch (error) {

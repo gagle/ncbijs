@@ -10,4 +10,5 @@ export interface RetryConfig {
 export interface FetchRetryOptions {
   readonly request?: RequestInit;
   readonly createError?: (status: number, body: string) => Error;
+  readonly sensitiveParams?: ReadonlyArray<string>;
 }

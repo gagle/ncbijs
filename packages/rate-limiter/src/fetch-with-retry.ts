@@ -39,6 +39,9 @@ export async function fetchWithRetry(
         await backoff(attempt);
         continue;
       }
+      if (err instanceof TypeError && options?.sensitiveParams?.length) {
+        throw new TypeError(redactParams(err.message, options.sensitiveParams), { cause: err });
+      }
       throw err;
     }
 
@@ -64,4 +67,19 @@ export async function fetchWithRetry(
 function backoff(attempt: number): Promise<void> {
   const ms = INITIAL_BACKOFF_MS * Math.pow(2, attempt) + Math.random() * MAX_JITTER_MS;
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function redactParams(message: string, paramNames: ReadonlyArray<string>): string {
+  let redacted = message;
+  for (const name of paramNames) {
+    redacted = redacted.replace(
+      new RegExp(`([?&])${escapeRegExp(name)}=[^&]*`, 'g'),
+      `$1${name}=[REDACTED]`,
+    );
+  }
+  return redacted;
+}
+
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

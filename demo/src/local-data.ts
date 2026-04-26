@@ -28,10 +28,20 @@ export interface LocalResult {
   readonly latencyMs: number;
 }
 
-export async function queryLocal(sql: string): Promise<LocalResult> {
+export async function queryLocal(
+  sql: string,
+  params?: ReadonlyArray<unknown>,
+): Promise<LocalResult> {
   const conn = await getConnection();
   const start = performance.now();
-  const result = await conn.query(sql);
+
+  let result: Awaited<ReturnType<typeof conn.query>>;
+  if (params !== undefined && params.length > 0) {
+    const stmt = await conn.prepare(sql);
+    result = await stmt.query(...params);
+  } else {
+    result = await conn.query(sql);
+  }
 
   const columns = result.schema.fields.map((field) => field.name);
   const records: Array<Record<string, unknown>> = [];
