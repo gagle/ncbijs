@@ -1,5 +1,5 @@
 // Normalize drug names using RxNorm, look up concept properties,
-// check drug-drug interactions, and map NDC codes.
+// find drug classes, and map NDC codes.
 
 import { RxNorm } from '@ncbijs/rxnorm';
 
@@ -29,12 +29,11 @@ async function main(): Promise<void> {
     const ndcs = await rxnorm.ndcByRxcui(concept.rxcui);
     console.log(`  Found ${ndcs.length} NDC(s): ${ndcs.slice(0, 5).join(', ')}`);
 
-    console.log('\nDrug interactions:\n');
+    console.log('\nDrug classes (ATC):\n');
 
-    const interactions = await rxnorm.interaction(concept.rxcui);
-    for (const ix of interactions.slice(0, 3)) {
-      console.log(`  ${ix.description.slice(0, 100)}`);
-      console.log(`    Severity: ${ix.severity}`);
+    const classes = await rxnorm.classByDrugName('aspirin', 'ATC');
+    for (const drugClass of classes.slice(0, 5)) {
+      console.log(`  ${drugClass.classId}: ${drugClass.className} (${drugClass.classType})`);
     }
   }
 

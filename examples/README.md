@@ -63,7 +63,8 @@ pnpm exec tsx examples/search-pubmed.ts
 | `eutils-history-server.ts`        | `@ncbijs/eutils`          | History Server pipeline with searchAndFetch             |
 | `clinical-trials-search.ts`       | `@ncbijs/clinical-trials` | Search ClinicalTrials.gov by condition and phase        |
 | `icite-metrics.ts`                | `@ncbijs/icite`           | Retrieve NIH iCite citation impact metrics              |
-| `rxnorm-drug-lookup.ts`           | `@ncbijs/rxnorm`          | Normalize drug names and check interactions             |
+| `rxnorm-drug-lookup.ts`           | `@ncbijs/rxnorm`          | Normalize drug names and find drug classes              |
+| `dailymed-drug-labels.ts`         | `@ncbijs/dailymed`        | Search drug labels, SPLs, and NDC packaging             |
 | `litvar-variant-literature.ts`    | `@ncbijs/litvar`          | Find literature linked to genetic variants              |
 | `bioc-annotated-text.ts`          | `@ncbijs/bioc`            | Retrieve annotated articles with named entities         |
 | `clinical-tables-autocomplete.ts` | `@ncbijs/clinical-tables` | Autocomplete ICD-10, LOINC, SNOMED codes                |

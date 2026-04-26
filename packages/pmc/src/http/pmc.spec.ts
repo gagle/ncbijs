@@ -892,7 +892,7 @@ describe('PMC', () => {
 
       const fetchCall = vi.mocked(fetch).mock.calls[0];
       const url = fetchCall?.[0] as string;
-      expect(url).toContain('https://www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi');
+      expect(url).toContain('https://pmc.ncbi.nlm.nih.gov/api/oai/v1/mh/');
       expect(url).toContain('verb=ListRecords');
     });
 

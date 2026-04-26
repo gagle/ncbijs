@@ -9,7 +9,7 @@
   <a href="https://github.com/gagle/ncbijs/actions"><img src="https://img.shields.io/github/actions/workflow/status/gagle/ncbijs/ci.yml" alt="CI" /></a>
   <a href="./docs/rag-integration.md"><img src="https://img.shields.io/badge/RAG-Ready-blueviolet" alt="RAG Ready" /></a>
   <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-Server-blue" alt="MCP Server" /></a>
-  <a href="./packages/http-mcp"><img src="https://img.shields.io/badge/LLM_Tools-29_tools-green" alt="LLM Tools" /></a>
+  <a href="./packages/http-mcp"><img src="https://img.shields.io/badge/LLM_Tools-27_tools-green" alt="LLM Tools" /></a>
 </p>
 
 ---
@@ -27,7 +27,7 @@ It is designed for two audiences:
 - **Developers and researchers** building biomedical applications, literature review tools, or clinical decision support systems.
 - **LLM and AI agents** that need structured, programmatic access to biomedical literature for retrieval-augmented generation (RAG), entity extraction, and citation management.
 
-**Built for LLM consumption.** Every package follows consistent naming, consistent interfaces, and has a self-documenting API with full JSDoc. The [MCP server](./packages/http-mcp) exposes 29 tools that any LLM agent can call directly. The workflow table below and the "Which package do I need?" decision tree make it easy for agents to discover the right package without reading source code. 39 of 42 packages run in the browser — ideal for agentic web apps that query NCBI without a backend.
+**Built for LLM consumption.** Every package follows consistent naming, consistent interfaces, and has a self-documenting API with full JSDoc. The [MCP server](./packages/http-mcp) exposes 27 tools that any LLM agent can call directly. The workflow table below and the "Which package do I need?" decision tree make it easy for agents to discover the right package without reading source code. 40 of 43 packages run in the browser — ideal for agentic web apps that query NCBI without a backend.
 
 ### What can you do with ncbijs?
 
@@ -64,7 +64,8 @@ It is designed for two audiences:
 | Chain search-fetch pipelines via History Server       | `@ncbijs/eutils`                    |
 | Search clinical trials by condition/intervention      | `@ncbijs/clinical-trials`           |
 | Get citation metrics and impact scores                | `@ncbijs/icite`                     |
-| Normalize drug names and check interactions           | `@ncbijs/rxnorm`                    |
+| Normalize drug names and find drug classes            | `@ncbijs/rxnorm`                    |
+| Look up drug labels, SPLs, and NDC packaging          | `@ncbijs/dailymed`                  |
 | Find literature linked to genetic variants            | `@ncbijs/litvar`                    |
 | Get annotated text with entity recognition            | `@ncbijs/bioc`                      |
 | Autocomplete ICD-10, LOINC, SNOMED codes              | `@ncbijs/clinical-tables`           |
@@ -108,7 +109,8 @@ It is designed for two audiences:
 | [`@ncbijs/nlm-catalog`](./packages/nlm-catalog)         | NLM Catalog journal and serial records with ISSN data               | [![npm](https://img.shields.io/npm/v/@ncbijs/nlm-catalog)](https://www.npmjs.com/package/@ncbijs/nlm-catalog)         |
 | [`@ncbijs/clinical-trials`](./packages/clinical-trials) | ClinicalTrials.gov v2 — study search, stats, and field values       | [![npm](https://img.shields.io/npm/v/@ncbijs/clinical-trials)](https://www.npmjs.com/package/@ncbijs/clinical-trials) |
 | [`@ncbijs/icite`](./packages/icite)                     | NIH iCite citation metrics — RCR, percentiles, clinical citations   | [![npm](https://img.shields.io/npm/v/@ncbijs/icite)](https://www.npmjs.com/package/@ncbijs/icite)                     |
-| [`@ncbijs/rxnorm`](./packages/rxnorm)                   | RxNorm drug normalization — concepts, interactions, NDC codes       | [![npm](https://img.shields.io/npm/v/@ncbijs/rxnorm)](https://www.npmjs.com/package/@ncbijs/rxnorm)                   |
+| [`@ncbijs/rxnorm`](./packages/rxnorm)                   | RxNorm drug normalization — concepts, classes, NDC codes            | [![npm](https://img.shields.io/npm/v/@ncbijs/rxnorm)](https://www.npmjs.com/package/@ncbijs/rxnorm)                   |
+| [`@ncbijs/dailymed`](./packages/dailymed)               | DailyMed drug labels — SPLs, NDC packaging, drug classes            | [![npm](https://img.shields.io/npm/v/@ncbijs/dailymed)](https://www.npmjs.com/package/@ncbijs/dailymed)               |
 | [`@ncbijs/litvar`](./packages/litvar)                   | LitVar2 variant-literature linking — publications by rsID           | [![npm](https://img.shields.io/npm/v/@ncbijs/litvar)](https://www.npmjs.com/package/@ncbijs/litvar)                   |
 | [`@ncbijs/bioc`](./packages/bioc)                       | BioC annotated text — PubMed/PMC articles with named entities       | [![npm](https://img.shields.io/npm/v/@ncbijs/bioc)](https://www.npmjs.com/package/@ncbijs/bioc)                       |
 | [`@ncbijs/clinical-tables`](./packages/clinical-tables) | Clinical Table Search — ICD-10, LOINC, SNOMED autocomplete          | [![npm](https://img.shields.io/npm/v/@ncbijs/clinical-tables)](https://www.npmjs.com/package/@ncbijs/clinical-tables) |
@@ -258,7 +260,7 @@ ncbijs ships two MCP servers that give AI agents direct access to NCBI data. Pic
 | **Network**        | Required (queries NCBI APIs in real time) | Offline after initial load   |
 | **Rate limits**    | NCBI limits apply (3-10 req/s)            | None                         |
 | **Data freshness** | Always current                            | As fresh as last sync        |
-| **Tools**          | 29                                        | 13                           |
+| **Tools**          | 27                                        | 13                           |
 
 ### Live API access (`@ncbijs/http-mcp`)
 
@@ -278,7 +280,7 @@ Query NCBI APIs in real time — PubMed, PMC full text, BLAST, ClinVar, PubChem,
 }
 ```
 
-29 tools covering: PubMed search, PMC full text, PubTator entity recognition, gene/genome/taxonomy lookup, BLAST alignment, SNP/ClinVar variant queries, PubChem compounds, citation formatting, ID conversion, MeSH vocabulary, iCite metrics, RxNorm drug data, and LitVar variant-literature linking.
+27 tools covering: PubMed search, PMC full text, PubTator entity recognition, gene/genome/taxonomy lookup, BLAST alignment, SNP/ClinVar variant queries, PubChem compounds, citation formatting, ID conversion, MeSH vocabulary, iCite metrics, RxNorm drug data, and LitVar variant-literature linking.
 
 Example prompts:
 
@@ -324,11 +326,11 @@ See [`@ncbijs/store-mcp`](./packages/store-mcp) for details. See [Data pipelines
 
 ## Browser compatibility
 
-39 of 42 packages work in both browsers and Node.js. Only 3 infrastructure packages require Node.js:
+40 of 43 packages work in both browsers and Node.js. Only 3 infrastructure packages require Node.js:
 
 | Runtime               | Packages                                                                                        | Why                                                            |
 | --------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| **Browser + Node.js** | All HTTP clients, parsers, rate-limiter, xml, fasta, genbank, pipeline, etl, sync (39 packages) | Only uses `fetch`, `DecompressionStream`, and pure computation |
+| **Browser + Node.js** | All HTTP clients, parsers, rate-limiter, xml, fasta, genbank, pipeline, etl, sync (40 packages) | Only uses `fetch`, `DecompressionStream`, and pure computation |
 | **Node.js only**      | `@ncbijs/store`                                                                                 | Requires `@duckdb/node-api` (native binding)                   |
 | **Node.js only**      | `@ncbijs/store-mcp`, `@ncbijs/http-mcp`                                                         | MCP server CLIs (stdio transport)                              |
 
@@ -413,8 +415,9 @@ I want to...
 │   ├── Compound properties ───────────────→ @ncbijs/pubchem
 │   ├── Compound annotations (GHS, etc.) ──→ @ncbijs/pubchem
 │   ├── Drug normalization (RxCUI) ────────→ @ncbijs/rxnorm
-│   ├── Drug interactions ─────────────────→ @ncbijs/rxnorm
-│   └── NDC code lookup ───────────────────→ @ncbijs/rxnorm
+│   ├── Drug classes (ATC, VA, MEDRT) ─────→ @ncbijs/rxnorm
+│   ├── NDC code lookup ───────────────────→ @ncbijs/rxnorm
+│   └── Drug labels and SPLs ─────────────→ @ncbijs/dailymed
 │
 ├── Autocomplete medical codes
 │   ├── ICD-10, LOINC, SNOMED ─────────────→ @ncbijs/clinical-tables
@@ -449,7 +452,7 @@ I want to...
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Supports API key  | `eutils`, `pubmed`, `pmc`, `clinvar`, `snp`, `datasets`, `omim`, `medgen`, `gtr`, `geo`, `dbvar`, `sra`, `structure`, `cdd`, `books`, `nlm-catalog`, `protein`, `nucleotide` (optional, for higher rate limits) |
 | No API key needed | All others (non-NCBI APIs)                                                                                                                                                                                      |
-| Rate-limited      | `eutils`, `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `clinical-trials`, `icite`, `rxnorm`, + all that depend on `rate-limiter`                                                                           |
+| Rate-limited      | `eutils`, `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `clinical-trials`, `icite`, `rxnorm`, `dailymed`, + all that depend on `rate-limiter`                                                               |
 | Zero dependencies | `pipeline`, `sync`, `cite`, `id-converter`, `mesh`, `fasta`, `genbank`, `litvar`, `bioc`, `clinical-tables`                                                                                                     |
 | Async iterators   | `eutils` (efetchBatches, searchAndFetch, searchAndSummarize), `pubmed` (batch), `clinical-trials` (searchStudies), `cite` (citeMany), `pipeline` (Source, streamParser)                                         |
 | XML parsing       | `eutils`, `pubmed-xml`, `jats`, `pubtator`, `xml`                                                                                                                                                               |

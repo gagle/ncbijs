@@ -2,12 +2,12 @@
 
 > **Runtime**: Browser + Node.js
 
-Typed client for the RxNorm REST API. Normalize drug names, look up concept properties, check drug-drug interactions, and map NDC codes with automatic rate limiting and retry logic.
+Typed client for the RxNorm REST API. Normalize drug names, look up concept properties, find drug classes via RxClass, and map NDC codes with automatic rate limiting and retry logic.
 
 ## Installation
 
 ```bash
-npm install @ncbijs/rxnorm
+pnpm install @ncbijs/rxnorm
 ```
 
 ## Usage
@@ -23,14 +23,14 @@ console.log(rxcui); // '1191'
 const props = await rxnorm.properties('1191');
 console.log(props.name); // 'aspirin'
 
-const interactions = await rxnorm.interaction('1191');
-for (const ix of interactions) {
-  console.log(ix.description);
-}
-
 const related = await rxnorm.relatedByType('1191', ['SBD', 'SCD']);
 for (const concept of related) {
   console.log(`${concept.rxcui}: ${concept.name}`);
+}
+
+const classes = await rxnorm.classByDrugName('aspirin', 'ATC');
+for (const drugClass of classes) {
+  console.log(`${drugClass.classId}: ${drugClass.className}`);
 }
 
 const suggestions = await rxnorm.spelling('asprin');
@@ -52,7 +52,7 @@ RxNorm is a fully public API with no API key required. Rate limit: 2 requests/se
 
 ### Concept lookup
 
-#### `rxcui(name: string): Promise<string | undefined>`
+#### `rxcui(name: string): Promise<RxConcept | undefined>`
 
 Get the RxNorm concept identifier (RXCUI) from a drug name. Returns `undefined` if not found.
 
@@ -74,11 +74,19 @@ Get the drug group with all associated concepts for a drug name.
 
 Get spelling suggestions for a drug name.
 
-### Interactions
+### Drug classes (RxClass)
 
-#### `interaction(rxcui: string): Promise<ReadonlyArray<DrugInteraction>>`
+#### `classByDrugName(drugName: string, relaSource?: string): Promise<ReadonlyArray<RxClassDrugInfo>>`
 
-Get drug-drug interactions for a concept.
+Find drug classes associated with a drug name. Filter by relationship source (`'ATC'`, `'VA'`, `'MEDRT'`, `'FDASPL'`).
+
+#### `classByRxcui(rxcui: string, relaSource?: string): Promise<ReadonlyArray<RxClassDrugInfo>>`
+
+Find drug classes associated with an RxCUI. Filter by relationship source.
+
+#### `classMembers(classId: string, relaSource?: string): Promise<ReadonlyArray<RxClassMember>>`
+
+Fetch drug members of a drug class (e.g., all drugs in ATC class `'N02BA'`).
 
 ### Fuzzy search
 
@@ -149,7 +157,6 @@ interface RxConceptProperties {
   tty: string;
   language: string;
   suppress: string;
-  umlscui: string;
 }
 ```
 
@@ -171,20 +178,25 @@ interface ConceptGroup {
 }
 ```
 
-### `DrugInteraction`
+### `RxClassDrugInfo`
 
 ```ts
-interface DrugInteraction {
-  description: string;
-  severity: string;
-  interactionConcept: Array<InteractionConcept>;
+interface RxClassDrugInfo {
+  rxcui: string;
+  drugName: string;
+  tty: string;
+  classId: string;
+  className: string;
+  classType: string;
+  rela: string;
+  relaSource: string;
 }
 ```
 
-### `InteractionConcept`
+### `RxClassMember`
 
 ```ts
-interface InteractionConcept {
+interface RxClassMember {
   rxcui: string;
   name: string;
   tty: string;

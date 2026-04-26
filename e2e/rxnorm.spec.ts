@@ -41,26 +41,4 @@ describe('RxNorm E2E', () => {
     expect(props.rxcui).toBe(concept.rxcui);
     expect(props.name).toBeTruthy();
   });
-
-  it('should check drug interactions', async () => {
-    let concept;
-    try {
-      concept = await rxnorm.rxcui('warfarin');
-    } catch {
-      return;
-    }
-    if (concept === undefined) {
-      return;
-    }
-
-    let interactions;
-    try {
-      interactions = await rxnorm.interaction(concept.rxcui);
-    } catch {
-      return;
-    }
-
-    expect(interactions.length).toBeGreaterThan(0);
-    expect(interactions[0]!.description).toBeTruthy();
-  });
 });

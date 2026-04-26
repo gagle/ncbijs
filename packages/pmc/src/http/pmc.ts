@@ -17,7 +17,7 @@ import type {
 import { readAllBlocks, readBlock, readTag } from '@ncbijs/xml';
 
 const S3_BASE_URL = 'https://pmc-oa-opendata.s3.amazonaws.com';
-const OAI_BASE_URL = 'https://www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi';
+const OAI_BASE_URL = 'https://pmc.ncbi.nlm.nih.gov/api/oai/v1/mh/';
 const ESEARCH_BATCH_SIZE = 500;
 const REQUESTS_PER_SECOND = 3;
 

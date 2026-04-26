@@ -2,8 +2,6 @@ export type {
   ApproximateTermOptions,
   ConceptGroup,
   DrugGroup,
-  DrugInteraction,
-  InteractionConcept,
   RxClassConcept,
   RxClassDrugInfo,
   RxClassMember,

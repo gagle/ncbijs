@@ -32,22 +32,6 @@ export interface ConceptGroup {
   readonly conceptProperties: ReadonlyArray<RxConcept>;
 }
 
-/** A drug-drug interaction with severity and involved concepts. */
-export interface DrugInteraction {
-  readonly description: string;
-  readonly severity: string;
-  readonly interactionConcept: ReadonlyArray<InteractionConcept>;
-}
-
-/** A concept involved in a drug-drug interaction. */
-export interface InteractionConcept {
-  readonly rxcui: string;
-  readonly name: string;
-  readonly tty: string;
-  readonly sourceConceptId: string;
-  readonly sourceConceptName: string;
-}
-
 /** Options for fuzzy drug name lookup. */
 export interface ApproximateTermOptions {
   readonly maxEntries?: number;

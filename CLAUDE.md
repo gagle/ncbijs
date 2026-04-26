@@ -28,7 +28,7 @@ cd demo && pnpm build         # Production build to demo/dist/
 - **Language**: TypeScript 6, ES2022 target, `strict: true`
 - **Module**: ESM-only (`"type": "module"`), `moduleResolution: "bundler"`, no `.js` in source imports
 - **Build**: `tsc` + `tsc-esm-imports` CLI (devDep, linked from `../tsc-esm-imports`) adds `.js` to compiled output
-- **Zero-dep philosophy**: Most packages have zero runtime dependencies. `eutils` depends on `rate-limiter` + `openapi-fetch`. `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `clinical-trials`, `icite`, `rxnorm`, `litvar`, `bioc`, `cite`, `mesh`, `id-converter`, `pubtator`, `clinical-tables` depend on `rate-limiter`. `pubmed` and `pmc` depend only on internal `@ncbijs/*` packages.
+- **Zero-dep philosophy**: Most packages have zero runtime dependencies. `eutils` depends on `rate-limiter` + `openapi-fetch`. `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `clinical-trials`, `icite`, `rxnorm`, `dailymed`, `litvar`, `bioc`, `cite`, `mesh`, `id-converter`, `pubtator`, `clinical-tables` depend on `rate-limiter`. `pubmed` and `pmc` depend only on internal `@ncbijs/*` packages.
 - **`rate-limiter` is project-agnostic**: This package must contain zero NCBI-specific code, zero business logic, and zero coupling to any other `@ncbijs/*` package. It is designed to be extractable into a standalone published library with no changes. Never add domain-specific constants, NCBI URLs, credential helpers, or API-specific retry logic to it. All NCBI-specific infrastructure belongs in the consuming packages (e.g., `*-client.ts` files).
 
 ### Package dependency graph
@@ -48,6 +48,7 @@ rate-limiter ─────┤               │
                   ├─ clinical-trials
                   ├─ icite
                   ├─ rxnorm
+                  ├─ dailymed
                   ├─ litvar
                   ├─ bioc
                   ├─ cite
@@ -64,7 +65,7 @@ demo (private) ────── pubmed, mesh, datasets, clinvar, snp, pubchem,
 ### Build order (Nx topological)
 
 1. Zero-dep parallel: `rate-limiter`, `xml`, `fasta`, `pipeline`, `sync`
-2. `id-converter`, `mesh`, `cite`, `litvar`, `bioc`, `clinical-tables`, `eutils`, `datasets`, `blast`, `snp`, `pubchem`, `pubmed-xml`, `jats`, `pubtator`, `clinvar`, `clinical-trials`, `icite`, `rxnorm`
+2. `id-converter`, `mesh`, `cite`, `litvar`, `bioc`, `clinical-tables`, `eutils`, `datasets`, `blast`, `snp`, `pubchem`, `pubmed-xml`, `jats`, `pubtator`, `clinvar`, `clinical-trials`, `icite`, `rxnorm`, `dailymed`
 3. `pubmed` (after `eutils` + `pubmed-xml`), `pmc` (after `eutils` + `jats` + `rate-limiter`)
 4. `etl` (after `pipeline` + `sync` + `mesh` + `clinvar` + `datasets` + `pubchem` + `id-converter`)
 
@@ -151,7 +152,7 @@ Common to both layouts: `package.json`, `project.json`, `tsconfig.json`, `tsconf
 
 - Prettier: 100 width, single quotes, trailing commas, 2-space indent, LF
 - Commit: `{type}({scope}): {subject}` (conventional commits via commitlint)
-- Scopes: `eutils`, `pubmed-xml`, `pubmed`, `jats`, `pmc`, `id-converter`, `pubtator`, `mesh`, `cite`, `http-mcp`, `store`, `store-mcp`, `pipeline`, `sync`, `rate-limiter`, `xml`, `fasta`, `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `genbank`, `protein`, `nucleotide`, `omim`, `medgen`, `gtr`, `geo`, `dbvar`, `sra`, `structure`, `cdd`, `books`, `nlm-catalog`, `clinical-trials`, `icite`, `rxnorm`, `litvar`, `bioc`, `clinical-tables`, `etl`, `workspace`
+- Scopes: `eutils`, `pubmed-xml`, `pubmed`, `jats`, `pmc`, `id-converter`, `pubtator`, `mesh`, `cite`, `http-mcp`, `store`, `store-mcp`, `pipeline`, `sync`, `rate-limiter`, `xml`, `fasta`, `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `genbank`, `protein`, `nucleotide`, `omim`, `medgen`, `gtr`, `geo`, `dbvar`, `sra`, `structure`, `cdd`, `books`, `nlm-catalog`, `clinical-trials`, `icite`, `rxnorm`, `dailymed`, `litvar`, `bioc`, `clinical-tables`, `etl`, `workspace`
 
 ### Adding a new package
 

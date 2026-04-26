@@ -37,10 +37,10 @@ describe('MCP Server E2E', () => {
     return first.text;
   }
 
-  it('should list all 29 tools', async () => {
+  it('should list all 27 tools', async () => {
     const { tools } = await client.listTools();
 
-    expect(tools).toHaveLength(29);
+    expect(tools).toHaveLength(27);
     const names = tools.map((tool) => tool.name).sort();
     expect(names).toContain('search-pubmed');
     expect(names).toContain('get-full-text');
@@ -63,7 +63,6 @@ describe('MCP Server E2E', () => {
     expect(names).toContain('citation-metrics');
     expect(names).toContain('citation-graph');
     expect(names).toContain('drug-lookup');
-    expect(names).toContain('drug-interaction');
     expect(names).toContain('search-litvar');
   });
 

@@ -60,7 +60,8 @@ These packages have README documentation in their package directories. See each 
 | -------------------------------------------------------- | ---------------------------------------------------------- |
 | [`@ncbijs/clinical-trials`](../packages/clinical-trials) | ClinicalTrials.gov v2 — study search, stats, field values  |
 | [`@ncbijs/icite`](../packages/icite)                     | NIH iCite citation metrics — RCR, percentiles              |
-| [`@ncbijs/rxnorm`](../packages/rxnorm)                   | RxNorm drug normalization, interactions, NDC codes         |
+| [`@ncbijs/rxnorm`](../packages/rxnorm)                   | RxNorm drug normalization, drug classes, NDC codes         |
+| [`@ncbijs/dailymed`](../packages/dailymed)               | DailyMed drug labels, SPLs, NDC packaging, drug classes    |
 | [`@ncbijs/litvar`](../packages/litvar)                   | LitVar2 variant-literature linking by rsID                 |
 | [`@ncbijs/bioc`](../packages/bioc)                       | BioC annotated text with named entity recognition          |
 | [`@ncbijs/clinical-tables`](../packages/clinical-tables) | Clinical Table Search — ICD-10, LOINC, SNOMED autocomplete |

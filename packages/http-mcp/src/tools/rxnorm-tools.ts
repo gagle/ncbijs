@@ -22,20 +22,4 @@ export function registerRxNormTools(server: McpServer, getRxNorm: () => RxNorm):
       return { content: [{ type: 'text' as const, text: JSON.stringify(candidates, null, 2) }] };
     },
   );
-
-  server.registerTool(
-    'drug-interaction',
-    {
-      title: 'Check Drug Interactions',
-      description: 'Check known drug-drug interactions for an RxNorm concept by RxCUI.',
-      inputSchema: {
-        rxcui: z.string().describe('RxNorm Concept Unique Identifier'),
-      },
-    },
-    async ({ rxcui }) => {
-      const rxnorm = getRxNorm();
-      const interactions = await rxnorm.interaction(rxcui);
-      return { content: [{ type: 'text' as const, text: JSON.stringify(interactions, null, 2) }] };
-    },
-  );
 }

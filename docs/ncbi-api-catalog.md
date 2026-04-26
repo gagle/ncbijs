@@ -160,22 +160,22 @@ Rate limits: ~50 req/min.
 
 ### RxNorm and related drug APIs
 
-| Endpoint               | URL                                                                            | Description               |
-| ---------------------- | ------------------------------------------------------------------------------ | ------------------------- |
-| RxNorm: RxCUI lookup   | `https://rxnav.nlm.nih.gov/REST/rxcui.json?name={name}`                        | Drug name to RxCUI        |
-| RxNorm: properties     | `https://rxnav.nlm.nih.gov/REST/rxcui/{rxcui}/properties.json`                 | Drug concept properties   |
-| RxNorm: related        | `https://rxnav.nlm.nih.gov/REST/rxcui/{rxcui}/related.json?tty={tty}`          | Related concepts by TTY   |
-| RxNorm: NDC            | `https://rxnav.nlm.nih.gov/REST/rxcui/{rxcui}/ndcs.json`                       | NDC codes for a drug      |
-| RxNorm: allrelated     | `https://rxnav.nlm.nih.gov/REST/rxcui/{rxcui}/allrelated.json`                 | All related concepts      |
-| RxNorm: version        | `https://rxnav.nlm.nih.gov/REST/version.json`                                  | Data and API version      |
-| RxClass: by class      | `https://rxnav.nlm.nih.gov/REST/rxclass/classMembers.json?classId={id}`        | Drugs in a class          |
-| RxClass: by drug       | `https://rxnav.nlm.nih.gov/REST/rxclass/class/byDrugName.json?drugName={name}` | Classes for a drug        |
-| Drug interaction       | `https://rxnav.nlm.nih.gov/REST/interaction/interaction.json?rxcui={rxcui}`    | Drug-drug interactions    |
-| Drug interaction: list | `https://rxnav.nlm.nih.gov/REST/interaction/list.json?rxcuis={rxcuis}`         | Interactions among a list |
+| Endpoint               | URL                                                                            | Description                             |
+| ---------------------- | ------------------------------------------------------------------------------ | --------------------------------------- |
+| RxNorm: RxCUI lookup   | `https://rxnav.nlm.nih.gov/REST/rxcui.json?name={name}`                        | Drug name to RxCUI                      |
+| RxNorm: properties     | `https://rxnav.nlm.nih.gov/REST/rxcui/{rxcui}/properties.json`                 | Drug concept properties                 |
+| RxNorm: related        | `https://rxnav.nlm.nih.gov/REST/rxcui/{rxcui}/related.json?tty={tty}`          | Related concepts by TTY                 |
+| RxNorm: NDC            | `https://rxnav.nlm.nih.gov/REST/rxcui/{rxcui}/ndcs.json`                       | NDC codes for a drug                    |
+| RxNorm: allrelated     | `https://rxnav.nlm.nih.gov/REST/rxcui/{rxcui}/allrelated.json`                 | All related concepts                    |
+| RxNorm: version        | `https://rxnav.nlm.nih.gov/REST/version.json`                                  | Data and API version                    |
+| RxClass: by class      | `https://rxnav.nlm.nih.gov/REST/rxclass/classMembers.json?classId={id}`        | Drugs in a class                        |
+| RxClass: by drug       | `https://rxnav.nlm.nih.gov/REST/rxclass/class/byDrugName.json?drugName={name}` | Classes for a drug                      |
+| Drug interaction       | ~~`https://rxnav.nlm.nih.gov/REST/interaction/interaction.json`~~              | **Discontinued Jan 2024** (returns 404) |
+| Drug interaction: list | ~~`https://rxnav.nlm.nih.gov/REST/interaction/list.json`~~                     | **Discontinued Jan 2024** (returns 404) |
 
 Rate limits: 20 req/s.
 
-**ncbijs**: `@ncbijs/rxnorm` (core RxNorm only; RxClass and interaction endpoints not wrapped)
+**ncbijs**: `@ncbijs/rxnorm` (RxNorm core + RxClass endpoints)
 
 ### LitVar2
 
@@ -279,7 +279,7 @@ Tables: `icd10cm`, `icd9cm_dx`, `loinc_items`, `snomed_ct`, `hcpcs`, `hpo`, `con
 | NDC lookup    | `https://dailymed.nlm.nih.gov/dailymed/services/v2/ndcs.json?ndc={ndc}`             | NDC code lookup     |
 | Drug classes  | `https://dailymed.nlm.nih.gov/dailymed/services/v2/drugclasses.json`                | Drug classification |
 
-**ncbijs**: -- (not wrapped)
+**ncbijs**: `@ncbijs/dailymed`
 
 ### ClinVar Submission API (write-only)
 
@@ -366,10 +366,23 @@ Requires SP-API-KEY header. This is a write API for submitting data to ClinVar.
 
 ## Coverage summary
 
-| Status                    | Count       | Details                                                                                  |
-| ------------------------- | ----------- | ---------------------------------------------------------------------------------------- |
-| Wrapped in ncbijs         | 33 packages | All major NCBI APIs covered                                                              |
-| Not wrapped (niche)       | 5           | BioC FAIR-SMart, PubMed Computed Authors, PubChem SDQ Agent, PMC OAI-PMH, PMC OA Service |
-| Not wrapped (gated)       | 2           | UMLS Terminology Services, VSAC FHIR (require UMLS license)                              |
-| Not wrapped (write-only)  | 1           | ClinVar Submission API                                                                   |
-| Not wrapped (independent) | 2           | DailyMed v2, RxClass/Drug Interaction                                                    |
+| Status                   | Count       | Details                                                                                  |
+| ------------------------ | ----------- | ---------------------------------------------------------------------------------------- |
+| Wrapped in ncbijs        | 35 packages | All major NCBI/NLM APIs covered (including DailyMed and RxClass)                         |
+| Not wrapped (niche)      | 5           | BioC FAIR-SMart, PubMed Computed Authors, PubChem SDQ Agent, PMC OAI-PMH, PMC OA Service |
+| Not wrapped (gated)      | 2           | UMLS Terminology Services, VSAC FHIR (require UMLS license)                              |
+| Not wrapped (write-only) | 1           | ClinVar Submission API                                                                   |
+| Deprecated (removed)     | 1           | Drug Interaction API (discontinued Jan 2024, returns 404)                                |
+
+---
+
+## Deprecated and discontinued APIs
+
+These APIs have been discontinued by their maintainers. **Do NOT re-implement them.**
+
+| API                                                               | Status                               | Date     | Notes                                                                                                        |
+| ----------------------------------------------------------------- | ------------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------ |
+| RxNorm Drug Interaction API (`/REST/interaction/`)                | Returns 404                          | Jan 2024 | Removed from `@ncbijs/rxnorm`. Was at `rxnav.nlm.nih.gov/REST/interaction/interaction.json` and `list.json`. |
+| PMC OAI-PMH old endpoint (`www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi`) | Redirects to new URL                 | 2024     | Replaced by `pmc.ncbi.nlm.nih.gov/api/oai/v1/mh/`. Updated in `@ncbijs/pmc`.                                 |
+| PMC FTP legacy paths                                              | Moving to `deprecated/` subdirectory | Apr 2026 | All legacy FTP files removed Aug 2026. New location: PMC Cloud Service on AWS S3.                            |
+| NCBI HTTP (non-HTTPS)                                             | Rejected                             | 2023     | All E-utilities require HTTPS. HTTP requests are rejected.                                                   |

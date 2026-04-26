@@ -5,8 +5,6 @@ import type {
   ApproximateTermOptions,
   ConceptGroup,
   DrugGroup,
-  DrugInteraction,
-  InteractionConcept,
   RxClassDrugInfo,
   RxClassMember,
   RxConcept,
@@ -20,7 +18,7 @@ import type {
 const BASE_URL = 'https://rxnav.nlm.nih.gov/REST';
 const REQUESTS_PER_SECOND = 2;
 
-/** RxNorm REST API client for drug concept lookups, interactions, and NDC codes. */
+/** RxNorm REST API client for drug concept lookups, drug classes, and NDC codes. */
 export class RxNorm {
   private readonly _config: RxNormClientConfig;
 
@@ -110,32 +108,6 @@ export class RxNorm {
     const raw = await fetchJson<RawSpellingResponse>(url, this._config);
 
     return raw.suggestionGroup?.suggestionList?.suggestion ?? [];
-  }
-
-  /**
-   * Fetch known drug-drug interactions for an RxCUI.
-   * @deprecated The RxNav Drug Interaction API was discontinued January 2, 2024.
-   * This method will throw an HTTP error. Use external interaction databases instead.
-   */
-  public async interaction(rxcui: string): Promise<ReadonlyArray<DrugInteraction>> {
-    const url = `${BASE_URL}/interaction/interaction.json?rxcui=${encodeURIComponent(rxcui)}`;
-    const raw = await fetchJson<RawInteractionResponse>(url, this._config);
-    const typeGroups = raw.interactionTypeGroup ?? [];
-
-    const interactions: Array<DrugInteraction> = [];
-    for (const typeGroup of typeGroups) {
-      for (const interactionType of typeGroup.interactionType ?? []) {
-        for (const pair of interactionType.interactionPair ?? []) {
-          interactions.push({
-            description: pair.description ?? '',
-            severity: pair.severity ?? '',
-            interactionConcept: (pair.interactionConcept ?? []).map(mapInteractionConcept),
-          });
-        }
-      }
-    }
-
-    return interactions;
   }
 
   /** Fetch NDC (National Drug Code) identifiers for an RxCUI. */
@@ -323,32 +295,6 @@ interface RawSpellingResponse {
   };
 }
 
-interface RawInteractionResponse {
-  readonly interactionTypeGroup?: ReadonlyArray<{
-    readonly interactionType?: ReadonlyArray<{
-      readonly interactionPair?: ReadonlyArray<RawInteractionPair>;
-    }>;
-  }>;
-}
-
-interface RawInteractionPair {
-  readonly description?: string;
-  readonly severity?: string;
-  readonly interactionConcept?: ReadonlyArray<RawInteractionConcept>;
-}
-
-interface RawInteractionConcept {
-  readonly minConceptItem?: {
-    readonly rxcui?: string;
-    readonly name?: string;
-    readonly tty?: string;
-  };
-  readonly sourceConceptItem?: {
-    readonly id?: string;
-    readonly name?: string;
-  };
-}
-
 interface RawNdcResponse {
   readonly ndcGroup?: {
     readonly ndcList?: {
@@ -455,16 +401,6 @@ function mapConceptGroup(raw: RawConceptGroup): ConceptGroup {
       name: prop.name ?? '',
       tty: prop.tty ?? '',
     })),
-  };
-}
-
-function mapInteractionConcept(raw: RawInteractionConcept): InteractionConcept {
-  return {
-    rxcui: raw.minConceptItem?.rxcui ?? '',
-    name: raw.minConceptItem?.name ?? '',
-    tty: raw.minConceptItem?.tty ?? '',
-    sourceConceptId: raw.sourceConceptItem?.id ?? '',
-    sourceConceptName: raw.sourceConceptItem?.name ?? '',
   };
 }
 
