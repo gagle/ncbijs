@@ -4,6 +4,13 @@
 
 Watch NCBI data sources for updates and trigger pipeline re-runs.
 
+This package is **Phase 2** of the data pipeline workflow. Phase 1 (initial load) uses `@ncbijs/etl` to populate the database. Phase 2 (this package) keeps it fresh by polling for upstream changes.
+
+```
+Phase 1: load('clinvar', mySink)     →  DuckDB has data
+Phase 2: SyncScheduler.start()       →  DuckDB stays up to date
+```
+
 ## Quick Start
 
 With `@ncbijs/etl` (recommended — URLs and strategy are handled automatically):
@@ -94,7 +101,9 @@ Available `.md5` companions on NCBI FTP:
 
 ### `InMemorySyncState`
 
-In-memory implementation of `SyncStateStore`. State is lost on process restart. For persistent state, implement the `SyncStateStore` interface with your own storage backend.
+In-memory implementation of `SyncStateStore`. State is lost on process restart, which means every restart triggers a full re-check (all datasets appear "new"). This is fine for development and testing.
+
+For production, implement the `SyncStateStore` interface with persistent storage (e.g., a DuckDB table or a JSON file) so that restarts resume from the last known state.
 
 ### Interfaces
 

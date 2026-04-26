@@ -168,33 +168,56 @@ await loadAll((dataset) =>
 );
 ```
 
-Four packages work together:
+The pipeline has two phases: **initial load** and **watch & sync**:
 
-- **`@ncbijs/pipeline`** — Composable Source/Sink primitives built on `AsyncIterable`. HTTP and composite sources; custom sinks. Streaming support, backpressure, abort signals, error strategies, and progress reporting. Works in browsers and Node.js.
-- **`@ncbijs/etl`** — Pre-wired loaders for 6 NCBI bulk datasets. Encapsulates URLs, parsers, and source constructors so `load('mesh', mySink)` is all the user needs. Accepts any `Sink<object>`.
-- **`@ncbijs/store`** — `ReadableStorage` / `WritableStorage` interfaces with a `DuckDbFileStorage` reference implementation. `DuckDbSink` plugs directly into the pipeline as one of many possible sinks. Node.js only (requires `@duckdb/node-api`).
-- **`@ncbijs/sync`** — Watches NCBI FTP sources for updates via MD5 checksums or HTTP `Last-Modified` headers. Pluggable checkers, configurable polling interval, and abort signal support.
+```
+Phase 1: Initial Load               Phase 2: Watch & Sync
+  NCBI FTP ──→ DuckDB                Poll NCBI → detect changes → re-load
+  (one-time bulk download)            (long-running background process)
+```
 
-### Keep data fresh with `@ncbijs/sync`
+### Phase 1: Load data with `@ncbijs/etl`
 
-Once data is loaded, `@ncbijs/sync` watches for upstream changes and re-syncs automatically. `createCheckers()` picks the best strategy per dataset: **MD5 checksums** for ClinVar, Taxonomy, and PubChem (content-based, ~50 bytes); **HTTP `Last-Modified`** for all others (universal fallback).
+```typescript
+import { load, loadAll } from '@ncbijs/etl';
+import { DuckDbFileStorage } from '@ncbijs/store';
+
+const storage = await DuckDbFileStorage.open('ncbi.duckdb');
+
+// Load a single dataset
+await load('clinvar', storage.createSink('clinvar'));
+
+// Or load all 6 datasets at once
+await loadAll((dataset) => storage.createSink(dataset));
+```
+
+### Phase 2: Keep data fresh with `@ncbijs/sync`
+
+Once loaded, start a watcher to poll for upstream changes and re-load only what changed. `createCheckers()` picks the best detection strategy per dataset: **MD5 checksums** for ClinVar, Taxonomy, and PubChem; **HTTP `Last-Modified`** for all others.
 
 ```typescript
 import { createCheckers, load } from '@ncbijs/etl';
 import { SyncScheduler, InMemorySyncState } from '@ncbijs/sync';
 
-const scheduler = new SyncScheduler(new InMemorySyncState(), createCheckers(['clinvar', 'genes']), {
+const scheduler = new SyncScheduler(new InMemorySyncState(), createCheckers(), {
   checkIntervalMs: 3600_000,
   datasets: ['clinvar', 'genes'],
   onUpdate: async (dataset) => {
-    await load(dataset, mySink);
+    await load(dataset, storage.createSink(dataset));
   },
 });
 
 await scheduler.start(); // checks immediately, then every hour
 ```
 
-See [`examples/data-pipeline/sync-watch.ts`](./examples/data-pipeline/sync-watch.ts) for a complete script that watches all 6 datasets and auto-reloads into DuckDB.
+See [`examples/data-pipeline/`](./examples/data-pipeline/) for complete scripts covering both phases.
+
+### Packages
+
+- **`@ncbijs/pipeline`** — Composable Source/Sink primitives built on `AsyncIterable`. HTTP and composite sources, streaming, backpressure, abort signals. Browser + Node.js.
+- **`@ncbijs/etl`** — Pre-wired loaders for 6 NCBI bulk datasets. `load('mesh', mySink)` is all you need. Also exports `createCheckers()` for sync.
+- **`@ncbijs/store`** — Storage interfaces with a DuckDB reference implementation. Node.js only.
+- **`@ncbijs/sync`** — Watches NCBI FTP for updates via MD5 checksums or HTTP `Last-Modified`. Pluggable checkers, configurable interval, abort signal.
 
 See **[Data Pipeline Guide](./docs/pipeline.md)** for the full API walkthrough, streaming parsers, error handling, and sync scheduling.
 

@@ -71,8 +71,8 @@ for (const entry of results) {
 | `clinvar`     | ClinVar Variants  | TSV    | Yes (.gz)  | ~150 MB        | ~2.5M submissions | Weekly           |
 | `genes`       | Gene Info         | TSV    | Yes (.gz)  | ~600 MB        | ~35M genes        | Daily            |
 | `taxonomy`    | Taxonomy          | tar.gz | Yes        | ~80 MB         | ~2.5M taxa        | Daily            |
-| `compounds`   | PubChem Compounds | TSV    | Yes (.gz)  | ~15 GB         | ~115M compounds   | Weekly           |
-| `id-mappings` | PMC ID Mappings   | CSV    | Yes (.gz)  | ~233 MB        | ~9.5M mappings    | Regular          |
+| `compounds`   | PubChem Compounds | TSV    | Yes (.gz)  | ~15 GB         | ~115M compounds   | Daily            |
+| `id-mappings` | PMC ID Mappings   | CSV    | Yes (.gz)  | ~233 MB        | ~9.5M mappings    | Daily            |
 
 ## API
 
@@ -142,6 +142,30 @@ await load('clinvar', mySink, {
     }),
 });
 ```
+
+## Keep data fresh
+
+After the initial load, use `createCheckers()` with `@ncbijs/sync` to poll for upstream changes and re-load only what changed:
+
+```typescript
+import { createCheckers, load } from '@ncbijs/etl';
+import { SyncScheduler, InMemorySyncState } from '@ncbijs/sync';
+
+// Phase 1: initial load (see examples above)
+
+// Phase 2: watch for changes and re-sync
+const scheduler = new SyncScheduler(new InMemorySyncState(), createCheckers(), {
+  checkIntervalMs: 3600_000,
+  datasets: ['clinvar', 'genes'],
+  onUpdate: async (dataset) => {
+    await load(dataset, mySink);
+  },
+});
+
+await scheduler.start();
+```
+
+`createCheckers()` reads the dataset registry and auto-selects the best change detection strategy per dataset (MD5 checksum or HTTP `Last-Modified`). See [`@ncbijs/sync`](../sync/README.md) for details.
 
 ## Taxonomy note
 

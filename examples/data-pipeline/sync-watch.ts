@@ -3,14 +3,23 @@
  *
  * Usage: pnpm exec tsx examples/data-pipeline/sync-watch.ts [--db-path <path>] [--interval <minutes>] [--dataset <name>]
  *
- * Combines @ncbijs/sync (change detection) with @ncbijs/etl (data loading)
- * to keep a local DuckDB database up to date with upstream NCBI data.
+ * This is Step 2 of the data pipeline workflow:
+ *
+ *   Step 1 (initial load): Run http-to-duckdb.ts or loadAll() to populate DuckDB
+ *   Step 2 (keep fresh):   Run this script to poll for upstream changes and re-sync
+ *
+ * On first run (or after restart with InMemorySyncState), every dataset appears
+ * "new" because there is no stored checksum or timestamp to compare against.
+ * This triggers a full reload of all watched datasets — effectively combining
+ * the initial load and ongoing sync into a single process. For large datasets,
+ * prefer running the initial load separately with http-to-duckdb.ts, then
+ * starting this watcher afterward.
  *
  * Change detection strategy is selected automatically per dataset:
  *   - MD5 checksum (ClinVar, Taxonomy, PubChem): downloads tiny .md5 companion
- *     files (~50 bytes) and compares against stored checksum — reliable content-based detection
+ *     files (~50 bytes) and compares against stored checksum
  *   - HTTP Last-Modified (Gene, MeSH, PMC IDs): sends HEAD request and compares
- *     the Last-Modified header — universal fallback for datasets without .md5 files
+ *     the Last-Modified header
  */
 
 import { join } from 'node:path';
