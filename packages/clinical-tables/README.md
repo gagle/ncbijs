@@ -33,7 +33,7 @@ const withExtras = await search('loinc_items', 'glucose', {
 
 Search any clinical table by term with optional configuration.
 
-**Supported tables:** `icd10cm`, `icd9cm_dx`, `loinc_items`, `rxterms`, `snomed_problem_list`, and more.
+**Supported tables:** `icd10cm`, `icd9cm_dx`, `loinc_items`, `rxterms`, `conditions`, and more.
 
 **`ClinicalTablesSearchOptions`**
 

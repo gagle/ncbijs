@@ -35,25 +35,32 @@ describe('parseLitVarJson', () => {
       expect(result[0]!.rsid).toBe('rs80359550');
     });
 
-    it('extracts HGVS notations', () => {
+    it('extracts first HGVS notation from FTP array', () => {
       const json = JSON.stringify([VARIANT_BRCA2]);
       const result = parseLitVarJson(json);
 
-      expect(result[0]!.hgvs).toEqual(['NM_000059.4:c.5946delT', 'p.Ser1982ArgfsTer22']);
+      expect(result[0]!.hgvs).toBe('NM_000059.4:c.5946delT');
     });
 
-    it('extracts gene', () => {
+    it('wraps gene string in array', () => {
       const json = JSON.stringify([VARIANT_BRCA2]);
       const result = parseLitVarJson(json);
 
-      expect(result[0]!.gene).toBe('BRCA2');
+      expect(result[0]!.gene).toEqual(['BRCA2']);
     });
 
-    it('extracts publication count', () => {
+    it('sets name to empty string (not in FTP format)', () => {
       const json = JSON.stringify([VARIANT_BRCA2]);
       const result = parseLitVarJson(json);
 
-      expect(result[0]!.publicationCount).toBe(42);
+      expect(result[0]!.name).toBe('');
+    });
+
+    it('sets clinicalSignificance to empty array (not in FTP format)', () => {
+      const json = JSON.stringify([VARIANT_BRCA2]);
+      const result = parseLitVarJson(json);
+
+      expect(result[0]!.clinicalSignificance).toEqual([]);
     });
 
     it('defaults missing fields', () => {
@@ -61,9 +68,10 @@ describe('parseLitVarJson', () => {
       const result = parseLitVarJson(json);
 
       expect(result[0]!.rsid).toBe('rs12345');
-      expect(result[0]!.hgvs).toEqual([]);
-      expect(result[0]!.gene).toBe('');
-      expect(result[0]!.publicationCount).toBe(0);
+      expect(result[0]!.hgvs).toBe('');
+      expect(result[0]!.gene).toEqual([]);
+      expect(result[0]!.name).toBe('');
+      expect(result[0]!.clinicalSignificance).toEqual([]);
     });
   });
 

@@ -2,15 +2,11 @@ import { TokenBucket } from '@ncbijs/rate-limiter';
 import { fetchJson } from './datasets-client';
 import type { DatasetsClientConfig } from './datasets-client';
 import type {
-  AssemblyDescriptor,
   AssemblyInfo,
   AssemblyStats,
-  BioProjectReport,
   BioSampleAttribute,
   BioSampleReport,
-  DatasetInfo,
   DatasetsConfig,
-  ExternalLink,
   GeneLink,
   GeneOntology,
   GeneReport,
@@ -136,21 +132,6 @@ export class Datasets {
     return (raw.reports ?? []).map(mapVirusReport);
   }
 
-  /** Fetch BioProject reports by accession numbers. */
-  public async bioproject(
-    accessions: ReadonlyArray<string>,
-  ): Promise<ReadonlyArray<BioProjectReport>> {
-    if (accessions.length === 0) {
-      throw new Error('accessions must not be empty');
-    }
-
-    const joined = accessions.join(',');
-    const url = `${BASE_URL}/bioproject/accession/${encodeURIComponent(joined)}`;
-    const raw = await fetchJson<RawBioProjectResponse>(url, this._config);
-
-    return (raw.reports ?? []).map(mapBioProjectReport);
-  }
-
   /** Fetch BioSample reports by accession numbers. */
   public async biosample(
     accessions: ReadonlyArray<string>,
@@ -160,25 +141,10 @@ export class Datasets {
     }
 
     const joined = accessions.join(',');
-    const url = `${BASE_URL}/biosample/accession/${encodeURIComponent(joined)}`;
+    const url = `${BASE_URL}/biosample/accession/${encodeURIComponent(joined)}/biosample_report`;
     const raw = await fetchJson<RawBioSampleResponse>(url, this._config);
 
     return (raw.reports ?? []).map(mapBioSampleReport);
-  }
-
-  /** Fetch lightweight assembly descriptors by accession numbers. */
-  public async assemblyDescriptors(
-    accessions: ReadonlyArray<string>,
-  ): Promise<ReadonlyArray<AssemblyDescriptor>> {
-    if (accessions.length === 0) {
-      throw new Error('accessions must not be empty');
-    }
-
-    const joined = accessions.join(',');
-    const url = `${BASE_URL}/genome/accession/${encodeURIComponent(joined)}/assembly_descriptors`;
-    const raw = await fetchJson<RawAssemblyDescriptorResponse>(url, this._config);
-
-    return (raw.assemblies ?? []).map(mapAssemblyDescriptor);
   }
 
   /** Fetch external database links for genes by NCBI Gene IDs. */
@@ -191,15 +157,7 @@ export class Datasets {
     const url = `${BASE_URL}/gene/id/${encodeURIComponent(joined)}/links`;
     const raw = await fetchJson<RawGeneLinkResponse>(url, this._config);
 
-    return (raw.genes ?? []).map(mapGeneLink);
-  }
-
-  /** List available NCBI datasets from the catalog. */
-  public async datasetCatalog(): Promise<ReadonlyArray<DatasetInfo>> {
-    const url = `${BASE_URL}/dataset_catalog`;
-    const raw = await fetchJson<RawDatasetCatalogResponse>(url, this._config);
-
-    return (raw.datasets ?? []).map(mapDatasetInfo);
+    return (raw.gene_links ?? []).map(mapGeneLink);
   }
 }
 
@@ -224,7 +182,7 @@ interface RawGeneData {
   readonly swiss_prot_accessions?: ReadonlyArray<string>;
   readonly ensembl_gene_ids?: ReadonlyArray<string>;
   readonly omim_ids?: ReadonlyArray<string>;
-  readonly summary?: ReadonlyArray<string>;
+  readonly summary?: ReadonlyArray<{ readonly description?: string }>;
   readonly transcript_count?: number;
   readonly protein_count?: number;
   readonly gene_ontology?: RawGeneOntology;
@@ -340,7 +298,7 @@ function mapGeneReport(wrapper: RawGeneReportWrapper): GeneReport {
     swissProtAccessions: gene.swiss_prot_accessions ?? [],
     ensemblGeneIds: gene.ensembl_gene_ids ?? [],
     omimIds: gene.omim_ids ?? [],
-    summary: (gene.summary ?? []).join(' '),
+    summary: (gene.summary ?? []).map((entry) => entry.description ?? '').join(' '),
     transcriptCount: gene.transcript_count ?? 0,
     proteinCount: gene.protein_count ?? 0,
     geneOntology: mapGeneOntology(gene.gene_ontology),
@@ -465,30 +423,13 @@ interface RawVirusResponse {
 
 interface RawVirusData {
   readonly accession?: string;
-  readonly tax_id?: number;
-  readonly organism_name?: string;
-  readonly isolate_name?: string;
-  readonly host?: string;
-  readonly collection_date?: string;
-  readonly geo_location?: string;
+  readonly virus?: { readonly tax_id?: number; readonly organism_name?: string };
+  readonly isolate?: { readonly name?: string; readonly collection_date?: string };
+  readonly host?: { readonly organism_name?: string };
+  readonly location?: { readonly geographic_location?: string };
   readonly completeness?: string;
   readonly length?: number;
-  readonly bioproject_accession?: string;
-  readonly biosample_accession?: string;
-}
-
-interface RawBioProjectResponse {
-  readonly reports?: ReadonlyArray<RawBioProjectData>;
-}
-
-interface RawBioProjectData {
-  readonly accession?: string;
-  readonly title?: string;
-  readonly description?: string;
-  readonly organism_name?: string;
-  readonly tax_id?: number;
-  readonly project_type?: string;
-  readonly registration_date?: string;
+  readonly bioprojects?: ReadonlyArray<{ readonly accession?: string }>;
 }
 
 interface RawBioSampleResponse {
@@ -497,14 +438,16 @@ interface RawBioSampleResponse {
 
 interface RawBioSampleData {
   readonly accession?: string;
-  readonly title?: string;
-  readonly description?: string;
-  readonly organism_name?: string;
-  readonly tax_id?: number;
-  readonly owner_name?: string;
+  readonly description?: { readonly title?: string; readonly organism?: RawBioSampleOrganism };
+  readonly owner?: { readonly name?: string };
   readonly submission_date?: string;
   readonly publication_date?: string;
   readonly attributes?: ReadonlyArray<RawBioSampleAttribute>;
+}
+
+interface RawBioSampleOrganism {
+  readonly tax_id?: number;
+  readonly organism_name?: string;
 }
 
 interface RawBioSampleAttribute {
@@ -515,39 +458,25 @@ interface RawBioSampleAttribute {
 function mapVirusReport(raw: RawVirusData): VirusReport {
   return {
     accession: raw.accession ?? '',
-    taxId: raw.tax_id ?? 0,
-    organismName: raw.organism_name ?? '',
-    isolateName: raw.isolate_name ?? '',
-    host: raw.host ?? '',
-    collectionDate: raw.collection_date ?? '',
-    geoLocation: raw.geo_location ?? '',
+    taxId: raw.virus?.tax_id ?? 0,
+    organismName: raw.virus?.organism_name ?? '',
+    isolateName: raw.isolate?.name ?? '',
+    host: raw.host?.organism_name ?? '',
+    collectionDate: raw.isolate?.collection_date ?? '',
+    geoLocation: raw.location?.geographic_location ?? '',
     completeness: raw.completeness ?? '',
     length: raw.length ?? 0,
-    bioprojectAccession: raw.bioproject_accession ?? '',
-    biosampleAccession: raw.biosample_accession ?? '',
-  };
-}
-
-function mapBioProjectReport(raw: RawBioProjectData): BioProjectReport {
-  return {
-    accession: raw.accession ?? '',
-    title: raw.title ?? '',
-    description: raw.description ?? '',
-    organismName: raw.organism_name ?? '',
-    taxId: raw.tax_id ?? 0,
-    projectType: raw.project_type ?? '',
-    registrationDate: raw.registration_date ?? '',
+    bioprojectAccession: raw.bioprojects?.[0]?.accession ?? '',
   };
 }
 
 function mapBioSampleReport(raw: RawBioSampleData): BioSampleReport {
   return {
     accession: raw.accession ?? '',
-    title: raw.title ?? '',
-    description: raw.description ?? '',
-    organismName: raw.organism_name ?? '',
-    taxId: raw.tax_id ?? 0,
-    ownerName: raw.owner_name ?? '',
+    title: raw.description?.title ?? '',
+    organismName: raw.description?.organism?.organism_name ?? '',
+    taxId: raw.description?.organism?.tax_id ?? 0,
+    ownerName: raw.owner?.name ?? '',
     submissionDate: raw.submission_date ?? '',
     publicationDate: raw.publication_date ?? '',
     attributes: (raw.attributes ?? []).map(mapBioSampleAttribute),
@@ -561,74 +490,22 @@ function mapBioSampleAttribute(raw: RawBioSampleAttribute): BioSampleAttribute {
   };
 }
 
-interface RawAssemblyDescriptorResponse {
-  readonly assemblies?: ReadonlyArray<RawAssemblyDescriptorData>;
-}
-
-interface RawAssemblyDescriptorData {
-  readonly accession?: string;
-  readonly assembly_name?: string;
-  readonly assembly_level?: string;
-  readonly organism?: string;
-  readonly tax_id?: number;
-  readonly submitter?: string;
-  readonly release_date?: string;
-}
-
 interface RawGeneLinkResponse {
-  readonly genes?: ReadonlyArray<RawGeneLinkData>;
+  readonly gene_links?: ReadonlyArray<RawGeneLinkData>;
 }
 
 interface RawGeneLinkData {
   readonly gene_id?: number;
-  readonly links?: ReadonlyArray<RawExternalLink>;
-}
-
-interface RawExternalLink {
-  readonly resource_name?: string;
-  readonly url?: string;
-}
-
-interface RawDatasetCatalogResponse {
-  readonly datasets?: ReadonlyArray<RawDatasetInfoData>;
-}
-
-interface RawDatasetInfoData {
-  readonly name?: string;
-  readonly description?: string;
-  readonly version?: string;
-}
-
-function mapAssemblyDescriptor(raw: RawAssemblyDescriptorData): AssemblyDescriptor {
-  return {
-    accession: raw.accession ?? '',
-    assemblyName: raw.assembly_name ?? '',
-    assemblyLevel: raw.assembly_level ?? '',
-    organism: raw.organism ?? '',
-    taxId: raw.tax_id ?? 0,
-    submitter: raw.submitter ?? '',
-    releaseDate: raw.release_date ?? '',
-  };
+  readonly gene_link_type?: string;
+  readonly resource_link?: string;
+  readonly resource_id?: string;
 }
 
 function mapGeneLink(raw: RawGeneLinkData): GeneLink {
   return {
     geneId: raw.gene_id ?? 0,
-    links: (raw.links ?? []).map(mapExternalLink),
-  };
-}
-
-function mapExternalLink(raw: RawExternalLink): ExternalLink {
-  return {
-    resourceName: raw.resource_name ?? '',
-    url: raw.url ?? '',
-  };
-}
-
-function mapDatasetInfo(raw: RawDatasetInfoData): DatasetInfo {
-  return {
-    name: raw.name ?? '',
-    description: raw.description ?? '',
-    version: raw.version ?? '',
+    type: raw.gene_link_type ?? '',
+    url: raw.resource_link ?? '',
+    resourceId: raw.resource_id ?? '',
   };
 }

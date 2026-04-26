@@ -123,11 +123,14 @@ export class PubTator {
     pmids: ReadonlyArray<string>,
     options?: AnnotateOptions,
   ): Promise<string> {
+    const format = options?.format ?? 'pubtator';
     const params = new URLSearchParams({ pmids: pmids.join(',') });
     appendParam(params, 'concepts', options?.concept);
-    appendParam(params, 'type', options?.format);
 
-    return fetchText(`${BASE_URL}/publications/annotate?${params.toString()}`, this._config);
+    return fetchText(
+      `${BASE_URL}/publications/export/${format}?${params.toString()}`,
+      this._config,
+    );
   }
 
   /** Submit free text to PubTator3 for biomedical entity annotation. */
@@ -137,7 +140,7 @@ export class PubTator {
     appendParam(params, 'type', options?.format);
 
     const query = params.toString();
-    const url = query ? `${BASE_URL}/annotate/text/?${query}` : `${BASE_URL}/annotate/text/`;
+    const url = query ? `${BASE_URL}/annotate/?${query}` : `${BASE_URL}/annotate/`;
 
     return fetchText(url, this._config, {
       method: 'POST',

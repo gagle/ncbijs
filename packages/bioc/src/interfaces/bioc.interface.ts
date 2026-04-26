@@ -29,11 +29,31 @@ export interface BioCLocation {
   readonly length: number;
 }
 
-/** An entity returned by the PubTator3 autocomplete search. */
+/** Raw entity shape returned by the PubTator3 autocomplete API. */
+export interface RawEntitySearchResult {
+  readonly _id: string;
+  readonly biotype: string;
+  readonly db_id: string;
+  readonly db: string;
+  readonly name: string;
+  readonly description: string;
+  readonly match: string;
+}
+
+/** A mapped entity returned by the PubTator3 autocomplete search. */
 export interface EntitySearchResult {
-  readonly identifier: string;
+  readonly id: string;
   readonly name: string;
   readonly type: string;
+}
+
+/** Raw collection wrapper returned by the BioC RESTful API. */
+export interface BioCCollection {
+  readonly source: string;
+  readonly date: string;
+  readonly key: string;
+  readonly infons: Readonly<Record<string, string>>;
+  readonly documents: ReadonlyArray<BioCDocument>;
 }
 
 /** Configuration for the BioC client. */

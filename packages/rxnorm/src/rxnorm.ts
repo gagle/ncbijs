@@ -41,7 +41,7 @@ export class RxNorm {
 
     return {
       rxcui: group.rxnormId[0],
-      name: group.name ?? '',
+      name: '',
       tty: '',
     };
   }
@@ -71,7 +71,7 @@ export class RxNorm {
     rxcui: string,
     types: ReadonlyArray<string>,
   ): Promise<ReadonlyArray<RxConcept>> {
-    const ttyParam = types.join('+');
+    const ttyParam = types.join(' ');
     const url = `${BASE_URL}/rxcui/${encodeURIComponent(rxcui)}/related.json?tty=${encodeURIComponent(ttyParam)}`;
     const raw = await fetchJson<RawRelatedResponse>(url, this._config);
     const groups = raw.relatedGroup?.conceptGroup ?? [];
@@ -110,7 +110,11 @@ export class RxNorm {
     return raw.suggestionGroup?.suggestionList?.suggestion ?? [];
   }
 
-  /** Fetch known drug-drug interactions for an RxCUI. */
+  /**
+   * Fetch known drug-drug interactions for an RxCUI.
+   * @deprecated The RxNav Drug Interaction API was discontinued January 2, 2024.
+   * This method will throw an HTTP error. Use external interaction databases instead.
+   */
   public async interaction(rxcui: string): Promise<ReadonlyArray<DrugInteraction>> {
     const url = `${BASE_URL}/interaction/interaction.json?rxcui=${encodeURIComponent(rxcui)}`;
     const raw = await fetchJson<RawInteractionResponse>(url, this._config);
@@ -170,14 +174,15 @@ export class RxNorm {
   public async history(rxcui: string): Promise<RxConceptHistory> {
     const url = `${BASE_URL}/rxcui/${encodeURIComponent(rxcui)}/historystatus.json`;
     const raw = await fetchJson<RawHistoryResponse>(url, this._config);
-    const status = raw.rxcuiStatusHistory?.metaData;
-    const derivedConcepts = raw.rxcuiStatusHistory?.derivedConcepts?.remappedTo ?? [];
+    const attributes = raw.rxcuiStatusHistory?.attributes;
+    const meta = raw.rxcuiStatusHistory?.metaData;
+    const derived = raw.rxcuiStatusHistory?.derivedConcepts?.remappedConcept ?? [];
 
     return {
-      rxcui: status?.rxcui ?? '',
-      name: status?.name ?? '',
-      status: status?.status ?? '',
-      remappedTo: remappedConcepts(derivedConcepts),
+      rxcui: attributes?.rxcui ?? '',
+      name: attributes?.name ?? '',
+      status: meta?.status ?? '',
+      remappedTo: extractRemappedRxcuis(derived),
     };
   }
 
@@ -190,7 +195,7 @@ export class RxNorm {
     rxcui: string,
     properties: ReadonlyArray<string>,
   ): Promise<ReadonlyArray<RxProperty>> {
-    const propParam = properties.join('+');
+    const propParam = properties.join(' ');
     const url = `${BASE_URL}/rxcui/${encodeURIComponent(rxcui)}/allProperties.json?prop=${encodeURIComponent(propParam)}`;
     const raw = await fetchJson<RawAllPropertiesResponse>(url, this._config);
 
@@ -204,7 +209,6 @@ export class RxNorm {
 
 interface RawRxcuiResponse {
   readonly idGroup?: {
-    readonly name?: string;
     readonly rxnormId?: ReadonlyArray<string>;
   };
 }
@@ -302,18 +306,20 @@ interface RawApproximateCandidate {
 interface RawHistoryResponse {
   readonly rxcuiStatusHistory?: {
     readonly metaData?: {
-      readonly rxcui?: string;
-      readonly name?: string;
       readonly status?: string;
     };
+    readonly attributes?: {
+      readonly rxcui?: string;
+      readonly name?: string;
+    };
     readonly derivedConcepts?: {
-      readonly remappedTo?: ReadonlyArray<RawRemappedConcept>;
+      readonly remappedConcept?: ReadonlyArray<RawRemappedConcept>;
     };
   };
 }
 
 interface RawRemappedConcept {
-  readonly rxcui?: string;
+  readonly remappedRxCui?: string;
 }
 
 interface RawAllPropertiesResponse {
@@ -349,11 +355,11 @@ function mapInteractionConcept(raw: RawInteractionConcept): InteractionConcept {
   };
 }
 
-function remappedConcepts(concepts: ReadonlyArray<RawRemappedConcept>): ReadonlyArray<string> {
+function extractRemappedRxcuis(concepts: ReadonlyArray<RawRemappedConcept>): ReadonlyArray<string> {
   const rxcuis: Array<string> = [];
   for (const concept of concepts) {
-    if (concept.rxcui) {
-      rxcuis.push(concept.rxcui);
+    if (concept.remappedRxCui) {
+      rxcuis.push(concept.remappedRxCui);
     }
   }
   return rxcuis;

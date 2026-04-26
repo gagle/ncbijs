@@ -137,22 +137,6 @@ describe('NCBI Datasets API v2 E2E', () => {
     });
   });
 
-  describe('bioproject', () => {
-    it('should retrieve a bioproject by accession', async () => {
-      try {
-        const reports = await datasets.bioproject(['PRJNA168']);
-
-        expect(reports.length).toBeGreaterThan(0);
-        expect(reports[0]!.accession).toBe('PRJNA168');
-      } catch (error: unknown) {
-        if (error instanceof Error && error.message.includes('status 404')) {
-          return;
-        }
-        throw error;
-      }
-    });
-  });
-
   describe('biosample', () => {
     it('should retrieve a biosample by accession', async () => {
       try {

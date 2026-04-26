@@ -2,7 +2,7 @@
 export type CitationFormat = 'ris' | 'medline' | 'csl' | 'citation';
 
 /** NCBI source database for citation retrieval. */
-export type CitationSource = 'pubmed' | 'pmc' | 'books';
+export type CitationSource = 'pubmed' | 'pmc';
 
 /** A citation rendered in a specific bibliographic style. */
 export interface CitationStyle {

@@ -1,7 +1,6 @@
 export type {
-  LitVarAnnotation,
   LitVarConfig,
-  LitVarPublication,
+  LitVarPublicationResult,
   LitVarSearchResult,
   LitVarVariant,
 } from './interfaces/litvar.interface';

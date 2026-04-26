@@ -74,35 +74,17 @@ Fetch virus genome reports by accessions.
 
 Fetch virus genome reports for all viruses of a taxon.
 
-### BioProject
-
-#### `bioproject(accessions: Array<string>): Promise<Array<BioProjectReport>>`
-
-Fetch BioProject reports by accessions (e.g., `PRJNA12345`).
-
 ### BioSample
 
 #### `biosample(accessions: Array<string>): Promise<Array<BioSampleReport>>`
 
 Fetch BioSample reports by accessions (e.g., `SAMN12345`).
 
-### Assembly
-
-#### `assemblyDescriptors(accessions: Array<string>): Promise<Array<AssemblyDescriptor>>`
-
-Fetch lightweight assembly descriptors by accession numbers.
-
 ### Gene links
 
 #### `geneLinks(geneIds: Array<number>): Promise<Array<GeneLink>>`
 
 Fetch external database links for genes by NCBI Gene IDs.
-
-### Catalog
-
-#### `datasetCatalog(): Promise<Array<DatasetInfo>>`
-
-List available NCBI datasets from the catalog.
 
 ## Error handling
 
@@ -280,21 +262,6 @@ interface VirusReport {
   completeness: string;
   length: number;
   bioprojectAccession: string;
-  biosampleAccession: string;
-}
-```
-
-### `BioProjectReport`
-
-```ts
-interface BioProjectReport {
-  accession: string;
-  title: string;
-  description: string;
-  organismName: string;
-  taxId: number;
-  projectType: string;
-  registrationDate: string;
 }
 ```
 
@@ -304,7 +271,6 @@ interface BioProjectReport {
 interface BioSampleReport {
   accession: string;
   title: string;
-  description: string;
   organismName: string;
   taxId: number;
   ownerName: string;
@@ -323,45 +289,14 @@ interface BioSampleAttribute {
 }
 ```
 
-### `AssemblyDescriptor`
-
-```ts
-interface AssemblyDescriptor {
-  accession: string;
-  assemblyName: string;
-  assemblyLevel: string;
-  organism: string;
-  taxId: number;
-  submitter: string;
-  releaseDate: string;
-}
-```
-
 ### `GeneLink`
 
 ```ts
 interface GeneLink {
   geneId: number;
-  links: Array<ExternalLink>;
-}
-```
-
-### `ExternalLink`
-
-```ts
-interface ExternalLink {
-  resourceName: string;
+  type: string;
   url: string;
-}
-```
-
-### `DatasetInfo`
-
-```ts
-interface DatasetInfo {
-  name: string;
-  description: string;
-  version: string;
+  resourceId: string;
 }
 ```
 

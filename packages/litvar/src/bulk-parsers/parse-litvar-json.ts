@@ -5,6 +5,11 @@ import type { LitVarVariant } from '../interfaces/litvar.interface';
  *
  * Accepts both a JSON array and newline-delimited JSON (NDJSON).
  *
+ * The FTP bulk file uses a slightly different field layout than the HTTP API:
+ * `gene` is a string (mapped to a single-element array) and `hgvs` is an array
+ * (the first element is used). Fields not present in the bulk format (`name`,
+ * `clinicalSignificance`) default to empty.
+ *
  * @see https://ftp.ncbi.nlm.nih.gov/pub/lu/LitVar/litvar2_variants.json.gz
  */
 export function parseLitVarJson(json: string): ReadonlyArray<LitVarVariant> {
@@ -68,8 +73,9 @@ interface RawLitVarVariant {
 function mapVariant(raw: RawLitVarVariant): LitVarVariant {
   return {
     rsid: raw.rsid ?? '',
-    hgvs: raw.hgvs ?? [],
-    gene: raw.gene ?? '',
-    publicationCount: raw.publication_count ?? 0,
+    gene: raw.gene ? [raw.gene] : [],
+    name: '',
+    hgvs: raw.hgvs?.[0] ?? '',
+    clinicalSignificance: [],
   };
 }

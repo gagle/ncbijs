@@ -15,7 +15,7 @@ describe('parseLitVarJson (real data)', () => {
     }
   });
 
-  it('should have HGVS notations', () => {
+  it('should have HGVS notation', () => {
     const first = records[0]!;
 
     expect(first.hgvs.length).toBeGreaterThan(0);
@@ -25,11 +25,5 @@ describe('parseLitVarJson (real data)', () => {
     const first = records[0]!;
 
     expect(first.gene.length).toBeGreaterThan(0);
-  });
-
-  it('should have publication counts', () => {
-    for (const record of records) {
-      expect(record.publicationCount).toBeGreaterThan(0);
-    }
   });
 });

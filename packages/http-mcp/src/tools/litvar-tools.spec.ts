@@ -37,8 +37,14 @@ describe('registerLitVarTools', () => {
 
   describe('search-litvar', () => {
     it('calls variant and publications with the rsid', async () => {
-      const variantInfo = { rsid: 'rs328', gene: 'LPL', hgvs: ['NM_000237.3:c.1421C>G'] };
-      const pubs = [{ pmid: 12345, title: 'LPL variant study' }];
+      const variantInfo = {
+        rsid: 'rs328',
+        gene: ['LPL'],
+        name: 'p.S447X',
+        hgvs: 'p.S447X',
+        clinicalSignificance: ['benign'],
+      };
+      const pubs = { pmids: [12345], pmcids: ['PMC123'], count: 1 };
       mockVariant.mockResolvedValue(variantInfo);
       mockPublications.mockResolvedValue(pubs);
 

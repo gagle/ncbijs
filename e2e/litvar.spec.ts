@@ -13,19 +13,18 @@ describe('LitVar E2E', () => {
     }
 
     expect(result.rsid).toBe('rs328');
-    expect(result.gene).toBeTruthy();
-    expect(result.publicationCount).toBeGreaterThan(0);
+    expect(result.gene.length).toBeGreaterThan(0);
   });
 
-  it('should fetch publications for a variant', async () => {
-    let pubs;
+  it('should fetch publication IDs for a variant', async () => {
+    let result;
     try {
-      pubs = await litvar.publications('rs328');
+      result = await litvar.publications('rs328');
     } catch {
       return;
     }
 
-    expect(pubs.length).toBeGreaterThan(0);
-    expect(pubs[0]!.pmid).toBeGreaterThan(0);
+    expect(result.count).toBeGreaterThan(0);
+    expect(result.pmids.length).toBeGreaterThan(0);
   });
 });

@@ -1,5 +1,5 @@
 // Find literature linked to genetic variants using LitVar2.
-// Look up variant details and retrieve publications by rsID.
+// Look up variant details and retrieve publication IDs by rsID.
 
 import { LitVar } from '@ncbijs/litvar';
 
@@ -11,19 +11,17 @@ async function main(): Promise<void> {
 
   const info = await litvar.variant(rsid);
   console.log(`  rsID: ${info.rsid}`);
-  console.log(`  Gene: ${info.gene}`);
-  console.log(`  Publications: ${info.publicationCount}`);
-  console.log(`  HGVS notations: ${info.hgvs.slice(0, 3).join(', ')}`);
+  console.log(`  Gene: ${info.gene.join(', ')}`);
+  console.log(`  Name: ${info.name}`);
+  console.log(`  HGVS: ${info.hgvs}`);
+  console.log(`  Clinical significance: ${info.clinicalSignificance.join(', ')}`);
 
   console.log(`\nFetching publications for ${rsid}...\n`);
 
   const pubs = await litvar.publications(rsid);
-  for (const pub of pubs.slice(0, 10)) {
-    console.log(`  PMID ${pub.pmid}: ${pub.title.slice(0, 70)}...`);
-    console.log(`    ${pub.journal} (${pub.year})`);
-  }
-
-  console.log(`\n  Showing ${Math.min(10, pubs.length)} of ${pubs.length} publications`);
+  console.log(`  Total publications: ${pubs.count}`);
+  console.log(`  First 5 PMIDs: ${pubs.pmids.slice(0, 5).join(', ')}`);
+  console.log(`  First 5 PMCIDs: ${pubs.pmcids.slice(0, 5).join(', ')}`);
 }
 
 main().catch(console.error);

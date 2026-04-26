@@ -130,12 +130,15 @@ export interface PubTatorAnnotation {
   readonly id: string;
 }
 
+/** Output format identifier for PubTator3 annotation and export endpoints. */
+export type AnnotateFormat = 'pubtator' | 'biocjson' | 'biocxml';
+
 /** Options for controlling annotation output format and concept filtering. */
 export interface AnnotateOptions {
   /** Limit annotations to a specific concept type. */
   readonly concept?: ConceptType;
-  /** Output format for the annotation response. */
-  readonly format?: 'PubTator' | 'BioC' | 'JSON';
+  /** Output format for the annotation response (defaults to "pubtator"). */
+  readonly format?: AnnotateFormat;
 }
 
 /** Configuration for the PubTator3 client. */

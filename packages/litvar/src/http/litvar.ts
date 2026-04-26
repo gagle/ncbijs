@@ -2,9 +2,8 @@ import { TokenBucket } from '@ncbijs/rate-limiter';
 import { fetchJson } from './litvar-client';
 import type { LitVarClientConfig } from './litvar-client';
 import type {
-  LitVarAnnotation,
   LitVarConfig,
-  LitVarPublication,
+  LitVarPublicationResult,
   LitVarSearchResult,
   LitVarVariant,
 } from '../interfaces/litvar.interface';
@@ -12,59 +11,32 @@ import type {
 const BASE_URL = 'https://www.ncbi.nlm.nih.gov/research/litvar2-api';
 const REQUESTS_PER_SECOND = 3;
 
-interface RawVariantResult {
-  readonly rsid?: string;
-  readonly hgvs_list?: ReadonlyArray<string>;
-  readonly gene?: string;
-  readonly pmid_count?: number;
-}
-
 interface RawVariantResponse {
-  readonly results?: ReadonlyArray<RawVariantResult>;
+  readonly rsid?: string;
+  readonly gene?: ReadonlyArray<string>;
+  readonly name?: string;
+  readonly hgvs?: string;
+  readonly data_clinical_significance?: ReadonlyArray<string>;
 }
 
-interface RawPublication {
-  readonly pmid?: number;
-  readonly title?: string;
-  readonly journal?: string;
-  readonly year?: number;
-}
-
-interface RawSearchResult {
-  readonly term?: string;
-  readonly type?: string;
-  readonly score?: number;
-}
-
-interface RawAnnotation {
-  readonly disease?: string;
-  readonly genes?: ReadonlyArray<string>;
+interface RawPublicationsResponse {
   readonly pmids?: ReadonlyArray<number>;
+  readonly pmcids?: ReadonlyArray<string>;
+  readonly pmids_count?: number;
 }
 
-function mapPublication(raw: RawPublication): LitVarPublication {
-  return {
-    pmid: raw.pmid ?? 0,
-    title: raw.title ?? '',
-    journal: raw.journal ?? '',
-    year: raw.year ?? 0,
-  };
+interface RawAutocompleteResult {
+  readonly rsid?: string;
+  readonly gene?: ReadonlyArray<string>;
+  readonly name?: string;
+  readonly hgvs?: string;
+  readonly pmids_count?: number;
+  readonly data_clinical_significance?: ReadonlyArray<string>;
+  readonly match?: string;
 }
 
-function mapSearchResult(raw: RawSearchResult): LitVarSearchResult {
-  return {
-    term: raw.term ?? '',
-    type: raw.type ?? '',
-    score: raw.score ?? 0,
-  };
-}
-
-function mapAnnotation(raw: RawAnnotation): LitVarAnnotation {
-  return {
-    disease: raw.disease ?? '',
-    genes: raw.genes ?? [],
-    pmids: raw.pmids ?? [],
-  };
+function buildVariantId(rsid: string): string {
+  return `litvar@${rsid}%23%23`;
 }
 
 /** Client for the LitVar2 API providing variant-literature association queries. */
@@ -78,38 +50,38 @@ export class LitVar {
     };
   }
 
-  /** Fetch variant details and publication count for an rsID. */
+  /** Fetch variant details by rsID. */
   public async variant(rsid: string): Promise<LitVarVariant> {
     if (!rsid) {
       throw new Error('rsid must not be empty');
     }
 
-    const url = `${BASE_URL}/variant/get/litvar/${encodeURIComponent(rsid)}%23%23`;
+    const url = `${BASE_URL}/variant/get/${buildVariantId(rsid)}`;
     const raw = await fetchJson<RawVariantResponse>(url, this._config);
 
-    if (!raw.results || raw.results.length === 0) {
-      throw new Error(`No variant found for ${rsid}`);
-    }
-
-    const result = raw.results[0]!;
-
     return {
-      rsid: result.rsid ?? '',
-      hgvs: result.hgvs_list ?? [],
-      gene: result.gene ?? '',
-      publicationCount: result.pmid_count ?? 0,
+      rsid: raw.rsid ?? '',
+      gene: raw.gene ?? [],
+      name: raw.name ?? '',
+      hgvs: raw.hgvs ?? '',
+      clinicalSignificance: raw.data_clinical_significance ?? [],
     };
   }
 
-  /** Fetch publications mentioning a variant by rsID. */
-  public async publications(rsid: string): Promise<ReadonlyArray<LitVarPublication>> {
+  /** Fetch publication IDs associated with a variant by rsID. */
+  public async publications(rsid: string): Promise<LitVarPublicationResult> {
     if (!rsid) {
       throw new Error('rsid must not be empty');
     }
 
-    const url = `${BASE_URL}/variant/publications/litvar/${encodeURIComponent(rsid)}%23%23`;
-    const raw = await fetchJson<ReadonlyArray<RawPublication>>(url, this._config);
-    return raw.map(mapPublication);
+    const url = `${BASE_URL}/variant/get/${buildVariantId(rsid)}/publications`;
+    const raw = await fetchJson<RawPublicationsResponse>(url, this._config);
+
+    return {
+      pmids: raw.pmids ?? [],
+      pmcids: raw.pmcids ?? [],
+      count: raw.pmids_count ?? 0,
+    };
   }
 
   /** Search LitVar for variants matching a text query. */
@@ -118,19 +90,22 @@ export class LitVar {
       throw new Error('query must not be empty');
     }
 
-    const url = `${BASE_URL}/api/v1/entity/search/${encodeURIComponent(query)}`;
-    const raw = await fetchJson<ReadonlyArray<RawSearchResult>>(url, this._config);
+    const params = new URLSearchParams({ query });
+    const url = `${BASE_URL}/variant/autocomplete/?${params.toString()}`;
+    const raw = await fetchJson<ReadonlyArray<RawAutocompleteResult>>(url, this._config);
+
     return raw.map(mapSearchResult);
   }
+}
 
-  /** Fetch detailed annotations for a variant by rsID. */
-  public async variantAnnotations(rsid: string): Promise<ReadonlyArray<LitVarAnnotation>> {
-    if (!rsid) {
-      throw new Error('rsid must not be empty');
-    }
-
-    const url = `${BASE_URL}/api/v1/entity/litvar/${encodeURIComponent(rsid)}%23%23/annotations`;
-    const raw = await fetchJson<ReadonlyArray<RawAnnotation>>(url, this._config);
-    return raw.map(mapAnnotation);
-  }
+function mapSearchResult(raw: RawAutocompleteResult): LitVarSearchResult {
+  return {
+    rsid: raw.rsid ?? '',
+    gene: raw.gene ?? [],
+    name: raw.name ?? '',
+    hgvs: raw.hgvs ?? '',
+    publicationCount: raw.pmids_count ?? 0,
+    clinicalSignificance: raw.data_clinical_significance ?? [],
+    match: raw.match ?? '',
+  };
 }

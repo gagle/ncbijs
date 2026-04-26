@@ -67,17 +67,14 @@ function buildSynonymsResponse(overrides: Record<string, unknown> = {}): Record<
   };
 }
 
-function buildDescriptionResponse(
-  overrides: Record<string, unknown> = {},
-): Record<string, unknown> {
+function buildDescriptionResponse(): Record<string, unknown> {
   return {
     InformationList: {
       Information: [
+        { CID: 2244, Title: 'Aspirin' },
         {
           CID: 2244,
-          Title: 'Aspirin',
           Description: 'Aspirin is a member of the class of benzoic acids.',
-          ...overrides,
         },
       ],
     },
@@ -359,7 +356,7 @@ describe('PubChem', () => {
       expect(result.description).toBe('');
     });
 
-    it('should handle Information entry with missing fields', async () => {
+    it('should handle Information entries with missing fields', async () => {
       mockFetchJson({ InformationList: { Information: [{ CID: 5 }] } });
       const pubchem = new PubChem();
 
@@ -368,6 +365,24 @@ describe('PubChem', () => {
       expect(result.cid).toBe(5);
       expect(result.title).toBe('');
       expect(result.description).toBe('');
+    });
+
+    it('should get description from second entry when first only has title', async () => {
+      mockFetchJson({
+        InformationList: {
+          Information: [
+            { CID: 2244, Title: 'Aspirin' },
+            { CID: 2244, Description: 'Description from OEHHA' },
+            { CID: 2244, Description: 'Description from ChEBI' },
+          ],
+        },
+      });
+      const pubchem = new PubChem();
+
+      const result = await pubchem.description(2244);
+
+      expect(result.title).toBe('Aspirin');
+      expect(result.description).toBe('Description from OEHHA');
     });
 
     it('should throw on 404 for non-existent compound', async () => {
@@ -561,16 +576,13 @@ describe('PubChem', () => {
   describe('substanceBySid', () => {
     it('should fetch substance by SID and map fields', async () => {
       mockFetchJson({
-        InformationList: {
-          Information: [
-            {
-              SID: 175,
-              SourceName: 'DTP/NCI',
-              SourceID: '729456',
-              Description: 'A benzoic acid derivative.',
-            },
-          ],
-        },
+        PC_Substances: [
+          {
+            sid: { id: 175 },
+            source: { db: { name: 'DTP/NCI', source_id: { str: '729456' } } },
+            comment: ['A benzoic acid derivative.'],
+          },
+        ],
       });
       const pubchem = new PubChem();
 
@@ -583,16 +595,16 @@ describe('PubChem', () => {
     });
 
     it('should build correct URL with SID', async () => {
-      mockFetchJson({ InformationList: { Information: [{ SID: 175 }] } });
+      mockFetchJson({ PC_Substances: [] });
       const pubchem = new PubChem();
 
       await pubchem.substanceBySid(175);
 
       const url = vi.mocked(fetch).mock.calls[0]![0] as string;
-      expect(url).toContain('/substance/sid/175/description/JSON');
+      expect(url).toContain('/substance/sid/175/JSON');
     });
 
-    it('should handle missing InformationList', async () => {
+    it('should handle missing PC_Substances', async () => {
       mockFetchJson({});
       const pubchem = new PubChem();
 
@@ -604,13 +616,30 @@ describe('PubChem', () => {
       expect(substance.description).toBe('');
     });
 
-    it('should handle empty Information array', async () => {
-      mockFetchJson({ InformationList: { Information: [] } });
+    it('should handle empty PC_Substances array', async () => {
+      mockFetchJson({ PC_Substances: [] });
       const pubchem = new PubChem();
 
       const substance = await pubchem.substanceBySid(1);
 
       expect(substance.sid).toBe(0);
+    });
+
+    it('should join multiple comment lines', async () => {
+      mockFetchJson({
+        PC_Substances: [
+          {
+            sid: { id: 175 },
+            source: { db: { name: 'DTP/NCI', source_id: { str: '729456' } } },
+            comment: ['Line one.', 'Line two.'],
+          },
+        ],
+      });
+      const pubchem = new PubChem();
+
+      const substance = await pubchem.substanceBySid(175);
+
+      expect(substance.description).toBe('Line one. Line two.');
     });
 
     it('should throw on 404 for non-existent substance', async () => {
@@ -626,12 +655,18 @@ describe('PubChem', () => {
   describe('substanceBySidBatch', () => {
     it('should fetch multiple substances and map all entries', async () => {
       mockFetchJson({
-        InformationList: {
-          Information: [
-            { SID: 175, SourceName: 'DTP/NCI', SourceID: '729456', Description: 'Substance 1' },
-            { SID: 176, SourceName: 'ChEBI', SourceID: '15365', Description: 'Substance 2' },
-          ],
-        },
+        PC_Substances: [
+          {
+            sid: { id: 175 },
+            source: { db: { name: 'DTP/NCI', source_id: { str: '729456' } } },
+            comment: ['Substance 1'],
+          },
+          {
+            sid: { id: 176 },
+            source: { db: { name: 'ChEBI', source_id: { str: '15365' } } },
+            comment: ['Substance 2'],
+          },
+        ],
       });
       const pubchem = new PubChem();
 
@@ -645,13 +680,13 @@ describe('PubChem', () => {
     });
 
     it('should build correct URL with comma-separated SIDs', async () => {
-      mockFetchJson({ InformationList: { Information: [] } });
+      mockFetchJson({ PC_Substances: [] });
       const pubchem = new PubChem();
 
       await pubchem.substanceBySidBatch([175, 176]);
 
       const url = vi.mocked(fetch).mock.calls[0]![0] as string;
-      expect(url).toContain('/substance/sid/175%2C176/description/JSON');
+      expect(url).toContain('/substance/sid/175%2C176/JSON');
     });
 
     it('should return empty array for empty SIDs', async () => {
@@ -662,7 +697,7 @@ describe('PubChem', () => {
       expect(substances).toEqual([]);
     });
 
-    it('should handle missing InformationList', async () => {
+    it('should handle missing PC_Substances', async () => {
       mockFetchJson({});
       const pubchem = new PubChem();
 
@@ -675,16 +710,13 @@ describe('PubChem', () => {
   describe('substanceByName', () => {
     it('should fetch substance by name and map fields', async () => {
       mockFetchJson({
-        InformationList: {
-          Information: [
-            {
-              SID: 175,
-              SourceName: 'DTP/NCI',
-              SourceID: '729456',
-              Description: 'Aspirin substance',
-            },
-          ],
-        },
+        PC_Substances: [
+          {
+            sid: { id: 175 },
+            source: { db: { name: 'DTP/NCI', source_id: { str: '729456' } } },
+            comment: ['Aspirin substance'],
+          },
+        ],
       });
       const pubchem = new PubChem();
 
@@ -695,13 +727,13 @@ describe('PubChem', () => {
     });
 
     it('should build correct URL with encoded name', async () => {
-      mockFetchJson({ InformationList: { Information: [{ SID: 1 }] } });
+      mockFetchJson({ PC_Substances: [] });
       const pubchem = new PubChem();
 
       await pubchem.substanceByName('acetylsalicylic acid');
 
       const url = vi.mocked(fetch).mock.calls[0]![0] as string;
-      expect(url).toContain('/substance/name/acetylsalicylic%20acid/description/JSON');
+      expect(url).toContain('/substance/name/acetylsalicylic%20acid/JSON');
     });
 
     it('should throw on 404 for unknown substance', async () => {
@@ -992,12 +1024,24 @@ describe('PubChem', () => {
   });
 
   describe('assaySummary', () => {
-    it('should fetch assay summary with SID and CID counts', async () => {
-      mockFetchJson({
-        InformationList: {
-          Information: [{ AID: 1000, SID: [1, 2, 3, 4, 5], CID: [100, 200, 300] }],
-        },
-      });
+    it('should fetch assay summary with SID and CID counts from separate endpoints', async () => {
+      let callCount = 0;
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockImplementation((url: string) => {
+          callCount++;
+          const isSids = (url as string).includes('/sids/');
+          const data = isSids
+            ? { InformationList: { Information: [{ AID: 1000, SID: [1, 2, 3, 4, 5] }] } }
+            : { InformationList: { Information: [{ AID: 1000, CID: [100, 200, 300] }] } };
+          return Promise.resolve({
+            ok: true,
+            status: 200,
+            json: () => Promise.resolve(data),
+            headers: new Headers({ 'content-type': 'application/json' }),
+          });
+        }),
+      );
       const pubchem = new PubChem();
 
       const summary = await pubchem.assaySummary(1000);
@@ -1005,16 +1049,18 @@ describe('PubChem', () => {
       expect(summary.aid).toBe(1000);
       expect(summary.sidCount).toBe(5);
       expect(summary.cidCount).toBe(3);
+      expect(callCount).toBe(2);
     });
 
-    it('should build correct URL', async () => {
+    it('should call both sids and cids endpoints', async () => {
       mockFetchJson({ InformationList: { Information: [{ AID: 1000 }] } });
       const pubchem = new PubChem();
 
       await pubchem.assaySummary(1000);
 
-      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
-      expect(url).toContain('/assay/aid/1000/sids/JSON');
+      const urls = vi.mocked(fetch).mock.calls.map((call) => call[0] as string);
+      expect(urls.some((u) => u.includes('/assay/aid/1000/sids/JSON'))).toBe(true);
+      expect(urls.some((u) => u.includes('/assay/aid/1000/cids/JSON'))).toBe(true);
     });
 
     it('should handle missing InformationList', async () => {
@@ -1028,7 +1074,7 @@ describe('PubChem', () => {
       expect(summary.cidCount).toBe(0);
     });
 
-    it('should handle empty Information array', async () => {
+    it('should handle empty Information arrays', async () => {
       mockFetchJson({ InformationList: { Information: [] } });
       const pubchem = new PubChem();
 
@@ -1038,7 +1084,7 @@ describe('PubChem', () => {
       expect(summary.sidCount).toBe(0);
     });
 
-    it('should handle Information entry with missing SID/CID arrays', async () => {
+    it('should handle Information entries with missing SID/CID arrays', async () => {
       mockFetchJson({ InformationList: { Information: [{ AID: 1000 }] } });
       const pubchem = new PubChem();
 
@@ -1226,7 +1272,7 @@ describe('PubChem', () => {
               GeneID: 7157,
               Symbol: 'TP53',
               Name: 'tumor protein p53',
-              TaxID: 9606,
+              TaxonomyID: 9606,
               Description: 'This gene encodes a tumor suppressor protein.',
             },
           ],
@@ -1364,10 +1410,10 @@ describe('PubChem', () => {
         ProteinSummaries: {
           ProteinSummary: [
             {
-              RegistryID: 'P04637',
+              ProteinAccession: 'P04637',
               Name: 'Cellular tumor antigen p53',
-              Organism: 'Homo sapiens',
-              TaxID: 9606,
+              Taxonomy: 'Homo sapiens',
+              TaxonomyID: 9606,
             },
           ],
         },
@@ -1415,7 +1461,7 @@ describe('PubChem', () => {
     });
 
     it('should handle ProteinSummary entry with missing fields', async () => {
-      mockFetchJson({ ProteinSummaries: { ProteinSummary: [{ RegistryID: 'P04637' }] } });
+      mockFetchJson({ ProteinSummaries: { ProteinSummary: [{ ProteinAccession: 'P04637' }] } });
       const pubchem = new PubChem();
 
       const protein = await pubchem.proteinByAccession('P04637');

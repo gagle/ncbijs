@@ -2,10 +2,12 @@ import { TokenBucket } from '@ncbijs/rate-limiter';
 import { fetchText } from './bioc-client';
 import type { BioCClientConfig } from './bioc-client';
 import type {
+  BioCCollection,
   BioCConfig,
   BioCDocument,
   BioCFormat,
   EntitySearchResult,
+  RawEntitySearchResult,
 } from './interfaces/bioc.interface';
 
 const BASE_URL = 'https://www.ncbi.nlm.nih.gov/research/bionlp/RESTful';
@@ -79,11 +81,17 @@ export class BioC {
     }
 
     const text = await fetchText(url, this._config);
-    return JSON.parse(text) as ReadonlyArray<EntitySearchResult>;
+    const rawResults = JSON.parse(text) as ReadonlyArray<RawEntitySearchResult>;
+
+    return rawResults.map((raw) => ({
+      id: raw.db_id,
+      name: raw.name,
+      type: raw.biotype,
+    }));
   }
 
   private async fetchBioC(
-    idType: string,
+    idType: 'pmid' | 'pmcid',
     id: string,
     format: BioCFormat,
   ): Promise<BioCDocument | string> {
@@ -91,14 +99,23 @@ export class BioC {
       throw new Error('id must not be empty');
     }
 
-    const url = `${BASE_URL}/${idType}/get/${encodeURIComponent(id)}/${format}`;
+    const cgiSegment = idType === 'pmid' ? 'pubmed.cgi' : 'pmcoa.cgi';
+    const biocFormat = format === 'xml' ? 'BioC_xml' : 'BioC_json';
+    const url = `${BASE_URL}/${cgiSegment}/${biocFormat}/${encodeURIComponent(id)}/unicode`;
     const text = await fetchText(url, this._config);
 
     if (format === 'xml') {
       return text;
     }
 
-    return JSON.parse(text) as BioCDocument;
+    const collection = JSON.parse(text) as BioCCollection;
+    const document = collection.documents[0];
+
+    if (document === undefined) {
+      throw new Error('BioC API returned a collection with no documents');
+    }
+
+    return document;
   }
 
   private async fetchBioCBatch(
@@ -111,8 +128,9 @@ export class BioC {
     }
 
     const formatSegment = format === 'xml' ? 'biocxml' : 'biocjson';
+    const exportSegment = idParam === 'pmcids' ? 'pmc_export' : 'export';
     const commaSeparated = ids.map((id) => encodeURIComponent(id)).join(',');
-    const url = `${PUBTATOR3_BASE_URL}/publications/export/${formatSegment}?${idParam}=${commaSeparated}`;
+    const url = `${PUBTATOR3_BASE_URL}/publications/${exportSegment}/${formatSegment}?${idParam}=${commaSeparated}`;
     const text = await fetchText(url, this._config);
 
     if (format === 'xml') {

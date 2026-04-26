@@ -357,7 +357,7 @@ describe('ClinicalTrials', () => {
       expect(url).toContain('filter.overallStatus=RECRUITING%2CCOMPLETED');
     });
 
-    it('should append filter.condition parameters', async () => {
+    it('should join filter.condition with OR separator', async () => {
       mockFetchJson({ studies: [] });
       const ct = new ClinicalTrials();
 
@@ -369,11 +369,10 @@ describe('ClinicalTrials', () => {
       }
 
       const url = vi.mocked(fetch).mock.calls[0]![0] as string;
-      expect(url).toContain('query.cond=Diabetes');
-      expect(url).toContain('query.cond=Obesity');
+      expect(url).toContain('query.cond=Diabetes+OR+Obesity');
     });
 
-    it('should append filter.intervention parameters', async () => {
+    it('should join filter.intervention with OR separator', async () => {
       mockFetchJson({ studies: [] });
       const ct = new ClinicalTrials();
 
@@ -385,8 +384,7 @@ describe('ClinicalTrials', () => {
       }
 
       const url = vi.mocked(fetch).mock.calls[0]![0] as string;
-      expect(url).toContain('query.intr=Metformin');
-      expect(url).toContain('query.intr=Insulin');
+      expect(url).toContain('query.intr=Metformin+OR+Insulin');
     });
 
     it('should set filter.sponsor parameter', async () => {
@@ -466,11 +464,11 @@ describe('ClinicalTrials', () => {
   });
 
   describe('studyFieldValues', () => {
-    it('should return field value counts', async () => {
+    it('should return field value counts from topValues', async () => {
       mockFetchJson({
-        values: [
-          { value: 'COMPLETED', count: 200000 },
-          { value: 'RECRUITING', count: 50000 },
+        topValues: [
+          { value: 'COMPLETED', studiesCount: 200000 },
+          { value: 'RECRUITING', studiesCount: 50000 },
         ],
       });
       const ct = new ClinicalTrials();
@@ -483,17 +481,17 @@ describe('ClinicalTrials', () => {
       expect(values[1]!.value).toBe('RECRUITING');
     });
 
-    it('should build correct URL with encoded field', async () => {
-      mockFetchJson({ values: [] });
+    it('should build correct URL with field as path param', async () => {
+      mockFetchJson({ topValues: [] });
       const ct = new ClinicalTrials();
 
       await ct.studyFieldValues('OverallStatus');
 
       const url = vi.mocked(fetch).mock.calls[0]![0] as string;
-      expect(url).toBe('https://clinicaltrials.gov/api/v2/stats/field/values?field=OverallStatus');
+      expect(url).toBe('https://clinicaltrials.gov/api/v2/stats/fieldValues/OverallStatus');
     });
 
-    it('should handle missing values', async () => {
+    it('should handle missing topValues', async () => {
       mockFetchJson({});
       const ct = new ClinicalTrials();
 
@@ -503,7 +501,7 @@ describe('ClinicalTrials', () => {
     });
 
     it('should handle entries with missing fields', async () => {
-      mockFetchJson({ values: [{}] });
+      mockFetchJson({ topValues: [{}] });
       const ct = new ClinicalTrials();
 
       const values = await ct.studyFieldValues('OverallStatus');
@@ -514,40 +512,61 @@ describe('ClinicalTrials', () => {
   });
 
   describe('studyMetadata', () => {
-    it('should return mapped field definitions', async () => {
-      mockFetchJson({
-        fields: [
-          {
-            name: 'NCTId',
-            type: 'string',
-            description: 'Unique identifier',
-            sourceField: 'protocolSection.identificationModule.nctId',
-            isEnum: false,
-          },
-          {
-            name: 'OverallStatus',
-            type: 'string',
-            description: 'Current status',
-            sourceField: 'protocolSection.statusModule.overallStatus',
-            isEnum: true,
-          },
-        ],
-      });
+    it('should flatten tree nodes into field definitions', async () => {
+      mockFetchJson([
+        {
+          name: 'protocolSection',
+          piece: 'ProtocolSection',
+          sourceType: 'STRUCT',
+          children: [
+            {
+              name: 'identificationModule',
+              piece: 'IdentificationModule',
+              sourceType: 'STRUCT',
+              children: [
+                {
+                  name: 'nctId',
+                  piece: 'NCTId',
+                  sourceType: 'STRING',
+                },
+              ],
+            },
+          ],
+        },
+      ]);
       const ct = new ClinicalTrials();
 
       const metadata = await ct.studyMetadata();
 
-      expect(metadata.fields).toHaveLength(2);
-      expect(metadata.fields[0]!.name).toBe('NCTId');
-      expect(metadata.fields[0]!.type).toBe('string');
-      expect(metadata.fields[0]!.description).toBe('Unique identifier');
-      expect(metadata.fields[0]!.sourceField).toBe('protocolSection.identificationModule.nctId');
+      expect(metadata.fields).toHaveLength(3);
+      expect(metadata.fields[0]!.name).toBe('protocolSection');
+      expect(metadata.fields[0]!.type).toBe('STRUCT');
+      expect(metadata.fields[0]!.description).toBe('ProtocolSection');
+      expect(metadata.fields[0]!.sourceField).toBe('protocolSection');
       expect(metadata.fields[0]!.isEnum).toBe(false);
-      expect(metadata.fields[1]!.isEnum).toBe(true);
+      expect(metadata.fields[1]!.name).toBe('protocolSection.identificationModule');
+      expect(metadata.fields[2]!.name).toBe('protocolSection.identificationModule.nctId');
+      expect(metadata.fields[2]!.type).toBe('STRING');
+      expect(metadata.fields[2]!.description).toBe('NCTId');
+    });
+
+    it('should mark ENUM sourceType as isEnum true', async () => {
+      mockFetchJson([
+        {
+          name: 'overallStatus',
+          piece: 'OverallStatus',
+          sourceType: 'ENUM',
+        },
+      ]);
+      const ct = new ClinicalTrials();
+
+      const metadata = await ct.studyMetadata();
+
+      expect(metadata.fields[0]!.isEnum).toBe(true);
     });
 
     it('should build correct URL', async () => {
-      mockFetchJson({ fields: [] });
+      mockFetchJson([]);
       const ct = new ClinicalTrials();
 
       await ct.studyMetadata();
@@ -556,8 +575,8 @@ describe('ClinicalTrials', () => {
       expect(url).toBe('https://clinicaltrials.gov/api/v2/studies/metadata');
     });
 
-    it('should handle missing fields array', async () => {
-      mockFetchJson({});
+    it('should handle empty array response', async () => {
+      mockFetchJson([]);
       const ct = new ClinicalTrials();
 
       const metadata = await ct.studyMetadata();
@@ -565,8 +584,8 @@ describe('ClinicalTrials', () => {
       expect(metadata.fields).toEqual([]);
     });
 
-    it('should default missing field properties', async () => {
-      mockFetchJson({ fields: [{}] });
+    it('should default missing node properties', async () => {
+      mockFetchJson([{}]);
       const ct = new ClinicalTrials();
 
       const metadata = await ct.studyMetadata();
@@ -580,8 +599,14 @@ describe('ClinicalTrials', () => {
   });
 
   describe('enumValues', () => {
-    it('should return enum values for a field', async () => {
-      mockFetchJson({ values: ['RECRUITING', 'COMPLETED', 'TERMINATED'] });
+    it('should return enum values extracted from topValues', async () => {
+      mockFetchJson({
+        topValues: [
+          { value: 'RECRUITING', studiesCount: 50000 },
+          { value: 'COMPLETED', studiesCount: 200000 },
+          { value: 'TERMINATED', studiesCount: 10000 },
+        ],
+      });
       const ct = new ClinicalTrials();
 
       const values = await ct.enumValues('OverallStatus');
@@ -590,16 +615,16 @@ describe('ClinicalTrials', () => {
     });
 
     it('should build correct URL with encoded field', async () => {
-      mockFetchJson({ values: [] });
+      mockFetchJson({ topValues: [] });
       const ct = new ClinicalTrials();
 
       await ct.enumValues('OverallStatus');
 
       const url = vi.mocked(fetch).mock.calls[0]![0] as string;
-      expect(url).toBe('https://clinicaltrials.gov/api/v2/studies/enums/OverallStatus');
+      expect(url).toBe('https://clinicaltrials.gov/api/v2/stats/fieldValues/OverallStatus');
     });
 
-    it('should handle missing values', async () => {
+    it('should handle missing topValues', async () => {
       mockFetchJson({});
       const ct = new ClinicalTrials();
 
@@ -608,13 +633,22 @@ describe('ClinicalTrials', () => {
       expect(values).toEqual([]);
     });
 
-    it('should return empty array for empty response', async () => {
-      mockFetchJson({ values: [] });
+    it('should return empty array for empty topValues', async () => {
+      mockFetchJson({ topValues: [] });
       const ct = new ClinicalTrials();
 
       const values = await ct.enumValues('Phase');
 
       expect(values).toEqual([]);
+    });
+
+    it('should default missing value to empty string', async () => {
+      mockFetchJson({ topValues: [{}] });
+      const ct = new ClinicalTrials();
+
+      const values = await ct.enumValues('Phase');
+
+      expect(values).toEqual(['']);
     });
   });
 
@@ -670,26 +704,24 @@ describe('ClinicalTrials', () => {
       expect(url).toContain('filter.overallStatus=RECRUITING%2CCOMPLETED');
     });
 
-    it('should apply filter.condition', async () => {
+    it('should apply filter.condition with OR separator', async () => {
       mockFetchJson({ totalCount: 100 });
       const ct = new ClinicalTrials();
 
       await ct.studySize('diabetes', { condition: ['Diabetes', 'Obesity'] });
 
       const url = vi.mocked(fetch).mock.calls[0]![0] as string;
-      expect(url).toContain('query.cond=Diabetes');
-      expect(url).toContain('query.cond=Obesity');
+      expect(url).toContain('query.cond=Diabetes+OR+Obesity');
     });
 
-    it('should apply filter.intervention', async () => {
+    it('should apply filter.intervention with OR separator', async () => {
       mockFetchJson({ totalCount: 100 });
       const ct = new ClinicalTrials();
 
       await ct.studySize('diabetes', { intervention: ['Metformin', 'Insulin'] });
 
       const url = vi.mocked(fetch).mock.calls[0]![0] as string;
-      expect(url).toContain('query.intr=Metformin');
-      expect(url).toContain('query.intr=Insulin');
+      expect(url).toContain('query.intr=Metformin+OR+Insulin');
     });
 
     it('should apply filter.sponsor', async () => {

@@ -1,31 +1,28 @@
-/** Variant details returned by the LitVar API. */
+/** Variant details returned by the LitVar2 variant detail endpoint. */
 export interface LitVarVariant {
   readonly rsid: string;
-  readonly hgvs: ReadonlyArray<string>;
-  readonly gene: string;
-  readonly publicationCount: number;
+  readonly gene: ReadonlyArray<string>;
+  readonly name: string;
+  readonly hgvs: string;
+  readonly clinicalSignificance: ReadonlyArray<string>;
 }
 
-/** A publication mentioning a genetic variant. */
-export interface LitVarPublication {
-  readonly pmid: number;
-  readonly title: string;
-  readonly journal: string;
-  readonly year: number;
-}
-
-/** A variant entity returned by the LitVar search endpoint. */
-export interface LitVarSearchResult {
-  readonly term: string;
-  readonly type: string;
-  readonly score: number;
-}
-
-/** An annotation for a variant (disease association, related genes, supporting PMIDs). */
-export interface LitVarAnnotation {
-  readonly disease: string;
-  readonly genes: ReadonlyArray<string>;
+/** Publication IDs associated with a variant. */
+export interface LitVarPublicationResult {
   readonly pmids: ReadonlyArray<number>;
+  readonly pmcids: ReadonlyArray<string>;
+  readonly count: number;
+}
+
+/** A variant autocomplete result from the LitVar2 search endpoint. */
+export interface LitVarSearchResult {
+  readonly rsid: string;
+  readonly gene: ReadonlyArray<string>;
+  readonly name: string;
+  readonly hgvs: string;
+  readonly publicationCount: number;
+  readonly clinicalSignificance: ReadonlyArray<string>;
+  readonly match: string;
 }
 
 /** Configuration for the LitVar client. */

@@ -124,21 +124,16 @@ export class PubChem {
   public async description(cid: number): Promise<CompoundDescription> {
     const url = `${BASE_URL}/compound/cid/${encodeURIComponent(cid)}/description/JSON`;
     const raw = await fetchJson<RawDescriptionResponse>(url, this._config);
-    const information = raw.InformationList?.Information?.[0];
 
-    return {
-      cid: information?.CID ?? 0,
-      title: information?.Title ?? '',
-      description: information?.Description ?? '',
-    };
+    return mapCompoundDescription(raw.InformationList?.Information ?? []);
   }
 
   /** Fetch a substance record by SID. */
   public async substanceBySid(sid: number): Promise<SubstanceRecord> {
-    const url = `${BASE_URL}/substance/sid/${encodeURIComponent(sid)}/description/JSON`;
-    const raw = await fetchJson<RawSubstanceDescriptionResponse>(url, this._config);
+    const url = `${BASE_URL}/substance/sid/${encodeURIComponent(sid)}/JSON`;
+    const raw = await fetchJson<RawSubstanceResponse>(url, this._config);
 
-    return mapSubstanceRecord(raw.InformationList?.Information?.[0]);
+    return mapSubstanceRecord(raw.PC_Substances?.[0]);
   }
 
   /** Fetch substance records for multiple SIDs in a single request. */
@@ -150,18 +145,18 @@ export class PubChem {
     }
 
     const joined = sids.join(',');
-    const url = `${BASE_URL}/substance/sid/${encodeURIComponent(joined)}/description/JSON`;
-    const raw = await fetchJson<RawSubstanceDescriptionResponse>(url, this._config);
+    const url = `${BASE_URL}/substance/sid/${encodeURIComponent(joined)}/JSON`;
+    const raw = await fetchJson<RawSubstanceResponse>(url, this._config);
 
-    return (raw.InformationList?.Information ?? []).map(mapSubstanceRecord);
+    return (raw.PC_Substances ?? []).map(mapSubstanceRecord);
   }
 
   /** Fetch a substance record by name. */
   public async substanceByName(name: string): Promise<SubstanceRecord> {
-    const url = `${BASE_URL}/substance/name/${encodeURIComponent(name)}/description/JSON`;
-    const raw = await fetchJson<RawSubstanceDescriptionResponse>(url, this._config);
+    const url = `${BASE_URL}/substance/name/${encodeURIComponent(name)}/JSON`;
+    const raw = await fetchJson<RawSubstanceResponse>(url, this._config);
 
-    return mapSubstanceRecord(raw.InformationList?.Information?.[0]);
+    return mapSubstanceRecord(raw.PC_Substances?.[0]);
   }
 
   /** Fetch synonyms for a substance by SID. */
@@ -207,15 +202,23 @@ export class PubChem {
 
   /** Fetch a summary of substance and compound counts for a bioassay. */
   public async assaySummary(aid: number): Promise<AssaySummary> {
-    const url = `${BASE_URL}/assay/aid/${encodeURIComponent(aid)}/sids/JSON`;
-    const raw = await fetchJson<RawAssaySidsResponse>(url, this._config);
-    const information = raw.InformationList?.Information?.[0];
+    const encodedAid = encodeURIComponent(aid);
+    const sidsUrl = `${BASE_URL}/assay/aid/${encodedAid}/sids/JSON`;
+    const cidsUrl = `${BASE_URL}/assay/aid/${encodedAid}/cids/JSON`;
+
+    const [sidsRaw, cidsRaw] = await Promise.all([
+      fetchJson<RawAssaySidsResponse>(sidsUrl, this._config),
+      fetchJson<RawAssayCidsResponse>(cidsUrl, this._config),
+    ]);
+
+    const sidsInfo = sidsRaw.InformationList?.Information?.[0];
+    const cidsInfo = cidsRaw.InformationList?.Information?.[0];
 
     return {
-      aid: information?.AID ?? 0,
+      aid: sidsInfo?.AID ?? cidsInfo?.AID ?? 0,
       name: '',
-      sidCount: information?.SID?.length ?? 0,
-      cidCount: information?.CID?.length ?? 0,
+      sidCount: sidsInfo?.SID?.length ?? 0,
+      cidCount: cidsInfo?.CID?.length ?? 0,
     };
   }
 
@@ -342,27 +345,42 @@ interface RawSynonymsResponse {
   };
 }
 
+interface RawDescriptionEntry {
+  readonly CID?: number;
+  readonly Title?: string;
+  readonly Description?: string;
+}
+
 interface RawDescriptionResponse {
   readonly InformationList?: {
-    readonly Information?: ReadonlyArray<{
-      readonly CID?: number;
-      readonly Title?: string;
-      readonly Description?: string;
-    }>;
+    readonly Information?: ReadonlyArray<RawDescriptionEntry>;
   };
 }
 
-interface RawSubstanceDescriptionResponse {
-  readonly InformationList?: {
-    readonly Information?: ReadonlyArray<RawSubstanceInformation>;
+function mapCompoundDescription(entries: ReadonlyArray<RawDescriptionEntry>): CompoundDescription {
+  const titleEntry = entries[0];
+  const descriptionEntry = entries.find((entry) => entry.Description !== undefined);
+
+  return {
+    cid: titleEntry?.CID ?? 0,
+    title: titleEntry?.Title ?? '',
+    description: descriptionEntry?.Description ?? '',
   };
 }
 
-interface RawSubstanceInformation {
-  readonly SID?: number;
-  readonly SourceName?: string;
-  readonly SourceID?: string;
-  readonly Description?: string;
+interface RawSubstanceResponse {
+  readonly PC_Substances?: ReadonlyArray<RawPCSubstance>;
+}
+
+interface RawPCSubstance {
+  readonly sid?: { readonly id?: number };
+  readonly source?: {
+    readonly db?: {
+      readonly name?: string;
+      readonly source_id?: { readonly str?: string };
+    };
+  };
+  readonly comment?: ReadonlyArray<string>;
 }
 
 interface RawSubstanceSynonymsResponse {
@@ -408,17 +426,25 @@ interface RawAssaySidsResponse {
     readonly Information?: ReadonlyArray<{
       readonly AID?: number;
       readonly SID?: ReadonlyArray<number>;
+    }>;
+  };
+}
+
+interface RawAssayCidsResponse {
+  readonly InformationList?: {
+    readonly Information?: ReadonlyArray<{
+      readonly AID?: number;
       readonly CID?: ReadonlyArray<number>;
     }>;
   };
 }
 
-function mapSubstanceRecord(raw?: RawSubstanceInformation): SubstanceRecord {
+function mapSubstanceRecord(raw?: RawPCSubstance): SubstanceRecord {
   return {
-    sid: raw?.SID ?? 0,
-    sourceName: raw?.SourceName ?? '',
-    sourceId: raw?.SourceID ?? '',
-    description: raw?.Description ?? '',
+    sid: raw?.sid?.id ?? 0,
+    sourceName: raw?.source?.db?.name ?? '',
+    sourceId: raw?.source?.db?.source_id?.str ?? '',
+    description: (raw?.comment ?? []).join(' '),
   };
 }
 
@@ -439,8 +465,8 @@ function mapCompoundProperty(raw: RawPropertyResponse): CompoundProperty {
 }
 
 function mapCompoundPropertyEntry(property: RawCompoundProperty): CompoundProperty {
-  const canonicalSmiles =
-    property.CanonicalSMILES ?? property.ConnectivitySMILES ?? property.SMILES ?? '';
+  const canonicalSmiles = property.CanonicalSMILES ?? property.ConnectivitySMILES ?? '';
+  const isomericSmiles = property.IsomericSMILES ?? property.SMILES ?? canonicalSmiles;
 
   return {
     cid: property.CID ?? 0,
@@ -448,7 +474,7 @@ function mapCompoundPropertyEntry(property: RawCompoundProperty): CompoundProper
     molecularWeight: Number(property.MolecularWeight ?? 0),
     iupacName: property.IUPACName ?? '',
     canonicalSmiles,
-    isomericSmiles: property.IsomericSMILES ?? canonicalSmiles,
+    isomericSmiles,
     inchi: property.InChI ?? '',
     inchiKey: property.InChIKey ?? '',
     xLogP: property.XLogP ?? 0,
@@ -535,7 +561,7 @@ interface RawGeneSummary {
   readonly GeneID?: number;
   readonly Symbol?: string;
   readonly Name?: string;
-  readonly TaxID?: number;
+  readonly TaxonomyID?: number;
   readonly Description?: string;
 }
 
@@ -555,10 +581,10 @@ interface RawProteinSummaryResponse {
 }
 
 interface RawProteinSummary {
-  readonly RegistryID?: string;
+  readonly ProteinAccession?: string;
   readonly Name?: string;
-  readonly Organism?: string;
-  readonly TaxID?: number;
+  readonly Taxonomy?: string;
+  readonly TaxonomyID?: number;
 }
 
 function mapGeneRecord(raw?: RawGeneSummary): GeneRecord {
@@ -566,17 +592,17 @@ function mapGeneRecord(raw?: RawGeneSummary): GeneRecord {
     geneId: raw?.GeneID ?? 0,
     symbol: raw?.Symbol ?? '',
     name: raw?.Name ?? '',
-    taxId: raw?.TaxID ?? 0,
+    taxId: raw?.TaxonomyID ?? 0,
     description: raw?.Description ?? '',
   };
 }
 
 function mapProteinRecord(raw?: RawProteinSummary): ProteinRecord {
   return {
-    accession: raw?.RegistryID ?? '',
+    accession: raw?.ProteinAccession ?? '',
     name: raw?.Name ?? '',
-    organism: raw?.Organism ?? '',
-    taxId: raw?.TaxID ?? 0,
+    organism: raw?.Taxonomy ?? '',
+    taxId: raw?.TaxonomyID ?? 0,
   };
 }
 

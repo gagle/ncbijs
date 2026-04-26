@@ -213,14 +213,6 @@ describe('cite', () => {
       expect(fetchCall).toContain('/pmc/');
     });
 
-    it('should support books source', async () => {
-      mockFetchText('TY  - BOOK');
-      const client = new Cite();
-      await client.cite('NBK12345', 'ris', 'books');
-      const fetchCall = vi.mocked(fetch).mock.calls[0]![0] as string;
-      expect(fetchCall).toContain('/books/');
-    });
-
     it('should construct correct URL for each source', async () => {
       mockFetchText('TY  - JOUR');
       const client = new Cite();

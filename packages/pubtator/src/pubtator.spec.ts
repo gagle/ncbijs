@@ -439,31 +439,32 @@ describe('PubTator', () => {
       const result = await client.annotateByPmid(['12345']);
       expect(result).toBe('annotation output');
       const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(fetchUrl).toContain('/publications/export/pubtator');
       expect(fetchUrl).toContain('pmids=12345');
     });
 
-    it('should support PubTator format', async () => {
+    it('should default to pubtator format', async () => {
       mockFetchText('pubtator format');
       const client = new PubTator();
-      await client.annotateByPmid(['12345'], { format: 'PubTator' });
+      await client.annotateByPmid(['12345']);
       const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
-      expect(fetchUrl).toContain('type=PubTator');
+      expect(fetchUrl).toContain('/publications/export/pubtator');
     });
 
-    it('should support BioC format', async () => {
-      mockFetchText('bioc format');
+    it('should support biocjson format', async () => {
+      mockFetchText('biocjson format');
       const client = new PubTator();
-      await client.annotateByPmid(['12345'], { format: 'BioC' });
+      await client.annotateByPmid(['12345'], { format: 'biocjson' });
       const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
-      expect(fetchUrl).toContain('type=BioC');
+      expect(fetchUrl).toContain('/publications/export/biocjson');
     });
 
-    it('should support JSON format', async () => {
-      mockFetchText('json format');
+    it('should support biocxml format', async () => {
+      mockFetchText('biocxml format');
       const client = new PubTator();
-      await client.annotateByPmid(['12345'], { format: 'JSON' });
+      await client.annotateByPmid(['12345'], { format: 'biocxml' });
       const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
-      expect(fetchUrl).toContain('type=JSON');
+      expect(fetchUrl).toContain('/publications/export/biocxml');
     });
 
     it('should filter by concept type', async () => {
@@ -501,6 +502,14 @@ describe('PubTator', () => {
       );
     });
 
+    it('should support format option in query string', async () => {
+      mockFetchText('biocjson result');
+      const client = new PubTator();
+      await client.annotateText('BRCA1', { format: 'biocjson' });
+      const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(fetchUrl).toContain('type=biocjson');
+    });
+
     it('should return annotation results as string', async () => {
       mockFetchText('12345\t0\t5\tBRCA1\tGene\t672');
       const client = new PubTator();
@@ -514,7 +523,7 @@ describe('PubTator', () => {
       const result = await client.annotateText('TP53');
       expect(result).toBe('result');
       expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/annotate/text/'),
+        expect.stringContaining('/annotate/'),
         expect.objectContaining({
           method: 'POST',
           body: 'TP53',
@@ -547,7 +556,7 @@ describe('PubTator', () => {
       const client = new PubTator();
       await client.annotateText('BRCA1');
       const fetchUrl = vi.mocked(fetch).mock.calls[0]![0] as string;
-      expect(fetchUrl).toBe('https://www.ncbi.nlm.nih.gov/research/pubtator3-api/annotate/text/');
+      expect(fetchUrl).toBe('https://www.ncbi.nlm.nih.gov/research/pubtator3-api/annotate/');
     });
   });
 });

@@ -260,7 +260,7 @@ interface Article {
     lastName?: string;
     foreName?: string;
     collectiveName?: string;
-    affiliation?: string;
+    affiliations: ReadonlyArray<string>;
   }>;
   readonly journal: {
     title: string;

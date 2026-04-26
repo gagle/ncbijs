@@ -12,27 +12,35 @@ function mockFetchText(text: string, status = 200): void {
   );
 }
 
-const SAMPLE_DOCUMENT = JSON.stringify({
-  id: '33533846',
-  passages: [
+const SAMPLE_COLLECTION = JSON.stringify({
+  source: 'PubMed',
+  date: '20260207',
+  key: 'collection.key',
+  infons: {},
+  documents: [
     {
-      offset: 0,
-      text: 'COVID-19 and variants',
-      infons: { type: 'title' },
-      annotations: [
+      id: '33533846',
+      passages: [
         {
-          id: '1',
-          text: 'COVID-19',
-          infons: { type: 'Disease', identifier: 'MESH:C000657245' },
-          locations: [{ offset: 0, length: 8 }],
+          offset: 0,
+          text: 'COVID-19 and variants',
+          infons: { type: 'title' },
+          annotations: [
+            {
+              id: '1',
+              text: 'COVID-19',
+              infons: { type: 'Disease', identifier: 'MESH:C000657245' },
+              locations: [{ offset: 0, length: 8 }],
+            },
+          ],
+        },
+        {
+          offset: 22,
+          text: 'Body text here.',
+          infons: { type: 'abstract' },
+          annotations: [],
         },
       ],
-    },
-    {
-      offset: 22,
-      text: 'Body text here.',
-      infons: { type: 'abstract' },
-      annotations: [],
     },
   ],
 });
@@ -44,24 +52,24 @@ describe('pubmed', () => {
     vi.unstubAllGlobals();
   });
 
-  it('should construct the correct URL with /pmid/get/', async () => {
-    mockFetchText(SAMPLE_DOCUMENT);
+  it('should construct the correct URL with pubmed.cgi/BioC_json', async () => {
+    mockFetchText(SAMPLE_COLLECTION);
     const client = new BioC();
     await client.pubmed('33533846');
     const fetchCall = vi.mocked(fetch).mock.calls[0]![0] as string;
-    expect(fetchCall).toContain('/pmid/get/33533846/json');
+    expect(fetchCall).toContain('/pubmed.cgi/BioC_json/33533846/unicode');
   });
 
   it('should default to json format', async () => {
-    mockFetchText(SAMPLE_DOCUMENT);
+    mockFetchText(SAMPLE_COLLECTION);
     const client = new BioC();
     await client.pubmed('33533846');
     const fetchCall = vi.mocked(fetch).mock.calls[0]![0] as string;
-    expect(fetchCall).toMatch(/\/json$/);
+    expect(fetchCall).toContain('/BioC_json/');
   });
 
-  it('should parse JSON response and return a BioCDocument', async () => {
-    mockFetchText(SAMPLE_DOCUMENT);
+  it('should extract the first document from the collection wrapper', async () => {
+    mockFetchText(SAMPLE_COLLECTION);
     const client = new BioC();
     const document = await client.pubmed('33533846');
     expect(document).toEqual({
@@ -97,6 +105,14 @@ describe('pubmed', () => {
     expect(xmlResult).toBe(SAMPLE_XML);
   });
 
+  it('should use BioC_xml format for xml requests', async () => {
+    mockFetchText(SAMPLE_XML);
+    const client = new BioC();
+    await client.pubmed('33533846', 'xml');
+    const fetchCall = vi.mocked(fetch).mock.calls[0]![0] as string;
+    expect(fetchCall).toContain('/pubmed.cgi/BioC_xml/33533846/unicode');
+  });
+
   it('should throw when id is empty', async () => {
     const client = new BioC();
     await expect(client.pubmed('')).rejects.toThrow('id must not be empty');
@@ -109,7 +125,7 @@ describe('pubmed', () => {
   });
 
   it('should encode special characters in the id', async () => {
-    mockFetchText(SAMPLE_DOCUMENT);
+    mockFetchText(SAMPLE_COLLECTION);
     const client = new BioC();
     await client.pubmed('id with spaces');
     const fetchCall = vi.mocked(fetch).mock.calls[0]![0] as string;
@@ -122,16 +138,16 @@ describe('pmc', () => {
     vi.unstubAllGlobals();
   });
 
-  it('should construct the correct URL with /pmcid/get/', async () => {
-    mockFetchText(SAMPLE_DOCUMENT);
+  it('should construct the correct URL with pmcoa.cgi/BioC_json', async () => {
+    mockFetchText(SAMPLE_COLLECTION);
     const client = new BioC();
     await client.pmc('PMC7096724');
     const fetchCall = vi.mocked(fetch).mock.calls[0]![0] as string;
-    expect(fetchCall).toContain('/pmcid/get/PMC7096724/json');
+    expect(fetchCall).toContain('/pmcoa.cgi/BioC_json/PMC7096724/unicode');
   });
 
-  it('should parse JSON response and return a BioCDocument', async () => {
-    mockFetchText(SAMPLE_DOCUMENT);
+  it('should extract the first document from the collection wrapper', async () => {
+    mockFetchText(SAMPLE_COLLECTION);
     const client = new BioC();
     const document = await client.pmc('PMC7096724');
     expect(document.id).toBe('33533846');
@@ -143,6 +159,14 @@ describe('pmc', () => {
     const client = new BioC();
     const xmlResult = await client.pmc('PMC7096724', 'xml');
     expect(xmlResult).toBe(SAMPLE_XML);
+  });
+
+  it('should use BioC_xml format for xml requests', async () => {
+    mockFetchText(SAMPLE_XML);
+    const client = new BioC();
+    await client.pmc('PMC7096724', 'xml');
+    const fetchCall = vi.mocked(fetch).mock.calls[0]![0] as string;
+    expect(fetchCall).toContain('/pmcoa.cgi/BioC_xml/PMC7096724/unicode');
   });
 
   it('should throw when id is empty', async () => {
@@ -255,12 +279,12 @@ describe('pmcBatch', () => {
     vi.unstubAllGlobals();
   });
 
-  it('should construct the correct URL with comma-separated PMCIDs', async () => {
+  it('should construct the correct URL with /pmc_export/ for PMCIDs', async () => {
     mockFetchText(SAMPLE_BATCH_RESPONSE);
     const client = new BioC();
     await client.pmcBatch(['PMC7096724', 'PMC1234567']);
     const fetchCall = vi.mocked(fetch).mock.calls[0]![0] as string;
-    expect(fetchCall).toContain('/publications/export/biocjson?pmcids=PMC7096724,PMC1234567');
+    expect(fetchCall).toContain('/publications/pmc_export/biocjson?pmcids=PMC7096724,PMC1234567');
   });
 
   it('should parse JSON response and return an array of BioCDocuments', async () => {
@@ -327,15 +351,34 @@ describe('entitySearch', () => {
     expect(fetchCall).not.toContain('&type=');
   });
 
-  it('should parse the JSON response', async () => {
-    const sampleEntities = [
-      { identifier: 'MESH:C000657245', name: 'COVID-19', type: 'Disease' },
-      { identifier: 'MESH:D045169', name: 'SARS-CoV-2', type: 'Species' },
+  it('should map raw API fields to EntitySearchResult', async () => {
+    const rawEntities = [
+      {
+        _id: '@DISEASE_COVID-19',
+        biotype: 'disease',
+        db_id: 'MESH:C000657245',
+        db: 'mesh',
+        name: 'COVID-19',
+        description: 'All Species',
+        match: 'COVID-19',
+      },
+      {
+        _id: '@SPECIES_SARS-CoV-2',
+        biotype: 'species',
+        db_id: 'MESH:D045169',
+        db: 'mesh',
+        name: 'SARS-CoV-2',
+        description: 'All Species',
+        match: 'SARS-CoV-2',
+      },
     ];
-    mockFetchText(JSON.stringify(sampleEntities));
+    mockFetchText(JSON.stringify(rawEntities));
     const client = new BioC();
     const results = await client.entitySearch('covid');
-    expect(results).toEqual(sampleEntities);
+    expect(results).toEqual([
+      { id: 'MESH:C000657245', name: 'COVID-19', type: 'disease' },
+      { id: 'MESH:D045169', name: 'SARS-CoV-2', type: 'species' },
+    ]);
   });
 
   it('should encode special characters in the query', async () => {
@@ -372,21 +415,21 @@ describe('document mapping', () => {
   });
 
   it('should map the document id', async () => {
-    mockFetchText(SAMPLE_DOCUMENT);
+    mockFetchText(SAMPLE_COLLECTION);
     const client = new BioC();
     const document = await client.pubmed('33533846');
     expect(document.id).toBe('33533846');
   });
 
   it('should map the correct number of passages', async () => {
-    mockFetchText(SAMPLE_DOCUMENT);
+    mockFetchText(SAMPLE_COLLECTION);
     const client = new BioC();
     const document = await client.pubmed('33533846');
     expect(document.passages).toHaveLength(2);
   });
 
   it('should map passage offset', async () => {
-    mockFetchText(SAMPLE_DOCUMENT);
+    mockFetchText(SAMPLE_COLLECTION);
     const client = new BioC();
     const document = await client.pubmed('33533846');
     expect(document.passages[0]!.offset).toBe(0);
@@ -394,7 +437,7 @@ describe('document mapping', () => {
   });
 
   it('should map passage text', async () => {
-    mockFetchText(SAMPLE_DOCUMENT);
+    mockFetchText(SAMPLE_COLLECTION);
     const client = new BioC();
     const document = await client.pubmed('33533846');
     expect(document.passages[0]!.text).toBe('COVID-19 and variants');
@@ -402,7 +445,7 @@ describe('document mapping', () => {
   });
 
   it('should map passage infons', async () => {
-    mockFetchText(SAMPLE_DOCUMENT);
+    mockFetchText(SAMPLE_COLLECTION);
     const client = new BioC();
     const document = await client.pubmed('33533846');
     expect(document.passages[0]!.infons).toEqual({ type: 'title' });
@@ -410,7 +453,7 @@ describe('document mapping', () => {
   });
 
   it('should map annotations with id, text, and infons', async () => {
-    mockFetchText(SAMPLE_DOCUMENT);
+    mockFetchText(SAMPLE_COLLECTION);
     const client = new BioC();
     const document = await client.pubmed('33533846');
     const annotation = document.passages[0]!.annotations[0]!;
@@ -420,7 +463,7 @@ describe('document mapping', () => {
   });
 
   it('should map annotation locations with offset and length', async () => {
-    mockFetchText(SAMPLE_DOCUMENT);
+    mockFetchText(SAMPLE_COLLECTION);
     const client = new BioC();
     const document = await client.pubmed('33533846');
     const location = document.passages[0]!.annotations[0]!.locations[0]!;
@@ -429,7 +472,7 @@ describe('document mapping', () => {
   });
 
   it('should map empty annotations array', async () => {
-    mockFetchText(SAMPLE_DOCUMENT);
+    mockFetchText(SAMPLE_COLLECTION);
     const client = new BioC();
     const document = await client.pubmed('33533846');
     expect(document.passages[1]!.annotations).toEqual([]);

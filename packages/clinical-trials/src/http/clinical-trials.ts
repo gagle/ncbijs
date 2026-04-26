@@ -83,31 +83,31 @@ export class ClinicalTrials {
 
   /** Fetch distinct values and their counts for a study field. */
   public async studyFieldValues(field: string): Promise<ReadonlyArray<FieldValueCount>> {
-    const url = `${BASE_URL}/stats/field/values?field=${encodeURIComponent(field)}`;
+    const url = `${BASE_URL}/stats/fieldValues/${encodeURIComponent(field)}`;
     const raw = await fetchJson<RawFieldValuesResponse>(url, this._config);
 
-    return (raw.values ?? []).map((entry) => ({
+    return (raw.topValues ?? []).map((entry) => ({
       value: entry.value ?? '',
-      count: entry.count ?? 0,
+      count: entry.studiesCount ?? 0,
     }));
   }
 
   /** Fetch field definitions for the studies API. */
   public async studyMetadata(): Promise<StudyMetadata> {
     const url = `${BASE_URL}/studies/metadata`;
-    const raw = await fetchJson<RawMetadataResponse>(url, this._config);
+    const raw = await fetchJson<ReadonlyArray<RawMetadataNode>>(url, this._config);
 
     return {
-      fields: (raw.fields ?? []).map(mapFieldDefinition),
+      fields: flattenMetadataTree(raw),
     };
   }
 
   /** Fetch valid enum values for a specific study field. */
   public async enumValues(field: string): Promise<ReadonlyArray<string>> {
-    const url = `${BASE_URL}/studies/enums/${encodeURIComponent(field)}`;
-    const raw = await fetchJson<RawEnumValuesResponse>(url, this._config);
+    const url = `${BASE_URL}/stats/fieldValues/${encodeURIComponent(field)}`;
+    const raw = await fetchJson<RawFieldValuesResponse>(url, this._config);
 
-    return raw.values ?? [];
+    return (raw.topValues ?? []).map((entry) => entry.value ?? '');
   }
 
   /** Get total count of studies matching a query without fetching results. */
@@ -183,21 +183,17 @@ interface RawStatsResponse {
 }
 
 interface RawFieldValuesResponse {
-  readonly values?: ReadonlyArray<{ readonly value?: string; readonly count?: number }>;
-}
-
-interface RawMetadataResponse {
-  readonly fields?: ReadonlyArray<{
-    readonly name?: string;
-    readonly type?: string;
-    readonly description?: string;
-    readonly sourceField?: string;
-    readonly isEnum?: boolean;
+  readonly topValues?: ReadonlyArray<{
+    readonly value?: string;
+    readonly studiesCount?: number;
   }>;
 }
 
-interface RawEnumValuesResponse {
-  readonly values?: ReadonlyArray<string>;
+interface RawMetadataNode {
+  readonly name?: string;
+  readonly piece?: string;
+  readonly sourceType?: string;
+  readonly children?: ReadonlyArray<RawMetadataNode>;
 }
 
 interface RawStudySizeResponse {
@@ -209,14 +205,10 @@ function applySearchFilters(params: URLSearchParams, filter?: StudySearchFilter)
     params.set('filter.overallStatus', filter.overallStatus.join(','));
   }
   if (filter?.condition !== undefined) {
-    for (const condition of filter.condition) {
-      params.append('query.cond', condition);
-    }
+    params.set('query.cond', filter.condition.join(' OR '));
   }
   if (filter?.intervention !== undefined) {
-    for (const intervention of filter.intervention) {
-      params.append('query.intr', intervention);
-    }
+    params.set('query.intr', filter.intervention.join(' OR '));
   }
   if (filter?.sponsor !== undefined) {
     params.set('query.spons', filter.sponsor);
@@ -294,18 +286,33 @@ function mapLocation(raw: {
   };
 }
 
-function mapFieldDefinition(raw: {
-  readonly name?: string;
-  readonly type?: string;
-  readonly description?: string;
-  readonly sourceField?: string;
-  readonly isEnum?: boolean;
-}): StudyFieldDefinition {
-  return {
-    name: raw.name ?? '',
-    type: raw.type ?? '',
-    description: raw.description ?? '',
-    sourceField: raw.sourceField ?? '',
-    isEnum: raw.isEnum ?? false,
-  };
+function flattenMetadataTree(
+  nodes: ReadonlyArray<RawMetadataNode>,
+  parentPath = '',
+): ReadonlyArray<StudyFieldDefinition> {
+  const result: Array<StudyFieldDefinition> = [];
+
+  for (const node of nodes) {
+    const nodeName = node.name ?? '';
+    const path = parentPath !== '' ? `${parentPath}.${nodeName}` : nodeName;
+    const sourceType = node.sourceType ?? '';
+    const isLeaf = node.children === undefined || node.children.length === 0;
+
+    result.push({
+      name: path,
+      type: sourceType,
+      description: node.piece ?? '',
+      sourceField: path,
+      isEnum: sourceType === 'ENUM',
+    });
+
+    if (!isLeaf) {
+      const childFields = flattenMetadataTree(node.children ?? [], path);
+      for (const child of childFields) {
+        result.push(child);
+      }
+    }
+  }
+
+  return result;
 }

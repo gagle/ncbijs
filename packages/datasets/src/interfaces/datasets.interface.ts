@@ -110,25 +110,12 @@ export interface VirusReport {
   readonly completeness: string;
   readonly length: number;
   readonly bioprojectAccession: string;
-  readonly biosampleAccession: string;
-}
-
-/** NCBI BioProject report with project metadata. */
-export interface BioProjectReport {
-  readonly accession: string;
-  readonly title: string;
-  readonly description: string;
-  readonly organismName: string;
-  readonly taxId: number;
-  readonly projectType: string;
-  readonly registrationDate: string;
 }
 
 /** NCBI BioSample report with sample attributes. */
 export interface BioSampleReport {
   readonly accession: string;
   readonly title: string;
-  readonly description: string;
   readonly organismName: string;
   readonly taxId: number;
   readonly ownerName: string;
@@ -143,34 +130,12 @@ export interface BioSampleAttribute {
   readonly value: string;
 }
 
-/** Lightweight assembly descriptor with core metadata. */
-export interface AssemblyDescriptor {
-  readonly accession: string;
-  readonly assemblyName: string;
-  readonly assemblyLevel: string;
-  readonly organism: string;
-  readonly taxId: number;
-  readonly submitter: string;
-  readonly releaseDate: string;
-}
-
 /** External database link associated with a gene. */
 export interface GeneLink {
   readonly geneId: number;
-  readonly links: ReadonlyArray<ExternalLink>;
-}
-
-/** A single link to an external resource. */
-export interface ExternalLink {
-  readonly resourceName: string;
+  readonly type: string;
   readonly url: string;
-}
-
-/** Metadata about an available NCBI dataset. */
-export interface DatasetInfo {
-  readonly name: string;
-  readonly description: string;
-  readonly version: string;
+  readonly resourceId: string;
 }
 
 /** Link between a gene and a PubMed article from the gene2pubmed bulk file. */

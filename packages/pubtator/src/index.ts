@@ -1,4 +1,5 @@
 export type {
+  AnnotateFormat,
   AnnotateOptions,
   Annotation,
   BioDocument,

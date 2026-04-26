@@ -24,7 +24,7 @@ export class Cite {
     };
   }
 
-  /** Fetch a formatted citation for a PubMed, PMC, or Books article. */
+  /** Fetch a formatted citation for a PubMed or PMC article. */
   public cite(id: string, format: 'csl', source?: CitationSource): Promise<CSLData>;
   public cite(id: string, format: 'citation', source?: CitationSource): Promise<CitationData>;
   public cite(id: string, format: 'ris' | 'medline', source?: CitationSource): Promise<string>;

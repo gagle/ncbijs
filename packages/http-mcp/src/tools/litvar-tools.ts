@@ -9,7 +9,7 @@ export function registerLitVarTools(server: McpServer): void {
       title: 'Search LitVar',
       description:
         'Search LitVar2 for genetic variants matching a query and find associated literature. ' +
-        'Returns variant rsIDs, HGVS notations, genes, and publication counts.',
+        'Returns variant rsIDs, genes, HGVS notation, publication counts, and clinical significance.',
       inputSchema: {
         rsid: z.string().describe('dbSNP rsID (e.g., "rs328")'),
       },

@@ -2,49 +2,51 @@
 
 > **Runtime**: Browser + Node.js
 
-Typed client for the LitVar2 API. Find literature linked to genetic variants and retrieve publications mentioning specific rsIDs.
+Typed client for the LitVar2 API. Find literature linked to genetic variants and retrieve publication IDs mentioning specific rsIDs.
 
 ## Installation
 
 ```bash
-npm install @ncbijs/litvar
+pnpm install @ncbijs/litvar
 ```
 
 ## Usage
 
 ```ts
-import { variant, publications } from '@ncbijs/litvar';
+import { LitVar } from '@ncbijs/litvar';
 
-const info = await variant('rs328');
-console.log(`${info.gene}: ${info.publicationCount} publications`);
+const litvar = new LitVar();
 
-const pubs = await publications('rs328');
-for (const pub of pubs) {
-  console.log(`PMID ${pub.pmid}: ${pub.title}`);
-}
+const info = await litvar.variant('rs328');
+console.log(`${info.gene.join(', ')}: ${info.name}`);
+
+const pubs = await litvar.publications('rs328');
+console.log(`${pubs.count} publications, first PMID: ${pubs.pmids[0]}`);
 ```
 
 ## API
 
-#### `variant(rsid: string): Promise<LitVarVariant>`
+### `new LitVar(config?)`
 
-Get variant information and associated publication count by rsID.
+| Option       | Default | Description                         |
+| ------------ | ------- | ----------------------------------- |
+| `maxRetries` | `3`     | Number of retries on 429/5xx errors |
 
-#### `publications(rsid: string): Promise<ReadonlyArray<LitVarPublication>>`
+### `variant(rsid: string): Promise<LitVarVariant>`
 
-Get all publications mentioning a variant by rsID.
+Get variant information by rsID. Returns gene associations, HGVS notation, and clinical significance.
 
-#### `search(query: string): Promise<ReadonlyArray<LitVarSearchResult>>`
+### `publications(rsid: string): Promise<LitVarPublicationResult>`
+
+Get publication IDs (PMIDs and PMCIDs) associated with a variant by rsID.
+
+### `search(query: string): Promise<ReadonlyArray<LitVarSearchResult>>`
 
 Search LitVar for variants matching a text query (gene name, rsID prefix, HGVS notation, etc.).
 
-#### `variantAnnotations(rsid: string): Promise<ReadonlyArray<LitVarAnnotation>>`
-
-Get detailed annotations for a variant, including disease associations, related genes, and supporting PMIDs.
-
 ## Bulk parsing
 
-#### `parseLitVarJson(json: string): ReadonlyArray<LitVarVariant>`
+### `parseLitVarJson(json: string): ReadonlyArray<LitVarVariant>`
 
 Parses a LitVar2 bulk variant file. Accepts either a JSON array or NDJSON format (e.g. `litvar2_variants.json.gz` after decompression).
 
@@ -56,13 +58,15 @@ const variants = parseLitVarJson(fs.readFileSync('litvar2_variants.json', 'utf-8
 ## Error handling
 
 ```ts
-import { variant } from '@ncbijs/litvar';
+import { LitVar, LitVarHttpError } from '@ncbijs/litvar';
+
+const litvar = new LitVar();
 
 try {
-  await variant('rs000000000');
+  await litvar.variant('rs000000000');
 } catch (err) {
-  if (err instanceof Error) {
-    console.error(err.message);
+  if (err instanceof LitVarHttpError) {
+    console.error(`HTTP ${err.status}: ${err.body}`);
   }
 }
 ```
@@ -74,20 +78,20 @@ try {
 ```ts
 interface LitVarVariant {
   rsid: string;
+  gene: ReadonlyArray<string>;
+  name: string;
   hgvs: string;
-  gene: string;
-  publicationCount: number;
+  clinicalSignificance: ReadonlyArray<string>;
 }
 ```
 
-### `LitVarPublication`
+### `LitVarPublicationResult`
 
 ```ts
-interface LitVarPublication {
-  pmid: number;
-  title: string;
-  journal: string;
-  year: number;
+interface LitVarPublicationResult {
+  pmids: ReadonlyArray<number>;
+  pmcids: ReadonlyArray<string>;
+  count: number;
 }
 ```
 
@@ -95,18 +99,12 @@ interface LitVarPublication {
 
 ```ts
 interface LitVarSearchResult {
-  term: string;
-  type: string;
-  score: number;
-}
-```
-
-### `LitVarAnnotation`
-
-```ts
-interface LitVarAnnotation {
-  disease: string;
-  genes: Array<string>;
-  pmids: Array<number>;
+  rsid: string;
+  gene: ReadonlyArray<string>;
+  name: string;
+  hgvs: string;
+  publicationCount: number;
+  clinicalSignificance: ReadonlyArray<string>;
+  match: string;
 }
 ```

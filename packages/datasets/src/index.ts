@@ -1,13 +1,9 @@
 export type {
-  AssemblyDescriptor,
   AssemblyInfo,
   AssemblyStats,
-  BioProjectReport,
   BioSampleAttribute,
   BioSampleReport,
-  DatasetInfo,
   DatasetsConfig,
-  ExternalLink,
   Gene2GoAnnotation,
   Gene2PubmedLink,
   GeneHistoryEntry,

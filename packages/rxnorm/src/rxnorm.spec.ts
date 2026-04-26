@@ -19,14 +19,14 @@ describe('RxNorm', () => {
 
   describe('rxcui', () => {
     it('should return concept for a drug name', async () => {
-      mockFetchJson({ idGroup: { name: 'aspirin', rxnormId: ['1191'] } });
+      mockFetchJson({ idGroup: { rxnormId: ['1191'] } });
       const rx = new RxNorm();
 
       const concept = await rx.rxcui('aspirin');
 
       expect(concept).toBeDefined();
       expect(concept!.rxcui).toBe('1191');
-      expect(concept!.name).toBe('aspirin');
+      expect(concept!.name).toBe('');
     });
 
     it('should build correct URL', async () => {
@@ -40,7 +40,7 @@ describe('RxNorm', () => {
     });
 
     it('should return undefined when no match', async () => {
-      mockFetchJson({ idGroup: { name: 'notadrug' } });
+      mockFetchJson({ idGroup: {} });
       const rx = new RxNorm();
 
       const concept = await rx.rxcui('notadrug');
@@ -604,17 +604,12 @@ describe('RxNorm', () => {
   });
 
   describe('history', () => {
-    it('should return concept history', async () => {
+    it('should return concept history from attributes and metaData', async () => {
       mockFetchJson({
         rxcuiStatusHistory: {
-          metaData: {
-            rxcui: '1191',
-            name: 'aspirin',
-            status: 'Active',
-          },
-          derivedConcepts: {
-            remappedTo: [],
-          },
+          metaData: { status: 'Active' },
+          attributes: { rxcui: '1191', name: 'aspirin' },
+          derivedConcepts: { remappedConcept: [] },
         },
       });
       const rx = new RxNorm();
@@ -637,16 +632,13 @@ describe('RxNorm', () => {
       expect(url).toBe('https://rxnav.nlm.nih.gov/REST/rxcui/1191/historystatus.json');
     });
 
-    it('should return remapped RxCUIs', async () => {
+    it('should return remapped RxCUIs from remappedConcept', async () => {
       mockFetchJson({
         rxcuiStatusHistory: {
-          metaData: {
-            rxcui: '100',
-            name: 'old drug',
-            status: 'Remapped',
-          },
+          metaData: { status: 'Remapped' },
+          attributes: { rxcui: '100', name: 'old drug' },
           derivedConcepts: {
-            remappedTo: [{ rxcui: '200' }, { rxcui: '300' }],
+            remappedConcept: [{ remappedRxCui: '200' }, { remappedRxCui: '300' }],
           },
         },
       });
@@ -657,12 +649,13 @@ describe('RxNorm', () => {
       expect(result.remappedTo).toEqual(['200', '300']);
     });
 
-    it('should filter out remapped entries without rxcui', async () => {
+    it('should filter out remapped entries without remappedRxCui', async () => {
       mockFetchJson({
         rxcuiStatusHistory: {
-          metaData: { rxcui: '100', name: 'test', status: 'Remapped' },
+          metaData: { status: 'Remapped' },
+          attributes: { rxcui: '100', name: 'test' },
           derivedConcepts: {
-            remappedTo: [{ rxcui: '200' }, {}, { rxcui: '300' }],
+            remappedConcept: [{ remappedRxCui: '200' }, {}, { remappedRxCui: '300' }],
           },
         },
       });
@@ -685,7 +678,7 @@ describe('RxNorm', () => {
       expect(result.remappedTo).toEqual([]);
     });
 
-    it('should handle missing metaData', async () => {
+    it('should handle missing attributes and metaData', async () => {
       mockFetchJson({ rxcuiStatusHistory: {} });
       const rx = new RxNorm();
 
@@ -699,7 +692,8 @@ describe('RxNorm', () => {
     it('should handle missing derivedConcepts', async () => {
       mockFetchJson({
         rxcuiStatusHistory: {
-          metaData: { rxcui: '1191', name: 'aspirin', status: 'Active' },
+          metaData: { status: 'Active' },
+          attributes: { rxcui: '1191', name: 'aspirin' },
         },
       });
       const rx = new RxNorm();
@@ -709,10 +703,11 @@ describe('RxNorm', () => {
       expect(result.remappedTo).toEqual([]);
     });
 
-    it('should handle missing remappedTo array', async () => {
+    it('should handle missing remappedConcept array', async () => {
       mockFetchJson({
         rxcuiStatusHistory: {
-          metaData: { rxcui: '1191', name: 'aspirin', status: 'Active' },
+          metaData: { status: 'Active' },
+          attributes: { rxcui: '1191', name: 'aspirin' },
           derivedConcepts: {},
         },
       });
@@ -753,7 +748,7 @@ describe('RxNorm', () => {
 
       const url = vi.mocked(fetch).mock.calls[0]![0] as string;
       expect(url).toBe(
-        'https://rxnav.nlm.nih.gov/REST/rxcui/1191/allProperties.json?prop=NAMES%2BSOURCES',
+        'https://rxnav.nlm.nih.gov/REST/rxcui/1191/allProperties.json?prop=NAMES%20SOURCES',
       );
     });
 
