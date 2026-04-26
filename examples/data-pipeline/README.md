@@ -68,6 +68,18 @@ pnpm exec tsx examples/data-pipeline/verify.ts
 
 Runs spot-check queries against each loaded dataset: record lookups by primary key, searches by field, and record count summaries. Use `--db-path <path>` to point at a custom database.
 
+## Watch for updates
+
+Keep the database in sync with upstream NCBI data using `@ncbijs/sync`:
+
+```bash
+pnpm exec tsx examples/data-pipeline/sync-watch.ts
+```
+
+Polls NCBI sources hourly (configurable with `--interval <minutes>`) and auto-reloads datasets when changes are detected. Uses MD5 checksum comparison for ClinVar, Taxonomy, and PubChem; HTTP `Last-Modified` header for all others.
+
+Supports `--db-path <path>`, `--interval <minutes>`, and `--dataset <name>` flags.
+
 ## Querying with the MCP server
 
 Once the database is loaded, use `@ncbijs/store-mcp` to expose it to Claude as 14 query tools:

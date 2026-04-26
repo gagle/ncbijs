@@ -111,7 +111,7 @@ describe('dataset-registry', () => {
         url: string;
       };
       expect(source.type).toBe('http');
-      expect(source.url).toContain('desc2025.xml');
+      expect(source.url).toContain('desc2026.xml');
     });
 
     it('mesh parse delegates to parseMeshDescriptorXml', () => {

@@ -13,7 +13,7 @@ export interface DatasetDescriptor {
   readonly parse: (raw: string | Record<string, string>) => ReadonlyArray<object>;
 }
 
-const MESH_URL = 'https://nlmpubs.nlm.nih.gov/projects/mesh/MESH_FILES/xmlmesh/desc2025.xml';
+const MESH_URL = 'https://nlmpubs.nlm.nih.gov/projects/mesh/MESH_FILES/xmlmesh/desc2026.xml';
 const CLINVAR_URL = 'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz';
 const GENE_URL = 'https://ftp.ncbi.nlm.nih.gov/gene/DATA/gene_info.gz';
 const TAXONOMY_URL = 'https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz';
@@ -104,7 +104,7 @@ const REGISTRY: ReadonlyArray<DatasetDescriptor> = [
       compressed: true,
       estimatedSize: '~15 GB',
       estimatedRecords: '~115M compounds',
-      updateFrequency: 'Weekly',
+      updateFrequency: 'Daily',
     },
     createSource: () =>
       createCompositeSource({
@@ -131,7 +131,7 @@ const REGISTRY: ReadonlyArray<DatasetDescriptor> = [
       compressed: true,
       estimatedSize: '~233 MB',
       estimatedRecords: '~9.5M mappings',
-      updateFrequency: 'Regular',
+      updateFrequency: 'Daily',
     },
     createSource: () => createHttpSource(PMC_IDS_URL),
     parse: (raw) => parsePmcIdsCsv(raw as string),

@@ -15,7 +15,10 @@ export class HttpTimestampChecker implements UpdateChecker {
   }
 
   public async check(currentState: DatasetSyncState): Promise<UpdateCheckResult> {
-    const response = await fetch(this._url, { method: 'HEAD' });
+    const response = await fetch(this._url, {
+      method: 'HEAD',
+      headers: { 'User-Agent': 'ncbijs-sync' },
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP ${String(response.status)} checking ${this._url}`);

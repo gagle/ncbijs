@@ -88,5 +88,6 @@ The `data-pipeline/` directory contains a 3-step pipeline that downloads NCBI bu
 | `data-pipeline/download.ts`       | Node.js built-ins                                              | Download ~4.4 GB from NCBI FTP servers     |
 | `data-pipeline/load.ts`           | `pipeline` + `store` + parsers                                 | Parse local files and load into DuckDB     |
 | `data-pipeline/verify.ts`         | `store`                                                        | Spot-check queries against loaded data     |
+| `data-pipeline/sync-watch.ts`     | `sync` + `etl` + `store`                                       | Watch for NCBI updates and auto-reload     |
 
 See [`data-pipeline/README.md`](./data-pipeline/README.md) for full setup and MCP server integration instructions.

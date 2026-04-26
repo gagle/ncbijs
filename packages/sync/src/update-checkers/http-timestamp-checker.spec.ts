@@ -108,7 +108,10 @@ describe('HttpTimestampChecker', () => {
     const checker = new HttpTimestampChecker('mesh', 'https://example.com/mesh.xml');
     await checker.check(createState());
 
-    expect(fetchSpy).toHaveBeenCalledWith('https://example.com/mesh.xml', { method: 'HEAD' });
+    expect(fetchSpy).toHaveBeenCalledWith('https://example.com/mesh.xml', {
+      method: 'HEAD',
+      headers: { 'User-Agent': 'ncbijs-sync' },
+    });
   });
 
   it('exposes dataset name', () => {
