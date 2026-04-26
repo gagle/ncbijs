@@ -685,17 +685,17 @@ describe('ClinVar', () => {
       );
     });
 
-    it('should return HGVS expressions', async () => {
+    it('should return HGVS expression string', async () => {
       mockFetchJson({
         data: {
-          hgvsExpression: ['NC_000001.11:g.1014043C>T', 'NG_007400.1:g.7894C>T'],
+          hgvs: 'NC_000001.11:g.1014043C>T',
         },
       });
       const clinvar = new ClinVar();
 
       const result = await clinvar.spdiToHgvs('NC_000001.11:1014042:C:T');
 
-      expect(result).toEqual(['NC_000001.11:g.1014043C>T', 'NG_007400.1:g.7894C>T']);
+      expect(result).toBe('NC_000001.11:g.1014043C>T');
     });
 
     it('should handle missing data', async () => {
@@ -704,16 +704,16 @@ describe('ClinVar', () => {
 
       const result = await clinvar.spdiToHgvs('NC_000001.11:1014042:C:T');
 
-      expect(result).toEqual([]);
+      expect(result).toBe('');
     });
 
-    it('should handle data with missing hgvsExpression', async () => {
+    it('should handle data with missing hgvs', async () => {
       mockFetchJson({ data: {} });
       const clinvar = new ClinVar();
 
       const result = await clinvar.spdiToHgvs('NC_000001.11:1014042:C:T');
 
-      expect(result).toEqual([]);
+      expect(result).toBe('');
     });
   });
 

@@ -1,5 +1,11 @@
 /** Sort orders accepted by ESearch (PubMed). */
-export type ESearchSort = 'relevance' | 'pub_date' | 'Author' | 'JournalName';
+export type ESearchSort =
+  | 'relevance'
+  | 'pub_date'
+  | 'Author'
+  | 'JournalName'
+  | 'first_author'
+  | 'last_author';
 
 /** ELink `cmd` parameter variants. */
 export type ELinkCmd =
@@ -45,6 +51,8 @@ export interface ESearchParams {
   readonly retmax?: number | undefined;
   /** Response format. */
   readonly retmode?: RetMode | undefined;
+  /** Retrieval type (`'uilist'` for UID list or `'count'` for count only). */
+  readonly rettype?: 'count' | 'uilist' | undefined;
   /** Sort order (PubMed-specific values). */
   readonly sort?: ESearchSort | undefined;
   /** Search field limiter (e.g. `'title'`, `'author'`). */
@@ -85,6 +93,14 @@ export interface EFetchParams {
   readonly retmax?: number | undefined;
   /** Return accession.version identifiers instead of GI numbers. */
   readonly idtype?: 'acc' | undefined;
+  /** Strand of DNA to retrieve (`1` = plus, `2` = minus). Sequence databases only. */
+  readonly strand?: 1 | 2 | undefined;
+  /** First sequence position to retrieve (1-based). Sequence databases only. */
+  readonly seq_start?: number | undefined;
+  /** Last sequence position to retrieve (1-based). Sequence databases only. */
+  readonly seq_stop?: number | undefined;
+  /** Data complexity level (`0`=entire blob, `1`=bioseq, `2`=minimal bioseq-set, `3`=minimal nuc-prot, `4`=minimal pub-set). Sequence databases only. */
+  readonly complexity?: 0 | 1 | 2 | 3 | 4 | undefined;
 }
 
 /** Parameters for ESummary (`esummary.fcgi`). */

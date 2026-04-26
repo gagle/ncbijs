@@ -135,11 +135,11 @@ export class ClinVar {
   }
 
   /** Convert an SPDI expression to HGVS notation via the Variation Services API. */
-  public async spdiToHgvs(spdiExpression: string): Promise<ReadonlyArray<string>> {
+  public async spdiToHgvs(spdiExpression: string): Promise<string> {
     const url = `${VARIATION_BASE_URL}/spdi/${encodeURIComponent(spdiExpression)}/hgvs`;
     const raw = await fetchJson<RawSpdiHgvsResponse>(url, this._config);
 
-    return raw.data?.hgvsExpression ?? [];
+    return raw.data?.hgvs ?? '';
   }
 
   /** Convert an HGVS expression to contextual SPDI alleles via the Variation Services API. */
@@ -368,7 +368,7 @@ function mapSpdiResult(raw: RawSpdiResponse): SpdiAllele {
 
 interface RawSpdiHgvsResponse {
   readonly data?: {
-    readonly hgvsExpression?: ReadonlyArray<string>;
+    readonly hgvs?: string;
   };
 }
 

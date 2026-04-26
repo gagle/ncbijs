@@ -72,6 +72,10 @@ export interface paths {
           readonly retstart?: number | undefined;
           readonly retmax?: number | undefined;
           readonly idtype?: 'acc' | undefined;
+          readonly strand?: 1 | 2 | undefined;
+          readonly seq_start?: number | undefined;
+          readonly seq_stop?: number | undefined;
+          readonly complexity?: 0 | 1 | 2 | 3 | 4 | undefined;
         };
         header?: never;
         path?: never;

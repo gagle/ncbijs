@@ -87,13 +87,13 @@ console.log(result.deletedSequence); // 'C'
 console.log(result.insertedSequence); // 'T'
 ```
 
-#### `spdiToHgvs(spdiExpression: string): Promise<Array<string>>`
+#### `spdiToHgvs(spdiExpression: string): Promise<string>`
 
-Convert an SPDI expression to HGVS notation. Returns one or more HGVS expression strings.
+Convert an SPDI expression to HGVS notation.
 
 ```ts
-const hgvsList = await clinvar.spdiToHgvs('NC_000011.10:5227001:C:T');
-console.log(hgvsList[0]); // 'NC_000011.10:g.5227002C>T'
+const hgvs = await clinvar.spdiToHgvs('NC_000011.10:5227001:C:T');
+console.log(hgvs); // 'NC_000011.10:g.5227002C>T'
 ```
 
 #### `hgvsToSpdi(hgvsExpression: string, assembly?: string): Promise<Array<SpdiAllele>>`
