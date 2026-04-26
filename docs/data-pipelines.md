@@ -54,13 +54,13 @@ All data is public domain (U.S. government work) except PMC articles which carry
 ```typescript
 import { MeSH, parseMeshDescriptorXml } from '@ncbijs/mesh';
 
-const xml = fs.readFileSync('desc2025.xml', 'utf-8');
+const xml = fs.readFileSync('desc2026.xml', 'utf-8');
 const treeData = parseMeshDescriptorXml(xml);
 const mesh = new MeSH(treeData);
 mesh.expand('Asthma'); // fully local
 ```
 
-**Source:** `https://nlmpubs.nlm.nih.gov/projects/mesh/MESH_FILES/xmlmesh/desc2025.xml` (~360 MB)
+**Source:** `https://nlmpubs.nlm.nih.gov/projects/mesh/MESH_FILES/xmlmesh/desc2026.xml` (~360 MB)
 **Output:** ~2 MB MeshTreeData JSON (30K descriptors with tree numbers and qualifiers)
 **New files:** `parse-mesh-descriptor-xml.ts` + spec
 **Replaces:** `sparql()`, `lookupOnline()`

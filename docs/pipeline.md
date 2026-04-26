@@ -126,7 +126,7 @@ import { DuckDbFileStorage } from '@ncbijs/store';
 const storage = await DuckDbFileStorage.open('ncbijs.duckdb');
 
 const result = await pipeline(
-  createHttpSource('https://nlmpubs.nlm.nih.gov/projects/mesh/MESH_FILES/xmlmesh/desc2025.xml'),
+  createHttpSource('https://nlmpubs.nlm.nih.gov/projects/mesh/MESH_FILES/xmlmesh/desc2026.xml'),
   (xml) => parseMeshDescriptorXml(xml).descriptors,
   storage.createSink('mesh'),
 );
@@ -336,7 +336,7 @@ interface Storage extends ReadableStorage, WritableStorage {}
 const storage = await DuckDbFileStorage.open('ncbijs.duckdb');
 const sink = storage.createSink('mesh');
 
-await pipeline(createFileSource('desc2025.xml'), parseDescriptors, sink);
+await pipeline(createFileSource('desc2026.xml'), parseDescriptors, sink);
 
 const record = await storage.getRecord('mesh', 'D000001');
 ```

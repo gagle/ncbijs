@@ -10,6 +10,7 @@ export class SyncScheduler {
   private readonly _checkers: ReadonlyMap<string, UpdateChecker>;
   private readonly _config: SyncSchedulerConfig;
   private _intervalId: ReturnType<typeof setInterval> | undefined;
+  private _checking = false;
 
   constructor(
     stateStore: SyncStateStore,
@@ -23,6 +24,10 @@ export class SyncScheduler {
 
   /** Start the scheduler: check immediately, then on interval. */
   public async start(): Promise<void> {
+    if (this._intervalId !== undefined) {
+      return;
+    }
+
     await this.checkOnce();
 
     this._intervalId = setInterval(() => {
@@ -44,6 +49,20 @@ export class SyncScheduler {
 
   /** Run a single check cycle across all configured datasets. */
   public async checkOnce(): Promise<ReadonlyArray<string>> {
+    if (this._checking) {
+      return [];
+    }
+
+    this._checking = true;
+
+    try {
+      return await this._runCheckCycle();
+    } finally {
+      this._checking = false;
+    }
+  }
+
+  private async _runCheckCycle(): Promise<ReadonlyArray<string>> {
     const updatedDatasets: Array<string> = [];
 
     for (const dataset of this._config.datasets) {

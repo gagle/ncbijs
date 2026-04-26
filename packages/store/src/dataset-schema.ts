@@ -24,22 +24,32 @@ function parseJsonArray(value: unknown): Array<unknown> {
   if (typeof value !== 'string' || value === '') {
     return [];
   }
-  const parsed: unknown = JSON.parse(value);
-  if (!Array.isArray(parsed)) {
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+    return parsed;
+  } catch {
+    // noop
     return [];
   }
-  return parsed;
 }
 
 function parseJsonObject(value: unknown): Record<string, unknown> {
   if (typeof value !== 'string' || value === '') {
     return {};
   }
-  const parsed: unknown = JSON.parse(value);
-  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+      return {};
+    }
+    return parsed as Record<string, unknown>;
+  } catch {
+    // noop
     return {};
   }
-  return parsed as Record<string, unknown>;
 }
 
 function toNullableString(value: unknown): string | null {

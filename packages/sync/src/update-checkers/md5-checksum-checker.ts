@@ -4,7 +4,7 @@ import type {
   UpdateChecker,
 } from '../interfaces/sync.interface';
 
-const MD5_PATTERN = /[0-9a-f]{32}/i;
+const MD5_PATTERN = /\b[0-9a-f]{32}\b/i;
 
 /** Extracts the 32-character hex MD5 hash from GNU md5sum output (`<hash>  <filename>`). */
 export function parseMd5(text: string): string {

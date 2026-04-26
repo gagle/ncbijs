@@ -212,6 +212,66 @@ describe('SyncScheduler', () => {
     expect(checker.check).toHaveBeenCalledTimes(1);
   });
 
+  it('ignores double start', async () => {
+    const checker = createMockChecker('mesh', {
+      hasUpdate: false,
+      sourceTimestamp: undefined,
+      checksum: undefined,
+    });
+
+    const scheduler = new SyncScheduler(stateStore, [checker], {
+      checkIntervalMs: 60_000,
+      datasets: ['mesh'],
+    });
+
+    await scheduler.start();
+    await scheduler.start();
+
+    expect(checker.check).toHaveBeenCalledTimes(1);
+
+    await vi.advanceTimersByTimeAsync(60_000);
+
+    expect(checker.check).toHaveBeenCalledTimes(2);
+
+    scheduler.stop();
+  });
+
+  it('skips concurrent checkOnce calls', async () => {
+    let resolveCheck: (() => void) | undefined;
+    const slowChecker: UpdateChecker = {
+      dataset: 'mesh',
+      check: vi.fn().mockImplementation(
+        () =>
+          new Promise<UpdateCheckResult>((resolve) => {
+            resolveCheck = () => {
+              resolve({ hasUpdate: false, sourceTimestamp: undefined, checksum: undefined });
+            };
+          }),
+      ),
+    };
+
+    const scheduler = new SyncScheduler(stateStore, [slowChecker], {
+      checkIntervalMs: 60_000,
+      datasets: ['mesh'],
+    });
+
+    const firstCheck = scheduler.checkOnce();
+
+    await vi.advanceTimersByTimeAsync(0);
+    expect(slowChecker.check).toHaveBeenCalledTimes(1);
+
+    const secondCheck = scheduler.checkOnce();
+    const secondResult = await secondCheck;
+    expect(secondResult).toEqual([]);
+    expect(slowChecker.check).toHaveBeenCalledTimes(1);
+
+    resolveCheck!();
+    const firstResult = await firstCheck;
+    expect(firstResult).toEqual([]);
+
+    scheduler.stop();
+  });
+
   it('stops checking remaining datasets when signal is aborted mid-cycle', async () => {
     const controller = new AbortController();
     const meshChecker: UpdateChecker = {

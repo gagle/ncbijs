@@ -23,8 +23,8 @@ interface DownloadSource {
 const SOURCES: ReadonlyArray<DownloadSource> = [
   {
     name: 'MeSH Descriptors',
-    url: 'https://nlmpubs.nlm.nih.gov/projects/mesh/MESH_FILES/xmlmesh/desc2025.xml',
-    outputFile: 'desc2025.xml',
+    url: 'https://nlmpubs.nlm.nih.gov/projects/mesh/MESH_FILES/xmlmesh/desc2026.xml',
+    outputFile: 'desc2026.xml',
   },
   {
     name: 'PMC ID Mapping',

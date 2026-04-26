@@ -41,8 +41,8 @@ const PIPELINE_STEPS: ReadonlyArray<PipelineStep> = [
   {
     name: 'MeSH Descriptors',
     dataset: 'mesh',
-    requiredFiles: ['desc2025.xml'],
-    source: (inputDir) => createFileSource(join(inputDir, 'desc2025.xml')),
+    requiredFiles: ['desc2026.xml'],
+    source: (inputDir) => createFileSource(join(inputDir, 'desc2026.xml')),
     parse: (raw) => parseMeshDescriptorXml(raw as string).descriptors,
   },
   {
