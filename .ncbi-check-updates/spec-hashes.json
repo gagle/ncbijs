@@ -1,10 +1,18 @@
 {
   "datasets": {
-    "hash": "ed5f0eabb2c70d6832401eaee852c5e2932410619d400f3594188694b56cacb1",
+    "hash": "dd67d07c92cdbcd5a36e29704f292f3c1daf305fb5a06e9f55c39803e5f57624",
     "version": "v2"
   },
   "variation": {
     "hash": "158526bcc6644ba1970ffe51e30e6838eb4a62132a6e75a37c735fb86d43a02c",
-    "version": "v0"
+    "version": "0.1.10"
+  },
+  "mesh": {
+    "hash": "192377ac729fbefe2d4609e45cf54daec95843b0f4e6513ffd72ba7f3abbe2ca",
+    "version": "1.0.1"
+  },
+  "clinicaltrials": {
+    "hash": "7ae50a64774f039c809e46cb56a8d907cb6ba70e59ef0be3e191d80967fc83e7",
+    "version": "unknown"
   }
 }

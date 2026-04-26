@@ -4,4 +4,5 @@ packages:
   - e2e/bulk-parsers
   - e2e/pipeline
   - examples
+  - scripts/ncbi-api-monitor
   - demo

@@ -145,10 +145,18 @@ Example: fetch ESummary for PubMed PMID 33533846, extract all keys from the JSON
 
 ### Implementation
 
-The `ncbi-check-updates` skill (`.claude/skills/ncbi-check-updates/SKILL.md`) implements these checks. State is stored in `.ncbi-check-updates/` (committed to git). Run periodically with:
+Detection is automated by `scripts/ncbi-api-monitor/detect.ts` — a pure TypeScript script (zero external dependencies) that runs all 7 check categories in parallel, compares against stored baselines, and outputs a JSON report. The `/ncbi-check-updates` skill invokes this script and acts on findings.
+
+State is stored in `.ncbi-check-updates/` (committed to git). Run periodically with:
 
 ```
 /ncbi-check-updates
+```
+
+Or run the detection script directly:
+
+```bash
+npx tsx scripts/ncbi-api-monitor/detect.ts
 ```
 
 ## Risk assessment

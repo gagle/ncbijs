@@ -50,6 +50,9 @@ importers:
       tsc-esm-imports:
         specifier: 0.0.0
         version: 0.0.0
+      tsx:
+        specifier: ^4.21.0
+        version: 4.21.0
       typescript:
         specifier: ^6.0.2
         version: 6.0.3
@@ -745,6 +748,8 @@ importers:
   packages/sync: {}
 
   packages/xml: {}
+
+  scripts/ncbi-api-monitor: {}
 
 packages:
 

@@ -81,6 +81,7 @@ This repo includes `.claude/` configuration that Claude reads automatically:
 - **`.claude/skills/debug-issue/`** -- Systematic debugging
 - **`.claude/skills/refactor-safely/`** -- Safe refactoring with dependency analysis
 - **`.claude/skills/package-architecture/`** -- Package layout conventions (flat vs. split with http/bulk-parsers)
+- **`.claude/skills/ncbi-check-updates/`** -- NCBI API change monitor (runs `scripts/ncbi-api-monitor/detect.ts` then acts on findings)
 
 See `CONTRIBUTING.md` for the contribution policy.
 
