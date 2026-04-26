@@ -161,6 +161,10 @@ export class Blast {
       body.set('THRESHOLD', String(options.threshold));
     }
 
+    if (options?.megablast !== undefined) {
+      body.set('MEGABLAST', options.megablast ? 'on' : 'off');
+    }
+
     if (options?.numIterations !== undefined) {
       body.set('NUM_ITERATIONS', String(options.numIterations));
     }

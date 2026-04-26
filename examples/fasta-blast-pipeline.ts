@@ -22,9 +22,10 @@ async function main(): Promise<void> {
 
   const blast = new Blast();
 
-  console.log('Submitting to BLAST (megablast vs nt)...\n');
+  console.log('Submitting to BLAST (blastn megablast vs nt)...\n');
 
-  const result = await blast.search(FASTA_INPUT, 'megablast', 'nt', {
+  const result = await blast.search(FASTA_INPUT, 'blastn', 'nt', {
+    megablast: true,
     hitListSize: 5,
     expect: 0.001,
   });

@@ -19,7 +19,8 @@ export interface ICitePublication {
   readonly fieldCitationRate: number | undefined;
   /** Average citations received per year since publication. */
   readonly citationsPerYear: number | undefined;
-  readonly isClinicallyCited: boolean;
+  /** Whether this article is classified as a clinical publication by iCite. */
+  readonly isClinical: boolean;
   /** Whether the citation metrics are provisional (article published within the last two years). */
   readonly provisional: boolean;
   /** Weighted percentage of supporting references that study humans (0-1). */
@@ -31,6 +32,8 @@ export interface ICitePublication {
   /** Approximate Potential to Translate score (clinical relevance of basic science research). */
   readonly apt: number;
   readonly citedByPmids: ReadonlyArray<number>;
+  /** PubMed IDs of clinical articles that cite this publication. */
+  readonly citedByClinicalPmids: ReadonlyArray<number>;
   readonly referencesPmids: ReadonlyArray<number>;
   readonly doi: string;
 }

@@ -21,7 +21,7 @@ async function main(): Promise<void> {
     console.log(`  NIH Percentile: ${pub.nihPercentile ?? 'N/A'}`);
     console.log(`  Cited by: ${pub.citedByCount} articles`);
     console.log(`  References: ${pub.referencesCount} articles`);
-    console.log(`  Clinically cited: ${pub.isClinicallyCited}`);
+    console.log(`  Clinical article: ${pub.isClinical}`);
     console.log(`  DOI: ${pub.doi}`);
     console.log();
   }

@@ -56,6 +56,7 @@ interface ColumnIndices {
   readonly molecularCellular: number;
   readonly apt: number;
   readonly citedBy: number;
+  readonly citedByClin: number;
   readonly references: number;
   readonly doi: number;
 }
@@ -90,6 +91,7 @@ function resolveColumnIndices(headerLine: string): ColumnIndices | undefined {
     molecularCellular: headers.indexOf('molecular_cellular'),
     apt: headers.indexOf('apt'),
     citedBy: headers.indexOf('cited_by'),
+    citedByClin: headers.indexOf('cited_by_clin'),
     references: headers.indexOf('references'),
     doi: headers.indexOf('doi'),
   };
@@ -118,13 +120,14 @@ function mapPublication(fields: ReadonlyArray<string>, indices: ColumnIndices): 
     expectedCitationsPerYear,
     fieldCitationRate,
     citationsPerYear,
-    isClinicallyCited: parseBool(fieldAt(fields, indices.isClinical)),
+    isClinical: parseBool(fieldAt(fields, indices.isClinical)),
     provisional: parseBool(fieldAt(fields, indices.provisional)),
     human: parseFloatSafe(fieldAt(fields, indices.human)),
     animal: parseFloatSafe(fieldAt(fields, indices.animal)),
     molecularCellular: parseFloatSafe(fieldAt(fields, indices.molecularCellular)),
     apt: parseFloatSafe(fieldAt(fields, indices.apt)),
     citedByPmids: parsePmidList(fieldAt(fields, indices.citedBy)),
+    citedByClinicalPmids: parsePmidList(fieldAt(fields, indices.citedByClin)),
     referencesPmids: parsePmidList(fieldAt(fields, indices.references)),
     doi: fieldAt(fields, indices.doi),
   };

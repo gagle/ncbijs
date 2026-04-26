@@ -36,6 +36,7 @@ function buildPublicationResponse(): Record<string, unknown> {
         molecular_cellular: 0.1,
         apt: 0.72,
         cited_by: [34000001, 34000002],
+        cited_by_clin: [34000001],
         references: [32000001],
         doi: '10.1038/s41586-020-03049-6',
       },
@@ -61,7 +62,7 @@ describe('ICite', () => {
       expect(pubs[0]!.relativeCitationRatio).toBe(85.2);
       expect(pubs[0]!.nihPercentile).toBe(99.9);
       expect(pubs[0]!.citedByCount).toBe(1500);
-      expect(pubs[0]!.isClinicallyCited).toBe(true);
+      expect(pubs[0]!.isClinical).toBe(true);
       expect(pubs[0]!.doi).toBe('10.1038/s41586-020-03049-6');
       expect(pubs[0]!.citationsPerYear).toBe(375.0);
       expect(pubs[0]!.provisional).toBe(false);
@@ -143,13 +144,14 @@ describe('ICite', () => {
       expect(pubs[0]!.isResearchArticle).toBe(false);
       expect(pubs[0]!.citedByCount).toBe(0);
       expect(pubs[0]!.referencesCount).toBe(0);
-      expect(pubs[0]!.isClinicallyCited).toBe(false);
+      expect(pubs[0]!.isClinical).toBe(false);
       expect(pubs[0]!.provisional).toBe(false);
       expect(pubs[0]!.human).toBe(0);
       expect(pubs[0]!.animal).toBe(0);
       expect(pubs[0]!.molecularCellular).toBe(0);
       expect(pubs[0]!.apt).toBe(0);
       expect(pubs[0]!.citedByPmids).toEqual([]);
+      expect(pubs[0]!.citedByClinicalPmids).toEqual([]);
       expect(pubs[0]!.referencesPmids).toEqual([]);
       expect(pubs[0]!.doi).toBe('');
     });
@@ -170,6 +172,7 @@ describe('ICite', () => {
       const pubs = await icite.publications([33533846]);
 
       expect(pubs[0]!.citedByPmids).toEqual([34000001, 34000002]);
+      expect(pubs[0]!.citedByClinicalPmids).toEqual([34000001]);
       expect(pubs[0]!.referencesPmids).toEqual([32000001]);
     });
   });

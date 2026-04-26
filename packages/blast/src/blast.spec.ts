@@ -173,6 +173,7 @@ describe('Blast', () => {
       expect(sentBody.has('HITLIST_SIZE')).toBe(false);
       expect(sentBody.has('MATRIX')).toBe(false);
       expect(sentBody.has('WORD_SIZE')).toBe(false);
+      expect(sentBody.has('MEGABLAST')).toBe(false);
       expect(sentBody.has('COMPOSITION_BASED_STATISTICS')).toBe(false);
       expect(sentBody.has('FILTER')).toBe(false);
       expect(sentBody.has('SOFT_MASKING')).toBe(false);
@@ -181,48 +182,37 @@ describe('Blast', () => {
       expect(sentBody.has('NUM_ITERATIONS')).toBe(false);
     });
 
-    it('should accept psiblast program type', async () => {
+    it('should set MEGABLAST to on when megablast option is true', async () => {
       mockFetchText(SUBMIT_RESPONSE);
       const blast = new Blast();
 
-      await blast.submit('MKWVTFISLLFLFSSAYS', 'psiblast', 'nr');
+      await blast.submit('ATCGATCG', 'blastn', 'nt', { megablast: true });
 
       const fetchCall = vi.mocked(fetch).mock.calls[0]!;
       const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
-      expect(sentBody.get('PROGRAM')).toBe('psiblast');
+      expect(sentBody.get('MEGABLAST')).toBe('on');
     });
 
-    it('should accept deltablast program type', async () => {
+    it('should set MEGABLAST to off when megablast option is false', async () => {
       mockFetchText(SUBMIT_RESPONSE);
       const blast = new Blast();
 
-      await blast.submit('MKWVTFISLLFLFSSAYS', 'deltablast', 'nr');
+      await blast.submit('ATCGATCG', 'blastn', 'nt', { megablast: false });
 
       const fetchCall = vi.mocked(fetch).mock.calls[0]!;
       const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
-      expect(sentBody.get('PROGRAM')).toBe('deltablast');
+      expect(sentBody.get('MEGABLAST')).toBe('off');
     });
 
-    it('should accept rpsblast program type', async () => {
+    it('should not set MEGABLAST when megablast option is not provided', async () => {
       mockFetchText(SUBMIT_RESPONSE);
       const blast = new Blast();
 
-      await blast.submit('MKWVTFISLLFLFSSAYS', 'rpsblast', 'cdd');
+      await blast.submit('ATCGATCG', 'blastn', 'nt');
 
       const fetchCall = vi.mocked(fetch).mock.calls[0]!;
       const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
-      expect(sentBody.get('PROGRAM')).toBe('rpsblast');
-    });
-
-    it('should accept rpstblastn program type', async () => {
-      mockFetchText(SUBMIT_RESPONSE);
-      const blast = new Blast();
-
-      await blast.submit('ATCGATCG', 'rpstblastn', 'cdd');
-
-      const fetchCall = vi.mocked(fetch).mock.calls[0]!;
-      const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
-      expect(sentBody.get('PROGRAM')).toBe('rpstblastn');
+      expect(sentBody.has('MEGABLAST')).toBe(false);
     });
 
     it('should set COMPOSITION_BASED_STATISTICS when provided', async () => {
@@ -346,7 +336,7 @@ describe('Blast', () => {
       mockFetchText(SUBMIT_RESPONSE);
       const blast = new Blast();
 
-      await blast.submit('MKWVTFISLLFLFSSAYS', 'psiblast', 'nr', { numIterations: 5 });
+      await blast.submit('MKWVTFISLLFLFSSAYS', 'blastp', 'nr', { numIterations: 5 });
 
       const fetchCall = vi.mocked(fetch).mock.calls[0]!;
       const sentBody = new URLSearchParams(fetchCall[1]?.body as string);
@@ -681,7 +671,7 @@ describe('Blast', () => {
       expect(sentBody.get('EXPECT')).toBe('0.01');
     });
 
-    it('should accept new program types in search', async () => {
+    it('should pass megablast option through to submit call', async () => {
       const json2 = buildJson2Response([]);
       mockFetchSequence(
         { text: SUBMIT_RESPONSE },
@@ -690,9 +680,9 @@ describe('Blast', () => {
       );
       const blast = new Blast();
 
-      const searchPromise = blast.search('MKWVTFISLLFLFSSAYS', 'psiblast', 'nr', {
+      const searchPromise = blast.search('ATCGATCG', 'blastn', 'nt', {
         pollIntervalMs: 1000,
-        numIterations: 3,
+        megablast: true,
       });
 
       await drainTimers();
@@ -700,8 +690,8 @@ describe('Blast', () => {
 
       const submitCall = vi.mocked(fetch).mock.calls[0]!;
       const sentBody = new URLSearchParams(submitCall[1]?.body as string);
-      expect(sentBody.get('PROGRAM')).toBe('psiblast');
-      expect(sentBody.get('NUM_ITERATIONS')).toBe('3');
+      expect(sentBody.get('PROGRAM')).toBe('blastn');
+      expect(sentBody.get('MEGABLAST')).toBe('on');
     });
 
     it('should use default poll interval and max attempts when not specified', async () => {

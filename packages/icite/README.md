@@ -99,13 +99,14 @@ interface ICitePublication {
   expectedCitationsPerYear: number | undefined;
   fieldCitationRate: number | undefined;
   citationsPerYear: number | undefined;
-  isClinicallyCited: boolean;
+  isClinical: boolean;
   provisional: boolean;
   human: number;
   animal: number;
   molecularCellular: number;
   apt: number;
   citedByPmids: Array<number>;
+  citedByClinicalPmids: Array<number>;
   referencesPmids: Array<number>;
   doi: string;
 }

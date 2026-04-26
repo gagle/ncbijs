@@ -87,9 +87,9 @@ describe('parseIciteCsv', () => {
   it('extracts boolean flags', () => {
     const result = parseIciteCsv(SAMPLE_CSV);
 
-    expect(result[0]!.isClinicallyCited).toBe(false);
+    expect(result[0]!.isClinical).toBe(false);
     expect(result[0]!.provisional).toBe(false);
-    expect(result[1]!.isClinicallyCited).toBe(true);
+    expect(result[1]!.isClinical).toBe(true);
     expect(result[1]!.provisional).toBe(true);
   });
 
@@ -119,6 +119,12 @@ describe('parseIciteCsv', () => {
 
     expect(result[1]!.citedByPmids).toEqual([]);
     expect(result[1]!.referencesPmids).toEqual([]);
+  });
+
+  it('defaults citedByClinicalPmids to empty array when column is missing', () => {
+    const result = parseIciteCsv(SAMPLE_CSV);
+
+    expect(result[0]!.citedByClinicalPmids).toEqual([]);
   });
 
   it('extracts DOI', () => {
@@ -172,7 +178,7 @@ describe('parseIciteCsv', () => {
     const result = parseIciteCsv(csv);
 
     expect(result[0]!.isResearchArticle).toBe(true);
-    expect(result[0]!.isClinicallyCited).toBe(true);
+    expect(result[0]!.isClinical).toBe(true);
     expect(result[0]!.provisional).toBe(false);
   });
 });

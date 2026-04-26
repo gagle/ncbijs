@@ -1,15 +1,5 @@
-/** BLAST program type for sequence alignment. */
-export type BlastProgram =
-  | 'blastn'
-  | 'blastp'
-  | 'blastx'
-  | 'deltablast'
-  | 'megablast'
-  | 'psiblast'
-  | 'rpsblast'
-  | 'rpstblastn'
-  | 'tblastn'
-  | 'tblastx';
+/** BLAST program type for sequence alignment (per NCBI Common URL API). */
+export type BlastProgram = 'blastn' | 'blastp' | 'blastx' | 'tblastn' | 'tblastx';
 
 /** Status of a BLAST search job on the server. */
 export type BlastStatus = 'failed' | 'ready' | 'unknown' | 'waiting';
@@ -28,6 +18,8 @@ export interface BlastSubmitOptions {
   readonly gapOpen?: number;
   readonly hitListSize?: number;
   readonly matrix?: string;
+  /** Enable megablast mode (only valid with program `blastn`). Sends `MEGABLAST=on`. */
+  readonly megablast?: boolean;
   readonly numIterations?: number;
   readonly seg?: boolean;
   readonly softMasking?: boolean;

@@ -11,18 +11,22 @@ export function registerBlastTools(server: McpServer, getBlast: () => Blast): vo
       description:
         'Run a BLAST sequence alignment search against NCBI databases. Submits the query, ' +
         'polls for completion, and returns the results. Supports blastn, blastp, blastx, ' +
-        'tblastn, tblastx, and megablast programs.',
+        'tblastn, and tblastx programs. Use megablast option with blastn for faster nucleotide searches.',
       inputSchema: {
         query: z
           .string()
           .describe('Nucleotide or protein sequence in FASTA format, or an accession number'),
         program: z
-          .enum(['blastn', 'blastp', 'blastx', 'tblastn', 'tblastx', 'megablast'])
+          .enum(['blastn', 'blastp', 'blastx', 'tblastn', 'tblastx'])
           .describe('BLAST program to use'),
         database: z
           .string()
           .default('nt')
           .describe('Target database (nt, nr, swissprot, refseq_protein, etc.)'),
+        megablast: z
+          .boolean()
+          .optional()
+          .describe('Enable megablast mode (only valid with blastn)'),
         expect: z.number().optional().describe('E-value threshold (default 10)'),
         hitlistSize: z
           .number()
@@ -30,9 +34,10 @@ export function registerBlastTools(server: McpServer, getBlast: () => Blast): vo
           .describe('Maximum number of hits to return (default 50)'),
       },
     },
-    async ({ query, program, database, expect, hitlistSize }) => {
+    async ({ query, program, database, megablast, expect, hitlistSize }) => {
       const blast = getBlast();
       const result = await blast.search(query, program, database, {
+        ...(megablast !== undefined && { megablast }),
         ...(expect !== undefined && { expect }),
         ...(hitlistSize !== undefined && { hitlistSize }),
       });
