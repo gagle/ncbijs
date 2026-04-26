@@ -48,7 +48,7 @@ function buildCddEntry(overrides: Record<string, unknown> = {}): Record<string, 
     organism: 'Betaherpesvirinae',
     pubdate: '2010/12/09 00:00',
     entrezdate: '2024/03/28 00:00',
-    pssmlength: 418,
+    pssmlength: '418',
     structurerepresentative: '',
     numbersites: '',
     sitedescriptions: [],
@@ -265,6 +265,26 @@ describe('Cdd', () => {
 
       expect(records[0]!.uid).toBe('');
       expect(records[0]!.accession).toBe('cd00001');
+    });
+
+    it('should convert pssmlength from string to number', async () => {
+      const entry = buildCddEntry({ pssmlength: '512' });
+      mockFetchJson(buildSummaryResponse({ '223044': entry as Record<string, unknown> }));
+      const cdd = new Cdd();
+
+      const records = await cdd.fetch(['223044']);
+
+      expect(records[0]!.pssmLength).toBe(512);
+    });
+
+    it('should handle pssmlength as number', async () => {
+      const entry = buildCddEntry({ pssmlength: 256 });
+      mockFetchJson(buildSummaryResponse({ '223044': entry as Record<string, unknown> }));
+      const cdd = new Cdd();
+
+      const records = await cdd.fetch(['223044']);
+
+      expect(records[0]!.pssmLength).toBe(256);
     });
 
     it('should convert numbersites from string to number', async () => {

@@ -138,7 +138,7 @@ interface RawCddEntry {
   readonly organism?: string;
   readonly pubdate?: string;
   readonly entrezdate?: string;
-  readonly pssmlength?: number;
+  readonly pssmlength?: string | number;
   readonly structurerepresentative?: string;
   readonly numbersites?: string | number;
   readonly sitedescriptions?: ReadonlyArray<string>;
@@ -158,7 +158,7 @@ function mapCddRecord(raw: RawCddEntry): CddRecord {
     organism: raw.organism ?? '',
     publicationDate: raw.pubdate ?? '',
     entrezDate: raw.entrezdate ?? '',
-    pssmLength: raw.pssmlength ?? 0,
+    pssmLength: Number(raw.pssmlength ?? 0) || 0,
     structureRepresentative: raw.structurerepresentative ?? '',
     numberOfSites: Number(raw.numbersites) || 0,
     siteDescriptions: raw.sitedescriptions ?? [],
