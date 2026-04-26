@@ -47,6 +47,7 @@ export default {
         'pipeline',
         'sync',
         'etl',
+        'dailymed',
         'workspace',
       ],
     ],

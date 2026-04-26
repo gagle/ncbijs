@@ -223,6 +223,10 @@
     "packages/etl": {
       "release-type": "node",
       "component": "@ncbijs/etl"
+    },
+    "packages/dailymed": {
+      "release-type": "node",
+      "component": "@ncbijs/dailymed"
     }
   }
 }

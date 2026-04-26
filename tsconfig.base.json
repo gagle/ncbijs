@@ -65,7 +65,8 @@
       "@ncbijs/store-mcp": ["./packages/store-mcp/src/index.ts"],
       "@ncbijs/pipeline": ["./packages/pipeline/src/index.ts"],
       "@ncbijs/sync": ["./packages/sync/src/index.ts"],
-      "@ncbijs/etl": ["./packages/etl/src/index.ts"]
+      "@ncbijs/etl": ["./packages/etl/src/index.ts"],
+      "@ncbijs/dailymed": ["./packages/dailymed/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "dist"]
