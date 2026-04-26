@@ -76,3 +76,29 @@ export interface RxProperty {
   readonly name: string;
   readonly value: string;
 }
+
+/** A drug-to-class relationship from the RxClass API. */
+export interface RxClassDrugInfo {
+  readonly rxcui: string;
+  readonly drugName: string;
+  readonly tty: string;
+  readonly classId: string;
+  readonly className: string;
+  readonly classType: string;
+  readonly rela: string;
+  readonly relaSource: string;
+}
+
+/** A minimal RxClass concept (class ID, name, and type). */
+export interface RxClassConcept {
+  readonly classId: string;
+  readonly className: string;
+  readonly classType: string;
+}
+
+/** A drug member of an RxClass drug class. */
+export interface RxClassMember {
+  readonly rxcui: string;
+  readonly name: string;
+  readonly tty: string;
+}

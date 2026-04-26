@@ -7,6 +7,8 @@ import type {
   DrugGroup,
   DrugInteraction,
   InteractionConcept,
+  RxClassDrugInfo,
+  RxClassMember,
   RxConcept,
   RxConceptHistory,
   RxConceptProperties,
@@ -205,6 +207,71 @@ export class RxNorm {
       value: prop.propValue ?? '',
     }));
   }
+
+  /**
+   * Find drug classes associated with a drug name using the RxClass API.
+   * @param drugName - The drug name to search for.
+   * @param relaSource - Relationship source (e.g., 'ATC', 'VA', 'MEDRT', 'FDASPL').
+   */
+  public async classByDrugName(
+    drugName: string,
+    relaSource?: string,
+  ): Promise<ReadonlyArray<RxClassDrugInfo>> {
+    let url = `${BASE_URL}/rxclass/class/byDrugName.json?drugName=${encodeURIComponent(drugName)}`;
+
+    if (relaSource !== undefined) {
+      url += `&relaSource=${encodeURIComponent(relaSource)}`;
+    }
+
+    const raw = await fetchJson<RawRxClassDrugInfoResponse>(url, this._config);
+
+    return (raw.rxclassDrugInfoList?.rxclassDrugInfo ?? []).map(mapRxClassDrugInfo);
+  }
+
+  /**
+   * Find drug classes associated with an RxCUI using the RxClass API.
+   * @param rxcui - The RxCUI to find classes for.
+   * @param relaSource - Relationship source (e.g., 'ATC', 'VA', 'MEDRT', 'FDASPL').
+   */
+  public async classByRxcui(
+    rxcui: string,
+    relaSource?: string,
+  ): Promise<ReadonlyArray<RxClassDrugInfo>> {
+    let url = `${BASE_URL}/rxclass/class/byRxcui.json?rxcui=${encodeURIComponent(rxcui)}`;
+
+    if (relaSource !== undefined) {
+      url += `&relaSource=${encodeURIComponent(relaSource)}`;
+    }
+
+    const raw = await fetchJson<RawRxClassDrugInfoResponse>(url, this._config);
+
+    return (raw.rxclassDrugInfoList?.rxclassDrugInfo ?? []).map(mapRxClassDrugInfo);
+  }
+
+  /**
+   * Fetch drug members of a drug class using the RxClass API.
+   * @param classId - The class identifier (e.g., 'N02BA' for ATC).
+   * @param relaSource - Relationship source (e.g., 'ATC', 'VA', 'MEDRT').
+   */
+  public async classMembers(
+    classId: string,
+    relaSource?: string,
+  ): Promise<ReadonlyArray<RxClassMember>> {
+    let url = `${BASE_URL}/rxclass/classMembers.json?classId=${encodeURIComponent(classId)}`;
+
+    if (relaSource !== undefined) {
+      url += `&relaSource=${encodeURIComponent(relaSource)}`;
+    }
+
+    const raw = await fetchJson<RawRxClassMembersResponse>(url, this._config);
+    const members = raw.drugMemberGroup?.drugMember ?? [];
+
+    return members.map((member) => ({
+      rxcui: member.minConcept?.rxcui ?? '',
+      name: member.minConcept?.name ?? '',
+      tty: member.minConcept?.tty ?? '',
+    }));
+  }
 }
 
 interface RawRxcuiResponse {
@@ -332,6 +399,52 @@ interface RawPropConcept {
   readonly propCategory?: string;
   readonly propName?: string;
   readonly propValue?: string;
+}
+
+interface RawRxClassDrugInfoResponse {
+  readonly rxclassDrugInfoList?: {
+    readonly rxclassDrugInfo?: ReadonlyArray<RawRxClassDrugInfoEntry>;
+  };
+}
+
+interface RawRxClassDrugInfoEntry {
+  readonly minConcept?: {
+    readonly rxcui?: string;
+    readonly name?: string;
+    readonly tty?: string;
+  };
+  readonly rxclassMinConceptItem?: {
+    readonly classId?: string;
+    readonly className?: string;
+    readonly classType?: string;
+  };
+  readonly rela?: string;
+  readonly relaSource?: string;
+}
+
+interface RawRxClassMembersResponse {
+  readonly drugMemberGroup?: {
+    readonly drugMember?: ReadonlyArray<{
+      readonly minConcept?: {
+        readonly rxcui?: string;
+        readonly name?: string;
+        readonly tty?: string;
+      };
+    }>;
+  };
+}
+
+function mapRxClassDrugInfo(raw: RawRxClassDrugInfoEntry): RxClassDrugInfo {
+  return {
+    rxcui: raw.minConcept?.rxcui ?? '',
+    drugName: raw.minConcept?.name ?? '',
+    tty: raw.minConcept?.tty ?? '',
+    classId: raw.rxclassMinConceptItem?.classId ?? '',
+    className: raw.rxclassMinConceptItem?.className ?? '',
+    classType: raw.rxclassMinConceptItem?.classType ?? '',
+    rela: raw.rela ?? '',
+    relaSource: raw.relaSource ?? '',
+  };
 }
 
 function mapConceptGroup(raw: RawConceptGroup): ConceptGroup {

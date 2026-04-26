@@ -787,6 +787,245 @@ describe('RxNorm', () => {
     });
   });
 
+  describe('classByDrugName', () => {
+    it('should return drug class info for a drug name', async () => {
+      mockFetchJson({
+        rxclassDrugInfoList: {
+          rxclassDrugInfo: [
+            {
+              minConcept: { rxcui: '1191', name: 'aspirin', tty: 'IN' },
+              rxclassMinConceptItem: {
+                classId: 'N02BA',
+                className: 'Salicylic acid and derivatives',
+                classType: 'ATC1-4',
+              },
+              rela: 'has_ATC',
+              relaSource: 'ATC',
+            },
+          ],
+        },
+      });
+      const rx = new RxNorm();
+
+      const result = await rx.classByDrugName('aspirin', 'ATC');
+
+      expect(result).toHaveLength(1);
+      expect(result[0]!.rxcui).toBe('1191');
+      expect(result[0]!.drugName).toBe('aspirin');
+      expect(result[0]!.tty).toBe('IN');
+      expect(result[0]!.classId).toBe('N02BA');
+      expect(result[0]!.className).toBe('Salicylic acid and derivatives');
+      expect(result[0]!.classType).toBe('ATC1-4');
+      expect(result[0]!.rela).toBe('has_ATC');
+      expect(result[0]!.relaSource).toBe('ATC');
+    });
+
+    it('should build correct URL with relaSource', async () => {
+      mockFetchJson({ rxclassDrugInfoList: {} });
+      const rx = new RxNorm();
+
+      await rx.classByDrugName('aspirin', 'ATC');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe(
+        'https://rxnav.nlm.nih.gov/REST/rxclass/class/byDrugName.json?drugName=aspirin&relaSource=ATC',
+      );
+    });
+
+    it('should build correct URL without relaSource', async () => {
+      mockFetchJson({ rxclassDrugInfoList: {} });
+      const rx = new RxNorm();
+
+      await rx.classByDrugName('aspirin');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe(
+        'https://rxnav.nlm.nih.gov/REST/rxclass/class/byDrugName.json?drugName=aspirin',
+      );
+    });
+
+    it('should handle missing rxclassDrugInfoList', async () => {
+      mockFetchJson({});
+      const rx = new RxNorm();
+
+      const result = await rx.classByDrugName('unknown');
+
+      expect(result).toEqual([]);
+    });
+
+    it('should handle missing rxclassDrugInfo array', async () => {
+      mockFetchJson({ rxclassDrugInfoList: {} });
+      const rx = new RxNorm();
+
+      const result = await rx.classByDrugName('unknown');
+
+      expect(result).toEqual([]);
+    });
+
+    it('should default missing nested fields', async () => {
+      mockFetchJson({
+        rxclassDrugInfoList: {
+          rxclassDrugInfo: [{}],
+        },
+      });
+      const rx = new RxNorm();
+
+      const result = await rx.classByDrugName('test');
+
+      expect(result).toHaveLength(1);
+      expect(result[0]!.rxcui).toBe('');
+      expect(result[0]!.drugName).toBe('');
+      expect(result[0]!.classId).toBe('');
+      expect(result[0]!.className).toBe('');
+      expect(result[0]!.rela).toBe('');
+      expect(result[0]!.relaSource).toBe('');
+    });
+  });
+
+  describe('classByRxcui', () => {
+    it('should return drug class info for an RxCUI', async () => {
+      mockFetchJson({
+        rxclassDrugInfoList: {
+          rxclassDrugInfo: [
+            {
+              minConcept: { rxcui: '1191', name: 'aspirin', tty: 'IN' },
+              rxclassMinConceptItem: {
+                classId: 'CN103',
+                className: 'NON-OPIOID ANALGESICS',
+                classType: 'VA',
+              },
+              rela: 'has_VAClass_extended',
+              relaSource: 'VA',
+            },
+          ],
+        },
+      });
+      const rx = new RxNorm();
+
+      const result = await rx.classByRxcui('1191', 'VA');
+
+      expect(result).toHaveLength(1);
+      expect(result[0]!.classId).toBe('CN103');
+      expect(result[0]!.className).toBe('NON-OPIOID ANALGESICS');
+      expect(result[0]!.relaSource).toBe('VA');
+    });
+
+    it('should build correct URL with relaSource', async () => {
+      mockFetchJson({ rxclassDrugInfoList: {} });
+      const rx = new RxNorm();
+
+      await rx.classByRxcui('1191', 'MEDRT');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe(
+        'https://rxnav.nlm.nih.gov/REST/rxclass/class/byRxcui.json?rxcui=1191&relaSource=MEDRT',
+      );
+    });
+
+    it('should build correct URL without relaSource', async () => {
+      mockFetchJson({ rxclassDrugInfoList: {} });
+      const rx = new RxNorm();
+
+      await rx.classByRxcui('1191');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe('https://rxnav.nlm.nih.gov/REST/rxclass/class/byRxcui.json?rxcui=1191');
+    });
+
+    it('should handle empty response', async () => {
+      mockFetchJson({});
+      const rx = new RxNorm();
+
+      const result = await rx.classByRxcui('999999');
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('classMembers', () => {
+    it('should return drug members of a class', async () => {
+      mockFetchJson({
+        drugMemberGroup: {
+          drugMember: [
+            { minConcept: { rxcui: '1191', name: 'aspirin', tty: 'IN' } },
+            {
+              minConcept: {
+                rxcui: '103863',
+                name: 'aspirin 150 MG Rectal Suppository',
+                tty: 'SCD',
+              },
+            },
+          ],
+        },
+      });
+      const rx = new RxNorm();
+
+      const result = await rx.classMembers('N02BA', 'ATC');
+
+      expect(result).toHaveLength(2);
+      expect(result[0]!.rxcui).toBe('1191');
+      expect(result[0]!.name).toBe('aspirin');
+      expect(result[0]!.tty).toBe('IN');
+      expect(result[1]!.rxcui).toBe('103863');
+    });
+
+    it('should build correct URL with relaSource', async () => {
+      mockFetchJson({ drugMemberGroup: {} });
+      const rx = new RxNorm();
+
+      await rx.classMembers('N02BA', 'ATC');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe(
+        'https://rxnav.nlm.nih.gov/REST/rxclass/classMembers.json?classId=N02BA&relaSource=ATC',
+      );
+    });
+
+    it('should build correct URL without relaSource', async () => {
+      mockFetchJson({ drugMemberGroup: {} });
+      const rx = new RxNorm();
+
+      await rx.classMembers('CN103');
+
+      const url = vi.mocked(fetch).mock.calls[0]![0] as string;
+      expect(url).toBe('https://rxnav.nlm.nih.gov/REST/rxclass/classMembers.json?classId=CN103');
+    });
+
+    it('should handle missing drugMemberGroup', async () => {
+      mockFetchJson({});
+      const rx = new RxNorm();
+
+      const result = await rx.classMembers('INVALID');
+
+      expect(result).toEqual([]);
+    });
+
+    it('should handle missing drugMember array', async () => {
+      mockFetchJson({ drugMemberGroup: {} });
+      const rx = new RxNorm();
+
+      const result = await rx.classMembers('N02BA');
+
+      expect(result).toEqual([]);
+    });
+
+    it('should default missing minConcept fields', async () => {
+      mockFetchJson({
+        drugMemberGroup: {
+          drugMember: [{}],
+        },
+      });
+      const rx = new RxNorm();
+
+      const result = await rx.classMembers('N02BA');
+
+      expect(result).toHaveLength(1);
+      expect(result[0]!.rxcui).toBe('');
+      expect(result[0]!.name).toBe('');
+      expect(result[0]!.tty).toBe('');
+    });
+  });
+
   describe('configuration', () => {
     it('should work without any config', async () => {
       mockFetchJson({ idGroup: { rxnormId: ['1191'] } });
