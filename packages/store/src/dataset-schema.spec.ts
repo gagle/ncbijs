@@ -261,20 +261,29 @@ describe('DATASET_SCHEMAS', () => {
         pmid: '12345678',
         pmcid: 'PMC1234567',
         doi: '10.1234/example',
-        mid: null,
-        live: true,
-        releaseDate: '2025-01-15',
+        mid: 'NIHMS123',
       };
 
       const serialized = schema.serialize(record);
       expect(serialized['pmid']).toBe('12345678');
-      expect(serialized['mid']).toBeNull();
-      expect(serialized['live']).toBe(true);
+      expect(serialized['mid']).toBe('NIHMS123');
 
       const deserialized = schema.deserialize(serialized);
       expect(deserialized['pmid']).toBe('12345678');
       expect(deserialized['pmcid']).toBe('PMC1234567');
-      expect(deserialized['live']).toBe(true);
+      expect(deserialized['mid']).toBe('NIHMS123');
+    });
+
+    it('omits mid when empty or null', () => {
+      const record = {
+        pmid: '12345678',
+        pmcid: 'PMC1234567',
+        doi: '10.1234/example',
+      };
+
+      const serialized = schema.serialize(record);
+      const deserialized = schema.deserialize(serialized);
+      expect(deserialized['mid']).toBeUndefined();
     });
 
     it('serializes null/undefined fields to null', () => {
@@ -282,9 +291,6 @@ describe('DATASET_SCHEMAS', () => {
         pmid: null,
         pmcid: undefined,
         doi: '10.1234/example',
-        mid: null,
-        live: false,
-        releaseDate: '',
       };
 
       const serialized = schema.serialize(record);

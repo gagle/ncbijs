@@ -70,43 +70,25 @@ export function parseEInfoXml(xml: string): EInfoResult {
 }
 
 export function parseEInfoJson(raw: string): EInfoResult {
-  const json = JSON.parse(raw) as {
+  const parsed = JSON.parse(raw) as {
+    einforesult?: RawEInfoJsonResult;
     dblist?: ReadonlyArray<string>;
-    dbinfo?: {
-      dbname?: string;
-      description?: string;
-      count?: string;
-      lastupdate?: string;
-      fieldlist?: ReadonlyArray<{
-        name?: string;
-        fullname?: string;
-        description?: string;
-        termcount?: string;
-        isdate?: string;
-        isnumerical?: string;
-        istruncatable?: string;
-        israngeable?: string;
-        ishidden?: string;
-      }>;
-      linklist?: ReadonlyArray<{
-        name?: string;
-        menu?: string;
-        description?: string;
-        dbto?: string;
-      }>;
-    };
+    dbinfo?: ReadonlyArray<RawEInfoJsonDbInfo> | RawEInfoJsonDbInfo;
   };
+
+  const json = parsed.einforesult ?? parsed;
 
   if (json.dblist) {
     return { dbList: json.dblist };
   }
 
-  const info = json.dbinfo;
+  const infoSource = json.dbinfo;
+  const info = Array.isArray(infoSource) ? infoSource[0] : infoSource;
   if (!info) {
     throw new Error('Invalid EInfo JSON: missing dblist or dbinfo');
   }
 
-  const fieldList: Array<FieldInfo> = (info.fieldlist ?? []).map((field) => ({
+  const fieldList: Array<FieldInfo> = (info.fieldlist ?? []).map((field: RawEInfoJsonField) => ({
     name: field.name ?? '',
     fullName: field.fullname ?? '',
     description: field.description ?? '',
@@ -118,7 +100,7 @@ export function parseEInfoJson(raw: string): EInfoResult {
     ...(field.ishidden !== undefined ? { isHidden: field.ishidden === 'Y' } : {}),
   }));
 
-  const linkList: Array<LinkInfo> = (info.linklist ?? []).map((link) => ({
+  const linkList: Array<LinkInfo> = (info.linklist ?? []).map((link: RawEInfoJsonLink) => ({
     name: link.name ?? '',
     menu: link.menu ?? '',
     description: link.description ?? '',
@@ -135,4 +117,37 @@ export function parseEInfoJson(raw: string): EInfoResult {
       linkList,
     },
   };
+}
+
+interface RawEInfoJsonField {
+  readonly name?: string;
+  readonly fullname?: string;
+  readonly description?: string;
+  readonly termcount?: string;
+  readonly isdate?: string;
+  readonly isnumerical?: string;
+  readonly istruncatable?: string;
+  readonly israngeable?: string;
+  readonly ishidden?: string;
+}
+
+interface RawEInfoJsonLink {
+  readonly name?: string;
+  readonly menu?: string;
+  readonly description?: string;
+  readonly dbto?: string;
+}
+
+interface RawEInfoJsonDbInfo {
+  readonly dbname?: string;
+  readonly description?: string;
+  readonly count?: string;
+  readonly lastupdate?: string;
+  readonly fieldlist?: ReadonlyArray<RawEInfoJsonField>;
+  readonly linklist?: ReadonlyArray<RawEInfoJsonLink>;
+}
+
+interface RawEInfoJsonResult {
+  readonly dblist?: ReadonlyArray<string>;
+  readonly dbinfo?: ReadonlyArray<RawEInfoJsonDbInfo> | RawEInfoJsonDbInfo;
 }

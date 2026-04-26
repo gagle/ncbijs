@@ -8,6 +8,7 @@ import { TokenBucket } from '@ncbijs/rate-limiter';
 import { fetchJson } from './clinvar-client';
 import type { ClinVarClientConfig } from './clinvar-client';
 import type {
+  AlleleFrequency,
   ClinVarConfig,
   ClinVarGene,
   ClinVarSearchResult,
@@ -204,10 +205,14 @@ interface RawVariantEntry {
   readonly obj_type?: string;
   readonly accession?: string;
   readonly accession_version?: string;
-  readonly clinical_significance?: { readonly description?: string };
+  readonly germline_classification?: {
+    readonly description?: string;
+    readonly last_evaluated?: string;
+    readonly review_status?: string;
+    readonly trait_set?: ReadonlyArray<RawTraitSet>;
+  };
   readonly gene_sort?: string;
   readonly genes?: ReadonlyArray<RawGene>;
-  readonly trait_set?: ReadonlyArray<RawTraitSet>;
   readonly variation_set?: ReadonlyArray<RawVariationSet>;
   readonly supporting_submissions?: { readonly scv?: ReadonlyArray<string> };
   readonly error?: string;
@@ -235,20 +240,24 @@ interface RawVariationSet {
 interface RawVariationLocation {
   readonly assembly_name?: string;
   readonly chr?: string;
-  readonly start?: number;
-  readonly stop?: number;
+  readonly start?: string | number;
+  readonly stop?: string | number;
 }
 
 function mapVariantReport(raw: RawVariantEntry): VariantReport {
+  const classification = raw.germline_classification;
+
   return {
     uid: raw.uid ?? '',
     title: raw.title ?? '',
     objectType: raw.obj_type ?? '',
     accession: raw.accession ?? '',
     accessionVersion: raw.accession_version ?? '',
-    clinicalSignificance: raw.clinical_significance?.description ?? '',
+    clinicalSignificance: classification?.description ?? '',
+    reviewStatus: classification?.review_status ?? '',
+    lastEvaluated: classification?.last_evaluated ?? '',
     genes: (raw.genes ?? []).map(mapGene),
-    traits: (raw.trait_set ?? []).map(mapTrait),
+    traits: (classification?.trait_set ?? []).map(mapTrait),
     locations: flatMapLocations(raw.variation_set ?? []),
     supportingSubmissions: raw.supporting_submissions?.scv ?? [],
   };
@@ -287,8 +296,8 @@ function mapLocation(raw: RawVariationLocation): VariantLocation {
   return {
     assemblyName: raw.assembly_name ?? '',
     chromosome: raw.chr ?? '',
-    start: raw.start ?? 0,
-    stop: raw.stop ?? 0,
+    start: Number(raw.start ?? 0) || 0,
+    stop: Number(raw.stop ?? 0) || 0,
   };
 }
 
@@ -395,37 +404,46 @@ function mapSpdiAllele(raw: RawSpdiEntry): SpdiAllele {
 }
 
 interface RawFrequencyResponse {
-  readonly results?: ReadonlyArray<RawFrequencyResult>;
-}
-
-interface RawFrequencyResult {
-  readonly study?: string;
-  readonly populations?: ReadonlyArray<RawPopulationFrequency>;
-}
-
-interface RawPopulationFrequency {
-  readonly population?: string;
-  readonly allele_count?: number;
-  readonly total_count?: number;
-  readonly frequency?: number;
+  readonly results?: Readonly<
+    Record<
+      string,
+      {
+        readonly ref?: string;
+        readonly counts?: Readonly<
+          Record<
+            string,
+            { readonly allele_counts?: Readonly<Record<string, Readonly<Record<string, number>>>> }
+          >
+        >;
+      }
+    >
+  >;
 }
 
 function mapFrequencyReport(rsid: number, raw: RawFrequencyResponse): FrequencyReport {
-  const populations: Array<PopulationFrequency> = [];
+  const alleles: Array<AlleleFrequency> = [];
 
-  for (const result of raw.results ?? []) {
-    const study = result.study ?? '';
+  for (const [alleleId, alleleData] of Object.entries(raw.results ?? {})) {
+    const populations: Array<PopulationFrequency> = [];
 
-    for (const pop of result.populations ?? []) {
-      populations.push({
-        study,
-        population: pop.population ?? '',
-        alleleCount: pop.allele_count ?? 0,
-        totalCount: pop.total_count ?? 0,
-        frequency: pop.frequency ?? 0,
-      });
+    for (const [study, studyData] of Object.entries(alleleData.counts ?? {})) {
+      for (const [biosample, alleleCounts] of Object.entries(studyData.allele_counts ?? {})) {
+        const total = Object.values(alleleCounts).reduce((sum, count) => sum + count, 0);
+        populations.push({
+          study,
+          biosample,
+          alleleCounts: { ...alleleCounts },
+          totalCount: total,
+        });
+      }
     }
+
+    alleles.push({
+      alleleId,
+      referenceAllele: alleleData.ref ?? '',
+      populations,
+    });
   }
 
-  return { rsid, populations };
+  return { rsid, alleles };
 }

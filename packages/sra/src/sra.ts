@@ -192,7 +192,7 @@ function parseLibraryLayout(xml: string): string {
     return '';
   }
 
-  const layoutMatch = /<(\w+)\s*\/>/.exec(block);
+  const layoutMatch = /<(\w+)(?:\s[^>]*)?\/>/.exec(block);
   return layoutMatch?.[1] ?? '';
 }
 

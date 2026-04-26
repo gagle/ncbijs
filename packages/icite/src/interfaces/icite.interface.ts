@@ -3,12 +3,19 @@ export interface ICiteConfig {
   readonly maxRetries?: number;
 }
 
+/** Author information from iCite. */
+export interface ICiteAuthor {
+  readonly firstName: string;
+  readonly lastName: string;
+  readonly fullName: string;
+}
+
 /** Citation metrics and bibliographic data for a publication from iCite. */
 export interface ICitePublication {
   readonly pmid: number;
   readonly year: number;
   readonly title: string;
-  readonly authors: string;
+  readonly authors: ReadonlyArray<ICiteAuthor>;
   readonly journal: string;
   readonly isResearchArticle: boolean;
   readonly relativeCitationRatio: number | undefined;
@@ -19,8 +26,8 @@ export interface ICitePublication {
   readonly fieldCitationRate: number | undefined;
   /** Average citations received per year since publication. */
   readonly citationsPerYear: number | undefined;
-  /** Whether this article is classified as a clinical publication by iCite. */
-  readonly isClinical: boolean;
+  /** Whether this article has been cited by at least one clinical article. */
+  readonly citedByClinicalArticle: boolean;
   /** Whether the citation metrics are provisional (article published within the last two years). */
   readonly provisional: boolean;
   /** Weighted percentage of supporting references that study humans (0-1). */

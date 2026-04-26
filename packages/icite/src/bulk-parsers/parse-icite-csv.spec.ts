@@ -38,10 +38,10 @@ describe('parseIciteCsv', () => {
     expect(result[0]!.title).toBe('A BRCA2 study');
   });
 
-  it('extracts authors', () => {
+  it('extracts authors as ICiteAuthor array', () => {
     const result = parseIciteCsv(SAMPLE_CSV);
 
-    expect(result[0]!.authors).toBe('Smith J');
+    expect(result[0]!.authors).toEqual([{ firstName: '', lastName: '', fullName: 'Smith J' }]);
   });
 
   it('extracts journal', () => {
@@ -87,9 +87,9 @@ describe('parseIciteCsv', () => {
   it('extracts boolean flags', () => {
     const result = parseIciteCsv(SAMPLE_CSV);
 
-    expect(result[0]!.isClinical).toBe(false);
+    expect(result[0]!.citedByClinicalArticle).toBe(false);
     expect(result[0]!.provisional).toBe(false);
-    expect(result[1]!.isClinical).toBe(true);
+    expect(result[1]!.citedByClinicalArticle).toBe(true);
     expect(result[1]!.provisional).toBe(true);
   });
 
@@ -178,7 +178,7 @@ describe('parseIciteCsv', () => {
     const result = parseIciteCsv(csv);
 
     expect(result[0]!.isResearchArticle).toBe(true);
-    expect(result[0]!.isClinical).toBe(true);
+    expect(result[0]!.citedByClinicalArticle).toBe(true);
     expect(result[0]!.provisional).toBe(false);
   });
 });

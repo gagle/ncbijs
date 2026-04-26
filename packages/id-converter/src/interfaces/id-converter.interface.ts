@@ -31,9 +31,7 @@ export interface ConvertedId {
   readonly pmid: string | null;
   readonly pmcid: string | null;
   readonly doi: string | null;
-  readonly mid: string | null;
-  readonly live: boolean;
-  readonly releaseDate: string;
+  readonly mid?: string;
   readonly versions?: ReadonlyArray<Readonly<VersionedId>>;
   readonly aiid?: string;
 }

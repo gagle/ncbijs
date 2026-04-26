@@ -92,9 +92,6 @@ function parseApiResponse(body: unknown): ReadonlyArray<ConvertedId> {
 }
 
 function mapRecordToConvertedId(record: ApiRecord): ConvertedId {
-  const live = record.live === true || record.live === 'true';
-  const releaseDate = record['release-date'] ?? '';
-
   const versions = record.versions?.map((version) => ({
     pmcid: version.pmcid,
     current: version.current === true || version.current === 'true',
@@ -104,9 +101,7 @@ function mapRecordToConvertedId(record: ApiRecord): ConvertedId {
     pmid: record.pmid !== undefined ? String(record.pmid) : null,
     pmcid: record.pmcid ?? null,
     doi: record.doi ?? null,
-    mid: record.mid ?? null,
-    live,
-    releaseDate,
+    ...(record.mid !== undefined ? { mid: record.mid } : {}),
     ...(versions !== undefined ? { versions } : {}),
     ...(record.aiid !== undefined ? { aiid: record.aiid } : {}),
   };

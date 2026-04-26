@@ -30,9 +30,10 @@ describe('parsePmcIdsCsv (real data)', () => {
     expect(withDoi!.doi!.length).toBeGreaterThan(0);
   });
 
-  it('should have live status as boolean', () => {
-    for (const record of records) {
-      expect(typeof record.live).toBe('boolean');
-    }
+  it('should have manuscript IDs on some records', () => {
+    const withMid = records.find((record) => record.mid !== undefined);
+
+    expect(withMid).toBeDefined();
+    expect(withMid!.mid!.length).toBeGreaterThan(0);
   });
 });

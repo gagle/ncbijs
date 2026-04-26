@@ -35,8 +35,6 @@ export interface paths {
                 readonly pmcid?: string;
                 readonly doi?: string;
                 readonly mid?: string;
-                readonly live?: boolean | string;
-                readonly 'release-date'?: string;
                 readonly versions?: ReadonlyArray<{
                   readonly pmcid: string;
                   readonly current: boolean | string;

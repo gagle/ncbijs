@@ -215,18 +215,48 @@ describe('parseEInfoJson', () => {
     expect(() => parseEInfoJson('{}')).toThrow('Invalid EInfo JSON');
   });
 
-  it('should parse dblist format', () => {
+  it('should parse dblist format with einforesult wrapper', () => {
+    const result = parseEInfoJson(JSON.stringify({ einforesult: { dblist: ['pubmed', 'pmc'] } }));
+    expect(result.dbList).toEqual(['pubmed', 'pmc']);
+  });
+
+  it('should parse dblist format without einforesult wrapper', () => {
     const result = parseEInfoJson(JSON.stringify({ dblist: ['pubmed', 'pmc'] }));
     expect(result.dbList).toEqual(['pubmed', 'pmc']);
   });
 
+  it('should parse dbinfo as array with einforesult wrapper', () => {
+    const json = JSON.stringify({
+      einforesult: {
+        dbinfo: [
+          {
+            dbname: 'pubmed',
+            description: 'PubMed bibliographic record',
+            count: '40000000',
+            lastupdate: '2026/04/26',
+          },
+        ],
+      },
+    });
+    const result = parseEInfoJson(json);
+    expect(result.dbInfo!.dbName).toBe('pubmed');
+    expect(result.dbInfo!.description).toBe('PubMed bibliographic record');
+    expect(result.dbInfo!.count).toBe(40000000);
+    expect(result.dbInfo!.fieldList).toHaveLength(0);
+    expect(result.dbInfo!.linkList).toHaveLength(0);
+  });
+
   it('should handle empty fieldlist and linklist in JSON', () => {
     const json = JSON.stringify({
-      dbinfo: {
-        dbname: 'test',
-        description: 'd',
-        count: '1',
-        lastupdate: 'now',
+      einforesult: {
+        dbinfo: [
+          {
+            dbname: 'test',
+            description: 'd',
+            count: '1',
+            lastupdate: 'now',
+          },
+        ],
       },
     });
     const result = parseEInfoJson(json);
@@ -236,9 +266,13 @@ describe('parseEInfoJson', () => {
 
   it('should use default values for missing JSON field properties', () => {
     const json = JSON.stringify({
-      dbinfo: {
-        fieldlist: [{}],
-        linklist: [{}],
+      einforesult: {
+        dbinfo: [
+          {
+            fieldlist: [{}],
+            linklist: [{}],
+          },
+        ],
       },
     });
     const result = parseEInfoJson(json);
@@ -256,9 +290,13 @@ describe('parseEInfoJson', () => {
 
   it('should parse JSON fields without optional boolean attributes', () => {
     const json = JSON.stringify({
-      dbinfo: {
-        fieldlist: [{ name: 'ALL', fullname: 'All', isdate: 'N', isnumerical: 'N' }],
-        linklist: [],
+      einforesult: {
+        dbinfo: [
+          {
+            fieldlist: [{ name: 'ALL', fullname: 'All', isdate: 'N', isnumerical: 'N' }],
+            linklist: [],
+          },
+        ],
       },
     });
     const result = parseEInfoJson(json);
@@ -269,12 +307,24 @@ describe('parseEInfoJson', () => {
   });
 
   it('should use default values for missing dbinfo string properties', () => {
-    const json = JSON.stringify({ dbinfo: {} });
+    const json = JSON.stringify({ einforesult: { dbinfo: [{}] } });
     const result = parseEInfoJson(json);
     expect(result.dbInfo!.dbName).toBe('');
     expect(result.dbInfo!.description).toBe('');
     expect(result.dbInfo!.count).toBe(0);
     expect(result.dbInfo!.lastUpdate).toBe('');
+  });
+
+  it('should handle dbinfo as a single object for backward compatibility', () => {
+    const json = JSON.stringify({
+      dbinfo: {
+        dbname: 'test',
+        count: '5',
+      },
+    });
+    const result = parseEInfoJson(json);
+    expect(result.dbInfo!.dbName).toBe('test');
+    expect(result.dbInfo!.count).toBe(5);
   });
 });
 
@@ -447,18 +497,18 @@ describe('parseELinkJson', () => {
 
   it('should handle linkset without linksetdbs', () => {
     const json = JSON.stringify({
-      linksets: [{ dbfrom: 'pubmed', ids: [{ value: '1' }] }],
+      linksets: [{ dbfrom: 'pubmed', ids: ['20210808'] }],
     });
     const result = parseELinkJson(json);
     expect(result.linkSets[0]!.linkSetDbs).toBeUndefined();
   });
 
-  it('should use id field when value is missing', () => {
+  it('should parse flat string ids array', () => {
     const json = JSON.stringify({
-      linksets: [{ dbfrom: 'pubmed', ids: [{ id: '123' }] }],
+      linksets: [{ dbfrom: 'pubmed', ids: ['20210808', '12345'] }],
     });
     const result = parseELinkJson(json);
-    expect(result.linkSets[0]!.idList).toEqual(['123']);
+    expect(result.linkSets[0]!.idList).toEqual(['20210808', '12345']);
   });
 
   it('should handle empty ids and linksetdbs arrays', () => {
@@ -469,32 +519,28 @@ describe('parseELinkJson', () => {
     expect(result.linkSets[0]!.idList).toEqual([]);
   });
 
-  it('should fall back to empty string when id has neither value nor id', () => {
-    const json = JSON.stringify({
-      linksets: [{ dbfrom: 'pubmed', ids: [{}] }],
-    });
-    const result = parseELinkJson(json);
-    expect(result.linkSets[0]!.idList).toEqual(['']);
-  });
-
-  it('should handle linksetdb links with missing id value', () => {
+  it('should parse flat string links array', () => {
     const json = JSON.stringify({
       linksets: [
         {
           dbfrom: 'pubmed',
-          ids: [],
+          ids: ['20210808'],
           linksetdbs: [
             {
               dbto: 'pubmed',
-              linkname: 'test',
-              links: [{ id: {} }],
+              linkname: 'pubmed_pubmed',
+              links: ['15876306', '15466689', '29684578'],
             },
           ],
         },
       ],
     });
     const result = parseELinkJson(json);
-    expect(result.linkSets[0]!.linkSetDbs![0]!.links[0]!.id).toBe('');
+    const links = result.linkSets[0]!.linkSetDbs![0]!.links;
+    expect(links).toHaveLength(3);
+    expect(links[0]!.id).toBe('15876306');
+    expect(links[1]!.id).toBe('15466689');
+    expect(links[2]!.id).toBe('29684578');
   });
 
   it('should include webenv and querykey when present', () => {
@@ -504,26 +550,6 @@ describe('parseELinkJson', () => {
     const result = parseELinkJson(json);
     expect(result.linkSets[0]!.webEnv).toBe('WEB1');
     expect(result.linkSets[0]!.queryKey).toBe(2);
-  });
-
-  it('should handle link scores', () => {
-    const json = JSON.stringify({
-      linksets: [
-        {
-          dbfrom: 'pubmed',
-          ids: [],
-          linksetdbs: [
-            {
-              dbto: 'pubmed',
-              linkname: 'test',
-              links: [{ id: { value: '1' }, score: '999' }],
-            },
-          ],
-        },
-      ],
-    });
-    const result = parseELinkJson(json);
-    expect(result.linkSets[0]!.linkSetDbs![0]!.links[0]!.score).toBe(999);
   });
 
   it('should use defaults for missing linksetdb properties', () => {

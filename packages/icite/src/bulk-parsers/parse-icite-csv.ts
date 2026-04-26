@@ -1,4 +1,4 @@
-import type { ICitePublication } from '../interfaces/icite.interface';
+import type { ICiteAuthor, ICitePublication } from '../interfaces/icite.interface';
 
 /**
  * Parse an iCite CSV export into an array of {@link ICitePublication} records.
@@ -49,7 +49,7 @@ interface ColumnIndices {
   readonly expectedCitationsPerYear: number;
   readonly fieldCitationRate: number;
   readonly citationsPerYear: number;
-  readonly isClinical: number;
+  readonly citedByClinicalArticle: number;
   readonly provisional: number;
   readonly human: number;
   readonly animal: number;
@@ -84,7 +84,7 @@ function resolveColumnIndices(headerLine: string): ColumnIndices | undefined {
     expectedCitationsPerYear: headers.indexOf('expected_citations_per_year'),
     fieldCitationRate: headers.indexOf('field_citation_rate'),
     citationsPerYear: headers.indexOf('citations_per_year'),
-    isClinical: headers.indexOf('is_clinical'),
+    citedByClinicalArticle: headers.indexOf('is_clinical'),
     provisional: headers.indexOf('provisional'),
     human: headers.indexOf('human'),
     animal: headers.indexOf('animal'),
@@ -110,7 +110,7 @@ function mapPublication(fields: ReadonlyArray<string>, indices: ColumnIndices): 
     pmid: parseIntSafe(fieldAt(fields, indices.pmid)),
     year: parseIntSafe(fieldAt(fields, indices.year)),
     title: fieldAt(fields, indices.title),
-    authors: fieldAt(fields, indices.authors),
+    authors: parseAuthors(fieldAt(fields, indices.authors)),
     journal: fieldAt(fields, indices.journal),
     isResearchArticle: parseBool(fieldAt(fields, indices.isResearchArticle)),
     relativeCitationRatio,
@@ -120,7 +120,7 @@ function mapPublication(fields: ReadonlyArray<string>, indices: ColumnIndices): 
     expectedCitationsPerYear,
     fieldCitationRate,
     citationsPerYear,
-    isClinical: parseBool(fieldAt(fields, indices.isClinical)),
+    citedByClinicalArticle: parseBool(fieldAt(fields, indices.citedByClinicalArticle)),
     provisional: parseBool(fieldAt(fields, indices.provisional)),
     human: parseFloatSafe(fieldAt(fields, indices.human)),
     animal: parseFloatSafe(fieldAt(fields, indices.animal)),
@@ -131,6 +131,37 @@ function mapPublication(fields: ReadonlyArray<string>, indices: ColumnIndices): 
     referencesPmids: parsePmidList(fieldAt(fields, indices.references)),
     doi: fieldAt(fields, indices.doi),
   };
+}
+
+function parseAuthors(value: string): ReadonlyArray<ICiteAuthor> {
+  if (value === '') {
+    return [];
+  }
+
+  const parts = value.split(',').map((part) => part.trim());
+
+  if (parts.length < 2) {
+    return [{ firstName: '', lastName: '', fullName: value.trim() }];
+  }
+
+  const authors: Array<ICiteAuthor> = [];
+
+  for (let index = 0; index + 1 < parts.length; index += 2) {
+    const lastName = parts[index]!;
+    const firstName = parts[index + 1]!;
+    authors.push({
+      firstName,
+      lastName,
+      fullName: `${lastName}, ${firstName}`,
+    });
+  }
+
+  if (parts.length % 2 !== 0) {
+    const lastPart = parts[parts.length - 1]!;
+    authors.push({ firstName: '', lastName: '', fullName: lastPart });
+  }
+
+  return authors;
 }
 
 /** Parse a CSV line respecting double-quote escaping. */

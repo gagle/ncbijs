@@ -3,6 +3,7 @@ export { ClinVar } from './http/clinvar';
 export { parseVariantSummaryTsv } from './bulk-parsers/parse-variant-summary-tsv';
 export { parseClinVarVcf } from './bulk-parsers/parse-clinvar-vcf';
 export type {
+  AlleleFrequency,
   ClinVarConfig,
   ClinVarGene,
   ClinVarSearchResult,

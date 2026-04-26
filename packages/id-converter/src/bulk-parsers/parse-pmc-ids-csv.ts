@@ -41,7 +41,6 @@ interface ColumnIndices {
   readonly pmcid: number;
   readonly pmid: number;
   readonly mid: number;
-  readonly releaseDate: number;
 }
 
 function resolveColumnIndices(headerLine: string): ColumnIndices | undefined {
@@ -51,23 +50,22 @@ function resolveColumnIndices(headerLine: string): ColumnIndices | undefined {
   const pmcid = headers.indexOf('pmcid');
   const pmid = headers.indexOf('pmid');
   const mid = headers.indexOf('manuscript id');
-  const releaseDate = headers.indexOf('release date');
 
   if (pmcid === -1 || pmid === -1) {
     return undefined;
   }
 
-  return { doi, pmcid, pmid, mid, releaseDate };
+  return { doi, pmcid, pmid, mid };
 }
 
 function mapConvertedId(fields: ReadonlyArray<string>, indices: ColumnIndices): ConvertedId {
+  const midValue = fieldAt(fields, indices.mid);
+
   return {
     pmid: emptyToNull(fieldAt(fields, indices.pmid)),
     pmcid: emptyToNull(fieldAt(fields, indices.pmcid)),
     doi: emptyToNull(fieldAt(fields, indices.doi)),
-    mid: emptyToNull(fieldAt(fields, indices.mid)),
-    live: true,
-    releaseDate: fieldAt(fields, indices.releaseDate),
+    ...(midValue !== '' ? { mid: midValue } : {}),
   };
 }
 

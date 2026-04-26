@@ -156,9 +156,6 @@ describe('DuckDbFileStorage', () => {
         pmid: '12345678',
         pmcid: 'PMC9876543',
         doi: '10.1234/test.2023',
-        mid: null,
-        live: true,
-        releaseDate: '2023-06-15',
       };
 
       await storage.writeRecords('id-mappings', [mapping]);
@@ -168,9 +165,7 @@ describe('DuckDbFileStorage', () => {
       expect(result?.['pmid']).toBe('12345678');
       expect(result?.['pmcid']).toBe('PMC9876543');
       expect(result?.['doi']).toBe('10.1234/test.2023');
-      expect(result?.['mid']).toBeNull();
-      expect(result?.['live']).toBe(true);
-      expect(result?.['releaseDate']).toBe('2023-06-15');
+      expect(result?.['mid']).toBeUndefined();
     });
 
     it('looks up id mappings by pmid', async () => {
@@ -178,9 +173,6 @@ describe('DuckDbFileStorage', () => {
         pmid: '12345678',
         pmcid: 'PMC9876543',
         doi: '10.1234/test.2023',
-        mid: null,
-        live: true,
-        releaseDate: '2023-06-15',
       };
 
       await storage.writeRecords('id-mappings', [mapping]);
@@ -195,9 +187,6 @@ describe('DuckDbFileStorage', () => {
         pmid: '12345678',
         pmcid: 'PMC9876543',
         doi: '10.1234/test.2023',
-        mid: null,
-        live: true,
-        releaseDate: '2023-06-15',
       };
 
       await storage.writeRecords('id-mappings', [mapping]);

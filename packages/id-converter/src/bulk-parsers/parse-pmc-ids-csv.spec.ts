@@ -36,30 +36,16 @@ describe('parsePmcIdsCsv', () => {
     expect(result[0]!.doi).toBe('10.1038/nbt0105-2');
   });
 
-  it('maps empty fields to null', () => {
+  it('omits mid when empty', () => {
     const result = parsePmcIdsCsv(SAMPLE_CSV);
 
-    expect(result[0]!.mid).toBeNull();
+    expect(result[0]!.mid).toBeUndefined();
   });
 
   it('extracts Manuscript Id when present', () => {
     const result = parsePmcIdsCsv(SAMPLE_CSV);
 
     expect(result[1]!.mid).toBe('NIHMS6395');
-  });
-
-  it('extracts release date', () => {
-    const result = parsePmcIdsCsv(SAMPLE_CSV);
-
-    expect(result[0]!.releaseDate).toBe('2005/01/28 00:00');
-  });
-
-  it('sets live to true for all records', () => {
-    const result = parsePmcIdsCsv(SAMPLE_CSV);
-
-    for (const record of result) {
-      expect(record.live).toBe(true);
-    }
   });
 
   it('returns empty array for empty input', () => {
@@ -129,7 +115,7 @@ describe('parsePmcIdsCsv', () => {
     const record = result[0]!;
 
     expect(record.doi).toBeNull();
-    expect(record.mid).toBeNull();
+    expect(record.mid).toBeUndefined();
     expect(record.pmcid).toBe('PMC1464427');
     expect(record.pmid).toBe('15637587');
   });
@@ -147,8 +133,7 @@ describe('parsePmcIdsCsv', () => {
 
     expect(record.pmcid).toBe('PMC0000003');
     expect(record.pmid).toBe('77777777');
-    expect(record.mid).toBeNull();
-    expect(record.releaseDate).toBe('');
+    expect(record.mid).toBeUndefined();
   });
 
   it('trims whitespace from field values', () => {

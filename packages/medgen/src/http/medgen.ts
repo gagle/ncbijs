@@ -9,6 +9,7 @@ import {
   readAllTags,
   readAllTagsWithAttributes,
   readBlock,
+  readTag,
   readAllBlocksWithAttributes,
 } from '@ncbijs/xml';
 import { fetchJson } from './medgen-client';
@@ -194,7 +195,7 @@ function parseModesOfInheritance(xml: string): ReadonlyArray<MedGenInheritance> 
   }
 
   return readAllBlocksWithAttributes(block, 'ModeOfInheritance').map((mode) => ({
-    name: mode.attributes['Name'] ?? '',
+    name: readTag(mode.content, 'Name') ?? mode.attributes['Name'] ?? '',
     cui: mode.attributes['CUI'] ?? '',
   }));
 }
@@ -207,7 +208,7 @@ function parseClinicalFeatures(xml: string): ReadonlyArray<MedGenClinicalFeature
   }
 
   return readAllBlocksWithAttributes(block, 'ClinicalFeature').map((feature) => ({
-    name: feature.attributes['Name'] ?? '',
+    name: readTag(feature.content, 'Name') ?? feature.attributes['Name'] ?? '',
     hpoId: feature.attributes['SDUI'] ?? '',
     cui: feature.attributes['CUI'] ?? '',
   }));
@@ -225,7 +226,7 @@ function parseDefinitions(xml: string): ReadonlyArray<MedGenDefinition> {
   }
 
   return readAllTagsWithAttributes(block, 'Definition').map((definition) => ({
-    source: definition.attributes['SAB'] ?? '',
+    source: definition.attributes['source'] ?? definition.attributes['SAB'] ?? '',
     text: definition.text,
   }));
 }

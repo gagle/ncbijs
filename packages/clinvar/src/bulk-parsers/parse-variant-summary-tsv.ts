@@ -43,6 +43,8 @@ interface ColumnIndices {
   readonly geneId: number;
   readonly geneSymbol: number;
   readonly clinicalSignificance: number;
+  readonly reviewStatus: number;
+  readonly lastEvaluated: number;
   readonly rcvAccession: number;
   readonly phenotypeList: number;
   readonly assembly: number;
@@ -69,6 +71,8 @@ function resolveColumnIndices(headerLine: string): ColumnIndices | undefined {
     geneId: headers.indexOf('geneid'),
     geneSymbol: headers.indexOf('genesymbol'),
     clinicalSignificance: headers.indexOf('clinicalsignificance'),
+    reviewStatus: headers.indexOf('reviewstatus'),
+    lastEvaluated: headers.indexOf('lastevaluated'),
     rcvAccession: headers.indexOf('rcvaccession'),
     phenotypeList: headers.indexOf('phenotypelist'),
     assembly: headers.indexOf('assembly'),
@@ -113,6 +117,8 @@ function mapVariantReport(fields: ReadonlyArray<string>, indices: ColumnIndices)
     accession: fieldAt(fields, indices.rcvAccession),
     accessionVersion: '',
     clinicalSignificance: fieldAt(fields, indices.clinicalSignificance),
+    reviewStatus: fieldAt(fields, indices.reviewStatus),
+    lastEvaluated: fieldAt(fields, indices.lastEvaluated),
     genes,
     traits,
     locations,

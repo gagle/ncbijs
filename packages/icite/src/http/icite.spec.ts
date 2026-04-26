@@ -19,17 +19,19 @@ function buildPublicationResponse(): Record<string, unknown> {
         pmid: 33533846,
         year: 2021,
         title: 'SARS-CoV-2 mRNA vaccine design',
-        authors: 'Corbett KS, Edwards DK',
+        authors: [
+          { firstName: 'Kizzmekia', lastName: 'Corbett', fullName: 'Corbett, Kizzmekia S' },
+          { firstName: 'Darin', lastName: 'Edwards', fullName: 'Edwards, Darin K' },
+        ],
         journal: 'Nature',
         is_research_article: true,
         relative_citation_ratio: 85.2,
         nih_percentile: 99.9,
         citation_count: 1500,
-        references_count: 45,
         expected_citations_per_year: 12.5,
         field_citation_rate: 5.3,
         citations_per_year: 375.0,
-        is_clinical: true,
+        citedByClinicalArticle: true,
         provisional: false,
         human: 0.85,
         animal: 0.05,
@@ -62,7 +64,7 @@ describe('ICite', () => {
       expect(pubs[0]!.relativeCitationRatio).toBe(85.2);
       expect(pubs[0]!.nihPercentile).toBe(99.9);
       expect(pubs[0]!.citedByCount).toBe(1500);
-      expect(pubs[0]!.isClinical).toBe(true);
+      expect(pubs[0]!.citedByClinicalArticle).toBe(true);
       expect(pubs[0]!.doi).toBe('10.1038/s41586-020-03049-6');
       expect(pubs[0]!.citationsPerYear).toBe(375.0);
       expect(pubs[0]!.provisional).toBe(false);
@@ -139,12 +141,12 @@ describe('ICite', () => {
       expect(pubs[0]!.pmid).toBe(0);
       expect(pubs[0]!.year).toBe(0);
       expect(pubs[0]!.title).toBe('');
-      expect(pubs[0]!.authors).toBe('');
+      expect(pubs[0]!.authors).toEqual([]);
       expect(pubs[0]!.journal).toBe('');
       expect(pubs[0]!.isResearchArticle).toBe(false);
       expect(pubs[0]!.citedByCount).toBe(0);
       expect(pubs[0]!.referencesCount).toBe(0);
-      expect(pubs[0]!.isClinical).toBe(false);
+      expect(pubs[0]!.citedByClinicalArticle).toBe(false);
       expect(pubs[0]!.provisional).toBe(false);
       expect(pubs[0]!.human).toBe(0);
       expect(pubs[0]!.animal).toBe(0);

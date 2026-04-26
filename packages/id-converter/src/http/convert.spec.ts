@@ -29,9 +29,6 @@ function buildRecord(overrides: Record<string, unknown> = {}): Record<string, un
     pmid: '12345678',
     pmcid: 'PMC1234567',
     doi: '10.1234/example',
-    mid: 'NIHMS1234567',
-    live: true,
-    'release-date': '2024/01/15',
     ...overrides,
   };
 }
@@ -97,55 +94,33 @@ describe('convert', () => {
   });
 
   describe('response parsing', () => {
-    it('should return pmid, pmcid, doi, mid for each ID', async () => {
+    it('should return pmid, pmcid, doi for each ID', async () => {
       mockFetchJson(buildApiResponse([buildRecord()]));
       const results = await convert(['12345678']);
       const firstResult = results[0]!;
       expect(firstResult.pmid).toBe('12345678');
       expect(firstResult.pmcid).toBe('PMC1234567');
       expect(firstResult.doi).toBe('10.1234/example');
-      expect(firstResult.mid).toBe('NIHMS1234567');
+    });
+
+    it('should return mid when present in record', async () => {
+      mockFetchJson(buildApiResponse([buildRecord({ mid: 'NIHMS1234567' })]));
+      const results = await convert(['12345678']);
+      expect(results[0]!.mid).toBe('NIHMS1234567');
+    });
+
+    it('should omit mid when not present in record', async () => {
+      mockFetchJson(buildApiResponse([buildRecord()]));
+      const results = await convert(['12345678']);
+      expect(results[0]!.mid).toBeUndefined();
     });
 
     it('should return null for unavailable ID types', async () => {
-      mockFetchJson(
-        buildApiResponse([buildRecord({ pmcid: undefined, doi: undefined, mid: undefined })]),
-      );
+      mockFetchJson(buildApiResponse([buildRecord({ pmcid: undefined, doi: undefined })]));
       const results = await convert(['12345678']);
       const firstResult = results[0]!;
       expect(firstResult.pmcid).toBeNull();
       expect(firstResult.doi).toBeNull();
-      expect(firstResult.mid).toBeNull();
-    });
-
-    it('should return live flag as true when boolean true', async () => {
-      mockFetchJson(buildApiResponse([buildRecord({ live: true })]));
-      const results = await convert(['12345678']);
-      expect(results[0]!.live).toBe(true);
-    });
-
-    it('should return live flag as true when string "true"', async () => {
-      mockFetchJson(buildApiResponse([buildRecord({ live: 'true' })]));
-      const results = await convert(['12345678']);
-      expect(results[0]!.live).toBe(true);
-    });
-
-    it('should return live flag as false when not true', async () => {
-      mockFetchJson(buildApiResponse([buildRecord({ live: false })]));
-      const results = await convert(['12345678']);
-      expect(results[0]!.live).toBe(false);
-    });
-
-    it('should return releaseDate', async () => {
-      mockFetchJson(buildApiResponse([buildRecord({ 'release-date': '2024/06/01' })]));
-      const results = await convert(['12345678']);
-      expect(results[0]!.releaseDate).toBe('2024/06/01');
-    });
-
-    it('should return empty releaseDate when not provided', async () => {
-      mockFetchJson(buildApiResponse([buildRecord({ 'release-date': undefined })]));
-      const results = await convert(['12345678']);
-      expect(results[0]!.releaseDate).toBe('');
     });
 
     it('should return null pmid when pmid is not in record', async () => {

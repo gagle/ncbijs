@@ -224,12 +224,12 @@ const ELINK_JSON = JSON.stringify({
   linksets: [
     {
       dbfrom: 'pubmed',
-      ids: [{ value: '123' }],
+      ids: ['123'],
       linksetdbs: [
         {
           dbto: 'pubmed',
           linkname: 'pubmed_pubmed',
-          links: [{ id: { value: '456' } }],
+          links: ['456'],
         },
       ],
     },
@@ -2058,23 +2058,23 @@ describe('EUtils', () => {
       expect(result.linkSets[0]!.queryKey).toBe(1);
     });
 
-    it('should parse elink JSON with score in links', async () => {
-      const jsonWithScore = JSON.stringify({
+    it('should parse elink JSON with flat string ids and links', async () => {
+      const jsonFlat = JSON.stringify({
         linksets: [
           {
             dbfrom: 'pubmed',
-            ids: [{ id: '123' }],
+            ids: ['123'],
             linksetdbs: [
               {
                 dbto: 'pubmed',
                 linkname: 'pubmed_pubmed',
-                links: [{ id: { value: '456' }, score: '100' }],
+                links: ['456'],
               },
             ],
           },
         ],
       });
-      mockFetch(jsonWithScore);
+      mockFetch(jsonFlat);
       const client = createClient();
       const result = await client.elink({
         db: 'pubmed',
@@ -2083,7 +2083,7 @@ describe('EUtils', () => {
         retmode: 'json',
       });
       expect(result.linkSets[0]!.idList).toEqual(['123']);
-      expect(result.linkSets[0]!.linkSetDbs![0]!.links[0]!.score).toBe(100);
+      expect(result.linkSets[0]!.linkSetDbs![0]!.links[0]!.id).toBe('456');
     });
 
     it('should parse ecitmatch text with empty lines', async () => {

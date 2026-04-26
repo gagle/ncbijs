@@ -309,9 +309,7 @@ export const DATASET_SCHEMAS: Record<DatasetType, DatasetSchema> = {
       pmid VARCHAR,
       pmcid VARCHAR,
       doi VARCHAR,
-      mid VARCHAR,
-      live BOOLEAN,
-      release_date VARCHAR
+      mid VARCHAR
     )`,
     createIndexesSql: [
       'CREATE INDEX IF NOT EXISTS idx_idmap_pmid ON id_mappings(pmid)',
@@ -319,8 +317,8 @@ export const DATASET_SCHEMAS: Record<DatasetType, DatasetSchema> = {
       'CREATE INDEX IF NOT EXISTS idx_idmap_doi ON id_mappings(doi)',
     ],
     insertSql: `INSERT INTO id_mappings
-      (pmid, pmcid, doi, mid, live, release_date)
-      VALUES ($pmid, $pmcid, $doi, $mid, $live, $release_date)`,
+      (pmid, pmcid, doi, mid)
+      VALUES ($pmid, $pmcid, $doi, $mid)`,
     getRecordSql:
       'SELECT * FROM id_mappings WHERE pmcid = $key OR pmid = $key OR doi = $key OR mid = $key LIMIT 1',
     keyTransform: toStringKey,
@@ -331,17 +329,16 @@ export const DATASET_SCHEMAS: Record<DatasetType, DatasetSchema> = {
         pmcid: toNullableString(r['pmcid']),
         doi: toNullableString(r['doi']),
         mid: toNullableString(r['mid']),
-        live: Boolean(r['live'] ?? false),
-        release_date: String(r['releaseDate'] ?? ''),
       };
     },
-    deserialize: (row) => ({
-      pmid: row['pmid'] ?? null,
-      pmcid: row['pmcid'] ?? null,
-      doi: row['doi'] ?? null,
-      mid: row['mid'] ?? null,
-      live: Boolean(row['live'] ?? false),
-      releaseDate: String(row['release_date'] ?? ''),
-    }),
+    deserialize: (row) => {
+      const mid = row['mid'];
+      return {
+        pmid: row['pmid'] ?? null,
+        pmcid: row['pmcid'] ?? null,
+        doi: row['doi'] ?? null,
+        ...(mid !== null && mid !== undefined && mid !== '' ? { mid: String(mid) } : {}),
+      };
+    },
   },
 };

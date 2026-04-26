@@ -1,7 +1,7 @@
 import { TokenBucket } from '@ncbijs/rate-limiter';
 import { fetchJson } from './icite-client';
 import type { ICiteClientConfig } from './icite-client';
-import type { ICiteConfig, ICitePublication } from '../interfaces/icite.interface';
+import type { ICiteAuthor, ICiteConfig, ICitePublication } from '../interfaces/icite.interface';
 
 const BASE_URL = 'https://icite.od.nih.gov/api/pubs';
 const REQUESTS_PER_SECOND = 2;
@@ -85,22 +85,27 @@ interface RawICiteResponse {
   readonly data?: ReadonlyArray<RawICitePublication>;
 }
 
+interface RawICiteAuthor {
+  readonly firstName?: string;
+  readonly lastName?: string;
+  readonly fullName?: string;
+}
+
 interface RawICitePublication {
   readonly pmid?: number;
   readonly year?: number;
   readonly title?: string;
-  readonly authors?: string;
+  readonly authors?: ReadonlyArray<RawICiteAuthor>;
   readonly journal?: string;
   readonly is_research_article?: boolean;
   readonly relative_citation_ratio?: number | null;
   readonly nih_percentile?: number | null;
   readonly cited_by_clin?: ReadonlyArray<number>;
   readonly citation_count?: number;
-  readonly references_count?: number;
   readonly expected_citations_per_year?: number | null;
   readonly field_citation_rate?: number | null;
   readonly citations_per_year?: number | null;
-  readonly is_clinical?: boolean;
+  readonly citedByClinicalArticle?: boolean;
   readonly provisional?: boolean;
   readonly human?: number;
   readonly animal?: number;
@@ -111,22 +116,32 @@ interface RawICitePublication {
   readonly doi?: string;
 }
 
+function mapAuthor(raw: RawICiteAuthor): ICiteAuthor {
+  return {
+    firstName: raw.firstName ?? '',
+    lastName: raw.lastName ?? '',
+    fullName: raw.fullName ?? '',
+  };
+}
+
 function mapPublication(raw: RawICitePublication): ICitePublication {
+  const references = raw.references ?? [];
+
   return {
     pmid: raw.pmid ?? 0,
     year: raw.year ?? 0,
     title: raw.title ?? '',
-    authors: raw.authors ?? '',
+    authors: (raw.authors ?? []).map(mapAuthor),
     journal: raw.journal ?? '',
     isResearchArticle: raw.is_research_article ?? false,
     relativeCitationRatio: raw.relative_citation_ratio ?? undefined,
     nihPercentile: raw.nih_percentile ?? undefined,
     citedByCount: raw.citation_count ?? 0,
-    referencesCount: raw.references_count ?? 0,
+    referencesCount: references.length,
     expectedCitationsPerYear: raw.expected_citations_per_year ?? undefined,
     fieldCitationRate: raw.field_citation_rate ?? undefined,
     citationsPerYear: raw.citations_per_year ?? undefined,
-    isClinical: raw.is_clinical ?? false,
+    citedByClinicalArticle: raw.citedByClinicalArticle ?? false,
     provisional: raw.provisional ?? false,
     human: raw.human ?? 0,
     animal: raw.animal ?? 0,
@@ -134,7 +149,7 @@ function mapPublication(raw: RawICitePublication): ICitePublication {
     apt: raw.apt ?? 0,
     citedByPmids: raw.cited_by ?? [],
     citedByClinicalPmids: raw.cited_by_clin ?? [],
-    referencesPmids: raw.references ?? [],
+    referencesPmids: references,
     doi: raw.doi ?? '',
   };
 }

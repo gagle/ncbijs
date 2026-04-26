@@ -53,6 +53,20 @@ describe('parseVariantSummaryTsv', () => {
     expect(secondVariant.clinicalSignificance).toBe('Likely benign');
   });
 
+  it('extracts ReviewStatus', () => {
+    const result = parseVariantSummaryTsv(SAMPLE_TSV);
+    const variant = result[0]!;
+
+    expect(variant.reviewStatus).toBe('criteria provided, single submitter');
+  });
+
+  it('extracts LastEvaluated', () => {
+    const result = parseVariantSummaryTsv(SAMPLE_TSV);
+    const variant = result[0]!;
+
+    expect(variant.lastEvaluated).toBe('2023-07-15');
+  });
+
   it('extracts RCVaccession as accession', () => {
     const result = parseVariantSummaryTsv(SAMPLE_TSV);
     const variant = result[0]!;

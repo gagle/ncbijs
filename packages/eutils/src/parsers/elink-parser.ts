@@ -36,11 +36,11 @@ export function parseELinkJson(raw: string): ELinkResult {
   const json = JSON.parse(raw) as {
     linksets?: ReadonlyArray<{
       dbfrom?: string;
-      ids?: ReadonlyArray<{ id?: string; value?: string }>;
+      ids?: ReadonlyArray<string>;
       linksetdbs?: ReadonlyArray<{
         dbto?: string;
         linkname?: string;
-        links?: ReadonlyArray<{ id?: { value?: string }; score?: string }>;
+        links?: ReadonlyArray<string>;
       }>;
       webenv?: string;
       querykey?: string;
@@ -51,13 +51,12 @@ export function parseELinkJson(raw: string): ELinkResult {
 
   for (const linkset of json.linksets ?? []) {
     const dbFrom = linkset.dbfrom ?? '';
-    const idList = (linkset.ids ?? []).map((id) => id.value ?? id.id ?? '');
+    const idList = (linkset.ids ?? []).map((id) => String(id));
 
     const linkSetDbs: Array<LinkSetDb> = [];
     for (const linksetDb of linkset.linksetdbs ?? []) {
-      const links: Array<Link> = (linksetDb.links ?? []).map((link) => ({
-        id: link.id?.value ?? '',
-        ...(link.score !== undefined ? { score: Number(link.score) } : {}),
+      const links: Array<Link> = (linksetDb.links ?? []).map((linkId) => ({
+        id: String(linkId),
       }));
 
       linkSetDbs.push({

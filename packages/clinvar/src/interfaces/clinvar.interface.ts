@@ -12,7 +12,7 @@ export interface ClinVarSearchResult {
   readonly ids: ReadonlyArray<string>;
 }
 
-/** ClinVar variant report with clinical significance, genes, traits, and locations. */
+/** ClinVar variant report with germline classification, genes, traits, and locations. */
 export interface VariantReport {
   readonly uid: string;
   readonly title: string;
@@ -20,6 +20,8 @@ export interface VariantReport {
   readonly accession: string;
   readonly accessionVersion: string;
   readonly clinicalSignificance: string;
+  readonly reviewStatus: string;
+  readonly lastEvaluated: string;
   readonly genes: ReadonlyArray<ClinVarGene>;
   readonly traits: ReadonlyArray<ClinVarTrait>;
   readonly locations: ReadonlyArray<VariantLocation>;
@@ -82,16 +84,22 @@ export interface SpdiAllele {
 /** Allele frequency report for a variant from the ALFA database. */
 export interface FrequencyReport {
   readonly rsid: number;
+  readonly alleles: ReadonlyArray<AlleleFrequency>;
+}
+
+/** Frequency data for a single allele across studies and populations. */
+export interface AlleleFrequency {
+  readonly alleleId: string;
+  readonly referenceAllele: string;
   readonly populations: ReadonlyArray<PopulationFrequency>;
 }
 
-/** Allele frequency for a specific population within a study. */
+/** Allele counts for a specific biosample/population within a study. */
 export interface PopulationFrequency {
   readonly study: string;
-  readonly population: string;
-  readonly alleleCount: number;
+  readonly biosample: string;
+  readonly alleleCounts: Readonly<Record<string, number>>;
   readonly totalCount: number;
-  readonly frequency: number;
 }
 
 /** ClinVar variant parsed from a VCF file. */

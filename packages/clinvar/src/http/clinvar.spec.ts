@@ -44,23 +44,27 @@ function buildVariantEntry(overrides: Record<string, unknown> = {}): Record<stri
     obj_type: 'single nucleotide variant',
     accession: 'VCV000846933',
     accession_version: 'VCV000846933.1',
-    clinical_significance: { description: 'Pathogenic/Likely pathogenic' },
+    germline_classification: {
+      description: 'Pathogenic/Likely pathogenic',
+      last_evaluated: '2026/01/24 00:00',
+      review_status: 'criteria provided, conflicting classifications',
+      trait_set: [
+        {
+          trait_name: 'Li-Fraumeni syndrome',
+          trait_xrefs: [{ db_source: 'MedGen', db_id: 'C0023357' }],
+        },
+      ],
+    },
     gene_sort: 'TP53',
     genes: [{ geneid: 7157, symbol: 'TP53' }],
-    trait_set: [
-      {
-        trait_name: 'Li-Fraumeni syndrome',
-        trait_xrefs: [{ db_source: 'MedGen', db_id: 'C0023357' }],
-      },
-    ],
     variation_set: [
       {
         variation_loc: [
           {
             assembly_name: 'GRCh38',
             chr: '17',
-            start: 7674221,
-            stop: 7674221,
+            start: '7674221',
+            stop: '7674221',
           },
         ],
       },
@@ -299,6 +303,8 @@ describe('ClinVar', () => {
       expect(reports[0]!.accession).toBe('');
       expect(reports[0]!.accessionVersion).toBe('');
       expect(reports[0]!.clinicalSignificance).toBe('');
+      expect(reports[0]!.reviewStatus).toBe('');
+      expect(reports[0]!.lastEvaluated).toBe('');
       expect(reports[0]!.genes).toEqual([]);
       expect(reports[0]!.traits).toEqual([]);
       expect(reports[0]!.locations).toEqual([]);
@@ -326,7 +332,11 @@ describe('ClinVar', () => {
     });
 
     it('should handle trait with missing fields', async () => {
-      mockFetchJson(buildSummaryResponse({ '1': { uid: '1', trait_set: [{}] } }, ['1']));
+      mockFetchJson(
+        buildSummaryResponse({ '1': { uid: '1', germline_classification: { trait_set: [{}] } } }, [
+          '1',
+        ]),
+      );
       const clinvar = new ClinVar();
 
       const reports = await clinvar.fetch(['1']);
@@ -337,7 +347,15 @@ describe('ClinVar', () => {
 
     it('should handle trait xref with missing fields', async () => {
       mockFetchJson(
-        buildSummaryResponse({ '1': { uid: '1', trait_set: [{ trait_xrefs: [{}] }] } }, ['1']),
+        buildSummaryResponse(
+          {
+            '1': {
+              uid: '1',
+              germline_classification: { trait_set: [{ trait_xrefs: [{}] }] },
+            },
+          },
+          ['1'],
+        ),
       );
       const clinvar = new ClinVar();
 
@@ -379,8 +397,14 @@ describe('ClinVar', () => {
             '1': {
               uid: '1',
               variation_set: [
-                { variation_loc: [{ assembly_name: 'GRCh38', chr: '17', start: 100, stop: 200 }] },
-                { variation_loc: [{ assembly_name: 'GRCh37', chr: '17', start: 50, stop: 150 }] },
+                {
+                  variation_loc: [
+                    { assembly_name: 'GRCh38', chr: '17', start: '100', stop: '200' },
+                  ],
+                },
+                {
+                  variation_loc: [{ assembly_name: 'GRCh37', chr: '17', start: '50', stop: '150' }],
+                },
               ],
             },
           },
@@ -396,13 +420,17 @@ describe('ClinVar', () => {
       expect(reports[0]!.locations[1]!.assemblyName).toBe('GRCh37');
     });
 
-    it('should handle missing clinical_significance description', async () => {
-      mockFetchJson(buildSummaryResponse({ '1': { uid: '1', clinical_significance: {} } }, ['1']));
+    it('should handle missing germline_classification description', async () => {
+      mockFetchJson(
+        buildSummaryResponse({ '1': { uid: '1', germline_classification: {} } }, ['1']),
+      );
       const clinvar = new ClinVar();
 
       const reports = await clinvar.fetch(['1']);
 
       expect(reports[0]!.clinicalSignificance).toBe('');
+      expect(reports[0]!.reviewStatus).toBe('');
+      expect(reports[0]!.lastEvaluated).toBe('');
     });
 
     it('should handle missing supporting_submissions scv', async () => {
@@ -816,40 +844,40 @@ describe('ClinVar', () => {
       expect(url).toBe('https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/328/frequency');
     });
 
-    it('should map frequency response with populations', async () => {
+    it('should map frequency response with alleles and populations', async () => {
       mockFetchJson({
-        results: [
-          {
-            study: 'ALFA',
-            populations: [
-              {
-                population: 'European',
-                allele_count: 500,
-                total_count: 1000,
-                frequency: 0.5,
+        results: {
+          '1@5227001': {
+            ref: 'T',
+            counts: {
+              PRJNA507278: {
+                allele_counts: {
+                  SAMN10492705: { A: 35, C: 0, G: 2, T: 68015 },
+                  SAMN10492695: { A: 2, C: 0, G: 0, T: 44826 },
+                },
               },
-              {
-                population: 'African',
-                allele_count: 300,
-                total_count: 800,
-                frequency: 0.375,
-              },
-            ],
+            },
           },
-        ],
+        },
       });
       const clinvar = new ClinVar();
 
       const report = await clinvar.frequency(328);
 
       expect(report.rsid).toBe(328);
-      expect(report.populations).toHaveLength(2);
-      expect(report.populations[0]!.study).toBe('ALFA');
-      expect(report.populations[0]!.population).toBe('European');
-      expect(report.populations[0]!.alleleCount).toBe(500);
-      expect(report.populations[0]!.totalCount).toBe(1000);
-      expect(report.populations[0]!.frequency).toBe(0.5);
-      expect(report.populations[1]!.population).toBe('African');
+      expect(report.alleles).toHaveLength(1);
+      expect(report.alleles[0]!.alleleId).toBe('1@5227001');
+      expect(report.alleles[0]!.referenceAllele).toBe('T');
+      expect(report.alleles[0]!.populations).toHaveLength(2);
+      expect(report.alleles[0]!.populations[0]!.study).toBe('PRJNA507278');
+      expect(report.alleles[0]!.populations[0]!.biosample).toBe('SAMN10492705');
+      expect(report.alleles[0]!.populations[0]!.alleleCounts).toEqual({
+        A: 35,
+        C: 0,
+        G: 2,
+        T: 68015,
+      });
+      expect(report.alleles[0]!.populations[0]!.totalCount).toBe(68052);
     });
 
     it('should handle missing results', async () => {
@@ -859,81 +887,79 @@ describe('ClinVar', () => {
       const report = await clinvar.frequency(328);
 
       expect(report.rsid).toBe(328);
-      expect(report.populations).toEqual([]);
+      expect(report.alleles).toEqual([]);
     });
 
-    it('should handle empty results array', async () => {
-      mockFetchJson({ results: [] });
+    it('should handle empty results object', async () => {
+      mockFetchJson({ results: {} });
       const clinvar = new ClinVar();
 
       const report = await clinvar.frequency(328);
 
-      expect(report.populations).toEqual([]);
+      expect(report.alleles).toEqual([]);
     });
 
-    it('should handle result with missing study and populations', async () => {
-      mockFetchJson({ results: [{}] });
-      const clinvar = new ClinVar();
-
-      const report = await clinvar.frequency(328);
-
-      expect(report.populations).toEqual([]);
-    });
-
-    it('should handle population with missing fields', async () => {
-      mockFetchJson({ results: [{ study: 'ALFA', populations: [{}] }] });
-      const clinvar = new ClinVar();
-
-      const report = await clinvar.frequency(328);
-
-      expect(report.populations[0]!.study).toBe('ALFA');
-      expect(report.populations[0]!.population).toBe('');
-      expect(report.populations[0]!.alleleCount).toBe(0);
-      expect(report.populations[0]!.totalCount).toBe(0);
-      expect(report.populations[0]!.frequency).toBe(0);
-    });
-
-    it('should flatten populations across multiple study results', async () => {
+    it('should handle allele with missing counts', async () => {
       mockFetchJson({
-        results: [
-          {
-            study: 'ALFA',
-            populations: [
-              { population: 'European', allele_count: 500, total_count: 1000, frequency: 0.5 },
-            ],
-          },
-          {
-            study: 'GnomAD',
-            populations: [
-              { population: 'Global', allele_count: 700, total_count: 2000, frequency: 0.35 },
-            ],
-          },
-        ],
+        results: {
+          '1@100': { ref: 'A' },
+        },
       });
       const clinvar = new ClinVar();
 
       const report = await clinvar.frequency(328);
 
-      expect(report.populations).toHaveLength(2);
-      expect(report.populations[0]!.study).toBe('ALFA');
-      expect(report.populations[1]!.study).toBe('GnomAD');
+      expect(report.alleles).toHaveLength(1);
+      expect(report.alleles[0]!.referenceAllele).toBe('A');
+      expect(report.alleles[0]!.populations).toEqual([]);
     });
 
-    it('should default study to empty string when missing from result', async () => {
+    it('should handle allele with missing ref', async () => {
       mockFetchJson({
-        results: [
-          {
-            populations: [
-              { population: 'European', allele_count: 100, total_count: 200, frequency: 0.5 },
-            ],
-          },
-        ],
+        results: {
+          '1@100': {},
+        },
       });
       const clinvar = new ClinVar();
 
       const report = await clinvar.frequency(328);
 
-      expect(report.populations[0]!.study).toBe('');
+      expect(report.alleles[0]!.referenceAllele).toBe('');
+    });
+
+    it('should handle multiple alleles across multiple studies', async () => {
+      mockFetchJson({
+        results: {
+          '1@100': {
+            ref: 'A',
+            counts: {
+              PRJNA1: {
+                allele_counts: {
+                  SAMN1: { A: 100, T: 50 },
+                },
+              },
+            },
+          },
+          '2@100': {
+            ref: 'G',
+            counts: {
+              PRJNA2: {
+                allele_counts: {
+                  SAMN2: { G: 80, C: 20 },
+                },
+              },
+            },
+          },
+        },
+      });
+      const clinvar = new ClinVar();
+
+      const report = await clinvar.frequency(328);
+
+      expect(report.alleles).toHaveLength(2);
+      const alleleIds = report.alleles.map((a) => a.alleleId);
+      expect(alleleIds).toContain('1@100');
+      expect(alleleIds).toContain('2@100');
     });
   });
 

@@ -229,6 +229,22 @@ describe('Sra', () => {
       expect(experiments[0]!.libraryLayout).toBe('PAIRED');
     });
 
+    it('should parse PAIRED layout with NOMINAL_LENGTH attribute', async () => {
+      const pairedXml =
+        '<Summary>' +
+        '<Title>WGS of E. coli</Title>' +
+        '<Platform instrument_model="Illumina HiSeq 2500">ILLUMINA</Platform>' +
+        '<LIBRARY_LAYOUT><PAIRED NOMINAL_LENGTH="3000" NOMINAL_SDEV="300"/></LIBRARY_LAYOUT>' +
+        '</Summary>';
+      const entry = buildSraEntry({ expxml: pairedXml });
+      mockFetchJson(buildSummaryResponse({ '12345': entry as Record<string, unknown> }));
+      const sra = new Sra();
+
+      const experiments = await sra.fetch(['12345']);
+
+      expect(experiments[0]!.libraryLayout).toBe('PAIRED');
+    });
+
     it('should parse runs from runs XML', async () => {
       const entry = buildSraEntry();
       mockFetchJson(buildSummaryResponse({ '12345': entry as Record<string, unknown> }));
