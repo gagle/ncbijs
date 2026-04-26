@@ -75,6 +75,13 @@ These packages have README documentation in their package directories. See each 
 | [`@ncbijs/store-mcp`](../packages/store-mcp) | MCP server for querying locally stored NCBI data            |
 | [`@ncbijs/etl`](../packages/etl)             | Pre-wired NCBI data loaders: `load('mesh', mySink)`         |
 
+## NCBI API Reference
+
+| Guide                                             | Covers                                               |
+| ------------------------------------------------- | ---------------------------------------------------- |
+| [NCBI API Catalog](./ncbi-api-catalog.md)         | Every NCBI/NLM HTTP endpoint and bulk download URL   |
+| [API Change Detection](./api-change-detection.md) | Versioning, deprecation signals, monitoring strategy |
+
 ## Architecture and Development
 
 | Guide                                           | Covers                                                   |
