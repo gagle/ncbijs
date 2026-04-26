@@ -1,3 +1,4 @@
+export { createCheckers } from './create-checkers';
 export { load } from './load';
 export { loadAll } from './load-all';
 export { listDatasets, getDataset } from './dataset-registry';

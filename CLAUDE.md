@@ -57,7 +57,7 @@ rate-limiter ─────┤               │
 pipeline  (zero-dep, independent)
 sync      (zero-dep, independent)
 fasta     (zero-dep, independent)
-etl ──────────────── pipeline, mesh, clinvar, datasets, pubchem, id-converter
+etl ──────────────── pipeline, sync, mesh, clinvar, datasets, pubchem, id-converter
 demo (private) ────── pubmed, mesh, datasets, clinvar, snp, pubchem, id-converter, etl + @duckdb/duckdb-wasm
 ```
 
@@ -66,7 +66,7 @@ demo (private) ────── pubmed, mesh, datasets, clinvar, snp, pubchem,
 1. Zero-dep parallel: `rate-limiter`, `xml`, `fasta`, `pipeline`, `sync`
 2. `id-converter`, `mesh`, `cite`, `litvar`, `bioc`, `clinical-tables`, `eutils`, `datasets`, `blast`, `snp`, `pubchem`, `pubmed-xml`, `jats`, `pubtator`, `clinvar`, `clinical-trials`, `icite`, `rxnorm`
 3. `pubmed` (after `eutils` + `pubmed-xml`), `pmc` (after `eutils` + `jats` + `rate-limiter`)
-4. `etl` (after `pipeline` + `mesh` + `clinvar` + `datasets` + `pubchem` + `id-converter`)
+4. `etl` (after `pipeline` + `sync` + `mesh` + `clinvar` + `datasets` + `pubchem` + `id-converter`)
 
 ## Rules and Skills
 

@@ -9,6 +9,7 @@ import type { DatasetInfo, EtlDatasetType } from './interfaces/etl.interface';
 
 export interface DatasetDescriptor {
   readonly info: DatasetInfo;
+  readonly md5Url?: string;
   readonly createSource: () => Source<string> | Source<Record<string, string>>;
   readonly parse: (raw: string | Record<string, string>) => ReadonlyArray<object>;
 }
@@ -50,6 +51,7 @@ const REGISTRY: ReadonlyArray<DatasetDescriptor> = [
       estimatedRecords: '~2.5M submissions',
       updateFrequency: 'Weekly',
     },
+    md5Url: `${CLINVAR_URL}.md5`,
     createSource: () => createHttpSource(CLINVAR_URL),
     parse: (raw) => parseVariantSummaryTsv(raw as string),
   },
@@ -80,6 +82,7 @@ const REGISTRY: ReadonlyArray<DatasetDescriptor> = [
       estimatedRecords: '~2.5M taxa',
       updateFrequency: 'Daily',
     },
+    md5Url: `${TAXONOMY_URL}.md5`,
     createSource: () => {
       throw new Error(
         'Taxonomy requires tar.gz extraction. Use loadTaxonomy() from @ncbijs/etl ' +
@@ -106,6 +109,7 @@ const REGISTRY: ReadonlyArray<DatasetDescriptor> = [
       estimatedRecords: '~115M compounds',
       updateFrequency: 'Daily',
     },
+    md5Url: `${PUBCHEM_SMILES_URL}.md5`,
     createSource: () =>
       createCompositeSource({
         cidSmiles: createHttpSource(PUBCHEM_SMILES_URL),

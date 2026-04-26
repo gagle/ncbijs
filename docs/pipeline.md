@@ -367,15 +367,48 @@ interface UpdateChecker {
 }
 ```
 
-The built-in `HttpTimestampChecker` uses HTTP `HEAD` requests to compare `Last-Modified` timestamps:
+Two built-in checkers cover all NCBI data sources:
+
+**`Md5ChecksumChecker`** — downloads a tiny `.md5` companion file (~50 bytes) and compares the checksum against the stored value. More reliable than timestamps for detecting actual content changes. Available for ClinVar, Taxonomy, and PubChem:
+
+```typescript
+import { Md5ChecksumChecker } from '@ncbijs/sync';
+
+const clinvarChecker = new Md5ChecksumChecker(
+  'clinvar',
+  'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz.md5',
+);
+```
+
+**`HttpTimestampChecker`** — sends an HTTP `HEAD` request and compares the `Last-Modified` header. Works with all NCBI FTP files (universal fallback):
 
 ```typescript
 import { HttpTimestampChecker } from '@ncbijs/sync';
 
-const meshChecker = new HttpTimestampChecker(
-  'mesh',
-  'https://nlmpubs.nlm.nih.gov/projects/mesh/MESH_FILES/xmlmesh/desc2025.xml',
+const geneChecker = new HttpTimestampChecker(
+  'genes',
+  'https://ftp.ncbi.nlm.nih.gov/gene/DATA/gene_info.gz',
 );
+```
+
+| Dataset  | Strategy      | Companion URL                    |
+| -------- | ------------- | -------------------------------- |
+| ClinVar  | MD5 checksum  | `variant_summary.txt.gz.md5`     |
+| Taxonomy | MD5 checksum  | `taxdump.tar.gz.md5`             |
+| PubChem  | MD5 checksum  | `CID-SMILES.gz.md5` (and others) |
+| Gene     | Last-Modified | _(no .md5 available)_            |
+| MeSH     | Last-Modified | _(no .md5 available)_            |
+| PMC IDs  | Last-Modified | _(no .md5 available)_            |
+
+### createCheckers (via `@ncbijs/etl`)
+
+`createCheckers()` reads the dataset registry and auto-selects the right checker per dataset — no URLs needed:
+
+```typescript
+import { createCheckers } from '@ncbijs/etl';
+
+const allCheckers = createCheckers(); // all 6 datasets
+const subset = createCheckers(['clinvar', 'genes']); // just these two
 ```
 
 ### SyncScheduler
@@ -383,28 +416,17 @@ const meshChecker = new HttpTimestampChecker(
 The scheduler runs update checks on a configurable interval and calls `onUpdate` when a dataset has new data:
 
 ```typescript
-import { SyncScheduler, InMemorySyncState, HttpTimestampChecker } from '@ncbijs/sync';
-import { pipeline, createFileSource } from '@ncbijs/pipeline';
-import { parseMeshDescriptorXml } from '@ncbijs/mesh';
+import { createCheckers, load } from '@ncbijs/etl';
+import { SyncScheduler, InMemorySyncState } from '@ncbijs/sync';
 import { DuckDbFileStorage } from '@ncbijs/store';
 
 const storage = await DuckDbFileStorage.open('ncbijs.duckdb');
-const syncState = new InMemorySyncState();
 
-const checkers = [
-  new HttpTimestampChecker('mesh', 'https://nlmpubs.nlm.nih.gov/.../desc2025.xml'),
-  new HttpTimestampChecker('clinvar', 'https://ftp.ncbi.nlm.nih.gov/.../variant_summary.txt.gz'),
-];
-
-const scheduler = new SyncScheduler(syncState, checkers, {
-  checkIntervalMs: 24 * 60 * 60 * 1000,
-  datasets: ['mesh', 'clinvar'],
+const scheduler = new SyncScheduler(new InMemorySyncState(), createCheckers(), {
+  checkIntervalMs: 3600_000,
+  datasets: ['mesh', 'clinvar', 'genes', 'taxonomy', 'compounds', 'id-mappings'],
   onUpdate: async (dataset) => {
-    await pipeline(
-      createFileSource(`data/raw/${dataset}.xml`),
-      parsers[dataset],
-      storage.createSink(dataset),
-    );
+    await load(dataset, storage.createSink(dataset));
   },
   onError: (dataset, error) => {
     console.error(`Sync failed for ${dataset}: ${error.message}`);
@@ -413,6 +435,8 @@ const scheduler = new SyncScheduler(syncState, checkers, {
 
 await scheduler.start();
 ```
+
+See [`examples/data-pipeline/sync-watch.ts`](../examples/data-pipeline/sync-watch.ts) for a complete script with CLI flags and graceful shutdown.
 
 ### Sync state
 

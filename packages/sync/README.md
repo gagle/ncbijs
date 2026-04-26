@@ -6,6 +6,25 @@ Watch NCBI data sources for updates and trigger pipeline re-runs.
 
 ## Quick Start
 
+With `@ncbijs/etl` (recommended — URLs and strategy are handled automatically):
+
+```typescript
+import { createCheckers, load } from '@ncbijs/etl';
+import { SyncScheduler, InMemorySyncState } from '@ncbijs/sync';
+
+const scheduler = new SyncScheduler(new InMemorySyncState(), createCheckers(['clinvar', 'genes']), {
+  checkIntervalMs: 3600_000,
+  datasets: ['clinvar', 'genes'],
+  onUpdate: async (dataset) => {
+    await load(dataset, mySink);
+  },
+});
+
+await scheduler.start();
+```
+
+Or construct checkers manually when you need full control:
+
 ```typescript
 import {
   SyncScheduler,
@@ -14,24 +33,23 @@ import {
   InMemorySyncState,
 } from '@ncbijs/sync';
 
-const checkers = [
-  new HttpTimestampChecker('genes', 'https://ftp.ncbi.nlm.nih.gov/gene/DATA/gene_info.gz'),
-  new Md5ChecksumChecker(
-    'clinvar',
-    'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz.md5',
-  ),
-];
-
-const scheduler = new SyncScheduler(new InMemorySyncState(), checkers, {
-  checkIntervalMs: 3600_000,
-  datasets: ['genes', 'clinvar'],
-  onUpdate: async (dataset) => {
-    console.log(`${dataset} has new data — reload it`);
+const scheduler = new SyncScheduler(
+  new InMemorySyncState(),
+  [
+    new Md5ChecksumChecker(
+      'clinvar',
+      'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/variant_summary.txt.gz.md5',
+    ),
+    new HttpTimestampChecker('genes', 'https://ftp.ncbi.nlm.nih.gov/gene/DATA/gene_info.gz'),
+  ],
+  {
+    checkIntervalMs: 3600_000,
+    datasets: ['clinvar', 'genes'],
+    onUpdate: async (dataset) => {
+      console.log(`${dataset} has new data — reload it`);
+    },
   },
-  onError: (dataset, error) => {
-    console.error(`${dataset} check failed: ${error.message}`);
-  },
-});
+);
 
 await scheduler.start();
 ```

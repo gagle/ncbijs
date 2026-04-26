@@ -454,6 +454,9 @@ importers:
       '@ncbijs/pubchem':
         specifier: workspace:*
         version: link:../pubchem
+      '@ncbijs/sync':
+        specifier: workspace:*
+        version: link:../sync
 
   packages/eutils:
     dependencies:

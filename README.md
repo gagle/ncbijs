@@ -138,7 +138,7 @@ import { parseMeshDescriptorXml } from '@ncbijs/mesh';
 
 // Download from NCBI HTTP → parse → write to any destination
 await pipeline(
-  createHttpSource('https://nlmpubs.nlm.nih.gov/projects/mesh/MESH_FILES/xmlmesh/desc2025.xml'),
+  createHttpSource('https://nlmpubs.nlm.nih.gov/projects/mesh/MESH_FILES/xmlmesh/desc2026.xml'),
   (xml) => parseMeshDescriptorXml(xml).descriptors,
   createSink(async (records) => {
     console.log(`Received ${records.length} MeSH descriptors`);
@@ -173,7 +173,28 @@ Four packages work together:
 - **`@ncbijs/pipeline`** — Composable Source/Sink primitives built on `AsyncIterable`. HTTP and composite sources; custom sinks. Streaming support, backpressure, abort signals, error strategies, and progress reporting. Works in browsers and Node.js.
 - **`@ncbijs/etl`** — Pre-wired loaders for 6 NCBI bulk datasets. Encapsulates URLs, parsers, and source constructors so `load('mesh', mySink)` is all the user needs. Accepts any `Sink<object>`.
 - **`@ncbijs/store`** — `ReadableStorage` / `WritableStorage` interfaces with a `DuckDbFileStorage` reference implementation. `DuckDbSink` plugs directly into the pipeline as one of many possible sinks. Node.js only (requires `@duckdb/node-api`).
-- **`@ncbijs/sync`** — Watches NCBI FTP sources for updates via HTTP `Last-Modified` timestamps and triggers re-sync on a configurable interval.
+- **`@ncbijs/sync`** — Watches NCBI FTP sources for updates via MD5 checksums or HTTP `Last-Modified` headers. Pluggable checkers, configurable polling interval, and abort signal support.
+
+### Keep data fresh with `@ncbijs/sync`
+
+Once data is loaded, `@ncbijs/sync` watches for upstream changes and re-syncs automatically. `createCheckers()` picks the best strategy per dataset: **MD5 checksums** for ClinVar, Taxonomy, and PubChem (content-based, ~50 bytes); **HTTP `Last-Modified`** for all others (universal fallback).
+
+```typescript
+import { createCheckers, load } from '@ncbijs/etl';
+import { SyncScheduler, InMemorySyncState } from '@ncbijs/sync';
+
+const scheduler = new SyncScheduler(new InMemorySyncState(), createCheckers(['clinvar', 'genes']), {
+  checkIntervalMs: 3600_000,
+  datasets: ['clinvar', 'genes'],
+  onUpdate: async (dataset) => {
+    await load(dataset, mySink);
+  },
+});
+
+await scheduler.start(); // checks immediately, then every hour
+```
+
+See [`examples/data-pipeline/sync-watch.ts`](./examples/data-pipeline/sync-watch.ts) for a complete script that watches all 6 datasets and auto-reloads into DuckDB.
 
 See **[Data Pipeline Guide](./docs/pipeline.md)** for the full API walkthrough, streaming parsers, error handling, and sync scheduling.
 

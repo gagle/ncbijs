@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@ncbijs/pipeline": "workspace:*",
+    "@ncbijs/sync": "workspace:*",
     "@ncbijs/mesh": "workspace:*",
     "@ncbijs/clinvar": "workspace:*",
     "@ncbijs/datasets": "workspace:*",
