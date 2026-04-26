@@ -42,6 +42,18 @@ packages/{name}/src/
 
 **When to use split layout**: Use the split layout when a package has both HTTP client methods AND bulk file parsers. Currently 13 packages use this layout: `mesh`, `snp`, `pubchem`, `clinvar`, `cite`, `id-converter`, `datasets`, `icite`, `clinical-trials`, `litvar`, `medgen`, `cdd`, `pmc`.
 
+## API-First Type Design
+
+**Every interface must be derived from a real API response, not from documentation alone.** NCBI docs are often out of date or imprecise about runtime types (e.g., an "integer" field that arrives as `"418"` string). Before writing or modifying any interface:
+
+1. Fetch a real response from the live endpoint with representative data.
+2. Inspect every field's actual type (`typeof`, array shape, nesting).
+3. Type the **raw response interface** to match the wire format exactly (strings that look like numbers stay as strings).
+4. Convert to domain types (e.g., `Number()`) in the mapping function, not in the raw interface.
+5. Use the real response as the basis for test fixtures.
+
+This applies to new packages AND modifications to existing packages. If you're adding a field, verify it against the live API first.
+
 ## HTTP Layer (`http/`)
 
 The HTTP layer contains everything related to live API communication:

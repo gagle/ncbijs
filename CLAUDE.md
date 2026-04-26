@@ -158,16 +158,17 @@ Common to both layouts: `package.json`, `project.json`, `tsconfig.json`, `tsconf
 See **[docs/adding-a-package.md](./docs/adding-a-package.md)** for the full checklist. Summary:
 
 1. Create `packages/{name}/` with `src/`, `package.json`, `project.json`, tsconfigs, vitest, eslint
-2. Write source, interfaces, and tests (100% coverage)
-3. Add JSDoc on all exported functions, classes, and interfaces
-4. Add E2E tests in `e2e/`
-5. Create `README.md` for the package
-6. Update root `README.md` (workflow table, packages table, decision tree, architecture)
-7. Create example in `examples/` and update `examples/README.md`
-8. Update `docs/README.md` with the new package
-9. Register MCP tools if applicable (tool file, register, descriptions, README)
-10. Update global configs: `tsconfig.base.json`, `release-please-config.json`, `commitlint.config.ts`
-11. Run `pnpm install && pnpm lint && pnpm build && pnpm typecheck && pnpm test`
+2. **Verify against the live API** -- fetch real responses from every endpoint, document actual runtime types, write interfaces from observed data (not docs alone)
+3. Write source, interfaces, and tests (100% coverage) with test fixtures matching real API responses
+4. Add JSDoc on all exported functions, classes, and interfaces
+5. Add E2E tests in `e2e/`
+6. Create `README.md` for the package
+7. Update root `README.md` (workflow table, packages table, decision tree, architecture)
+8. Create example in `examples/` and update `examples/README.md`
+9. Update `docs/README.md` with the new package
+10. Register MCP tools if applicable (tool file, register, descriptions, README)
+11. Update global configs: `tsconfig.base.json`, `release-please-config.json`, `commitlint.config.ts`
+12. Run `pnpm install && pnpm lint && pnpm build && pnpm typecheck && pnpm test`
 
 ## Verification
 

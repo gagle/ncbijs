@@ -13,7 +13,20 @@ Create `packages/{name}/` with:
 - `vitest.config.ts` -- globals, v8 coverage, package-scoped include/exclude
 - `eslint.config.mjs` -- `createPackageConfig()` from shared base
 
-## 2. Source files
+## 2. Verify against the live API
+
+**Before writing any interface or mapping code**, hit every NCBI endpoint you plan to wrap and inspect the actual JSON/XML response. This is the single most important step — skipping it causes type mismatches that are painful to find later.
+
+1. **Fetch a real response** for each endpoint (`curl`, browser, or E2E test). Use representative IDs that exercise all optional fields.
+2. **Document every field's actual runtime type** (string, number, array of strings, nested object, etc.). Do not trust NCBI documentation alone — the API is the source of truth. Common traps:
+   - Fields documented as "integer" that arrive as `"418"` (string).
+   - Fields documented but not present in real responses.
+   - Fields not documented but present in real responses.
+   - Nested structures that differ from flat descriptions.
+3. **Write interfaces that match the live response exactly.** If `pssmlength` comes back as a string, type the raw interface as `string`, then convert to `number` in the mapping function.
+4. **Use the live response as your test fixture** — paste it into `buildEntry()` helpers so unit tests reflect reality, not assumptions.
+
+## 3. Source files
 
 Use the **flat layout** (default) or the **split layout** depending on whether the package has bulk file parsers. See [Package Architecture](./package-architecture.md) for full details.
 
@@ -33,18 +46,18 @@ Use the **flat layout** (default) or the **split layout** depending on whether t
 
 All exported functions, classes, and interfaces must have JSDoc comments. One-line description minimum, with `@param` and `@returns` on functions with non-obvious signatures.
 
-## 3. Tests
+## 4. Tests
 
 - `src/{name}.spec.ts` -- unit tests covering every exported function
 - Target: 100% coverage (statements, branches, functions, lines)
 - Mock `fetch` with `vi.stubGlobal('fetch', ...)`, clean up with `vi.unstubAllGlobals()`
 - Test error paths (empty input, HTTP errors, malformed responses)
 
-## 4. E2E tests
+## 5. E2E tests
 
 Add the package to the E2E test suite in `e2e/`. E2E tests hit real APIs and run in CI with `NCBI_API_KEY`. Cover the golden path for each public method.
 
-## 5. Documentation
+## 6. Documentation
 
 ### Package README
 
@@ -80,7 +93,7 @@ Create at least one example in `examples/`:
 
 Add the package to `docs/README.md` "Additional Packages" table.
 
-## 6. MCP server
+## 7. MCP server
 
 If the package exposes functionality useful to LLM agents:
 
@@ -91,7 +104,7 @@ If the package exposes functionality useful to LLM agents:
 - Update `packages/http-mcp/README.md` with the new tools
 - Update the MCP server `instructions` string in `packages/http-mcp/src/index.ts`
 
-## 7. Global configuration
+## 8. Global configuration
 
 Update these files:
 
@@ -102,7 +115,7 @@ Update these files:
 | `commitlint.config.ts`       | Scope name in `scope-enum` array                                   |
 | `CLAUDE.md`                  | Scope in formatting section, dependency graph, build order         |
 
-## 8. Verification
+## 9. Verification
 
 ```bash
 pnpm install

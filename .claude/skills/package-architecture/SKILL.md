@@ -50,13 +50,14 @@ Split packages: `mesh`, `snp`, `pubchem`, `clinvar`, `cite`, `id-converter`, `da
 
 ## Key Rules
 
-1. **Interfaces at `src/interfaces/`** -- shared between HTTP and bulk layers.
-2. **Barrel exports from `index.ts` only** -- no other barrel files. Import paths point into subdirectories.
-3. **No file extensions in imports** -- post-build script adds `.js`.
-4. **Specs co-located** -- `{name}.spec.ts` lives next to `{name}.ts`.
-5. **100% coverage** -- statements, branches, functions, lines.
-6. **JSDoc on all exports** -- one-line minimum. Bulk parsers add `@see` download URL.
-7. **E2E tests** in `e2e/{name}.spec.ts` using `ncbiApiKey` from `e2e/test-config.ts`.
+1. **API-first types** -- fetch a real response from every endpoint BEFORE writing interfaces. Type raw interfaces to match the wire format exactly. Convert to domain types in mapping functions.
+2. **Interfaces at `src/interfaces/`** -- shared between HTTP and bulk layers.
+3. **Barrel exports from `index.ts` only** -- no other barrel files. Import paths point into subdirectories.
+4. **No file extensions in imports** -- post-build script adds `.js`.
+5. **Specs co-located** -- `{name}.spec.ts` lives next to `{name}.ts`.
+6. **100% coverage** -- statements, branches, functions, lines.
+7. **JSDoc on all exports** -- one-line minimum. Bulk parsers add `@see` download URL.
+8. **E2E tests** in `e2e/{name}.spec.ts` using `ncbiApiKey` from `e2e/test-config.ts`.
 
 ## Checklist
 
