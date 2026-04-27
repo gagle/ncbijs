@@ -5,6 +5,7 @@ export interface QueryExample {
   readonly liveHandler: string;
   readonly localSql: string;
   readonly extractInput: (raw: string) => string;
+  readonly columnMap: Readonly<Record<string, string>>;
 }
 
 function extractNumber(raw: string): string {
@@ -17,22 +18,70 @@ function extractGeneSymbol(raw: string): string {
   return match?.[1] ?? raw;
 }
 
+const MESH_COLUMNS: Readonly<Record<string, string>> = {
+  id: 'id',
+  name: 'name',
+  tree_numbers: 'treeNumbers',
+  qualifiers: 'qualifiers',
+  pharmacological_actions: 'pharmacologicalActions',
+  supplementary_concepts: 'supplementaryConcepts',
+};
+
+const GENE_COLUMNS: Readonly<Record<string, string>> = {
+  gene_id: 'geneId',
+  symbol: 'symbol',
+  description: 'description',
+  tax_name: 'taxName',
+  chromosomes: 'chromosomes',
+  synonyms: 'synonyms',
+};
+
+const CLINVAR_COLUMNS: Readonly<Record<string, string>> = {
+  uid: 'uid',
+  title: 'title',
+  clinical_significance: 'clinicalSignificance',
+  genes: 'genes',
+  traits: 'traits',
+};
+
+const COMPOUND_COLUMNS: Readonly<Record<string, string>> = {
+  cid: 'cid',
+  iupac_name: 'iupacName',
+  canonical_smiles: 'canonicalSmiles',
+  inchi_key: 'inchiKey',
+};
+
+const TAXONOMY_COLUMNS: Readonly<Record<string, string>> = {
+  tax_id: 'taxId',
+  organism_name: 'organismName',
+  common_name: 'commonName',
+  rank: 'rank',
+};
+
+const ID_MAPPING_COLUMNS: Readonly<Record<string, string>> = {
+  pmid: 'pmid',
+  pmcid: 'pmcid',
+  doi: 'doi',
+};
+
 export const QUERY_CATALOG: ReadonlyArray<QueryExample> = [
   {
     label: 'Find MeSH terms about Asthma',
     placeholder: 'e.g. "Find MeSH terms about Hypertension"',
     defaultInput: 'Find MeSH terms about Asthma',
     liveHandler: 'mesh-lookup',
-    localSql: `SELECT id, name FROM mesh_descriptors WHERE name ILIKE '%{{input}}%' LIMIT 50`,
+    localSql: `SELECT id, name, tree_numbers, qualifiers, pharmacological_actions, supplementary_concepts FROM mesh_descriptors WHERE name ILIKE '%{{input}}%' LIMIT 50`,
     extractInput: (raw) => raw.replace(/^find mesh terms about\s*/i, '') || raw,
+    columnMap: MESH_COLUMNS,
   },
   {
     label: 'Find MeSH terms about Diabetes',
     placeholder: 'e.g. "Find MeSH terms about Epilepsy"',
     defaultInput: 'Find MeSH terms about Diabetes',
     liveHandler: 'mesh-lookup',
-    localSql: `SELECT id, name FROM mesh_descriptors WHERE name ILIKE '%{{input}}%' LIMIT 50`,
+    localSql: `SELECT id, name, tree_numbers, qualifiers, pharmacological_actions, supplementary_concepts FROM mesh_descriptors WHERE name ILIKE '%{{input}}%' LIMIT 50`,
     extractInput: (raw) => raw.replace(/^find mesh terms about\s*/i, '') || raw,
+    columnMap: MESH_COLUMNS,
   },
   {
     label: 'Look up gene TP53',
@@ -41,6 +90,7 @@ export const QUERY_CATALOG: ReadonlyArray<QueryExample> = [
     liveHandler: 'gene-search',
     localSql: `SELECT gene_id, symbol, description, tax_name, chromosomes, synonyms FROM genes WHERE symbol = '{{input}}' LIMIT 50`,
     extractInput: extractGeneSymbol,
+    columnMap: GENE_COLUMNS,
   },
   {
     label: 'Find gene by ID 672',
@@ -49,6 +99,7 @@ export const QUERY_CATALOG: ReadonlyArray<QueryExample> = [
     liveHandler: 'gene-by-id',
     localSql: `SELECT gene_id, symbol, description, tax_name, chromosomes, synonyms FROM genes WHERE gene_id = {{input}}`,
     extractInput: extractNumber,
+    columnMap: GENE_COLUMNS,
   },
   {
     label: 'ClinVar variants for BRCA1',
@@ -57,6 +108,7 @@ export const QUERY_CATALOG: ReadonlyArray<QueryExample> = [
     liveHandler: 'clinvar-search',
     localSql: `SELECT uid, title, clinical_significance, genes, traits FROM clinvar_variants WHERE title ILIKE '%{{input}}%' OR genes ILIKE '%{{input}}%' LIMIT 50`,
     extractInput: extractGeneSymbol,
+    columnMap: CLINVAR_COLUMNS,
   },
   {
     label: 'ClinVar variants for TP53',
@@ -65,6 +117,7 @@ export const QUERY_CATALOG: ReadonlyArray<QueryExample> = [
     liveHandler: 'clinvar-search',
     localSql: `SELECT uid, title, clinical_significance, genes, traits FROM clinvar_variants WHERE title ILIKE '%{{input}}%' OR genes ILIKE '%{{input}}%' LIMIT 50`,
     extractInput: extractGeneSymbol,
+    columnMap: CLINVAR_COLUMNS,
   },
   {
     label: 'Look up compound aspirin (CID 2244)',
@@ -73,6 +126,7 @@ export const QUERY_CATALOG: ReadonlyArray<QueryExample> = [
     liveHandler: 'compound-lookup',
     localSql: `SELECT cid, iupac_name, canonical_smiles, inchi_key FROM compounds WHERE cid = {{input}}`,
     extractInput: extractNumber,
+    columnMap: COMPOUND_COLUMNS,
   },
   {
     label: 'Look up compound caffeine (CID 2519)',
@@ -81,6 +135,7 @@ export const QUERY_CATALOG: ReadonlyArray<QueryExample> = [
     liveHandler: 'compound-lookup',
     localSql: `SELECT cid, iupac_name, canonical_smiles, inchi_key FROM compounds WHERE cid = {{input}}`,
     extractInput: extractNumber,
+    columnMap: COMPOUND_COLUMNS,
   },
   {
     label: 'Look up organism Homo sapiens',
@@ -89,6 +144,7 @@ export const QUERY_CATALOG: ReadonlyArray<QueryExample> = [
     liveHandler: 'taxonomy-lookup',
     localSql: `SELECT tax_id, organism_name, common_name, rank FROM taxonomy WHERE organism_name ILIKE '%{{input}}%' OR common_name ILIKE '%{{input}}%' LIMIT 50`,
     extractInput: (raw) => raw.replace(/^look up organism\s*/i, '') || raw,
+    columnMap: TAXONOMY_COLUMNS,
   },
   {
     label: 'Convert PMID 35296856 to other IDs',
@@ -97,6 +153,7 @@ export const QUERY_CATALOG: ReadonlyArray<QueryExample> = [
     liveHandler: 'id-convert',
     localSql: `SELECT pmid, pmcid, doi FROM id_mappings WHERE pmid = '{{input}}' OR pmcid = '{{input}}' LIMIT 50`,
     extractInput: extractNumber,
+    columnMap: ID_MAPPING_COLUMNS,
   },
 ];
 

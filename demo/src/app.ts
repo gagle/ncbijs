@@ -96,19 +96,21 @@ async function runQuery(): Promise<void> {
 
   searchBtn.disabled = true;
 
-  const searchTerm = extractSearchTerm(activeExample, input);
-  const built = buildQuery(activeExample, input);
+  const currentExample = activeExample;
+  const searchTerm = extractSearchTerm(currentExample, input);
+  const built = buildQuery(currentExample, input);
 
   showPanelLoading(bodyLive, statsLive, metaLive);
   showPanelLoading(bodyLocal, statsLocal, metaLocal);
 
-  const livePromise = queryLive(activeExample.liveHandler, searchTerm)
+  const livePromise = queryLive(currentExample.liveHandler, searchTerm)
     .then((result) => {
+      const remapped = remapLiveRecords(result.records, currentExample.columnMap);
       showPanelResults(
         bodyLive,
         statsLive,
         metaLive,
-        result.records,
+        remapped,
         result.latencyMs,
         `via ${result.endpoint}`,
       );
@@ -134,6 +136,19 @@ async function runQuery(): Promise<void> {
 
   await Promise.all([livePromise, localPromise]);
   searchBtn.disabled = false;
+}
+
+function remapLiveRecords(
+  records: ReadonlyArray<Record<string, unknown>>,
+  columnMap: Readonly<Record<string, string>>,
+): ReadonlyArray<Record<string, unknown>> {
+  return records.map((record) => {
+    const remapped: Record<string, unknown> = {};
+    for (const [displayColumn, apiKey] of Object.entries(columnMap)) {
+      remapped[displayColumn] = record[apiKey] ?? '';
+    }
+    return remapped;
+  });
 }
 
 function escapeHtml(text: string): string {
