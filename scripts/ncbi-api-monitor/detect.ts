@@ -70,7 +70,7 @@ export interface LastCheckState {
 const FETCH_TIMEOUT_MS = 30_000;
 const NCBI_API_KEY = process.env['NCBI_API_KEY'] ?? '';
 const RATE_LIMIT_BATCH_SIZE = NCBI_API_KEY ? 9 : 2;
-const RATE_LIMIT_DELAY_MS = 1100;
+const RATE_LIMIT_DELAY_MS = process.env['VITEST'] ? 0 : 1100;
 
 interface EndpointConfig {
   readonly key: string;
