@@ -1,5 +1,7 @@
 import * as duckdb from '@duckdb/duckdb-wasm';
 
+const DB_FILE = 'ncbijs.duckdb';
+
 let db: duckdb.AsyncDuckDB | undefined;
 let connection: duckdb.AsyncDuckDBConnection | undefined;
 
@@ -21,6 +23,15 @@ async function getConnection(): Promise<duckdb.AsyncDuckDBConnection> {
   const logger = new duckdb.ConsoleLogger();
   db = new duckdb.AsyncDuckDB(logger, worker);
   await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+
+  const dbUrl = `${import.meta.env.BASE_URL}data/${DB_FILE}`;
+  const response = await fetch(dbUrl);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch database: ${String(response.status)}`);
+  }
+  const buffer = new Uint8Array(await response.arrayBuffer());
+  await db.registerFileBuffer(DB_FILE, buffer);
+  await db.open({ path: DB_FILE });
 
   connection = await db.connect();
   return connection;

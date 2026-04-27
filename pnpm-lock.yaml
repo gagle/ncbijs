@@ -92,6 +92,9 @@ importers:
       '@ncbijs/snp':
         specifier: workspace:*
         version: link:../packages/snp
+      '@ncbijs/store':
+        specifier: workspace:*
+        version: link:../packages/store
     devDependencies:
       typescript:
         specifier: ^6.0.2

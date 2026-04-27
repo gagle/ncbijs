@@ -15,6 +15,7 @@
     "@ncbijs/clinvar": "workspace:*",
     "@ncbijs/datasets": "workspace:*",
     "@ncbijs/etl": "workspace:*",
+    "@ncbijs/store": "workspace:*",
     "@ncbijs/id-converter": "workspace:*",
     "@ncbijs/mesh": "workspace:*",
     "@ncbijs/pubchem": "workspace:*",

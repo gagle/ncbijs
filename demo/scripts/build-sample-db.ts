@@ -1,43 +1,189 @@
-/**
- * Generates small sample Parquet files for the demo's Local Data mode.
- *
- * Usage: pnpm exec tsx demo/scripts/build-sample-db.ts
- *
- * This script uses @ncbijs/etl to download NCBI datasets, then exports
- * them as Parquet files into demo/public/data/ via DuckDB.
- *
- * Requirements:
- * - NCBI_API_KEY env var (recommended for higher rate limits)
- * - @ncbijs/store must be built (uses DuckDbFileStorage)
- * - Internet access to fetch from NCBI FTP
- *
- * Output files:
- * - demo/public/data/mesh.parquet         (~1 MB, all MeSH descriptors)
- * - demo/public/data/clinvar.parquet      (~2 MB, 10K pathogenic variants)
- * - demo/public/data/genes.parquet        (~3 MB, 20K human genes)
- * - demo/public/data/compounds.parquet    (~1 MB, 10K common compounds)
- * - demo/public/data/id-mappings.parquet  (~2 MB, 50K mappings)
- */
+import { MeSH } from '@ncbijs/mesh';
+import { Datasets } from '@ncbijs/datasets';
+import { ClinVar } from '@ncbijs/clinvar';
+import { convert } from '@ncbijs/id-converter';
+import { DuckDbFileStorage } from '@ncbijs/store';
+import { mkdirSync, rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const DATA_DIR = resolve(import.meta.dirname, '..', 'public', 'data');
+const DB_PATH = resolve(DATA_DIR, 'ncbijs.duckdb');
 
-console.log('Sample data build script placeholder.');
-console.log(`Output directory: ${DATA_DIR}`);
-console.log('');
-console.log('This script requires internet access to NCBI FTP servers and will');
-console.log('download several hundred MB of data to generate small Parquet samples.');
-console.log('');
-console.log('To generate the data, you will need:');
-console.log('  1. @ncbijs/store built (pnpm nx run @ncbijs/store:build)');
-console.log('  2. @ncbijs/etl built (pnpm nx run @ncbijs/etl:build)');
-console.log('  3. NCBI_API_KEY env var set for higher rate limits');
-console.log('');
-console.log('Run the full ETL pipeline for each dataset, then export to Parquet:');
-console.log('');
-console.log('  import { load } from "@ncbijs/etl";');
-console.log('  import { DuckDbFileStorage } from "@ncbijs/store";');
-console.log('');
-console.log('  const storage = await DuckDbFileStorage.open(":memory:");');
-console.log('  await load("mesh", storage.createSink("mesh"));');
-console.log('  // Then export via: COPY mesh TO "demo/public/data/mesh.parquet"');
+mkdirSync(DATA_DIR, { recursive: true });
+
+try {
+  rmSync(DB_PATH);
+} catch {
+  // noop
+}
+
+const EUTILS_CONFIG = { tool: 'ncbijs-demo', email: 'demo@ncbijs.dev' };
+
+const storage = await DuckDbFileStorage.open(DB_PATH);
+
+console.log('Fetching MeSH descriptors...');
+const mesh = new MeSH({ descriptors: [] });
+const meshTerms = [
+  'Asthma',
+  'Diabetes Mellitus',
+  'Breast Neoplasms',
+  'Alzheimer Disease',
+  'Hypertension',
+  'Obesity',
+  'Melanoma',
+  'Leukemia',
+  'HIV Infections',
+  'Parkinson Disease',
+  'Schizophrenia',
+  'Arthritis',
+  'Epilepsy',
+  'Tuberculosis',
+  'Malaria',
+  'Influenza',
+  'Pneumonia',
+  'Hepatitis',
+  'Anemia',
+  'Lymphoma',
+  'Migraine',
+  'Psoriasis',
+  'Autism',
+  'Depression',
+  'CRISPR',
+  'Genomics',
+  'Proteomics',
+  'Metabolomics',
+  'Immunotherapy',
+  'Gene Therapy',
+];
+const meshDescriptors: Array<Record<string, unknown>> = [];
+const seenMeshIds = new Set<string>();
+for (const term of meshTerms) {
+  try {
+    const results = await mesh.lookupOnline(term);
+    for (const descriptor of results) {
+      if (!seenMeshIds.has(descriptor.id)) {
+        seenMeshIds.add(descriptor.id);
+        meshDescriptors.push(descriptor as unknown as Record<string, unknown>);
+      }
+    }
+  } catch {
+    // noop
+  }
+}
+await storage.writeRecords('mesh', meshDescriptors);
+console.log(`  mesh: ${String(meshDescriptors.length)} descriptors`);
+
+console.log('Fetching gene reports...');
+const datasets = new Datasets();
+const geneSymbols = [
+  'BRCA1',
+  'BRCA2',
+  'TP53',
+  'EGFR',
+  'KRAS',
+  'BRAF',
+  'MYC',
+  'PIK3CA',
+  'PTEN',
+  'RB1',
+  'APC',
+  'VHL',
+  'ALK',
+  'RET',
+  'ERBB2',
+  'MET',
+  'NF1',
+  'CDH1',
+  'NOTCH1',
+  'HIF1A',
+  'ESR1',
+  'AR',
+  'CFTR',
+  'HBB',
+  'HTT',
+  'FMR1',
+  'DMD',
+  'APOE',
+  'ACE2',
+  'IL6',
+];
+try {
+  const genes = await datasets.geneBySymbol(geneSymbols, 'human');
+  await storage.writeRecords('genes', genes as unknown as ReadonlyArray<Record<string, unknown>>);
+  console.log(`  genes: ${String(genes.length)} records`);
+} catch (error: unknown) {
+  console.error('  genes: failed -', error instanceof Error ? error.message : error);
+}
+
+console.log('Fetching ClinVar variants...');
+const clinvar = new ClinVar(EUTILS_CONFIG);
+const clinvarSearchTerms = [
+  'BRCA1[gene]',
+  'BRCA2[gene]',
+  'TP53[gene]',
+  'KRAS[gene]',
+  'CFTR[gene]',
+  'PTEN[gene]',
+];
+const allVariants: Array<Record<string, unknown>> = [];
+const seenVariantUids = new Set<string>();
+for (const term of clinvarSearchTerms) {
+  try {
+    const variants = await clinvar.searchAndFetch(term, { retmax: 10 });
+    for (const variant of variants) {
+      if (!seenVariantUids.has(variant.uid)) {
+        seenVariantUids.add(variant.uid);
+        allVariants.push(variant as unknown as Record<string, unknown>);
+      }
+    }
+  } catch {
+    // noop
+  }
+}
+await storage.writeRecords('clinvar', allVariants);
+console.log(`  clinvar: ${String(allVariants.length)} variants`);
+
+console.log('Fetching ID mappings...');
+const pmids = [
+  '35296856',
+  '33533846',
+  '34726479',
+  '36624488',
+  '33567185',
+  '35589842',
+  '34234092',
+  '35478308',
+  '33442069',
+  '35891725',
+  '34504350',
+  '33826820',
+  '35662405',
+  '34175474',
+  '36027812',
+  '33603233',
+  '35480654',
+  '34404795',
+  '36098477',
+  '33649036',
+];
+try {
+  const mappings = await convert(pmids);
+  await storage.writeRecords(
+    'id-mappings',
+    mappings as unknown as ReadonlyArray<Record<string, unknown>>,
+  );
+  console.log(`  id-mappings: ${String(mappings.length)} records`);
+} catch (error: unknown) {
+  console.error('  id-mappings: failed -', error instanceof Error ? error.message : error);
+}
+
+const stats = await storage.getStats();
+console.log('\nDatabase summary:');
+for (const stat of stats) {
+  if (stat.recordCount > 0) {
+    console.log(`  ${stat.dataset}: ${String(stat.recordCount)} records`);
+  }
+}
+
+await storage.close();
+console.log(`\nWritten to ${DB_PATH}`);

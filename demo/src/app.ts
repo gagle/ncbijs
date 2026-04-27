@@ -1,10 +1,8 @@
-import { getExamplesForMode, buildQuery } from './query-catalog';
+import { QUERY_CATALOG, buildQuery } from './query-catalog';
 import type { QueryExample } from './query-catalog';
 import { queryLive } from './live-api';
 import { queryLocal } from './local-data';
 import { renderTable } from './render-table';
-
-type Mode = 'live' | 'local';
 
 function getElement<T extends HTMLElement>(id: string): T {
   const element = document.getElementById(id);
@@ -14,26 +12,28 @@ function getElement<T extends HTMLElement>(id: string): T {
   return element as T;
 }
 
-let currentMode: Mode = 'live';
 let activeExample: QueryExample | undefined;
 
-const modeTabs = document.querySelectorAll<HTMLButtonElement>('.mode-tab');
 const examplesContainer = getElement('examples');
 const searchInput = getElement<HTMLInputElement>('search-input');
 const searchBtn = getElement<HTMLButtonElement>('search-btn');
-const sqlPreview = getElement('sql-preview');
-const resultsHeader = getElement('results-header');
-const resultsBadge = getElement('results-badge');
-const resultsStats = getElement('results-stats');
-const resultsWrap = getElement('results-table-wrap');
+
+const statsLive = getElement('stats-live');
+const statsLocal = getElement('stats-local');
+const metaLive = getElement('meta-live');
+const metaLocal = getElement('meta-local');
+const bodyLive = getElement('body-live');
+const bodyLocal = getElement('body-local');
 
 function renderExamples(): void {
   examplesContainer.innerHTML = '';
-  const examples = getExamplesForMode(currentMode);
 
-  for (const example of examples) {
+  for (const example of QUERY_CATALOG) {
     const chip = document.createElement('button');
     chip.className = 'example-chip';
+    if (example.liveHandler !== undefined && example.localSql === undefined) {
+      chip.classList.add('example-chip--live-only');
+    }
     chip.textContent = example.label;
     chip.addEventListener('click', () => selectExample(example, chip));
     examplesContainer.appendChild(chip);
@@ -49,123 +49,120 @@ function selectExample(example: QueryExample, chip: HTMLButtonElement): void {
   activeExample = example;
   searchInput.placeholder = example.placeholder;
   searchInput.value = example.defaultInput;
-  updateSqlPreview();
 }
 
-function updateSqlPreview(): void {
-  if (currentMode === 'local' && activeExample !== undefined) {
-    const built = buildQuery(activeExample, searchInput.value);
-    if (built !== undefined) {
-      sqlPreview.textContent = built.sql;
-      sqlPreview.hidden = false;
-      return;
-    }
-  }
-  sqlPreview.hidden = true;
+function showPanelLoading(body: HTMLElement, stats: HTMLElement, meta: HTMLElement): void {
+  stats.textContent = '';
+  meta.textContent = '';
+  meta.classList.remove('panel-meta--visible');
+  body.innerHTML = '<p class="panel-placeholder"><span class="spinner"></span>Querying...</p>';
 }
 
-function showLoading(): void {
-  resultsHeader.hidden = true;
-  resultsWrap.innerHTML =
-    '<p class="results-placeholder"><span class="spinner"></span>Querying...</p>';
-}
-
-function showError(error: unknown): void {
-  console.error('Query error:', error);
-  resultsHeader.hidden = true;
-  const message = error instanceof Error ? error.message : 'An unexpected error occurred';
-  resultsWrap.innerHTML = `<div class="results-error">${escapeHtml(message)}</div>`;
-}
-
-function showResults(
+function showPanelResults(
+  body: HTMLElement,
+  stats: HTMLElement,
+  meta: HTMLElement,
   records: ReadonlyArray<Record<string, unknown>>,
-  mode: Mode,
   latencyMs: number,
-  extra?: string,
+  metaText?: string,
 ): void {
-  resultsHeader.hidden = false;
+  stats.textContent = `${String(records.length)} records \u00b7 ${String(Math.round(latencyMs))} ms`;
 
-  resultsBadge.className = `results-badge results-badge--${mode}`;
-  resultsBadge.textContent = mode === 'live' ? 'From NCBI API' : 'From Local DuckDB';
-
-  const parts = [`${records.length} records`, `${Math.round(latencyMs)} ms`];
-  if (extra !== undefined) {
-    parts.push(extra);
+  if (metaText !== undefined) {
+    meta.textContent = metaText;
+    meta.classList.add('panel-meta--visible');
+  } else {
+    meta.textContent = '';
+    meta.classList.remove('panel-meta--visible');
   }
-  resultsStats.textContent = parts.join(' \u00b7 ');
 
   if (records.length === 0) {
-    resultsWrap.innerHTML = '<p class="results-placeholder">No results found.</p>';
+    body.innerHTML = '<p class="panel-placeholder">No results found.</p>';
     return;
   }
 
-  resultsWrap.innerHTML = '';
-  resultsWrap.appendChild(renderTable(records));
+  body.innerHTML = '';
+  body.appendChild(renderTable(records));
+}
+
+function showPanelError(body: HTMLElement, stats: HTMLElement, error: unknown): void {
+  stats.textContent = '';
+  const message = error instanceof Error ? error.message : 'An unexpected error occurred';
+  body.innerHTML = `<div class="panel-error">${escapeHtml(message)}</div>`;
+}
+
+function showPanelNa(body: HTMLElement, stats: HTMLElement, text: string): void {
+  stats.textContent = '';
+  body.innerHTML = `<p class="panel-na">${escapeHtml(text)}</p>`;
 }
 
 async function runQuery(): Promise<void> {
   const input = searchInput.value.trim();
-  if (input === '') {
+  if (input === '' || activeExample === undefined) {
     return;
   }
 
   searchBtn.disabled = true;
-  showLoading();
 
-  try {
-    if (currentMode === 'live') {
-      if (activeExample?.liveHandler === undefined) {
-        throw new Error('Select a query type from the examples above');
-      }
-      const result = await queryLive(activeExample.liveHandler, input);
-      showResults(result.records, 'live', result.latencyMs, result.endpoint);
-    } else {
-      const built = activeExample !== undefined ? buildQuery(activeExample, input) : undefined;
-      if (built === undefined) {
-        throw new Error('This query type is not available in local mode');
-      }
-      const result = await queryLocal(built.sql, built.params);
-      showResults(result.records, 'local', result.latencyMs);
-    }
-  } catch (error) {
-    showError(error);
-  } finally {
-    searchBtn.disabled = false;
-  }
-}
+  const hasLive = activeExample.liveHandler !== undefined;
+  const built = buildQuery(activeExample, input);
+  const hasLocal = built !== undefined;
 
-function switchMode(mode: Mode): void {
-  currentMode = mode;
-  activeExample = undefined;
-
-  for (const tab of modeTabs) {
-    tab.classList.toggle('mode-tab--active', tab.dataset['mode'] === mode);
+  if (hasLive) {
+    showPanelLoading(bodyLive, statsLive, metaLive);
+  } else {
+    showPanelNa(bodyLive, statsLive, 'No live API handler for this query');
   }
 
-  searchInput.value = '';
-  searchInput.placeholder =
-    mode === 'live' ? 'Search PubMed for BRCA1...' : 'Enter a SQL query or select an example...';
-  sqlPreview.hidden = true;
-  resultsHeader.hidden = true;
-  resultsWrap.innerHTML =
-    '<p class="results-placeholder">Select an example or type a query to get started.</p>';
+  if (hasLocal) {
+    showPanelLoading(bodyLocal, statsLocal, metaLocal);
+  } else {
+    showPanelNa(bodyLocal, statsLocal, 'Not available in local data');
+  }
 
-  renderExamples();
+  const livePromise = hasLive
+    ? queryLive(activeExample.liveHandler!, input)
+        .then((result) => {
+          showPanelResults(
+            bodyLive,
+            statsLive,
+            metaLive,
+            result.records,
+            result.latencyMs,
+            `via ${result.endpoint}`,
+          );
+        })
+        .catch((error: unknown) => {
+          showPanelError(bodyLive, statsLive, error);
+        })
+    : Promise.resolve();
+
+  const localPromise =
+    hasLocal && built !== undefined
+      ? queryLocal(built.sql, built.params)
+          .then((result) => {
+            showPanelResults(
+              bodyLocal,
+              statsLocal,
+              metaLocal,
+              result.records,
+              result.latencyMs,
+              built.sql,
+            );
+          })
+          .catch((error: unknown) => {
+            showPanelError(bodyLocal, statsLocal, error);
+          })
+      : Promise.resolve();
+
+  await Promise.all([livePromise, localPromise]);
+  searchBtn.disabled = false;
 }
 
 function escapeHtml(text: string): string {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
-}
-
-for (const tab of modeTabs) {
-  tab.addEventListener('click', () => {
-    const mode = tab.dataset['mode'] as Mode;
-    if (mode !== currentMode) {
-      switchMode(mode);
-    }
-  });
 }
 
 searchBtn.addEventListener('click', () => {
@@ -176,10 +173,6 @@ searchInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
     void runQuery();
   }
-});
-
-searchInput.addEventListener('input', () => {
-  updateSqlPreview();
 });
 
 renderExamples();

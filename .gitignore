@@ -9,3 +9,4 @@ package-lock.json
 data/raw/
 *.duckdb
 *.duckdb.wal
+!demo/public/data/ncbijs.duckdb
