@@ -48,8 +48,8 @@ importers:
         specifier: ^3.8.3
         version: 3.8.3
       tsc-esm-imports:
-        specifier: 0.1.0
-        version: 0.1.0
+        specifier: 0.1.1
+        version: 0.1.1
       tsx:
         specifier: ^4.21.0
         version: 4.21.0
@@ -3810,8 +3810,8 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
-  tsc-esm-imports@0.1.0:
-    resolution: {integrity: sha512-LeRIqAV5muNC6GwP2bfhNkevuR4/mIOeWapgJI8UaVRm1dU15Qh2C4DeEDFrt6Zcz3Z8+rVI7ys1p04M8F7Vzg==}
+  tsc-esm-imports@0.1.1:
+    resolution: {integrity: sha512-QidHiE69hP/VrkwCQG2XAegK/vFjhQpSfVbadRGlwzzwsBGjiYEYehaWJmiCTjv6mP0TAOn7AG5vqDKReLl+bw==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -7291,7 +7291,7 @@ snapshots:
     dependencies:
       typescript: 6.0.3
 
-  tsc-esm-imports@0.1.0: {}
+  tsc-esm-imports@0.1.1: {}
 
   tsconfig-paths@4.2.0:
     dependencies:
