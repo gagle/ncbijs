@@ -12,6 +12,7 @@
     "@ncbijs/clinical-tables": "workspace:*",
     "@ncbijs/clinical-trials": "workspace:*",
     "@ncbijs/clinvar": "workspace:*",
+    "@ncbijs/dailymed": "workspace:*",
     "@ncbijs/datasets": "workspace:*",
     "@ncbijs/dbvar": "workspace:*",
     "@ncbijs/eutils": "workspace:*",

@@ -126,6 +126,9 @@ importers:
       '@ncbijs/clinvar':
         specifier: workspace:*
         version: link:../packages/clinvar
+      '@ncbijs/dailymed':
+        specifier: workspace:*
+        version: link:../packages/dailymed
       '@ncbijs/datasets':
         specifier: workspace:*
         version: link:../packages/datasets
