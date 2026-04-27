@@ -32,7 +32,7 @@ jobs:
           pnpm tsx scripts/ncbi-api-monitor/detect.ts > /tmp/report.json
           cat /tmp/report.json
 
-          ACTIONABLE=$(jq '.changes | length' /tmp/report.json)
+          ACTIONABLE=$(jq '[.changes[] | select(.severity == "high" or .severity == "medium")] | length' /tmp/report.json)
           echo "actionable=$ACTIONABLE" >> "$GITHUB_OUTPUT"
 
       - name: Ensure issue label exists
@@ -57,8 +57,8 @@ jobs:
         run: |
           TITLE=$(jq -r '
             "NCBI API changes detected (\(.date | split("T")[0])): " +
-            (.changes | length | tostring) +
-            " changes [TEST]"
+            ([.changes[] | select(.severity == "high" or .severity == "medium")] | length | tostring) +
+            " actionable"
           ' /tmp/report.json)
 
           BODY=$(jq -r '
@@ -79,17 +79,6 @@ jobs:
             (if ([.changes[] | select(.severity == "medium")] | length) > 0 then
               "### :orange_circle: MEDIUM (investigate)\n\n" +
               ([.changes[] | select(.severity == "medium") |
-                if (.affectedPackages | length) > 0 then
-                  "- **\(.affectedPackages | join(", "))**: \(.description)"
-                else
-                  "- \(.description)"
-                end
-              ] | join("\n")) + "\n\n"
-            else "" end) +
-
-            (if ([.changes[] | select(.severity == "low")] | length) > 0 then
-              "### :white_circle: LOW (informational)\n\n" +
-              ([.changes[] | select(.severity == "low") |
                 if (.affectedPackages | length) > 0 then
                   "- **\(.affectedPackages | join(", "))**: \(.description)"
                 else
