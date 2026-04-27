@@ -74,9 +74,6 @@ importers:
       '@ncbijs/datasets':
         specifier: workspace:*
         version: link:../packages/datasets
-      '@ncbijs/etl':
-        specifier: workspace:*
-        version: link:../packages/etl
       '@ncbijs/id-converter':
         specifier: workspace:*
         version: link:../packages/id-converter
@@ -86,12 +83,6 @@ importers:
       '@ncbijs/pubchem':
         specifier: workspace:*
         version: link:../packages/pubchem
-      '@ncbijs/pubmed':
-        specifier: workspace:*
-        version: link:../packages/pubmed
-      '@ncbijs/snp':
-        specifier: workspace:*
-        version: link:../packages/snp
       '@ncbijs/store':
         specifier: workspace:*
         version: link:../packages/store

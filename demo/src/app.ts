@@ -31,9 +31,6 @@ function renderExamples(): void {
   for (const example of QUERY_CATALOG) {
     const chip = document.createElement('button');
     chip.className = 'example-chip';
-    if (example.liveHandler !== undefined && example.localSql === undefined) {
-      chip.classList.add('example-chip--live-only');
-    }
     chip.textContent = example.label;
     chip.addEventListener('click', () => selectExample(example, chip));
     examplesContainer.appendChild(chip);
@@ -91,11 +88,6 @@ function showPanelError(body: HTMLElement, stats: HTMLElement, error: unknown): 
   body.innerHTML = `<div class="panel-error">${escapeHtml(message)}</div>`;
 }
 
-function showPanelNa(body: HTMLElement, stats: HTMLElement, text: string): void {
-  stats.textContent = '';
-  body.innerHTML = `<p class="panel-na">${escapeHtml(text)}</p>`;
-}
-
 async function runQuery(): Promise<void> {
   const input = searchInput.value.trim();
   if (input === '' || activeExample === undefined) {
@@ -104,56 +96,40 @@ async function runQuery(): Promise<void> {
 
   searchBtn.disabled = true;
 
-  const hasLive = activeExample.liveHandler !== undefined;
   const built = buildQuery(activeExample, input);
-  const hasLocal = built !== undefined;
 
-  if (hasLive) {
-    showPanelLoading(bodyLive, statsLive, metaLive);
-  } else {
-    showPanelNa(bodyLive, statsLive, 'No live API handler for this query');
-  }
+  showPanelLoading(bodyLive, statsLive, metaLive);
+  showPanelLoading(bodyLocal, statsLocal, metaLocal);
 
-  if (hasLocal) {
-    showPanelLoading(bodyLocal, statsLocal, metaLocal);
-  } else {
-    showPanelNa(bodyLocal, statsLocal, 'Not available in local data');
-  }
+  const livePromise = queryLive(activeExample.liveHandler, input)
+    .then((result) => {
+      showPanelResults(
+        bodyLive,
+        statsLive,
+        metaLive,
+        result.records,
+        result.latencyMs,
+        `via ${result.endpoint}`,
+      );
+    })
+    .catch((error: unknown) => {
+      showPanelError(bodyLive, statsLive, error);
+    });
 
-  const livePromise = hasLive
-    ? queryLive(activeExample.liveHandler!, input)
-        .then((result) => {
-          showPanelResults(
-            bodyLive,
-            statsLive,
-            metaLive,
-            result.records,
-            result.latencyMs,
-            `via ${result.endpoint}`,
-          );
-        })
-        .catch((error: unknown) => {
-          showPanelError(bodyLive, statsLive, error);
-        })
-    : Promise.resolve();
-
-  const localPromise =
-    hasLocal && built !== undefined
-      ? queryLocal(built.sql, built.params)
-          .then((result) => {
-            showPanelResults(
-              bodyLocal,
-              statsLocal,
-              metaLocal,
-              result.records,
-              result.latencyMs,
-              built.sql,
-            );
-          })
-          .catch((error: unknown) => {
-            showPanelError(bodyLocal, statsLocal, error);
-          })
-      : Promise.resolve();
+  const localPromise = queryLocal(built.sql, built.params)
+    .then((result) => {
+      showPanelResults(
+        bodyLocal,
+        statsLocal,
+        metaLocal,
+        result.records,
+        result.latencyMs,
+        built.sql,
+      );
+    })
+    .catch((error: unknown) => {
+      showPanelError(bodyLocal, statsLocal, error);
+    });
 
   await Promise.all([livePromise, localPromise]);
   searchBtn.disabled = false;

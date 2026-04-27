@@ -120,10 +120,6 @@ code {
   border-color: var(--accent);
 }
 
-.example-chip--live-only {
-  border-style: dashed;
-}
-
 /* Search bar */
 .search-bar {
   display: flex;
@@ -261,14 +257,6 @@ code {
   margin: 0.5rem;
   font-size: 0.8rem;
   white-space: pre-wrap;
-}
-
-.panel-na {
-  color: var(--text-muted);
-  text-align: center;
-  padding: 3rem 1rem;
-  font-size: 0.85rem;
-  font-style: italic;
 }
 
 /* Table */

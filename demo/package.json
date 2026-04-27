@@ -14,13 +14,10 @@
     "@duckdb/duckdb-wasm": "^1.29.0",
     "@ncbijs/clinvar": "workspace:*",
     "@ncbijs/datasets": "workspace:*",
-    "@ncbijs/etl": "workspace:*",
-    "@ncbijs/store": "workspace:*",
     "@ncbijs/id-converter": "workspace:*",
     "@ncbijs/mesh": "workspace:*",
     "@ncbijs/pubchem": "workspace:*",
-    "@ncbijs/pubmed": "workspace:*",
-    "@ncbijs/snp": "workspace:*"
+    "@ncbijs/store": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^6.0.2",

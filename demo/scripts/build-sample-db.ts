@@ -177,6 +177,38 @@ try {
   console.error('  id-mappings: failed -', error instanceof Error ? error.message : error);
 }
 
+console.log('Fetching PubChem compounds...');
+const { PubChem } = await import('@ncbijs/pubchem');
+const pubchem = new PubChem();
+const compoundNames = [
+  'aspirin',
+  'ibuprofen',
+  'acetaminophen',
+  'caffeine',
+  'metformin',
+  'atorvastatin',
+  'omeprazole',
+  'amoxicillin',
+  'lisinopril',
+  'amlodipine',
+  'losartan',
+  'simvastatin',
+  'levothyroxine',
+  'prednisone',
+  'gabapentin',
+];
+const allCompounds: Array<Record<string, unknown>> = [];
+for (const name of compoundNames) {
+  try {
+    const compound = await pubchem.compoundByName(name);
+    allCompounds.push(compound as unknown as Record<string, unknown>);
+  } catch {
+    // noop
+  }
+}
+await storage.writeRecords('compounds', allCompounds);
+console.log(`  compounds: ${String(allCompounds.length)} records`);
+
 const stats = await storage.getStats();
 console.log('\nDatabase summary:');
 for (const stat of stats) {

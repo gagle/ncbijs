@@ -1,18 +1,14 @@
-import { PubMed } from '@ncbijs/pubmed';
 import { MeSH } from '@ncbijs/mesh';
 import { Datasets } from '@ncbijs/datasets';
 import { ClinVar } from '@ncbijs/clinvar';
-import { Snp } from '@ncbijs/snp';
 import { PubChem } from '@ncbijs/pubchem';
 import { convert } from '@ncbijs/id-converter';
 
 const EUTILS_CONFIG = { tool: 'ncbijs-demo', email: 'demo@ncbijs.dev' };
 
-const pubmed = new PubMed(EUTILS_CONFIG);
 const mesh = new MeSH({ descriptors: [] });
 const datasets = new Datasets();
 const clinvar = new ClinVar(EUTILS_CONFIG);
-const snp = new Snp();
 const pubchem = new PubChem();
 
 export interface LiveResult {
@@ -25,15 +21,6 @@ export async function queryLive(handler: string, input: string): Promise<LiveRes
   const start = performance.now();
 
   switch (handler) {
-    case 'pubmed-search': {
-      const articles = await pubmed.search(input).limit(20).fetchAll();
-      return {
-        records: articles.map(flattenRecord),
-        latencyMs: performance.now() - start,
-        endpoint: 'E-utilities esearch + efetch',
-      };
-    }
-
     case 'mesh-lookup': {
       const descriptors = await mesh.lookupOnline(input);
       return {
@@ -61,18 +48,8 @@ export async function queryLive(handler: string, input: string): Promise<LiveRes
       };
     }
 
-    case 'snp-lookup': {
-      const rsId = Number(input.replace(/^rs/i, ''));
-      const report = await snp.refsnp(rsId);
-      return {
-        records: [flattenRecord(report)],
-        latencyMs: performance.now() - start,
-        endpoint: 'dbSNP API',
-      };
-    }
-
-    case 'compound-search': {
-      const compound = await pubchem.compoundByName(input);
+    case 'compound-lookup': {
+      const compound = await pubchem.compoundByCid(Number(input));
       return {
         records: [flattenRecord(compound)],
         latencyMs: performance.now() - start,

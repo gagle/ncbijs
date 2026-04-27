@@ -93,17 +93,17 @@
           <p>
             The <strong>Live API</strong> panel queries NCBI servers in real time using
             <code>@ncbijs/mesh</code>, <code>@ncbijs/datasets</code>, <code>@ncbijs/clinvar</code>,
-            and other packages.
+            <code>@ncbijs/pubchem</code>, and <code>@ncbijs/id-converter</code>.
           </p>
           <p>
             The <strong>Local DuckDB</strong> panel queries a pre-built database containing real
-            NCBI data: 188 MeSH descriptors, 20 genes, 59 ClinVar variants, and 11 ID mappings. The
-            database was built using <code>@ncbijs/store</code>'s <code>DuckDbFileStorage</code> and
-            is served as a static 4 MB file.
+            NCBI data: 188 MeSH descriptors, 20 genes, 60 ClinVar variants, 15 PubChem compounds,
+            and 11 ID mappings. The database was built using <code>@ncbijs/store</code>'s
+            <code>DuckDbFileStorage</code> and is served as a static 4 MB file.
           </p>
           <p>
-            Both panels run the same query simultaneously so you can compare the results. Queries
-            with only a Live API handler (PubMed, SNP, PubChem) run in the left panel only.
+            Both panels run the same query simultaneously so you can compare live API responses
+            with locally stored data side by side.
           </p>
         </div>
       </section>
