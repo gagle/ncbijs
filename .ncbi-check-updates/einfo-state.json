@@ -1,11 +1,11 @@
 {
   "pubmed": {
-    "lastupdate": "2026/04/26 22:58",
-    "dbbuild": "Build-2026.04.26.22.58"
+    "lastupdate": "2026/04/26 22:52",
+    "dbbuild": "Build-2026.04.26.22.52"
   },
   "pmc": {
-    "lastupdate": "2026/04/27 00:53",
-    "dbbuild": "Build-2026.04.27.00.53"
+    "lastupdate": "2026/04/27 00:37",
+    "dbbuild": "Build-2026.04.27.00.37"
   },
   "books": {
     "lastupdate": "2026/04/26 03:26",
@@ -22,5 +22,9 @@
   "dbvar": {
     "lastupdate": "2025/08/27 14:12",
     "dbbuild": "Build250827-1240.1"
+  },
+  "sra": {
+    "lastupdate": "2026/04/25 09:52",
+    "dbbuild": "Build260425-0733m.1"
   }
 }
