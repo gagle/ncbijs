@@ -177,6 +177,35 @@ try {
   console.error('  id-mappings: failed -', error instanceof Error ? error.message : error);
 }
 
+console.log('Fetching taxonomy reports...');
+const taxonomyTerms = [
+  'human',
+  'mouse',
+  'rat',
+  'zebrafish',
+  'fruit fly',
+  'roundworm',
+  'yeast',
+  'E. coli',
+  'chicken',
+  'dog',
+  'cat',
+  'pig',
+  'cow',
+  'horse',
+  'rabbit',
+];
+try {
+  const taxReports = await datasets.taxonomy(taxonomyTerms);
+  await storage.writeRecords(
+    'taxonomy',
+    taxReports as unknown as ReadonlyArray<Record<string, unknown>>,
+  );
+  console.log(`  taxonomy: ${String(taxReports.length)} records`);
+} catch (error: unknown) {
+  console.error('  taxonomy: failed -', error instanceof Error ? error.message : error);
+}
+
 console.log('Fetching PubChem compounds...');
 const { PubChem } = await import('@ncbijs/pubchem');
 const pubchem = new PubChem();

@@ -39,6 +39,24 @@ export async function queryLive(handler: string, input: string): Promise<LiveRes
       };
     }
 
+    case 'gene-by-id': {
+      const genesById = await datasets.geneById([Number(input)]);
+      return {
+        records: genesById.map(flattenRecord),
+        latencyMs: performance.now() - start,
+        endpoint: 'NCBI Datasets API v2',
+      };
+    }
+
+    case 'taxonomy-lookup': {
+      const taxReports = await datasets.taxonomy([input]);
+      return {
+        records: taxReports.map(flattenRecord),
+        latencyMs: performance.now() - start,
+        endpoint: 'NCBI Datasets API v2',
+      };
+    }
+
     case 'clinvar-search': {
       const variants = await clinvar.searchAndFetch(input, { retmax: 20 });
       return {
