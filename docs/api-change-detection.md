@@ -161,7 +161,7 @@ pnpm tsx scripts/ncbi-api-monitor/detect.ts
 
 ### Automated monitoring bot
 
-A GitHub Actions workflow (`.github/workflows/ncbi-api-monitor.yml`) runs the detection script on a weekly schedule (Monday 9am UTC). If HIGH or MEDIUM severity changes are detected, it opens a GitHub issue with the `ncbi-api-monitor` label. The workflow also commits updated baseline state files back to the repo so subsequent runs only report new changes.
+A GitHub Actions workflow (`.github/workflows/ncbi-api-monitor.yml`) runs the detection script on a weekly schedule (Monday 9am UTC). If any changes are detected (HIGH, MEDIUM, or LOW), it opens a GitHub issue with the `ncbi-api-monitor` label. Every change is reported to maintain strict sync with upstream APIs. The workflow also commits updated baseline state files back to the repo so subsequent runs only report new changes.
 
 The workflow can be triggered manually via `workflow_dispatch` for on-demand checks.
 

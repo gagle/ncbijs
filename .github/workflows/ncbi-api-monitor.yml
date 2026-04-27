@@ -32,17 +32,17 @@ jobs:
           pnpm tsx scripts/ncbi-api-monitor/detect.ts > /tmp/report.json
           cat /tmp/report.json
 
-          ACTIONABLE=$(jq '[.changes[] | select(.severity == "high" or .severity == "medium")] | length' /tmp/report.json)
-          echo "actionable=$ACTIONABLE" >> "$GITHUB_OUTPUT"
+          CHANGE_COUNT=$(jq '.changes | length' /tmp/report.json)
+          echo "change_count=$CHANGE_COUNT" >> "$GITHUB_OUTPUT"
 
       - name: Ensure issue label exists
-        if: steps.detect.outputs.actionable != '0'
+        if: steps.detect.outputs.change_count != '0'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh label create ncbi-api-monitor --description "Automated NCBI API change detection" --color "d93f0b" --force
 
       - name: Check for existing open issue
-        if: steps.detect.outputs.actionable != '0'
+        if: steps.detect.outputs.change_count != '0'
         id: existing
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -51,14 +51,12 @@ jobs:
           echo "open_issues=$COUNT" >> "$GITHUB_OUTPUT"
 
       - name: Open GitHub issue
-        if: steps.detect.outputs.actionable != '0' && steps.existing.outputs.open_issues == '0'
+        if: steps.detect.outputs.change_count != '0' && steps.existing.outputs.open_issues == '0'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TITLE=$(jq -r '
-            "NCBI API changes detected (\(.date | split("T")[0])): " +
-            ([.changes[] | select(.severity == "high" or .severity == "medium")] | length | tostring) +
-            " actionable"
+            "NCBI API changes detected (\(.date | split("T")[0])): \(.summary)"
           ' /tmp/report.json)
 
           BODY=$(jq -r '
@@ -79,6 +77,17 @@ jobs:
             (if ([.changes[] | select(.severity == "medium")] | length) > 0 then
               "### :orange_circle: MEDIUM (investigate)\n\n" +
               ([.changes[] | select(.severity == "medium") |
+                if (.affectedPackages | length) > 0 then
+                  "- **\(.affectedPackages | join(", "))**: \(.description)"
+                else
+                  "- \(.description)"
+                end
+              ] | join("\n")) + "\n\n"
+            else "" end) +
+
+            (if ([.changes[] | select(.severity == "low")] | length) > 0 then
+              "### :white_circle: LOW (informational)\n\n" +
+              ([.changes[] | select(.severity == "low") |
                 if (.affectedPackages | length) > 0 then
                   "- **\(.affectedPackages | join(", "))**: \(.description)"
                 else
