@@ -1,6 +1,32 @@
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
+
+// ─── Load .env ──────────────────────────────────────
+
+if (!process.env['VITEST']) {
+  try {
+    const envContent = readFileSync(resolve(process.cwd(), '.env'), 'utf-8');
+    for (const line of envContent.split('\n')) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) {
+        continue;
+      }
+      const separatorIndex = trimmed.indexOf('=');
+      if (separatorIndex === -1) {
+        continue;
+      }
+      const key = trimmed.slice(0, separatorIndex).trim();
+      const value = trimmed.slice(separatorIndex + 1).trim();
+      if (process.env[key] === undefined) {
+        process.env[key] = value;
+      }
+    }
+  } catch {
+    // .env file is optional — env vars can be set directly (e.g. CI secrets)
+  }
+}
 
 // ─── Types ───────────────────────────────────────────
 
@@ -43,6 +69,8 @@ export interface LastCheckState {
 
 const FETCH_TIMEOUT_MS = 30_000;
 const NCBI_API_KEY = process.env['NCBI_API_KEY'] ?? '';
+const RATE_LIMIT_BATCH_SIZE = NCBI_API_KEY ? 9 : 2;
+const RATE_LIMIT_DELAY_MS = 1100;
 
 interface EndpointConfig {
   readonly key: string;
@@ -305,6 +333,22 @@ async function readStateFile<T>(stateDir: string, filename: string): Promise<T |
 async function writeStateFile(stateDir: string, filename: string, data: unknown): Promise<void> {
   await mkdir(stateDir, { recursive: true });
   await writeFile(join(stateDir, filename), JSON.stringify(data, null, 2) + '\n', 'utf-8');
+}
+
+async function settleInBatches<TItem, TResult>(
+  items: ReadonlyArray<TItem>,
+  fetcher: (item: TItem) => Promise<TResult>,
+): Promise<Array<PromiseSettledResult<TResult>>> {
+  const allResults: Array<PromiseSettledResult<TResult>> = [];
+  for (let i = 0; i < items.length; i += RATE_LIMIT_BATCH_SIZE) {
+    if (i > 0) {
+      await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_DELAY_MS));
+    }
+    const batch = items.slice(i, i + RATE_LIMIT_BATCH_SIZE);
+    const results = await Promise.allSettled(batch.map(fetcher));
+    allResults.push(...results);
+  }
+  return allResults;
 }
 
 function extractSpecVersion(content: string): string {
@@ -721,33 +765,31 @@ export async function checkEinfoDatabases(currentState: Record<string, EinfoEntr
   const errors: Array<string> = [];
   const state: Record<string, EinfoEntry> = { ...currentState };
 
-  const results = await Promise.allSettled(
-    EINFO_DATABASES.map(async (database) => {
-      const baseUrl = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/einfo.fcgi?db=${database}&retmode=json`;
-      const response = await fetchWithTimeout(appendApiKey(baseUrl));
-      if (!response.ok) {
-        throw new Error(`HTTP ${String(response.status)} from ${baseUrl}`);
-      }
-      const text = await response.text();
-      const body: {
-        readonly einforesult?: {
-          readonly dbinfo?: ReadonlyArray<{
-            readonly lastupdate?: string;
-            readonly dbbuild?: string;
-          }>;
-        };
-      } = JSON.parse(text);
-      const dbinfo = body.einforesult?.dbinfo?.[0];
-      if (!dbinfo?.dbbuild) {
-        throw new Error(`Missing dbinfo for ${database}`);
-      }
-      return {
-        database,
-        lastupdate: dbinfo.lastupdate ?? '',
-        dbbuild: dbinfo.dbbuild,
+  const results = await settleInBatches(EINFO_DATABASES, async (database) => {
+    const baseUrl = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/einfo.fcgi?db=${database}&retmode=json`;
+    const response = await fetchWithTimeout(appendApiKey(baseUrl));
+    if (!response.ok) {
+      throw new Error(`HTTP ${String(response.status)} from ${baseUrl}`);
+    }
+    const text = await response.text();
+    const body: {
+      readonly einforesult?: {
+        readonly dbinfo?: ReadonlyArray<{
+          readonly lastupdate?: string;
+          readonly dbbuild?: string;
+        }>;
       };
-    }),
-  );
+    } = JSON.parse(text);
+    const dbinfo = body.einforesult?.dbinfo?.[0];
+    if (!dbinfo?.dbbuild) {
+      throw new Error(`Missing dbinfo for ${database}`);
+    }
+    return {
+      database,
+      lastupdate: dbinfo.lastupdate ?? '',
+      dbbuild: dbinfo.dbbuild,
+    };
+  });
 
   for (const result of results) {
     if (result.status === 'rejected') {
