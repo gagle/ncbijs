@@ -1,4 +1,4 @@
-import { QUERY_CATALOG, buildQuery } from './query-catalog';
+import { QUERY_CATALOG, buildQuery, extractSearchTerm } from './query-catalog';
 import type { QueryExample } from './query-catalog';
 import { queryLive } from './live-api';
 import { queryLocal } from './local-data';
@@ -96,12 +96,13 @@ async function runQuery(): Promise<void> {
 
   searchBtn.disabled = true;
 
+  const searchTerm = extractSearchTerm(activeExample, input);
   const built = buildQuery(activeExample, input);
 
   showPanelLoading(bodyLive, statsLive, metaLive);
   showPanelLoading(bodyLocal, statsLocal, metaLocal);
 
-  const livePromise = queryLive(activeExample.liveHandler, input)
+  const livePromise = queryLive(activeExample.liveHandler, searchTerm)
     .then((result) => {
       showPanelResults(
         bodyLive,
