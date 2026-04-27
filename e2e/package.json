@@ -39,6 +39,7 @@
     "@ncbijs/rxnorm": "workspace:*",
     "@ncbijs/snp": "workspace:*",
     "@ncbijs/sra": "workspace:*",
+    "@ncbijs/store": "workspace:*",
     "@ncbijs/structure": "workspace:*",
     "@ncbijs/xml": "workspace:*"
   }

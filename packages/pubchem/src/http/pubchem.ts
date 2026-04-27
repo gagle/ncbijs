@@ -11,6 +11,7 @@ import type {
   CompoundDescription,
   CompoundProperty,
   CompoundSynonyms,
+  DataStorage,
   GeneRecord,
   PatentRecord,
   ProteinRecord,
@@ -18,6 +19,7 @@ import type {
   SubstanceRecord,
   SubstanceSynonyms,
 } from '../interfaces/pubchem.interface';
+import { StorageModeError } from '../interfaces/pubchem.interface';
 
 const BASE_URL = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug';
 const PUG_VIEW_BASE_URL = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug_view';
@@ -44,27 +46,57 @@ const COMPOUND_PROPERTIES = [
 
 /** PubChem PUG REST and PUG View API client with automatic rate limiting. */
 export class PubChem {
-  private readonly _config: PubChemClientConfig;
+  private readonly _config: PubChemClientConfig | undefined;
+  private readonly _storage: DataStorage | undefined;
 
   constructor(config?: PubChemConfig) {
+    this._storage = undefined;
     this._config = {
       maxRetries: config?.maxRetries ?? 3,
       rateLimiter: new TokenBucket({ requestsPerSecond: REQUESTS_PER_SECOND }),
     };
   }
 
+  /**
+   * Create a PubChem instance backed by local storage instead of the PUG REST API.
+   *
+   * Only `compoundByCid()` is available in storage mode. All other methods
+   * throw a `StorageModeError`.
+   *
+   * @param storage - Any object implementing the `DataStorage` interface.
+   *   `ReadableStorage` from `@ncbijs/store` satisfies this interface.
+   */
+  public static fromStorage(storage: DataStorage): PubChem {
+    const instance = Object.create(PubChem.prototype) as PubChem;
+    Object.defineProperty(instance, '_storage', { value: storage, enumerable: true });
+    Object.defineProperty(instance, '_config', { value: undefined, enumerable: true });
+    return instance;
+  }
+
   /** Fetch compound properties by PubChem CID. */
   public async compoundByCid(cid: number): Promise<CompoundProperty> {
+    if (this._storage !== undefined) {
+      const record = await this._storage.getRecord<CompoundProperty>('compounds', String(cid));
+      if (record === undefined) {
+        throw new Error(`Compound with CID ${cid} not found in storage`);
+      }
+      return record;
+    }
+
     const url = `${BASE_URL}/compound/cid/${encodeURIComponent(cid)}/property/${COMPOUND_PROPERTIES}/JSON`;
-    const raw = await fetchJson<RawPropertyResponse>(url, this._config);
+    const raw = await fetchJson<RawPropertyResponse>(url, this._config!);
 
     return mapCompoundProperty(raw);
   }
 
   /** Fetch compound properties by chemical name. */
   public async compoundByName(name: string): Promise<CompoundProperty> {
+    if (this._storage !== undefined) {
+      throw new StorageModeError('compoundByName');
+    }
+
     const url = `${BASE_URL}/compound/name/${encodeURIComponent(name)}/property/${COMPOUND_PROPERTIES}/JSON`;
-    const raw = await fetchJson<RawPropertyResponse>(url, this._config);
+    const raw = await fetchJson<RawPropertyResponse>(url, this._config!);
 
     return mapCompoundProperty(raw);
   }
@@ -73,45 +105,55 @@ export class PubChem {
   public async compoundByCidBatch(
     cids: ReadonlyArray<number>,
   ): Promise<ReadonlyArray<CompoundProperty>> {
+    this._requireHttpMode('compoundByCidBatch');
+
     if (cids.length === 0) {
       return [];
     }
 
     const joined = cids.join(',');
     const url = `${BASE_URL}/compound/cid/${encodeURIComponent(joined)}/property/${COMPOUND_PROPERTIES}/JSON`;
-    const raw = await fetchJson<RawPropertyResponse>(url, this._config);
+    const raw = await fetchJson<RawPropertyResponse>(url, this._config!);
 
     return (raw.PropertyTable?.Properties ?? []).map(mapCompoundPropertyEntry);
   }
 
   /** Fetch compound properties by SMILES notation. */
   public async compoundBySmiles(smiles: string): Promise<CompoundProperty> {
+    this._requireHttpMode('compoundBySmiles');
+
     const url = `${BASE_URL}/compound/smiles/${encodeURIComponent(smiles)}/property/${COMPOUND_PROPERTIES}/JSON`;
-    const raw = await fetchJson<RawPropertyResponse>(url, this._config);
+    const raw = await fetchJson<RawPropertyResponse>(url, this._config!);
 
     return mapCompoundProperty(raw);
   }
 
   /** Fetch compound properties by InChIKey. */
   public async compoundByInchiKey(inchiKey: string): Promise<CompoundProperty> {
+    this._requireHttpMode('compoundByInchiKey');
+
     const url = `${BASE_URL}/compound/inchikey/${encodeURIComponent(inchiKey)}/property/${COMPOUND_PROPERTIES}/JSON`;
-    const raw = await fetchJson<RawPropertyResponse>(url, this._config);
+    const raw = await fetchJson<RawPropertyResponse>(url, this._config!);
 
     return mapCompoundProperty(raw);
   }
 
   /** Look up PubChem CIDs matching a chemical name. */
   public async cidsByName(name: string): Promise<ReadonlyArray<number>> {
+    this._requireHttpMode('cidsByName');
+
     const url = `${BASE_URL}/compound/name/${encodeURIComponent(name)}/cids/JSON`;
-    const raw = await fetchJson<RawCidResponse>(url, this._config);
+    const raw = await fetchJson<RawCidResponse>(url, this._config!);
 
     return raw.IdentifierList?.CID ?? [];
   }
 
   /** Fetch synonyms for a compound by CID. */
   public async synonyms(cid: number): Promise<CompoundSynonyms> {
+    this._requireHttpMode('synonyms');
+
     const url = `${BASE_URL}/compound/cid/${encodeURIComponent(cid)}/synonyms/JSON`;
-    const raw = await fetchJson<RawSynonymsResponse>(url, this._config);
+    const raw = await fetchJson<RawSynonymsResponse>(url, this._config!);
     const information = raw.InformationList?.Information?.[0];
 
     return {
@@ -122,16 +164,20 @@ export class PubChem {
 
   /** Fetch the description and title for a compound by CID. */
   public async description(cid: number): Promise<CompoundDescription> {
+    this._requireHttpMode('description');
+
     const url = `${BASE_URL}/compound/cid/${encodeURIComponent(cid)}/description/JSON`;
-    const raw = await fetchJson<RawDescriptionResponse>(url, this._config);
+    const raw = await fetchJson<RawDescriptionResponse>(url, this._config!);
 
     return mapCompoundDescription(raw.InformationList?.Information ?? []);
   }
 
   /** Fetch a substance record by SID. */
   public async substanceBySid(sid: number): Promise<SubstanceRecord> {
+    this._requireHttpMode('substanceBySid');
+
     const url = `${BASE_URL}/substance/sid/${encodeURIComponent(sid)}/JSON`;
-    const raw = await fetchJson<RawSubstanceResponse>(url, this._config);
+    const raw = await fetchJson<RawSubstanceResponse>(url, this._config!);
 
     return mapSubstanceRecord(raw.PC_Substances?.[0]);
   }
@@ -140,29 +186,35 @@ export class PubChem {
   public async substanceBySidBatch(
     sids: ReadonlyArray<number>,
   ): Promise<ReadonlyArray<SubstanceRecord>> {
+    this._requireHttpMode('substanceBySidBatch');
+
     if (sids.length === 0) {
       return [];
     }
 
     const joined = sids.join(',');
     const url = `${BASE_URL}/substance/sid/${encodeURIComponent(joined)}/JSON`;
-    const raw = await fetchJson<RawSubstanceResponse>(url, this._config);
+    const raw = await fetchJson<RawSubstanceResponse>(url, this._config!);
 
     return (raw.PC_Substances ?? []).map(mapSubstanceRecord);
   }
 
   /** Fetch a substance record by name. */
   public async substanceByName(name: string): Promise<SubstanceRecord> {
+    this._requireHttpMode('substanceByName');
+
     const url = `${BASE_URL}/substance/name/${encodeURIComponent(name)}/JSON`;
-    const raw = await fetchJson<RawSubstanceResponse>(url, this._config);
+    const raw = await fetchJson<RawSubstanceResponse>(url, this._config!);
 
     return mapSubstanceRecord(raw.PC_Substances?.[0]);
   }
 
   /** Fetch synonyms for a substance by SID. */
   public async substanceSynonyms(sid: number): Promise<SubstanceSynonyms> {
+    this._requireHttpMode('substanceSynonyms');
+
     const url = `${BASE_URL}/substance/sid/${encodeURIComponent(sid)}/synonyms/JSON`;
-    const raw = await fetchJson<RawSubstanceSynonymsResponse>(url, this._config);
+    const raw = await fetchJson<RawSubstanceSynonymsResponse>(url, this._config!);
     const information = raw.InformationList?.Information?.[0];
 
     return {
@@ -173,42 +225,50 @@ export class PubChem {
 
   /** Look up PubChem SIDs matching a substance name. */
   public async sidsByName(name: string): Promise<ReadonlyArray<number>> {
+    this._requireHttpMode('sidsByName');
+
     const url = `${BASE_URL}/substance/name/${encodeURIComponent(name)}/sids/JSON`;
-    const raw = await fetchJson<RawSidResponse>(url, this._config);
+    const raw = await fetchJson<RawSidResponse>(url, this._config!);
 
     return raw.IdentifierList?.SID ?? [];
   }
 
   /** Fetch a bioassay record by AID. */
   public async assayByAid(aid: number): Promise<AssayRecord> {
+    this._requireHttpMode('assayByAid');
+
     const url = `${BASE_URL}/assay/aid/${encodeURIComponent(aid)}/description/JSON`;
-    const raw = await fetchJson<RawAssayDescriptionResponse>(url, this._config);
+    const raw = await fetchJson<RawAssayDescriptionResponse>(url, this._config!);
 
     return mapAssayRecord(raw.PC_AssayContainer?.[0]);
   }
 
   /** Fetch bioassay records for multiple AIDs in a single request. */
   public async assayByAidBatch(aids: ReadonlyArray<number>): Promise<ReadonlyArray<AssayRecord>> {
+    this._requireHttpMode('assayByAidBatch');
+
     if (aids.length === 0) {
       return [];
     }
 
     const joined = aids.join(',');
     const url = `${BASE_URL}/assay/aid/${encodeURIComponent(joined)}/description/JSON`;
-    const raw = await fetchJson<RawAssayDescriptionResponse>(url, this._config);
+    const raw = await fetchJson<RawAssayDescriptionResponse>(url, this._config!);
 
     return (raw.PC_AssayContainer ?? []).map(mapAssayRecord);
   }
 
   /** Fetch a summary of substance and compound counts for a bioassay. */
   public async assaySummary(aid: number): Promise<AssaySummary> {
+    this._requireHttpMode('assaySummary');
+
     const encodedAid = encodeURIComponent(aid);
     const sidsUrl = `${BASE_URL}/assay/aid/${encodedAid}/sids/JSON`;
     const cidsUrl = `${BASE_URL}/assay/aid/${encodedAid}/cids/JSON`;
 
     const [sidsRaw, cidsRaw] = await Promise.all([
-      fetchJson<RawAssaySidsResponse>(sidsUrl, this._config),
-      fetchJson<RawAssayCidsResponse>(cidsUrl, this._config),
+      fetchJson<RawAssaySidsResponse>(sidsUrl, this._config!),
+      fetchJson<RawAssayCidsResponse>(cidsUrl, this._config!),
     ]);
 
     const sidsInfo = sidsRaw.InformationList?.Information?.[0];
@@ -224,47 +284,58 @@ export class PubChem {
 
   /** Fetch full compound annotations from PUG View, optionally filtered by heading. */
   public async compoundAnnotations(cid: number, heading?: string): Promise<AnnotationRecord> {
+    this._requireHttpMode('compoundAnnotations');
     return this._fetchAnnotations('compound', cid, heading);
   }
 
   /** Fetch full substance annotations from PUG View, optionally filtered by heading. */
   public async substanceAnnotations(sid: number, heading?: string): Promise<AnnotationRecord> {
+    this._requireHttpMode('substanceAnnotations');
     return this._fetchAnnotations('substance', sid, heading);
   }
 
   /** Fetch full bioassay annotations from PUG View, optionally filtered by heading. */
   public async assayAnnotations(aid: number, heading?: string): Promise<AnnotationRecord> {
+    this._requireHttpMode('assayAnnotations');
     return this._fetchAnnotations('bioassay', aid, heading);
   }
 
   /** Fetch a gene summary by NCBI Gene ID. */
   public async geneByGeneId(geneId: number): Promise<GeneRecord> {
+    this._requireHttpMode('geneByGeneId');
+
     const url = `${BASE_URL}/gene/geneid/${encodeURIComponent(geneId)}/summary/JSON`;
-    const raw = await fetchJson<RawGeneSummaryResponse>(url, this._config);
+    const raw = await fetchJson<RawGeneSummaryResponse>(url, this._config!);
 
     return mapGeneRecord(raw.GeneSummaries?.GeneSummary?.[0]);
   }
 
   /** Fetch gene IDs linked to a compound by CID. */
   public async geneByCid(cid: number): Promise<ReadonlyArray<number>> {
+    this._requireHttpMode('geneByCid');
+
     const url = `${BASE_URL}/compound/cid/${encodeURIComponent(cid)}/xrefs/GeneID/JSON`;
-    const raw = await fetchJson<RawGeneXrefResponse>(url, this._config);
+    const raw = await fetchJson<RawGeneXrefResponse>(url, this._config!);
 
     return raw.InformationList?.Information?.[0]?.GeneID ?? [];
   }
 
   /** Fetch a protein summary by accession. */
   public async proteinByAccession(accession: string): Promise<ProteinRecord> {
+    this._requireHttpMode('proteinByAccession');
+
     const url = `${BASE_URL}/protein/accession/${encodeURIComponent(accession)}/summary/JSON`;
-    const raw = await fetchJson<RawProteinSummaryResponse>(url, this._config);
+    const raw = await fetchJson<RawProteinSummaryResponse>(url, this._config!);
 
     return mapProteinRecord(raw.ProteinSummaries?.ProteinSummary?.[0]);
   }
 
   /** Fetch compound classification hierarchy from PUG View. */
   public async compoundClassification(cid: number): Promise<ReadonlyArray<ClassificationNode>> {
+    this._requireHttpMode('compoundClassification');
+
     const url = `${PUG_VIEW_BASE_URL}/data/compound/${encodeURIComponent(cid)}/JSON?heading=Classification`;
-    const raw = await fetchJson<RawPugViewResponse>(url, this._config);
+    const raw = await fetchJson<RawPugViewResponse>(url, this._config!);
     const classificationSection = findSectionByHeading(raw.Record?.Section ?? [], 'Classification');
 
     if (classificationSection === undefined) {
@@ -276,8 +347,10 @@ export class PubChem {
 
   /** Fetch patents associated with a compound from PUG View. */
   public async compoundPatents(cid: number): Promise<ReadonlyArray<PatentRecord>> {
+    this._requireHttpMode('compoundPatents');
+
     const url = `${PUG_VIEW_BASE_URL}/data/compound/${encodeURIComponent(cid)}/JSON?heading=Patents`;
-    const raw = await fetchJson<RawPugViewResponse>(url, this._config);
+    const raw = await fetchJson<RawPugViewResponse>(url, this._config!);
     const patentsSection = findSectionByHeading(raw.Record?.Section ?? [], 'Patents');
 
     if (patentsSection === undefined) {
@@ -285,6 +358,12 @@ export class PubChem {
     }
 
     return mapPatentRecords(patentsSection);
+  }
+
+  private _requireHttpMode(methodName: string): void {
+    if (this._storage !== undefined) {
+      throw new StorageModeError(methodName);
+    }
   }
 
   private async _fetchAnnotations(
@@ -296,7 +375,7 @@ export class PubChem {
     if (heading !== undefined) {
       url += `?heading=${encodeURIComponent(heading)}`;
     }
-    const raw = await fetchJson<RawPugViewResponse>(url, this._config);
+    const raw = await fetchJson<RawPugViewResponse>(url, this._config!);
 
     return mapAnnotationRecord(raw.Record);
   }

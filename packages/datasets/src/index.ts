@@ -3,6 +3,7 @@ export type {
   AssemblyStats,
   BioSampleAttribute,
   BioSampleReport,
+  DataStorage,
   DatasetsConfig,
   Gene2GoAnnotation,
   Gene2PubmedLink,
@@ -18,6 +19,7 @@ export type {
   TaxonomyReport,
   VirusReport,
 } from './interfaces/datasets.interface';
+export { StorageModeError } from './interfaces/datasets.interface';
 export { DatasetsHttpError } from './http/datasets-client';
 export { Datasets } from './http/datasets';
 export { parseGeneInfoTsv } from './bulk-parsers/parse-gene-info-tsv';

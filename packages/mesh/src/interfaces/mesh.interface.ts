@@ -38,3 +38,30 @@ export interface SparqlResult {
 export interface MeSHConfig {
   readonly maxRetries?: number;
 }
+
+/**
+ * Minimal storage interface for reading NCBI dataset records.
+ *
+ * This interface is structurally compatible with `ReadableStorage` from `@ncbijs/store`,
+ * but defined locally to avoid a runtime dependency. Any object matching this shape works.
+ */
+export interface DataStorage {
+  readonly getRecord: <T>(dataset: string, key: string) => Promise<T | undefined>;
+  readonly searchRecords: <T>(
+    dataset: string,
+    query: {
+      readonly field: string;
+      readonly value: string;
+      readonly operator?: 'eq' | 'contains' | 'starts_with';
+      readonly limit?: number;
+    },
+  ) => Promise<ReadonlyArray<T>>;
+}
+
+/** Error thrown when an HTTP-only method is called on a storage-backed instance. */
+export class StorageModeError extends Error {
+  constructor(methodName: string) {
+    super(`${methodName} is not available in storage mode`);
+    this.name = 'StorageModeError';
+  }
+}

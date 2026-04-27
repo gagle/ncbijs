@@ -4,6 +4,7 @@ import type { IdConverterClientConfig } from './id-converter-client';
 import type {
   ConvertedId,
   ConvertParams,
+  DataStorage,
   IdConverterConfig,
 } from '../interfaces/id-converter.interface';
 import type { paths } from './schema';
@@ -104,5 +105,33 @@ function mapRecordToConvertedId(record: ApiRecord): ConvertedId {
     ...(record.mid !== undefined ? { mid: record.mid } : {}),
     ...(versions !== undefined ? { versions } : {}),
     ...(record.aiid !== undefined ? { aiid: record.aiid } : {}),
+  };
+}
+
+/**
+ * Create a storage-backed converter that reads ID mappings from local storage.
+ *
+ * The returned function has the same return type as `convert()` but reads
+ * from storage instead of the PMC ID Converter HTTP API.
+ *
+ * @param storage - Any object implementing the `DataStorage` interface.
+ *   `ReadableStorage` from `@ncbijs/store` satisfies this interface.
+ */
+export function createConverter(
+  storage: DataStorage,
+): (ids: ReadonlyArray<string>) => Promise<ReadonlyArray<ConvertedId>> {
+  return async (ids: ReadonlyArray<string>): Promise<ReadonlyArray<ConvertedId>> => {
+    if (ids.length === 0) {
+      throw new Error('ids array must not be empty');
+    }
+
+    const results: Array<ConvertedId> = [];
+    for (const id of ids) {
+      const record = await storage.getRecord<ConvertedId>('id-mappings', id);
+      if (record !== undefined) {
+        results.push(record);
+      }
+    }
+    return results;
   };
 }

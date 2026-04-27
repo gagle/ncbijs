@@ -13,6 +13,7 @@ import type {
   ClinVarGene,
   ClinVarSearchResult,
   ClinVarTrait,
+  DataStorage,
   FrequencyReport,
   PopulationFrequency,
   RefSnpAllele,
@@ -23,14 +24,18 @@ import type {
   VariantLocation,
   VariantReport,
 } from '../interfaces/clinvar.interface';
+import { StorageModeError } from '../interfaces/clinvar.interface';
 
 const VARIATION_BASE_URL = 'https://api.ncbi.nlm.nih.gov/variation/v0';
 
 /** ClinVar variant database client for searching and fetching variant reports. */
 export class ClinVar {
-  private readonly _config: ClinVarClientConfig;
+  private readonly _config: ClinVarClientConfig | undefined;
+  private readonly _storage: DataStorage | undefined;
 
   constructor(config?: ClinVarConfig) {
+    this._storage = undefined;
+
     const requestsPerSecond = config?.apiKey
       ? EUTILS_REQUESTS_PER_SECOND_WITH_KEY
       : EUTILS_REQUESTS_PER_SECOND;
@@ -44,11 +49,31 @@ export class ClinVar {
     };
   }
 
+  /**
+   * Create a ClinVar instance backed by local storage instead of E-utilities HTTP APIs.
+   *
+   * Methods with corresponding stored data (`searchAndFetch`, `fetch`)
+   * query the storage directly. All other methods throw a `StorageModeError`.
+   *
+   * @param storage - Any object implementing the `DataStorage` interface.
+   *   `ReadableStorage` from `@ncbijs/store` satisfies this interface.
+   */
+  public static fromStorage(storage: DataStorage): ClinVar {
+    const instance = Object.create(ClinVar.prototype) as ClinVar;
+    Object.defineProperty(instance, '_storage', { value: storage, enumerable: true });
+    Object.defineProperty(instance, '_config', { value: undefined, enumerable: true });
+    return instance;
+  }
+
   /** Search ClinVar by term and return matching variant IDs. */
   public async search(
     term: string,
     options?: { readonly retmax?: number },
   ): Promise<ClinVarSearchResult> {
+    if (this._storage !== undefined) {
+      throw new StorageModeError('search');
+    }
+
     const params = new URLSearchParams({
       db: 'clinvar',
       term,
@@ -59,10 +84,10 @@ export class ClinVar {
       params.set('retmax', String(options.retmax));
     }
 
-    appendEUtilsCredentials(params, this._config);
+    appendEUtilsCredentials(params, this._config!);
 
     const url = `${EUTILS_BASE_URL}/esearch.fcgi?${params.toString()}`;
-    const raw = await fetchJson<RawESearchResponse>(url, this._config);
+    const raw = await fetchJson<RawESearchResponse>(url, this._config!);
 
     return {
       total: Number(raw.esearchresult?.count ?? '0'),
@@ -75,6 +100,31 @@ export class ClinVar {
     term: string,
     options?: { readonly retmax?: number },
   ): Promise<ReadonlyArray<VariantReport>> {
+    if (this._storage !== undefined) {
+      const limit = options?.retmax ?? 20;
+      const byTitle = await this._storage.searchRecords<VariantReport>('clinvar', {
+        field: 'title',
+        value: term,
+        operator: 'contains',
+        limit,
+      });
+      const byGenes = await this._storage.searchRecords<VariantReport>('clinvar', {
+        field: 'genes',
+        value: term,
+        operator: 'contains',
+        limit,
+      });
+      const seen = new Set<string>();
+      const merged: Array<VariantReport> = [];
+      for (const report of [...byTitle, ...byGenes]) {
+        if (!seen.has(report.uid)) {
+          seen.add(report.uid);
+          merged.push(report);
+        }
+      }
+      return merged.slice(0, limit);
+    }
+
     const searchResult = await this.search(term, options);
 
     if (searchResult.ids.length === 0) {
@@ -90,16 +140,27 @@ export class ClinVar {
       return [];
     }
 
+    if (this._storage !== undefined) {
+      const results: Array<VariantReport> = [];
+      for (const uid of ids) {
+        const record = await this._storage.getRecord<VariantReport>('clinvar', uid);
+        if (record !== undefined) {
+          results.push(record);
+        }
+      }
+      return results;
+    }
+
     const params = new URLSearchParams({
       db: 'clinvar',
       id: ids.join(','),
       retmode: 'json',
     });
 
-    appendEUtilsCredentials(params, this._config);
+    appendEUtilsCredentials(params, this._config!);
 
     const url = `${EUTILS_BASE_URL}/esummary.fcgi?${params.toString()}`;
-    const raw = await fetchJson<RawESummaryResponse>(url, this._config);
+    const raw = await fetchJson<RawESummaryResponse>(url, this._config!);
 
     const result = raw.result ?? {};
     const uids = result.uids ?? [];
@@ -121,24 +182,36 @@ export class ClinVar {
 
   /** Get a RefSNP report by rsID from the Variation Services API. */
   public async refsnp(rsid: number): Promise<RefSnpReport> {
+    if (this._storage !== undefined) {
+      throw new StorageModeError('refsnp');
+    }
+
     const url = `${VARIATION_BASE_URL}/refsnp/${rsid}`;
-    const raw = await fetchJson<RawRefSnpResponse>(url, this._config);
+    const raw = await fetchJson<RawRefSnpResponse>(url, this._config!);
 
     return mapRefSnpReport(rsid, raw);
   }
 
   /** Validate and resolve an SPDI expression via the Variation Services API. */
   public async spdi(spdiExpression: string): Promise<SpdiAllele> {
+    if (this._storage !== undefined) {
+      throw new StorageModeError('spdi');
+    }
+
     const url = `${VARIATION_BASE_URL}/spdi/${encodeURIComponent(spdiExpression)}`;
-    const raw = await fetchJson<RawSpdiResponse>(url, this._config);
+    const raw = await fetchJson<RawSpdiResponse>(url, this._config!);
 
     return mapSpdiResult(raw);
   }
 
   /** Convert an SPDI expression to HGVS notation via the Variation Services API. */
   public async spdiToHgvs(spdiExpression: string): Promise<string> {
+    if (this._storage !== undefined) {
+      throw new StorageModeError('spdiToHgvs');
+    }
+
     const url = `${VARIATION_BASE_URL}/spdi/${encodeURIComponent(spdiExpression)}/hgvs`;
-    const raw = await fetchJson<RawSpdiHgvsResponse>(url, this._config);
+    const raw = await fetchJson<RawSpdiHgvsResponse>(url, this._config!);
 
     return raw.data?.hgvs ?? '';
   }
@@ -148,21 +221,29 @@ export class ClinVar {
     hgvsExpression: string,
     assembly?: string,
   ): Promise<ReadonlyArray<SpdiAllele>> {
+    if (this._storage !== undefined) {
+      throw new StorageModeError('hgvsToSpdi');
+    }
+
     let url = `${VARIATION_BASE_URL}/hgvs/${encodeURIComponent(hgvsExpression)}/contextuals`;
 
     if (assembly !== undefined) {
       url += `?assembly=${encodeURIComponent(assembly)}`;
     }
 
-    const raw = await fetchJson<RawHgvsContextualsResponse>(url, this._config);
+    const raw = await fetchJson<RawHgvsContextualsResponse>(url, this._config!);
 
     return (raw.data?.spdis ?? []).map(mapSpdiAllele);
   }
 
   /** Get allele frequency data for a variant by rsID from the Variation Services API. */
   public async frequency(rsid: number): Promise<FrequencyReport> {
+    if (this._storage !== undefined) {
+      throw new StorageModeError('frequency');
+    }
+
     const url = `${VARIATION_BASE_URL}/refsnp/${rsid}/frequency`;
-    const raw = await fetchJson<RawFrequencyResponse>(url, this._config);
+    const raw = await fetchJson<RawFrequencyResponse>(url, this._config!);
 
     return mapFrequencyReport(rsid, raw);
   }

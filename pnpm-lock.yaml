@@ -201,6 +201,9 @@ importers:
       '@ncbijs/sra':
         specifier: workspace:*
         version: link:../packages/sra
+      '@ncbijs/store':
+        specifier: workspace:*
+        version: link:../packages/store
       '@ncbijs/structure':
         specifier: workspace:*
         version: link:../packages/structure

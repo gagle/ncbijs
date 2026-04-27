@@ -9,6 +9,7 @@ export type {
   CompoundLiteratureLink,
   CompoundProperty,
   CompoundSynonyms,
+  DataStorage,
   GeneRecord,
   PatentRecord,
   ProteinRecord,
@@ -16,6 +17,7 @@ export type {
   SubstanceRecord,
   SubstanceSynonyms,
 } from './interfaces/pubchem.interface';
+export { StorageModeError } from './interfaces/pubchem.interface';
 export { PubChemHttpError } from './http/pubchem-client';
 export { PubChem } from './http/pubchem';
 export { parseCompoundExtras } from './bulk-parsers/parse-compound-extras';

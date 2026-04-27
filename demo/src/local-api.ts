@@ -2,23 +2,25 @@ import { MeSH } from '@ncbijs/mesh';
 import { Datasets } from '@ncbijs/datasets';
 import { ClinVar } from '@ncbijs/clinvar';
 import { PubChem } from '@ncbijs/pubchem';
-import { convert } from '@ncbijs/id-converter';
+import { createConverter } from '@ncbijs/id-converter';
+import { DuckDbWasmStorage } from './duckdb-wasm-storage';
 import { flattenRecord } from './flatten-record';
 
-const EUTILS_CONFIG = { tool: 'ncbijs-demo', email: 'demo@ncbijs.dev' };
+const storage = new DuckDbWasmStorage();
 
-const mesh = new MeSH({ descriptors: [] });
-const datasets = new Datasets();
-const clinvar = new ClinVar(EUTILS_CONFIG);
-const pubchem = new PubChem();
+const mesh = MeSH.fromStorage(storage);
+const datasets = Datasets.fromStorage(storage);
+const clinvar = ClinVar.fromStorage(storage);
+const pubchem = PubChem.fromStorage(storage);
+const convertIds = createConverter(storage);
 
-export interface LiveResult {
+export interface LocalResult {
   readonly records: ReadonlyArray<Record<string, unknown>>;
   readonly latencyMs: number;
   readonly endpoint: string;
 }
 
-export async function queryLive(handler: string, input: string): Promise<LiveResult> {
+export async function queryLocal(handler: string, input: string): Promise<LocalResult> {
   const start = performance.now();
 
   switch (handler) {
@@ -27,7 +29,7 @@ export async function queryLive(handler: string, input: string): Promise<LiveRes
       return {
         records: descriptors.map(flattenRecord),
         latencyMs: performance.now() - start,
-        endpoint: 'MeSH Lookup API',
+        endpoint: 'MeSH.fromStorage()',
       };
     }
 
@@ -36,7 +38,7 @@ export async function queryLive(handler: string, input: string): Promise<LiveRes
       return {
         records: genes.map(flattenRecord),
         latencyMs: performance.now() - start,
-        endpoint: 'NCBI Datasets API v2',
+        endpoint: 'Datasets.fromStorage()',
       };
     }
 
@@ -45,7 +47,7 @@ export async function queryLive(handler: string, input: string): Promise<LiveRes
       return {
         records: genesById.map(flattenRecord),
         latencyMs: performance.now() - start,
-        endpoint: 'NCBI Datasets API v2',
+        endpoint: 'Datasets.fromStorage()',
       };
     }
 
@@ -54,7 +56,7 @@ export async function queryLive(handler: string, input: string): Promise<LiveRes
       return {
         records: taxReports.map(flattenRecord),
         latencyMs: performance.now() - start,
-        endpoint: 'NCBI Datasets API v2',
+        endpoint: 'Datasets.fromStorage()',
       };
     }
 
@@ -63,7 +65,7 @@ export async function queryLive(handler: string, input: string): Promise<LiveRes
       return {
         records: variants.map(flattenRecord),
         latencyMs: performance.now() - start,
-        endpoint: 'ClinVar E-utilities',
+        endpoint: 'ClinVar.fromStorage()',
       };
     }
 
@@ -72,16 +74,16 @@ export async function queryLive(handler: string, input: string): Promise<LiveRes
       return {
         records: [flattenRecord(compound)],
         latencyMs: performance.now() - start,
-        endpoint: 'PubChem PUG REST',
+        endpoint: 'PubChem.fromStorage()',
       };
     }
 
     case 'id-convert': {
-      const mappings = await convert([input]);
+      const mappings = await convertIds([input]);
       return {
         records: mappings.map(flattenRecord),
         latencyMs: performance.now() - start,
-        endpoint: 'PMC ID Converter API',
+        endpoint: 'createConverter(storage)',
       };
     }
 

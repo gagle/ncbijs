@@ -6,6 +6,7 @@ import type {
   AssemblyStats,
   BioSampleAttribute,
   BioSampleReport,
+  DataStorage,
   DatasetsConfig,
   GeneLink,
   GeneOntology,
@@ -17,6 +18,7 @@ import type {
   TaxonomyReport,
   VirusReport,
 } from '../interfaces/datasets.interface';
+import { StorageModeError } from '../interfaces/datasets.interface';
 
 const BASE_URL = 'https://api.ncbi.nlm.nih.gov/datasets/v2';
 const REQUESTS_PER_SECOND_DEFAULT = 5;
@@ -24,9 +26,12 @@ const REQUESTS_PER_SECOND_WITH_KEY = 10;
 
 /** NCBI Datasets v2 API client for genes, genomes, taxonomy, and biosamples. */
 export class Datasets {
-  private readonly _config: DatasetsClientConfig;
+  private readonly _config: DatasetsClientConfig | undefined;
+  private readonly _storage: DataStorage | undefined;
 
   constructor(config?: DatasetsConfig) {
+    this._storage = undefined;
+
     const requestsPerSecond = config?.apiKey
       ? REQUESTS_PER_SECOND_WITH_KEY
       : REQUESTS_PER_SECOND_DEFAULT;
@@ -38,15 +43,43 @@ export class Datasets {
     };
   }
 
+  /**
+   * Create a Datasets instance backed by local storage instead of NCBI HTTP APIs.
+   *
+   * Methods with corresponding stored data (`geneById`, `geneBySymbol`, `taxonomy`)
+   * query the storage directly. Methods without stored data equivalents
+   * throw a `StorageModeError`.
+   *
+   * @param storage - Any object implementing the `DataStorage` interface.
+   *   `ReadableStorage` from `@ncbijs/store` satisfies this interface.
+   */
+  public static fromStorage(storage: DataStorage): Datasets {
+    const instance = Object.create(Datasets.prototype) as Datasets;
+    Object.defineProperty(instance, '_storage', { value: storage, enumerable: true });
+    Object.defineProperty(instance, '_config', { value: undefined, enumerable: true });
+    return instance;
+  }
+
   /** Fetch gene reports by NCBI Gene IDs. */
   public async geneById(geneIds: ReadonlyArray<number>): Promise<ReadonlyArray<GeneReport>> {
     if (geneIds.length === 0) {
       throw new Error('geneIds must not be empty');
     }
 
+    if (this._storage !== undefined) {
+      const results: Array<GeneReport> = [];
+      for (const geneId of geneIds) {
+        const record = await this._storage.getRecord<GeneReport>('genes', String(geneId));
+        if (record !== undefined) {
+          results.push(record);
+        }
+      }
+      return results;
+    }
+
     const joined = geneIds.join(',');
     const url = `${BASE_URL}/gene/id/${encodeURIComponent(joined)}/dataset_report`;
-    const raw = await fetchJson<RawGeneResponse>(url, this._config);
+    const raw = await fetchJson<RawGeneResponse>(url, this._config!);
 
     return (raw.reports ?? []).map(mapGeneReport);
   }
@@ -54,15 +87,28 @@ export class Datasets {
   /** Fetch gene reports by gene symbols within a specific taxon. */
   public async geneBySymbol(
     symbols: ReadonlyArray<string>,
-    taxon: number | string,
+    _taxon: number | string,
   ): Promise<ReadonlyArray<GeneReport>> {
     if (symbols.length === 0) {
       throw new Error('symbols must not be empty');
     }
 
+    if (this._storage !== undefined) {
+      const results: Array<GeneReport> = [];
+      for (const symbol of symbols) {
+        const matches = await this._storage.searchRecords<GeneReport>('genes', {
+          field: 'symbol',
+          value: symbol,
+          operator: 'eq',
+        });
+        results.push(...matches);
+      }
+      return results;
+    }
+
     const joined = symbols.join(',');
-    const url = `${BASE_URL}/gene/symbol/${encodeURIComponent(joined)}/taxon/${encodeURIComponent(String(taxon))}/dataset_report`;
-    const raw = await fetchJson<RawGeneResponse>(url, this._config);
+    const url = `${BASE_URL}/gene/symbol/${encodeURIComponent(joined)}/taxon/${encodeURIComponent(String(_taxon))}/dataset_report`;
+    const raw = await fetchJson<RawGeneResponse>(url, this._config!);
 
     return (raw.reports ?? []).map(mapGeneReport);
   }
@@ -75,9 +121,29 @@ export class Datasets {
       throw new Error('taxons must not be empty');
     }
 
+    if (this._storage !== undefined) {
+      const results: Array<TaxonomyReport> = [];
+      for (const taxon of taxons) {
+        if (typeof taxon === 'number') {
+          const record = await this._storage.getRecord<TaxonomyReport>('taxonomy', String(taxon));
+          if (record !== undefined) {
+            results.push(record);
+          }
+        } else {
+          const matches = await this._storage.searchRecords<TaxonomyReport>('taxonomy', {
+            field: 'organismName',
+            value: taxon,
+            operator: 'contains',
+          });
+          results.push(...matches);
+        }
+      }
+      return results;
+    }
+
     const joined = taxons.join(',');
     const url = `${BASE_URL}/taxonomy/taxon/${encodeURIComponent(joined)}/dataset_report`;
-    const raw = await fetchJson<RawTaxonomyResponse>(url, this._config);
+    const raw = await fetchJson<RawTaxonomyResponse>(url, this._config!);
 
     if (raw.reports !== undefined && raw.reports.length > 0) {
       return raw.reports.map(mapTaxonomyReportV2);
@@ -90,21 +156,29 @@ export class Datasets {
   public async genomeByAccession(
     accessions: ReadonlyArray<string>,
   ): Promise<ReadonlyArray<GenomeReport>> {
+    if (this._storage !== undefined) {
+      throw new StorageModeError('genomeByAccession');
+    }
+
     if (accessions.length === 0) {
       throw new Error('accessions must not be empty');
     }
 
     const joined = accessions.join(',');
     const url = `${BASE_URL}/genome/accession/${encodeURIComponent(joined)}/dataset_report`;
-    const raw = await fetchJson<RawGenomeResponse>(url, this._config);
+    const raw = await fetchJson<RawGenomeResponse>(url, this._config!);
 
     return (raw.reports ?? []).map(mapGenomeReport);
   }
 
   /** Fetch genome assembly reports for a given taxon. */
   public async genomeByTaxon(taxon: number | string): Promise<ReadonlyArray<GenomeReport>> {
+    if (this._storage !== undefined) {
+      throw new StorageModeError('genomeByTaxon');
+    }
+
     const url = `${BASE_URL}/genome/taxon/${encodeURIComponent(String(taxon))}/dataset_report`;
-    const raw = await fetchJson<RawGenomeResponse>(url, this._config);
+    const raw = await fetchJson<RawGenomeResponse>(url, this._config!);
 
     return (raw.reports ?? []).map(mapGenomeReport);
   }
@@ -113,21 +187,29 @@ export class Datasets {
   public async virusByAccession(
     accessions: ReadonlyArray<string>,
   ): Promise<ReadonlyArray<VirusReport>> {
+    if (this._storage !== undefined) {
+      throw new StorageModeError('virusByAccession');
+    }
+
     if (accessions.length === 0) {
       throw new Error('accessions must not be empty');
     }
 
     const joined = accessions.join(',');
     const url = `${BASE_URL}/virus/accession/${encodeURIComponent(joined)}/dataset_report`;
-    const raw = await fetchJson<RawVirusResponse>(url, this._config);
+    const raw = await fetchJson<RawVirusResponse>(url, this._config!);
 
     return (raw.reports ?? []).map(mapVirusReport);
   }
 
   /** Fetch virus genome reports for a given taxon. */
   public async virusByTaxon(taxon: number | string): Promise<ReadonlyArray<VirusReport>> {
+    if (this._storage !== undefined) {
+      throw new StorageModeError('virusByTaxon');
+    }
+
     const url = `${BASE_URL}/virus/taxon/${encodeURIComponent(String(taxon))}/dataset_report`;
-    const raw = await fetchJson<RawVirusResponse>(url, this._config);
+    const raw = await fetchJson<RawVirusResponse>(url, this._config!);
 
     return (raw.reports ?? []).map(mapVirusReport);
   }
@@ -136,26 +218,34 @@ export class Datasets {
   public async biosample(
     accessions: ReadonlyArray<string>,
   ): Promise<ReadonlyArray<BioSampleReport>> {
+    if (this._storage !== undefined) {
+      throw new StorageModeError('biosample');
+    }
+
     if (accessions.length === 0) {
       throw new Error('accessions must not be empty');
     }
 
     const joined = accessions.join(',');
     const url = `${BASE_URL}/biosample/accession/${encodeURIComponent(joined)}/biosample_report`;
-    const raw = await fetchJson<RawBioSampleResponse>(url, this._config);
+    const raw = await fetchJson<RawBioSampleResponse>(url, this._config!);
 
     return (raw.reports ?? []).map(mapBioSampleReport);
   }
 
   /** Fetch external database links for genes by NCBI Gene IDs. */
   public async geneLinks(geneIds: ReadonlyArray<number>): Promise<ReadonlyArray<GeneLink>> {
+    if (this._storage !== undefined) {
+      throw new StorageModeError('geneLinks');
+    }
+
     if (geneIds.length === 0) {
       throw new Error('geneIds must not be empty');
     }
 
     const joined = geneIds.join(',');
     const url = `${BASE_URL}/gene/id/${encodeURIComponent(joined)}/links`;
-    const raw = await fetchJson<RawGeneLinkResponse>(url, this._config);
+    const raw = await fetchJson<RawGeneLinkResponse>(url, this._config!);
 
     return (raw.gene_links ?? []).map(mapGeneLink);
   }

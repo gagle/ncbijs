@@ -14,7 +14,7 @@
     <header class="header">
       <h1 class="header-title">ncbijs Data Explorer</h1>
       <p class="header-subtitle">
-        Compare live NCBI API responses with local DuckDB data side by side
+        Same code, any data source &mdash; query NCBI from their servers or from yours
       </p>
     </header>
 
@@ -37,74 +37,89 @@
       <section class="comparison" id="comparison">
         <div class="panel panel--live" id="panel-live">
           <div class="panel-header">
-            <span class="panel-badge panel-badge--live">Live API</span>
+            <span class="panel-badge panel-badge--live">NCBI Servers</span>
             <span class="panel-stats" id="stats-live"></span>
           </div>
           <div class="panel-meta" id="meta-live"></div>
           <div class="panel-body" id="body-live">
-            <p class="panel-placeholder">Results from NCBI servers will appear here.</p>
+            <p class="panel-placeholder">Results from NCBI HTTP APIs will appear here.</p>
           </div>
         </div>
 
         <div class="panel panel--local" id="panel-local">
           <div class="panel-header">
-            <span class="panel-badge panel-badge--local">Local DuckDB</span>
+            <span class="panel-badge panel-badge--local">Your Data</span>
             <span class="panel-stats" id="stats-local"></span>
           </div>
           <div class="panel-meta" id="meta-local"></div>
           <div class="panel-body" id="body-local">
-            <p class="panel-placeholder">Results from local DuckDB will appear here.</p>
+            <p class="panel-placeholder">Results from your local database will appear here.</p>
           </div>
         </div>
       </section>
 
       <section class="how-it-works">
         <h2 class="section-title">How It Works</h2>
+        <div class="how-problem">
+          <p>
+            <strong>Problem:</strong> NCBI limits you to 3&ndash;10 requests per second. If you need
+            millions of queries, that takes days.
+          </p>
+          <p>
+            <strong>Solution:</strong> Download the data once into your own database. Query it
+            locally with the same <code>@ncbijs/*</code> packages. No rate limits.
+          </p>
+        </div>
         <div class="pipeline-diagram">
           <div class="pipeline-step">
             <div class="pipeline-icon">1</div>
-            <div class="pipeline-label">NCBI Servers</div>
+            <div class="pipeline-label">Load</div>
             <div class="pipeline-desc">
-              MeSH, ClinVar, Gene, PMC bulk datasets hosted on NCBI FTP
+              <code>@ncbijs/etl</code> downloads bulk NCBI data, parses it, and writes structured
+              records to any storage backend (DuckDB, PostgreSQL, MotherDuck).
             </div>
           </div>
           <div class="pipeline-arrow"></div>
           <div class="pipeline-step">
             <div class="pipeline-icon">2</div>
-            <div class="pipeline-label">ncbijs HTTP APIs</div>
-            <div class="pipeline-desc">@ncbijs/* packages fetch and parse real biomedical data</div>
-          </div>
-          <div class="pipeline-arrow"></div>
-          <div class="pipeline-step">
-            <div class="pipeline-icon">3</div>
-            <div class="pipeline-label">DuckDB File</div>
-            <div class="pipeline-desc">@ncbijs/store writes records into a 4 MB .duckdb file</div>
-          </div>
-          <div class="pipeline-arrow"></div>
-          <div class="pipeline-step">
-            <div class="pipeline-icon">4</div>
-            <div class="pipeline-label">Browser DuckDB</div>
+            <div class="pipeline-label">Query</div>
             <div class="pipeline-desc">
-              DuckDB-Wasm loads the file and runs SQL queries client-side
+              The same <code>@ncbijs/*</code> packages query both sources. The only difference is
+              where the data lives.
             </div>
+          </div>
+        </div>
+        <div class="how-code-comparison">
+          <div class="how-code-block">
+            <div class="how-code-label">NCBI Servers</div>
+            <pre><code>const datasets = new Datasets();
+const genes = await datasets.geneBySymbol(
+  ['TP53'], 'human'
+);</code></pre>
+          </div>
+          <div class="how-code-block">
+            <div class="how-code-label">Your Data</div>
+            <pre><code>const datasets = Datasets.fromStorage(db);
+const genes = await datasets.geneBySymbol(
+  ['TP53'], 'human'
+);</code></pre>
           </div>
         </div>
         <div class="how-details">
           <p>
-            The <strong>Live API</strong> panel queries NCBI servers in real time using
+            The <strong>NCBI Servers</strong> panel queries NCBI APIs in real time using
             <code>@ncbijs/mesh</code>, <code>@ncbijs/datasets</code>, <code>@ncbijs/clinvar</code>,
             <code>@ncbijs/pubchem</code>, and <code>@ncbijs/id-converter</code>.
           </p>
           <p>
-            The <strong>Local DuckDB</strong> panel queries a pre-built database containing real
-            NCBI data: 188 MeSH descriptors, 20 genes, 60 ClinVar variants, 15 PubChem compounds,
-            12 taxonomy records, and 11 ID mappings. The database was built using
-            <code>@ncbijs/store</code>'s <code>DuckDbFileStorage</code> and is served as a static
-            file.
+            The <strong>Your Data</strong> panel uses the exact same packages with
+            <code>.fromStorage()</code> &mdash; pointed at a local DuckDB database pre-loaded with
+            real NCBI data. Same methods, same return types, zero network requests.
           </p>
           <p>
-            Both panels run the same query simultaneously so you can compare live API responses
-            with locally stored data side by side.
+            In production, you'd run the ETL once (or on a schedule with
+            <code>@ncbijs/sync</code>), then query your own copy &mdash; from a server, cloud
+            database, or even the browser.
           </p>
         </div>
       </section>

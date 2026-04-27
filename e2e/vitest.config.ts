@@ -5,7 +5,7 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     include: ['e2e/**/*.spec.ts'],
-    exclude: ['e2e/bulk-parsers/**'],
+    exclude: ['e2e/bulk-parsers/**', 'e2e/storage/**'],
     restoreMocks: true,
     testTimeout: 120_000,
     hookTimeout: 120_000,

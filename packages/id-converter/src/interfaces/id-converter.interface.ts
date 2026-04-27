@@ -35,3 +35,22 @@ export interface ConvertedId {
   readonly versions?: ReadonlyArray<Readonly<VersionedId>>;
   readonly aiid?: string;
 }
+
+/**
+ * Minimal storage interface for reading NCBI dataset records.
+ *
+ * This interface is structurally compatible with `ReadableStorage` from `@ncbijs/store`,
+ * but defined locally to avoid a runtime dependency. Any object matching this shape works.
+ */
+export interface DataStorage {
+  readonly getRecord: <T>(dataset: string, key: string) => Promise<T | undefined>;
+  readonly searchRecords: <T>(
+    dataset: string,
+    query: {
+      readonly field: string;
+      readonly value: string;
+      readonly operator?: 'eq' | 'contains' | 'starts_with';
+      readonly limit?: number;
+    },
+  ) => Promise<ReadonlyArray<T>>;
+}

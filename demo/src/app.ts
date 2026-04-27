@@ -1,7 +1,7 @@
-import { QUERY_CATALOG, buildQuery, extractSearchTerm } from './query-catalog';
+import { QUERY_CATALOG, extractSearchTerm } from './query-catalog';
 import type { QueryExample } from './query-catalog';
 import { queryLive } from './live-api';
-import { queryLocal } from './local-data';
+import { queryLocal } from './local-api';
 import { renderTable } from './render-table';
 
 function getElement<T extends HTMLElement>(id: string): T {
@@ -98,19 +98,17 @@ async function runQuery(): Promise<void> {
 
   const currentExample = activeExample;
   const searchTerm = extractSearchTerm(currentExample, input);
-  const built = buildQuery(currentExample, input);
 
   showPanelLoading(bodyLive, statsLive, metaLive);
   showPanelLoading(bodyLocal, statsLocal, metaLocal);
 
   const livePromise = queryLive(currentExample.liveHandler, searchTerm)
     .then((result) => {
-      const remapped = remapLiveRecords(result.records, currentExample.columnMap);
       showPanelResults(
         bodyLive,
         statsLive,
         metaLive,
-        remapped,
+        result.records,
         result.latencyMs,
         `via ${result.endpoint}`,
       );
@@ -119,7 +117,7 @@ async function runQuery(): Promise<void> {
       showPanelError(bodyLive, statsLive, error);
     });
 
-  const localPromise = queryLocal(built.sql, built.params)
+  const localPromise = queryLocal(currentExample.liveHandler, searchTerm)
     .then((result) => {
       showPanelResults(
         bodyLocal,
@@ -127,7 +125,7 @@ async function runQuery(): Promise<void> {
         metaLocal,
         result.records,
         result.latencyMs,
-        built.sql,
+        `via ${result.endpoint}`,
       );
     })
     .catch((error: unknown) => {
@@ -136,19 +134,6 @@ async function runQuery(): Promise<void> {
 
   await Promise.all([livePromise, localPromise]);
   searchBtn.disabled = false;
-}
-
-function remapLiveRecords(
-  records: ReadonlyArray<Record<string, unknown>>,
-  columnMap: Readonly<Record<string, string>>,
-): ReadonlyArray<Record<string, unknown>> {
-  return records.map((record) => {
-    const remapped: Record<string, unknown> = {};
-    for (const [displayColumn, apiKey] of Object.entries(columnMap)) {
-      remapped[displayColumn] = record[apiKey] ?? '';
-    }
-    return remapped;
-  });
 }
 
 function escapeHtml(text: string): string {
