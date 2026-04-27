@@ -14,7 +14,10 @@ async function getConnection(): Promise<duckdb.AsyncDuckDBConnection> {
   if (bundle.mainWorker === null) {
     throw new Error('DuckDB-Wasm: no suitable worker bundle found');
   }
-  const worker = new Worker(bundle.mainWorker);
+  const workerResponse = await fetch(bundle.mainWorker);
+  const workerBlob = await workerResponse.blob();
+  const workerUrl = URL.createObjectURL(workerBlob);
+  const worker = new Worker(workerUrl);
   const logger = new duckdb.ConsoleLogger();
   db = new duckdb.AsyncDuckDB(logger, worker);
   await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
