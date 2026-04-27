@@ -4,12 +4,12 @@
     "dbbuild": "Build-2026.04.26.23.27"
   },
   "pmc": {
-    "lastupdate": "2026/04/26 19:38",
-    "dbbuild": "Build-2026.04.26.19.38"
+    "lastupdate": "2026/04/27 04:53",
+    "dbbuild": "Build-2026.04.27.04.53"
   },
   "books": {
-    "lastupdate": "2026/04/26 03:26",
-    "dbbuild": "Build260426-0235.1"
+    "lastupdate": "2026/04/27 03:44",
+    "dbbuild": "Build260427-0250.1"
   },
   "snp": {
     "lastupdate": "2025/03/11 08:22",
@@ -28,39 +28,39 @@
     "dbbuild": "Build260425-0733m.1"
   },
   "clinvar": {
-    "lastupdate": "2026/04/21 07:04",
-    "dbbuild": "Build260421-0345.1"
+    "lastupdate": "2026/04/27 01:59",
+    "dbbuild": "Build260426-2245.1"
   },
   "gene": {
     "lastupdate": "2026/04/26 05:54",
     "dbbuild": "Build260425-2025.1"
   },
   "protein": {
-    "lastupdate": "2026/04/26 03:13",
-    "dbbuild": "Build260424-2016m.1"
+    "lastupdate": "2026/04/27 02:10",
+    "dbbuild": "Build260426-0321m.1"
   },
   "cdd": {
     "lastupdate": "2025/07/02 19:21",
     "dbbuild": "Build250702-1738.1"
   },
   "omim": {
-    "lastupdate": "2026/04/26 03:19",
-    "dbbuild": "Build260426-0305.1"
+    "lastupdate": "2026/04/27 03:19",
+    "dbbuild": "Build260427-0305.1"
   },
   "nucleotide": {
     "lastupdate": "2026/04/26 11:45",
     "dbbuild": "Build260425-1005m.1"
   },
   "gtr": {
-    "lastupdate": "2026/04/26 01:34",
-    "dbbuild": "Build260426-0045.1"
+    "lastupdate": "2026/04/27 01:16",
+    "dbbuild": "Build260427-0030.1"
   },
   "structure": {
     "lastupdate": "2026/04/22 18:32",
     "dbbuild": "Build260422-1800.1"
   },
   "nlmcatalog": {
-    "lastupdate": "2026/04/26 06:50",
-    "dbbuild": "Build260426-0615.1"
+    "lastupdate": "2026/04/27 06:50",
+    "dbbuild": "Build260427-0615.1"
   }
 }
