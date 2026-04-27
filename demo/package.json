@@ -12,17 +12,17 @@
   },
   "dependencies": {
     "@duckdb/duckdb-wasm": "^1.29.0",
-    "@ncbijs/pubmed": "workspace:*",
-    "@ncbijs/mesh": "workspace:*",
-    "@ncbijs/datasets": "workspace:*",
     "@ncbijs/clinvar": "workspace:*",
-    "@ncbijs/snp": "workspace:*",
-    "@ncbijs/pubchem": "workspace:*",
+    "@ncbijs/datasets": "workspace:*",
+    "@ncbijs/etl": "workspace:*",
     "@ncbijs/id-converter": "workspace:*",
-    "@ncbijs/etl": "workspace:*"
+    "@ncbijs/mesh": "workspace:*",
+    "@ncbijs/pubchem": "workspace:*",
+    "@ncbijs/pubmed": "workspace:*",
+    "@ncbijs/snp": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^6.0.2",
-    "vite": "^6.3.4"
+    "vite": "^8.0.10"
   }
 }

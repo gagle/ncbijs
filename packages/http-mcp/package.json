@@ -48,21 +48,21 @@
   ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
+    "@ncbijs/blast": "workspace:*",
     "@ncbijs/cite": "workspace:*",
+    "@ncbijs/clinvar": "workspace:*",
     "@ncbijs/datasets": "workspace:*",
+    "@ncbijs/icite": "workspace:*",
     "@ncbijs/id-converter": "workspace:*",
+    "@ncbijs/litvar": "workspace:*",
+    "@ncbijs/mesh": "workspace:*",
     "@ncbijs/pmc": "workspace:*",
+    "@ncbijs/pubchem": "workspace:*",
     "@ncbijs/pubmed": "workspace:*",
     "@ncbijs/pubtator": "workspace:*",
-    "@ncbijs/mesh": "workspace:*",
-    "@ncbijs/blast": "workspace:*",
-    "@ncbijs/snp": "workspace:*",
-    "@ncbijs/clinvar": "workspace:*",
-    "@ncbijs/icite": "workspace:*",
-    "@ncbijs/litvar": "workspace:*",
-    "@ncbijs/pubchem": "workspace:*",
     "@ncbijs/rxnorm": "workspace:*",
-    "zod": "^3.24.0"
+    "@ncbijs/snp": "workspace:*",
+    "zod": "^4.3.6"
   },
   "scripts": {
     "prepublishOnly": "echo 'Use CI to publish' && exit 1"
