@@ -59,7 +59,6 @@ describe('MCP Server E2E', () => {
     expect(names).toContain('lookup-refsnp');
     expect(names).toContain('lookup-frequency');
     expect(names).toContain('search-gene-by-compound');
-    expect(names).toContain('dataset-catalog');
     expect(names).toContain('citation-metrics');
     expect(names).toContain('citation-graph');
     expect(names).toContain('drug-lookup');

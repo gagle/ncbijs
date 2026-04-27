@@ -11,6 +11,7 @@
         "@ncbijs/clinical-tables:build",
         "@ncbijs/clinical-trials:build",
         "@ncbijs/clinvar:build",
+        "@ncbijs/dailymed:build",
         "@ncbijs/datasets:build",
         "@ncbijs/dbvar:build",
         "@ncbijs/eutils:build",
