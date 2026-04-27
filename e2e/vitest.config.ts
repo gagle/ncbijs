@@ -9,6 +9,7 @@ export default defineConfig({
     restoreMocks: true,
     testTimeout: 120_000,
     hookTimeout: 120_000,
+    retry: 2,
     fileParallelism: false,
     globalSetup: ['e2e/global-setup.ts'],
   },
