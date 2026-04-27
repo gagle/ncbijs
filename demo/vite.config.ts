@@ -7,6 +7,7 @@ const sharedArrayBufferHeaders = {
 };
 
 export default defineConfig({
+  base: '/ncbijs/',
   root: resolve(import.meta.dirname, 'src'),
   publicDir: resolve(import.meta.dirname, 'public'),
   build: {

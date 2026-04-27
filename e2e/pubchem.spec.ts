@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { PubChem } from '@ncbijs/pubchem';
 
-const pubchem = new PubChem();
+const pubchem = new PubChem({ maxRetries: 5 });
 
 describe('PubChem PUG REST E2E', () => {
   it('should retrieve aspirin by CID', async () => {

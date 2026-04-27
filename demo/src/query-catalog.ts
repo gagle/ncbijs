@@ -7,6 +7,8 @@ export interface QueryExample {
   readonly localSql?: string;
 }
 
+const DATA = `${import.meta.env.BASE_URL}data`;
+
 export const QUERY_CATALOG: ReadonlyArray<QueryExample> = [
   {
     label: 'PubMed search',
@@ -14,7 +16,7 @@ export const QUERY_CATALOG: ReadonlyArray<QueryExample> = [
     defaultInput: 'BRCA1 breast cancer',
     mode: 'both',
     liveHandler: 'pubmed-search',
-    localSql: `SELECT * FROM read_parquet('/data/pubmed-sample.parquet') LIMIT 50`,
+    localSql: `SELECT * FROM read_parquet('${DATA}/pubmed-sample.parquet') LIMIT 50`,
   },
   {
     label: 'MeSH lookup',
@@ -22,7 +24,7 @@ export const QUERY_CATALOG: ReadonlyArray<QueryExample> = [
     defaultInput: 'Asthma',
     mode: 'both',
     liveHandler: 'mesh-lookup',
-    localSql: `SELECT * FROM read_parquet('/data/mesh.parquet') WHERE name ILIKE '%{{input}}%' LIMIT 50`,
+    localSql: `SELECT * FROM read_parquet('${DATA}/mesh.parquet') WHERE name ILIKE '%{{input}}%' LIMIT 50`,
   },
   {
     label: 'Gene search',
@@ -30,7 +32,7 @@ export const QUERY_CATALOG: ReadonlyArray<QueryExample> = [
     defaultInput: 'TP53',
     mode: 'both',
     liveHandler: 'gene-search',
-    localSql: `SELECT * FROM read_parquet('/data/genes.parquet') WHERE "Symbol" = '{{input}}' LIMIT 50`,
+    localSql: `SELECT * FROM read_parquet('${DATA}/genes.parquet') WHERE "Symbol" = '{{input}}' LIMIT 50`,
   },
   {
     label: 'ClinVar variants',
@@ -38,7 +40,7 @@ export const QUERY_CATALOG: ReadonlyArray<QueryExample> = [
     defaultInput: 'BRCA2',
     mode: 'both',
     liveHandler: 'clinvar-search',
-    localSql: `SELECT * FROM read_parquet('/data/clinvar.parquet') WHERE "GeneSymbol" ILIKE '%{{input}}%' LIMIT 50`,
+    localSql: `SELECT * FROM read_parquet('${DATA}/clinvar.parquet') WHERE "GeneSymbol" ILIKE '%{{input}}%' LIMIT 50`,
   },
   {
     label: 'SNP lookup',
@@ -53,7 +55,7 @@ export const QUERY_CATALOG: ReadonlyArray<QueryExample> = [
     defaultInput: 'aspirin',
     mode: 'both',
     liveHandler: 'compound-search',
-    localSql: `SELECT * FROM read_parquet('/data/compounds.parquet') LIMIT 50`,
+    localSql: `SELECT * FROM read_parquet('${DATA}/compounds.parquet') LIMIT 50`,
   },
   {
     label: 'ID converter',
@@ -65,7 +67,7 @@ export const QUERY_CATALOG: ReadonlyArray<QueryExample> = [
   {
     label: 'Free SQL',
     placeholder: 'Enter a SQL query against local Parquet files...',
-    defaultInput: `SELECT 'mesh' AS dataset, COUNT(*) AS records FROM read_parquet('/data/mesh.parquet')`,
+    defaultInput: `SELECT 'mesh' AS dataset, COUNT(*) AS records FROM read_parquet('${DATA}/mesh.parquet')`,
     mode: 'local',
     localSql: '{{input}}',
   },

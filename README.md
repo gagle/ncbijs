@@ -10,6 +10,7 @@
   <a href="./docs/rag-integration.md"><img src="https://img.shields.io/badge/RAG-Ready-blueviolet" alt="RAG Ready" /></a>
   <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-Server-blue" alt="MCP Server" /></a>
   <a href="./packages/http-mcp"><img src="https://img.shields.io/badge/LLM_Tools-27_tools-green" alt="LLM Tools" /></a>
+  <a href="https://gagle.github.io/ncbijs/"><img src="https://img.shields.io/badge/Demo-Live-orange" alt="Live Demo" /></a>
 </p>
 
 ---
