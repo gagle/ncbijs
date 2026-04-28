@@ -140,6 +140,23 @@ isMID('35266103'); // false
 
 Returns `boolean`.
 
+## Storage mode
+
+Convert article IDs from locally stored data with the same return types — no network, no rate limits.
+
+```ts
+import { createConverter } from '@ncbijs/id-converter';
+import { DuckDbFileStorage } from '@ncbijs/store';
+
+const storage = await DuckDbFileStorage.open('./ncbijs.duckdb');
+const convertIds = createConverter(storage);
+
+const results = await convertIds(['35296856']);
+console.log(results[0].pmcid); // 'PMC...'
+```
+
+The `createConverter()` factory accepts any object implementing the `DataStorage` interface (`getRecord` + `searchRecords`). `ReadableStorage` from `@ncbijs/store` satisfies this interface.
+
 ## Types
 
 All types are exported for use in your own interfaces:

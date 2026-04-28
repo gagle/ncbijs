@@ -79,6 +79,20 @@ pnpm exec tsx examples/search-pubmed.ts
 | `gene-literature-pipeline.ts` | `datasets` + `pubmed` + `pubtator`     | Gene lookup, literature search, entity extraction    |
 | `compound-literature.ts`      | `pubchem` + `pubmed` + `id-converter`  | Compound lookup, find related literature, get DOIs   |
 
+## Storage queries
+
+Query locally stored NCBI data using the same `@ncbijs/*` package API — no network, no rate limits. These examples use `fromStorage()` to point domain packages at a local DuckDB database pre-loaded with NCBI data.
+
+**Prerequisites**: Build the sample database first: `cd demo && pnpm build-data` (or load data via `@ncbijs/etl`).
+
+| Script                      | Package                                  | Description                                           |
+| --------------------------- | ---------------------------------------- | ----------------------------------------------------- |
+| `storage-query-genes.ts`    | `@ncbijs/datasets` + `@ncbijs/store`     | Query genes and taxonomy from local DuckDB            |
+| `storage-query-mesh.ts`     | `@ncbijs/mesh` + `@ncbijs/store`         | Search MeSH descriptors from local DuckDB             |
+| `storage-query-clinvar.ts`  | `@ncbijs/clinvar` + `@ncbijs/store`      | Search ClinVar variants from local DuckDB             |
+| `storage-query-compound.ts` | `@ncbijs/pubchem` + `@ncbijs/store`      | Look up PubChem compound properties from local DuckDB |
+| `storage-convert-ids.ts`    | `@ncbijs/id-converter` + `@ncbijs/store` | Convert PMIDs from local DuckDB                       |
+
 ## Data pipeline
 
 The `data-pipeline/` directory contains a 3-step pipeline that downloads NCBI bulk data, loads it into a local DuckDB database, and verifies the result. Once loaded, the data is queryable locally via `@ncbijs/store` or through the `@ncbijs/store-mcp` MCP server.

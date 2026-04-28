@@ -196,6 +196,31 @@ const ghs = await pubchem.compoundAnnotations(2244, 'GHS Classification');
 console.log(ghs.sections[0].tocHeading);
 ```
 
+## Storage mode
+
+Query locally stored compound data with the same API — no network, no rate limits.
+
+```ts
+import { PubChem } from '@ncbijs/pubchem';
+import { DuckDbFileStorage } from '@ncbijs/store';
+
+const storage = await DuckDbFileStorage.open('./ncbijs.duckdb');
+const pubchem = PubChem.fromStorage(storage);
+
+const aspirin = await pubchem.compoundByCid(2244);
+```
+
+### Available methods in storage mode
+
+| Method               | Supported |
+| -------------------- | --------- |
+| `compoundByCid()`    | Yes       |
+| `compoundByName()`   | No        |
+| `compoundBySmiles()` | No        |
+| All other methods    | No        |
+
+Methods not available in storage mode throw a `StorageModeError`.
+
 ## Bulk parsers
 
 ### `parsePubchemLiteratureTsv(tsv: string): ReadonlyArray<CompoundLiteratureLink>`

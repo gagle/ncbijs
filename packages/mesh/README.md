@@ -204,6 +204,35 @@ console.log(descriptors[0].name); // "Asthma"
 
 Returns `Promise<ReadonlyArray<MeshDescriptor>>`.
 
+## Storage mode
+
+Search locally stored MeSH descriptors with the same API — no network, no rate limits.
+
+```ts
+import { MeSH } from '@ncbijs/mesh';
+import { DuckDbFileStorage } from '@ncbijs/store';
+
+const storage = await DuckDbFileStorage.open('./ncbijs.duckdb');
+const mesh = MeSH.fromStorage(storage);
+
+const descriptors = await mesh.lookupOnline('Asthma');
+```
+
+### Available methods in storage mode
+
+| Method           | Supported |
+| ---------------- | --------- |
+| `lookupOnline()` | Yes       |
+| `lookup()`       | No        |
+| `expand()`       | No        |
+| `ancestors()`    | No        |
+| `children()`     | No        |
+| `treePath()`     | No        |
+| `toQuery()`      | No        |
+| `sparql()`       | No        |
+
+Methods not available in storage mode throw a `StorageModeError`.
+
 ## Types
 
 All types are exported for use in your own interfaces:

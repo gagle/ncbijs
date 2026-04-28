@@ -121,6 +121,35 @@ console.log(freq.populations[0].population); // 'European'
 console.log(freq.populations[0].frequency); // 0.234
 ```
 
+## Storage mode
+
+Query locally stored ClinVar variants with the same API — no network, no rate limits.
+
+```ts
+import { ClinVar } from '@ncbijs/clinvar';
+import { DuckDbFileStorage } from '@ncbijs/store';
+
+const storage = await DuckDbFileStorage.open('./ncbijs.duckdb');
+const clinvar = ClinVar.fromStorage(storage);
+
+const variants = await clinvar.searchAndFetch('BRCA1');
+```
+
+### Available methods in storage mode
+
+| Method             | Supported |
+| ------------------ | --------- |
+| `searchAndFetch()` | Yes       |
+| `fetch()`          | Yes       |
+| `search()`         | No        |
+| `refsnp()`         | No        |
+| `spdi()`           | No        |
+| `spdiToHgvs()`     | No        |
+| `hgvsToSpdi()`     | No        |
+| `frequency()`      | No        |
+
+Methods not available in storage mode throw a `StorageModeError`.
+
 ## Bulk parsers
 
 ### `parseVariantSummaryTsv(tsv)`

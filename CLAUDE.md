@@ -85,16 +85,25 @@ This repo includes `.claude/` configuration that Claude reads automatically:
 
 See `CONTRIBUTING.md` for the contribution policy.
 
+### Source-agnostic architecture
+
+Domain packages (mesh, datasets, clinvar, pubchem, id-converter) support two modes:
+
+- **HTTP mode** (default): `new Datasets({ apiKey })` -- queries NCBI servers
+- **Storage mode**: `Datasets.fromStorage(storage)` -- queries local/cloud data
+
+The `DataStorage` interface is defined locally in each package (structural typing, no cross-package dependency). `ReadableStorage` from `@ncbijs/store` satisfies it. Pipeline + ETL populate storage; the same packages query it.
+
 ### Demo app (`demo/`)
 
 Static Vite app deployed to GitHub Pages with two query modes:
 
-- **Live API mode** -- imports browser-safe `@ncbijs/*` packages and queries NCBI HTTP APIs directly from the browser (PubMed, MeSH, Datasets, ClinVar, SNP, PubChem, ID converter)
-- **Local Data mode** -- uses DuckDB-Wasm to query pre-loaded Parquet files with SQL (no network required)
+- **NCBI Servers** -- imports browser-safe `@ncbijs/*` packages and queries NCBI HTTP APIs directly from the browser (MeSH, Datasets, ClinVar, PubChem, ID converter)
+- **Your Data** -- uses the same `@ncbijs/*` packages with `fromStorage()`, pointed at a DuckDB-Wasm database pre-loaded with NCBI data (no network required)
 
-Key files: `demo/src/app.ts` (mode switcher), `demo/src/live-api.ts` (NCBI API calls), `demo/src/local-data.ts` (DuckDB-Wasm), `demo/src/query-catalog.ts` (example queries). Deployed via `.github/workflows/demo.yml`.
+Key files: `demo/src/app.ts` (mode switcher), `demo/src/live-api.ts` (NCBI API calls), `demo/src/local-api.ts` (storage-backed queries), `demo/src/duckdb-wasm-storage.ts` (browser DataStorage adapter), `demo/src/query-catalog.ts` (example queries). Deployed via `.github/workflows/demo.yml`.
 
-After any demo changes, verify visually: `cd demo && pnpm dev`, open `http://localhost:5173`, test both Live API and Local Data tabs.
+After any demo changes, verify visually: `cd demo && pnpm dev`, open `http://localhost:5173`, test both NCBI Servers and Your Data tabs.
 
 ## Conventions
 

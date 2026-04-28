@@ -86,6 +86,37 @@ Fetch BioSample reports by accessions (e.g., `SAMN12345`).
 
 Fetch external database links for genes by NCBI Gene IDs.
 
+## Storage mode
+
+Query locally stored data with the same API — no network, no rate limits.
+
+```ts
+import { Datasets } from '@ncbijs/datasets';
+import { DuckDbFileStorage } from '@ncbijs/store';
+
+const storage = await DuckDbFileStorage.open('./ncbijs.duckdb');
+const datasets = Datasets.fromStorage(storage);
+
+const genes = await datasets.geneBySymbol(['TP53'], 'human');
+const taxonomy = await datasets.taxonomy([9606]);
+```
+
+### Available methods in storage mode
+
+| Method                | Stored dataset | Supported |
+| --------------------- | -------------- | --------- |
+| `geneById()`          | genes          | Yes       |
+| `geneBySymbol()`      | genes          | Yes       |
+| `taxonomy()`          | taxonomy       | Yes       |
+| `genomeByAccession()` | —              | No        |
+| `genomeByTaxon()`     | —              | No        |
+| `virusByAccession()`  | —              | No        |
+| `virusByTaxon()`      | —              | No        |
+| `biosample()`         | —              | No        |
+| `geneLinks()`         | —              | No        |
+
+Methods not available in storage mode throw a `StorageModeError`.
+
 ## Error handling
 
 ```ts

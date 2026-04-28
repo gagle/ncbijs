@@ -71,6 +71,7 @@ It is designed for two audiences:
 | Get annotated text with entity recognition            | `@ncbijs/bioc`                      |
 | Autocomplete ICD-10, LOINC, SNOMED codes              | `@ncbijs/clinical-tables`           |
 | Store NCBI data locally in DuckDB                     | `@ncbijs/store`                     |
+| Query stored data with the same package API           | `fromStorage()` on domain packages  |
 | Build data pipelines (Source → Parse → Sink)          | `@ncbijs/pipeline`                  |
 | Load any NCBI dataset with one function call          | `@ncbijs/etl`                       |
 | Watch NCBI sources for updates and re-sync            | `@ncbijs/sync`                      |
@@ -440,6 +441,7 @@ I want to...
 │   └── Journal records (NLM Catalog) ─────→ @ncbijs/nlm-catalog
 │
 ├── Store NCBI data locally ───────────────→ @ncbijs/store
+├── Query stored data with same API ───────→ fromStorage() on domain packages
 ├── Data pipeline (Source → Parse → Sink) ─→ @ncbijs/pipeline
 ├── Load any NCBI dataset in one call ─────→ @ncbijs/etl
 ├── Watch NCBI sources for updates ────────→ @ncbijs/sync
