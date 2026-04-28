@@ -12,6 +12,39 @@ function getElement<T extends HTMLElement>(id: string): T {
   return element as T;
 }
 
+const sidenav = getElement('sidenav');
+
+function navigateToPage(pageId: string): void {
+  for (const page of document.querySelectorAll<HTMLElement>('.page')) {
+    page.classList.remove('page--active');
+  }
+  for (const item of sidenav.querySelectorAll<HTMLButtonElement>('.sidenav-item')) {
+    item.classList.remove('sidenav-item--active');
+  }
+
+  const targetPage = document.getElementById(`page-${pageId}`);
+  const targetItem = sidenav.querySelector<HTMLButtonElement>(`[data-page="${pageId}"]`);
+
+  if (targetPage !== null) {
+    targetPage.classList.add('page--active');
+  }
+  if (targetItem !== null) {
+    targetItem.classList.add('sidenav-item--active');
+  }
+}
+
+sidenav.addEventListener('click', (event) => {
+  const target = event.target as HTMLElement;
+  const item = target.closest<HTMLButtonElement>('.sidenav-item');
+  if (item === null) {
+    return;
+  }
+  const pageId = item.dataset['page'];
+  if (pageId !== undefined) {
+    navigateToPage(pageId);
+  }
+});
+
 let activeExample: QueryExample | undefined;
 
 const examplesContainer = getElement('examples');
