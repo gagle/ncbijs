@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/clinical-tables",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Clinical Table Search API client — autocomplete ICD-10, LOINC, SNOMED, RxTerms, and more",
   "author": "Gabriel Llamas",
   "license": "MIT",

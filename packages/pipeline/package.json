@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/pipeline",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Composable data pipelines for NCBI bulk data: Source, Parse, Sink",
   "author": "Gabriel Llamas",
   "license": "MIT",
