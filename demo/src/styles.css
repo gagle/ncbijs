@@ -94,7 +94,7 @@ code {
 /* Sidenav — tracks 1rem left of the content edge on wide screens, hugs the viewport edge otherwise */
 .sidenav {
   position: fixed;
-  top: 10rem;
+  top: 12rem;
   left: max(1rem, calc((100vw - 1400px) / 2 - 86px));
   width: 170px;
   display: flex;
