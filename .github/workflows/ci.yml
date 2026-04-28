@@ -92,3 +92,27 @@ jobs:
       - run: pnpm nx run ncbijs-e2e:e2e
         env:
           NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
+
+  ci-status:
+    if: always() && github.event_name == 'workflow_dispatch'
+    needs: [lint, test, e2e]
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+    steps:
+      - name: Post CI status to commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
+            STATE=failure
+          elif [[ "${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            STATE=error
+          else
+            STATE=success
+          fi
+          gh api repos/${{ github.repository }}/statuses/${{ github.sha }} \
+            -f state="$STATE" \
+            -f context="CI" \
+            -f target_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            -f description="lint, test, e2e"
