@@ -13,8 +13,10 @@
   <body>
     <header class="header">
       <h1 class="header-title">ncbijs Data Explorer</h1>
-      <p class="header-subtitle">
-        Same code, any data source &mdash; query NCBI from their servers or from yours
+      <p class="header-subtitle">A typed data access layer for NCBI's biomedical databases</p>
+      <p class="header-tagline">
+        40+ TypeScript packages that fetch, parse, type, chunk, and annotate data from PubMed, PMC,
+        MeSH, ClinVar, PubChem, Datasets, and more &mdash; in the browser or Node.js.
       </p>
     </header>
 
@@ -124,6 +126,118 @@ const genes = await datasets.geneBySymbol(
             database, or even the browser.
           </p>
         </div>
+      </section>
+
+      <section class="rag-section">
+        <h2 class="section-title">ncbijs in RAG Pipelines</h2>
+        <p class="rag-intro">
+          ncbijs is a <strong>data access layer</strong>, not a RAG system. It provides the
+          structured biomedical data that RAG pipelines need at every stage &mdash; you bring the
+          embeddings model, vector database, and LLM.
+        </p>
+
+        <div class="rag-pipeline">
+          <div class="rag-stage">
+            <div class="rag-stage-header">
+              <span class="rag-stage-number">1</span>
+              <span class="rag-stage-title">Ingest</span>
+            </div>
+            <div class="rag-stage-body">
+              <p class="rag-stage-desc">
+                Fetch full-text articles, split into chunks, extract entities, normalize vocabulary.
+              </p>
+              <div class="rag-packages">
+                <span class="rag-pkg">pmc</span>
+                <span class="rag-pkg">jats</span>
+                <span class="rag-pkg">pubtator</span>
+                <span class="rag-pkg">mesh</span>
+                <span class="rag-pkg">pubmed</span>
+              </div>
+              <div class="rag-example">
+                <code>toChunks(article, { maxTokens: 512 })</code> &rarr; overlapping text passages
+                with section metadata
+              </div>
+            </div>
+          </div>
+
+          <div class="rag-arrow"></div>
+
+          <div class="rag-stage">
+            <div class="rag-stage-header">
+              <span class="rag-stage-number">2</span>
+              <span class="rag-stage-title">Retrieve</span>
+            </div>
+            <div class="rag-stage-body">
+              <p class="rag-stage-desc">
+                Expand queries via MeSH hierarchy so &ldquo;chronic inflammation&rdquo; also finds
+                passages about IL-6, TNF-alpha, and NF-kB.
+              </p>
+              <div class="rag-packages">
+                <span class="rag-pkg">mesh</span>
+                <span class="rag-pkg">datasets</span>
+                <span class="rag-pkg">pubchem</span>
+              </div>
+              <div class="rag-example">
+                <code>mesh.expand('Inflammation')</code> &rarr; all descendant MeSH terms for
+                broader search
+              </div>
+            </div>
+          </div>
+
+          <div class="rag-arrow"></div>
+
+          <div class="rag-stage">
+            <div class="rag-stage-header">
+              <span class="rag-stage-number">3</span>
+              <span class="rag-stage-title">Generate</span>
+            </div>
+            <div class="rag-stage-body">
+              <p class="rag-stage-desc">
+                LLM calls MCP tools in real time to verify claims, look up genes, and format
+                citations &mdash; turning answers into evidence-based output.
+              </p>
+              <div class="rag-packages">
+                <span class="rag-pkg">http-mcp</span>
+                <span class="rag-pkg">cite</span>
+                <span class="rag-pkg">pmc</span>
+                <span class="rag-pkg">id-converter</span>
+              </div>
+              <div class="rag-example">
+                27 MCP tools &mdash; Claude calls them directly during generation, zero glue code
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rag-diagram">
+          <div class="rag-diagram-title">What each layer provides</div>
+          <div class="rag-layers">
+            <div class="rag-layer rag-layer--ncbijs">
+              <div class="rag-layer-label">ncbijs (data access layer)</div>
+              <div class="rag-layer-items">
+                Fetch &bull; Parse &bull; Type &bull; Chunk &bull; Annotate &bull; Normalize &bull;
+                MCP tools
+              </div>
+            </div>
+            <div class="rag-layer rag-layer--yours">
+              <div class="rag-layer-label">Your infrastructure</div>
+              <div class="rag-layer-items">
+                Embeddings &bull; Vector DB &bull; Reranker &bull; LLM &bull; Orchestrator
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="rag-footer">
+          See the full
+          <a
+            href="https://github.com/gagle/ncbijs/blob/main/docs/rag-integration.md"
+            target="_blank"
+            rel="noopener"
+            >RAG Integration Guide</a
+          >
+          for code examples, architecture diagrams, and a priority assessment.
+        </p>
       </section>
     </main>
 

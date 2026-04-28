@@ -128,9 +128,17 @@ It is designed for two audiences:
 
 ## RAG integration
 
-ncbijs is built to power biomedical RAG (Retrieval-Augmented Generation) pipelines. Use it to enrich document chunks with named entities, normalize terminology via MeSH, validate claims against PubMed, and inject formatted citations into generated answers. The MCP server (`@ncbijs/http-mcp`) lets LLM agents call any ncbijs tool directly during generation with zero glue code.
+ncbijs is a **data access layer** for biomedical RAG pipelines. It provides the structured inputs that RAG systems need at every stage — you bring the embeddings model, vector database, and LLM:
 
-See **[RAG Integration Guide](./docs/rag-integration.md)** for a full architecture walkthrough covering ingestion enrichment, query-time augmentation, generation-time citation, and priority assessment.
+| RAG stage    | What ncbijs provides                                                  | Packages                                  |
+| ------------ | --------------------------------------------------------------------- | ----------------------------------------- |
+| **Ingest**   | Fetch full-text articles, chunk into passages, extract entities       | `pmc`, `jats`, `pubtator`, `mesh`         |
+| **Retrieve** | Expand queries via MeSH hierarchy, enrich with gene/compound metadata | `mesh`, `datasets`, `pubchem`             |
+| **Generate** | LLM calls MCP tools to verify claims, look up data, format citations  | `http-mcp`, `cite`, `pmc`, `id-converter` |
+
+ncbijs does **not** do embeddings, vector search, or re-ranking — those are infrastructure concerns that belong in your vector database and LLM orchestrator.
+
+See **[RAG Integration Guide](./docs/rag-integration.md)** for a full architecture walkthrough with code examples and diagrams.
 
 ## Data pipelines
 
