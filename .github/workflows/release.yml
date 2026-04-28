@@ -5,6 +5,7 @@ on:
     branches: [main]
 
 permissions:
+  actions: write
   contents: write
   pull-requests: write
 
@@ -27,7 +28,7 @@ jobs:
 
       - name: Trigger CI on release PR branch
         if: steps.release.outputs.pr
-        run: gh workflow run ci.yml --ref release-please--branches--main
+        run: gh workflow run ci.yml --ref release-please--branches--main --repo ${{ github.repository }}
         env:
           GH_TOKEN: ${{ github.token }}
 
