@@ -82,21 +82,27 @@ code {
   line-height: 1.5;
 }
 
-/* Layout */
+/* Layout — 3-column grid: left margin (sidenav) | content | right margin */
 .main {
   max-width: 1400px;
   width: 100%;
   margin: 0 auto;
   padding: 0 1rem 3rem;
   flex: 1;
+  display: grid;
+  grid-template-columns: 1fr min(1200px, calc(100vw - 400px)) 1fr;
 }
 
-/* Sidenav — tracks 1rem left of the content edge on wide screens, hugs the viewport edge otherwise */
+/* Sidenav — sticky inside the left margin column, vertically aligned with content */
 .sidenav {
-  position: fixed;
-  top: 12rem;
-  left: max(1rem, calc((100vw - 1400px) / 2 - 86px));
+  grid-column: 1;
+  grid-row: 1;
+  position: sticky;
+  top: 1rem;
+  align-self: start;
+  justify-self: end;
   width: 170px;
+  margin-right: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -141,10 +147,10 @@ code {
   flex-shrink: 0;
 }
 
-/* Content area — narrow enough to never overlap the fixed sidenav (170px + 1rem left + gap) */
+/* Content area — centered in the middle grid column */
 .content {
-  max-width: min(1200px, calc(100vw - 400px));
-  margin: 0 auto;
+  grid-column: 2;
+  grid-row: 1;
 }
 
 /* Pages */
@@ -863,9 +869,17 @@ code {
 
 /* Responsive */
 @media (max-width: 768px) {
+  .main {
+    grid-template-columns: 1fr;
+  }
+
   .sidenav {
+    grid-column: 1;
+    grid-row: auto;
     position: static;
     width: 100%;
+    justify-self: stretch;
+    margin-right: 0;
     flex-direction: row;
     gap: 0;
     margin-bottom: 1rem;
@@ -888,7 +902,7 @@ code {
   }
 
   .content {
-    max-width: none;
+    grid-column: 1;
   }
 
   .comparison {
