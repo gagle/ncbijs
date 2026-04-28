@@ -1,4 +1,5 @@
 {
+  ".": "0.0.0",
   "packages/eutils": "0.0.0",
   "packages/pubmed-xml": "0.0.0",
   "packages/pubmed": "0.0.0",
@@ -30,6 +31,12 @@
   "packages/books": "0.0.0",
   "packages/nlm-catalog": "0.0.0",
   "packages/http-mcp": "0.0.0",
+  "packages/store": "0.0.0",
+  "packages/store-mcp": "0.0.0",
+  "packages/pipeline": "0.0.0",
+  "packages/sync": "0.0.0",
+  "packages/etl": "0.0.0",
+  "packages/dailymed": "0.0.0",
   "packages/rxnorm": "0.0.0",
   "packages/litvar": "0.0.0",
   "packages/clinical-trials": "0.0.0",

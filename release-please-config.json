@@ -51,11 +51,17 @@
         "@ncbijs/store-mcp",
         "@ncbijs/pipeline",
         "@ncbijs/sync",
-        "@ncbijs/etl"
+        "@ncbijs/etl",
+        "ncbijs-workspace"
       ]
     }
   ],
   "packages": {
+    ".": {
+      "release-type": "node",
+      "component": "ncbijs-workspace",
+      "skip-github-release": true
+    },
     "packages/eutils": {
       "release-type": "node",
       "component": "@ncbijs/eutils"

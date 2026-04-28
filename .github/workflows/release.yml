@@ -37,6 +37,8 @@ jobs:
       fail-fast: false
       matrix:
         path: ${{ fromJSON(needs.release-please.outputs.paths_released) }}
+        exclude:
+          - path: '.'
     steps:
       - uses: actions/checkout@v6
 
