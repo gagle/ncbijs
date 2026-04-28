@@ -89,21 +89,18 @@ code {
   margin: 0 auto;
   padding: 0 1rem 3rem;
   flex: 1;
-  display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
 }
 
 /* Sidenav */
 .sidenav {
-  position: sticky;
-  top: 1rem;
-  flex-shrink: 0;
+  position: fixed;
+  top: 10rem;
+  left: max(0.75rem, calc((100vw - 1400px) / 2 - 10rem));
   width: 170px;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  padding-top: 0.25rem;
+  z-index: 10;
 }
 
 .sidenav-item {
@@ -146,8 +143,7 @@ code {
 
 /* Content area */
 .content {
-  flex: 1;
-  min-width: 0;
+  width: 100%;
 }
 
 /* Pages */
@@ -866,17 +862,11 @@ code {
 
 /* Responsive */
 @media (max-width: 768px) {
-  .main {
-    flex-direction: column;
-    gap: 0;
-  }
-
   .sidenav {
     position: static;
     width: 100%;
     flex-direction: row;
     gap: 0;
-    padding-top: 0;
     margin-bottom: 1rem;
     border-bottom: 1px solid var(--border);
   }
