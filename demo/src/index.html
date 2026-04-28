@@ -48,7 +48,7 @@
 
         <div class="panel panel--local" id="panel-local">
           <div class="panel-header">
-            <span class="panel-badge panel-badge--local">Your Data</span>
+            <span class="panel-badge panel-badge--local">Your Data (DuckDB)</span>
             <span class="panel-stats" id="stats-local"></span>
           </div>
           <div class="panel-meta" id="meta-local"></div>
@@ -98,7 +98,7 @@ const genes = await datasets.geneBySymbol(
 );</code></pre>
           </div>
           <div class="how-code-block">
-            <div class="how-code-label">Your Data</div>
+            <div class="how-code-label">Your Data (DuckDB)</div>
             <pre><code>const datasets = Datasets.fromStorage(db);
 const genes = await datasets.geneBySymbol(
   ['TP53'], 'human'
@@ -112,9 +112,11 @@ const genes = await datasets.geneBySymbol(
             <code>@ncbijs/pubchem</code>, and <code>@ncbijs/id-converter</code>.
           </p>
           <p>
-            The <strong>Your Data</strong> panel uses the exact same packages with
-            <code>.fromStorage()</code> &mdash; pointed at a local DuckDB database pre-loaded with
-            real NCBI data. Same methods, same return types, zero network requests.
+            The <strong>Your Data (DuckDB)</strong> panel uses the exact same packages with
+            <code>.fromStorage()</code> &mdash; pointed at a ~4 MB DuckDB database bundled with this
+            demo as a sample. It contains a curated subset of real NCBI data (genes, MeSH
+            descriptors, ClinVar variants, PubChem compounds, and ID mappings). Same methods, same
+            return types, zero network requests.
           </p>
           <p>
             In production, you'd run the ETL once (or on a schedule with
