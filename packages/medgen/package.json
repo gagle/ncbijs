@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/medgen",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Typed client for NCBI MedGen medical genetics concepts",
   "author": "Gabriel Llamas",
   "license": "MIT",
