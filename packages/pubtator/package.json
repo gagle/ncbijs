@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/pubtator",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Text mining client for PubTator/BioC APIs with entity annotations and relation discovery",
   "author": "Gabriel Llamas",
   "license": "MIT",

@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/icite",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Typed client for the NIH iCite API — citation metrics, Relative Citation Ratio, and impact analysis",
   "author": "Gabriel Llamas",
   "license": "MIT",
