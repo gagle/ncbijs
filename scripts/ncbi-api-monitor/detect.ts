@@ -428,18 +428,16 @@ export async function checkSpecHashes(currentState: Record<string, SpecHashEntry
   const errors: Array<string> = [];
   const state: Record<string, SpecHashEntry> = { ...currentState };
 
-  const results = await Promise.allSettled(
-    SPEC_ENDPOINTS.map(async (endpoint) => {
-      const response = await fetchWithTimeout(endpoint.url);
-      if (!response.ok) {
-        throw new Error(`HTTP ${String(response.status)} from ${endpoint.url}`);
-      }
-      const body = await response.text();
-      const hash = sha256(body);
-      const version = extractSpecVersion(body);
-      return { endpoint, hash, version };
-    }),
-  );
+  const results = await settleInBatches(SPEC_ENDPOINTS, async (endpoint) => {
+    const response = await fetchWithTimeout(endpoint.url);
+    if (!response.ok) {
+      throw new Error(`HTTP ${String(response.status)} from ${endpoint.url}`);
+    }
+    const body = await response.text();
+    const hash = sha256(body);
+    const version = extractSpecVersion(body);
+    return { endpoint, hash, version };
+  });
 
   for (const result of results) {
     if (result.status === 'rejected') {
@@ -477,17 +475,15 @@ export async function checkVersionEndpoints(
   const errors: Array<string> = [];
   const state: Record<string, Record<string, string>> = { ...currentState };
 
-  const results = await Promise.allSettled(
-    VERSION_ENDPOINTS.map(async (endpoint) => {
-      const response = await fetchWithTimeout(endpoint.url);
-      if (!response.ok) {
-        throw new Error(`HTTP ${String(response.status)} from ${endpoint.url}`);
-      }
-      const text = await response.text();
-      const body: Record<string, string> = JSON.parse(text);
-      return { endpoint, body };
-    }),
-  );
+  const results = await settleInBatches(VERSION_ENDPOINTS, async (endpoint) => {
+    const response = await fetchWithTimeout(endpoint.url);
+    if (!response.ok) {
+      throw new Error(`HTTP ${String(response.status)} from ${endpoint.url}`);
+    }
+    const text = await response.text();
+    const body: Record<string, string> = JSON.parse(text);
+    return { endpoint, body };
+  });
 
   for (const result of results) {
     if (result.status === 'rejected') {
@@ -540,22 +536,20 @@ export async function checkDeprecationHeaders(): Promise<{
   const changes: Array<Change> = [];
   const errors: Array<string> = [];
 
-  const results = await Promise.allSettled(
-    DEPRECATION_PROBES.map(async (probe) => {
-      const fetchUrl = probe.url.includes('eutils.ncbi.nlm.nih.gov')
-        ? appendApiKey(probe.url)
-        : probe.url;
-      const response = await fetchWithTimeout(fetchUrl);
-      const foundHeaders: Array<{ readonly name: string; readonly value: string }> = [];
-      for (const headerName of DEPRECATION_HEADER_NAMES) {
-        const headerValue = response.headers.get(headerName);
-        if (headerValue) {
-          foundHeaders.push({ name: headerName, value: headerValue });
-        }
+  const results = await settleInBatches(DEPRECATION_PROBES, async (probe) => {
+    const fetchUrl = probe.url.includes('eutils.ncbi.nlm.nih.gov')
+      ? appendApiKey(probe.url)
+      : probe.url;
+    const response = await fetchWithTimeout(fetchUrl);
+    const foundHeaders: Array<{ readonly name: string; readonly value: string }> = [];
+    for (const headerName of DEPRECATION_HEADER_NAMES) {
+      const headerValue = response.headers.get(headerName);
+      if (headerValue) {
+        foundHeaders.push({ name: headerName, value: headerValue });
       }
-      return { probe, foundHeaders };
-    }),
-  );
+    }
+    return { probe, foundHeaders };
+  });
 
   for (const result of results) {
     if (result.status === 'rejected') {
@@ -587,23 +581,21 @@ export async function checkSchemaFingerprints(
   const errors: Array<string> = [];
   const state: Record<string, Record<string, ReadonlyArray<string>>> = { ...currentState };
 
-  const results = await Promise.allSettled(
-    SCHEMA_ENDPOINTS.map(async (endpoint) => {
-      const fetchUrl = endpoint.url.includes('eutils.ncbi.nlm.nih.gov')
-        ? appendApiKey(endpoint.url)
-        : endpoint.url;
-      const response = await fetchWithTimeout(fetchUrl);
-      if (!response.ok) {
-        throw new Error(`HTTP ${String(response.status)} from ${endpoint.url}`);
-      }
-      const body: unknown = await response.json();
-      if (typeof body === 'object' && body !== null && 'error' in body) {
-        throw new Error(`Error response from ${endpoint.url}: ${JSON.stringify(body)}`);
-      }
-      const fingerprint = extractJsonKeys(body);
-      return { endpoint, fingerprint };
-    }),
-  );
+  const results = await settleInBatches(SCHEMA_ENDPOINTS, async (endpoint) => {
+    const fetchUrl = endpoint.url.includes('eutils.ncbi.nlm.nih.gov')
+      ? appendApiKey(endpoint.url)
+      : endpoint.url;
+    const response = await fetchWithTimeout(fetchUrl);
+    if (!response.ok) {
+      throw new Error(`HTTP ${String(response.status)} from ${endpoint.url}`);
+    }
+    const body: unknown = await response.json();
+    if (typeof body === 'object' && body !== null && 'error' in body) {
+      throw new Error(`Error response from ${endpoint.url}: ${JSON.stringify(body)}`);
+    }
+    const fingerprint = extractJsonKeys(body);
+    return { endpoint, fingerprint };
+  });
 
   for (const result of results) {
     if (result.status === 'rejected') {

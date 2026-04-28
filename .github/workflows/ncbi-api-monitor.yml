@@ -35,14 +35,20 @@ jobs:
           CHANGE_COUNT=$(jq '.changes | length' /tmp/report.json)
           echo "change_count=$CHANGE_COUNT" >> "$GITHUB_OUTPUT"
 
+      - name: Count actionable changes
+        id: actionable
+        run: |
+          COUNT=$(jq '[.changes[] | select(.severity == "high" or .severity == "medium")] | length' /tmp/report.json)
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+
       - name: Ensure issue label exists
-        if: steps.detect.outputs.change_count != '0'
+        if: steps.actionable.outputs.count != '0'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh label create ncbi-api-monitor --description "Automated NCBI API change detection" --color "d93f0b" --force
 
       - name: Check for existing open issue
-        if: steps.detect.outputs.change_count != '0'
+        if: steps.actionable.outputs.count != '0'
         id: existing
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -51,7 +57,7 @@ jobs:
           echo "open_issues=$COUNT" >> "$GITHUB_OUTPUT"
 
       - name: Open GitHub issue
-        if: steps.detect.outputs.change_count != '0' && steps.existing.outputs.open_issues == '0'
+        if: steps.actionable.outputs.count != '0' && steps.existing.outputs.open_issues == '0'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

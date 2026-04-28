@@ -168,7 +168,7 @@ If code was also changed (HIGH findings), include the state file updates in the 
 
 ### Automated monitoring
 
-A GitHub Actions workflow (`.github/workflows/ncbi-api-monitor.yml`) runs the detection script weekly (Monday 9am UTC). If any changes are detected (HIGH, MEDIUM, or LOW), it opens a GitHub issue with the `ncbi-api-monitor` label. Every change is reported to maintain strict sync with upstream APIs. This skill is for ad-hoc checks and for acting on those issues.
+A GitHub Actions workflow (`.github/workflows/ncbi-api-monitor.yml`) runs the detection script weekly (Monday 9am UTC). If HIGH or MEDIUM changes are detected, it opens a GitHub issue with the `ncbi-api-monitor` label. LOW-only changes (database builds, new schema keys, releases) are recorded in baselines but do not trigger issues since they require no action. This skill is for ad-hoc checks and for acting on those issues.
 
 ---
 
