@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/structure",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Typed client for NCBI Structure (MMDB/PDB) macromolecular 3D structures",
   "author": "Gabriel Llamas",
   "license": "MIT",
