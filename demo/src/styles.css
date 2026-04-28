@@ -95,7 +95,7 @@ code {
 .sidenav {
   position: fixed;
   top: 10rem;
-  left: max(0.75rem, calc((100vw - 1400px) / 2 - 10rem));
+  left: 1rem;
   width: 170px;
   display: flex;
   flex-direction: column;
@@ -141,9 +141,10 @@ code {
   flex-shrink: 0;
 }
 
-/* Content area */
+/* Content area — narrow enough to never overlap the fixed sidenav (170px + 1rem left + gap) */
 .content {
-  width: 100%;
+  max-width: min(1200px, calc(100vw - 400px));
+  margin: 0 auto;
 }
 
 /* Pages */
@@ -884,6 +885,10 @@ code {
     border-bottom-color: var(--accent);
     border-left-color: transparent;
     background: none;
+  }
+
+  .content {
+    max-width: none;
   }
 
   .comparison {
