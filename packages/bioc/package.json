@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/bioc",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "BioC API client — retrieve annotated PubMed and PMC articles with named entity recognition",
   "author": "Gabriel Llamas",
   "license": "MIT",

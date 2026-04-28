@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/geo",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Typed client for NCBI GEO (Gene Expression Omnibus)",
   "author": "Gabriel Llamas",
   "license": "MIT",
