@@ -19,7 +19,6 @@
     "test": "nx run-many -t test",
     "lint": "nx run-many -t lint",
     "typecheck": "nx run-many -t typecheck",
-    "npm-trust:setup": "npm-trust --scope @ncbijs --repo gagle/ncbijs --workflow release.yml",
     "prepare": "husky"
   },
   "devDependencies": {
