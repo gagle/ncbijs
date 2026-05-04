@@ -92,6 +92,7 @@
       "expected_citations_per_year",
       "field_citation_rate",
       "human",
+      "is_clinical",
       "is_research_article",
       "journal",
       "molecular_cellular",
