@@ -11,7 +11,7 @@ Composes /solo-npm:release with this repo's specifics.
 
 - Workspace: pnpm + Nx monorepo at `packages/*`
 - Versioning: unified across all packages — single git tag bumps every package
-- Publish: per-package matrix in `release.yml`; uses `gagle/prepare-dist@v1`
+- Publish: per-package matrix in `release.yml`; uses `gagle/prepare-dist`
   to translate source `package.json` → `dist/package.json` (strip `dist/`
   prefix from paths, drop dev fields, copy README/LICENSE)
 - Repo slug: `gagle/ncbijs`

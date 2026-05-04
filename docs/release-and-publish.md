@@ -42,7 +42,7 @@ All packages share the same version. A single `v{version}` tag (e.g., `v1.0.0`) 
 
 Triggered by `v*` tag push. Publishes all packages with npm OIDC provenance.
 
-### gagle/prepare-dist@v1
+### gagle/prepare-dist
 
 Custom GitHub Action that prepares `dist/` for npm publishing:
 
