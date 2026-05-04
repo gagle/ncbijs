@@ -1,0 +1,55 @@
+{
+  "name": "@ncbijs/dailymed",
+  "version": "0.0.0",
+  "description": "Typed client for the DailyMed REST API v2 — drug labels, SPL data, NDC codes, and drug classes",
+  "author": "Gabriel Llamas",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gagle/ncbijs.git",
+    "directory": "packages/dailymed"
+  },
+  "homepage": "https://github.com/gagle/ncbijs/tree/main/packages/dailymed#readme",
+  "bugs": {
+    "url": "https://github.com/gagle/ncbijs/issues"
+  },
+  "keywords": [
+    "ncbijs",
+    "dailymed",
+    "drug",
+    "label",
+    "spl",
+    "ndc",
+    "medication",
+    "nlm",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "dependencies": {
+    "@ncbijs/rate-limiter": "workspace:*"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "prepublishOnly": "echo 'Use CI to publish' && exit 1"
+  }
+}

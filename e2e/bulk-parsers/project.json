@@ -1,0 +1,37 @@
+{
+  "name": "ncbijs-e2e-bulk-parsers",
+  "targets": {
+    "e2e": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "@ncbijs/cdd:build",
+        "@ncbijs/clinical-trials:build",
+        "@ncbijs/clinvar:build",
+        "@ncbijs/datasets:build",
+        "@ncbijs/icite:build",
+        "@ncbijs/id-converter:build",
+        "@ncbijs/litvar:build",
+        "@ncbijs/medgen:build",
+        "@ncbijs/mesh:build",
+        "@ncbijs/pmc:build",
+        "@ncbijs/pubchem:build",
+        "@ncbijs/snp:build"
+      ],
+      "options": {
+        "command": "vitest run --config e2e/bulk-parsers/vitest.config.ts"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p e2e/bulk-parsers/tsconfig.json"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["{projectRoot}/**/*.ts"]
+      }
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "ncbijs-examples",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@ncbijs/blast": "workspace:*",
+    "@ncbijs/books": "workspace:*",
+    "@ncbijs/cdd": "workspace:*",
+    "@ncbijs/cite": "workspace:*",
+    "@ncbijs/clinvar": "workspace:*",
+    "@ncbijs/datasets": "workspace:*",
+    "@ncbijs/dbvar": "workspace:*",
+    "@ncbijs/eutils": "workspace:*",
+    "@ncbijs/fasta": "workspace:*",
+    "@ncbijs/genbank": "workspace:*",
+    "@ncbijs/geo": "workspace:*",
+    "@ncbijs/gtr": "workspace:*",
+    "@ncbijs/id-converter": "workspace:*",
+    "@ncbijs/medgen": "workspace:*",
+    "@ncbijs/mesh": "workspace:*",
+    "@ncbijs/nlm-catalog": "workspace:*",
+    "@ncbijs/nucleotide": "workspace:*",
+    "@ncbijs/omim": "workspace:*",
+    "@ncbijs/pipeline": "workspace:*",
+    "@ncbijs/pmc": "workspace:*",
+    "@ncbijs/protein": "workspace:*",
+    "@ncbijs/pubchem": "workspace:*",
+    "@ncbijs/pubmed": "workspace:*",
+    "@ncbijs/pubtator": "workspace:*",
+    "@ncbijs/snp": "workspace:*",
+    "@ncbijs/sra": "workspace:*",
+    "@ncbijs/store": "workspace:*",
+    "@ncbijs/structure": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0"
+  }
+}

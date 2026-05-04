@@ -1,0 +1,77 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm build
+      - run: pnpm test
+      - run: pnpm nx run ncbijs-e2e:e2e
+        env:
+          NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
+
+  packages:
+    needs: verify
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.list.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - id: list
+        run: |
+          PACKAGES=$(ls -d packages/*/ | sed 's/\/$//' | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "matrix=$PACKAGES" >> "$GITHUB_OUTPUT"
+
+  publish:
+    needs: packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        path: ${{ fromJSON(needs.packages.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm nx run-many -t build
+
+      - name: Prepare dist for publishing
+        uses: gagle/prepare-dist@v1
+        with:
+          path: ${{ matrix.path }}
+          tag: ${{ github.ref_name }}
+
+      - name: Publish to npm
+        run: pnpm publish --no-git-checks
+        working-directory: ${{ matrix.path }}/dist

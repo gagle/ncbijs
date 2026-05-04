@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.nx/
+coverage/
+*.tsbuildinfo
+package-lock.json
+.DS_Store
+.env
+data/raw/
+*.duckdb
+*.duckdb.wal
+!demo/public/data/ncbijs.duckdb

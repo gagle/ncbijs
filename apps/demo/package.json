@@ -1,0 +1,26 @@
+{
+  "name": "ncbijs-demo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "build-data": "tsx scripts/build-sample-db.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@duckdb/duckdb-wasm": "1.33.1-dev45.0",
+    "@ncbijs/clinvar": "workspace:*",
+    "@ncbijs/datasets": "workspace:*",
+    "@ncbijs/id-converter": "workspace:*",
+    "@ncbijs/mesh": "workspace:*",
+    "@ncbijs/pubchem": "workspace:*",
+    "@ncbijs/store": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vite": "^8.0.10"
+  }
+}

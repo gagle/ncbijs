@@ -1,0 +1,70 @@
+{
+  "name": "@ncbijs/http-mcp",
+  "version": "0.0.0",
+  "description": "MCP server exposing NCBI biomedical tools for LLM agents",
+  "author": "Gabriel Llamas",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gagle/ncbijs.git",
+    "directory": "packages/http-mcp"
+  },
+  "homepage": "https://github.com/gagle/ncbijs/tree/main/packages/http-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/gagle/ncbijs/issues"
+  },
+  "keywords": [
+    "ncbijs",
+    "ncbi",
+    "mcp",
+    "model-context-protocol",
+    "pubmed",
+    "pmc",
+    "biomedical",
+    "llm",
+    "ai",
+    "rag",
+    "tool",
+    "agent",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "bin": {
+    "ncbijs-mcp": "./dist/index.js"
+  },
+  "exports": {
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@ncbijs/blast": "workspace:*",
+    "@ncbijs/cite": "workspace:*",
+    "@ncbijs/clinvar": "workspace:*",
+    "@ncbijs/datasets": "workspace:*",
+    "@ncbijs/icite": "workspace:*",
+    "@ncbijs/id-converter": "workspace:*",
+    "@ncbijs/litvar": "workspace:*",
+    "@ncbijs/mesh": "workspace:*",
+    "@ncbijs/pmc": "workspace:*",
+    "@ncbijs/pubchem": "workspace:*",
+    "@ncbijs/pubmed": "workspace:*",
+    "@ncbijs/pubtator": "workspace:*",
+    "@ncbijs/rxnorm": "workspace:*",
+    "@ncbijs/snp": "workspace:*",
+    "zod": "^4.4.2"
+  },
+  "scripts": {
+    "prepublishOnly": "echo 'Use CI to publish' && exit 1"
+  }
+}

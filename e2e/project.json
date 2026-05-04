@@ -1,0 +1,61 @@
+{
+  "name": "ncbijs-e2e",
+  "targets": {
+    "e2e": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "@ncbijs/blast:build",
+        "@ncbijs/books:build",
+        "@ncbijs/cdd:build",
+        "@ncbijs/cite:build",
+        "@ncbijs/clinical-tables:build",
+        "@ncbijs/clinical-trials:build",
+        "@ncbijs/clinvar:build",
+        "@ncbijs/dailymed:build",
+        "@ncbijs/datasets:build",
+        "@ncbijs/dbvar:build",
+        "@ncbijs/eutils:build",
+        "@ncbijs/fasta:build",
+        "@ncbijs/genbank:build",
+        "@ncbijs/geo:build",
+        "@ncbijs/gtr:build",
+        "@ncbijs/icite:build",
+        "@ncbijs/id-converter:build",
+        "@ncbijs/jats:build",
+        "@ncbijs/litvar:build",
+        "@ncbijs/http-mcp:build",
+        "@ncbijs/medgen:build",
+        "@ncbijs/mesh:build",
+        "@ncbijs/nlm-catalog:build",
+        "@ncbijs/nucleotide:build",
+        "@ncbijs/omim:build",
+        "@ncbijs/pmc:build",
+        "@ncbijs/protein:build",
+        "@ncbijs/pubchem:build",
+        "@ncbijs/pubmed:build",
+        "@ncbijs/pubmed-xml:build",
+        "@ncbijs/pubtator:build",
+        "@ncbijs/rate-limiter:build",
+        "@ncbijs/rxnorm:build",
+        "@ncbijs/snp:build",
+        "@ncbijs/sra:build",
+        "@ncbijs/structure:build"
+      ],
+      "options": {
+        "command": "vitest run --config e2e/vitest.config.ts"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p e2e/tsconfig.json"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["{projectRoot}/**/*.ts"]
+      }
+    }
+  }
+}

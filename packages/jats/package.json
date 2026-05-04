@@ -1,0 +1,56 @@
+{
+  "name": "@ncbijs/jats",
+  "version": "0.0.0",
+  "description": "Parser for JATS XML full-text articles with RAG chunking",
+  "author": "Gabriel Llamas",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gagle/ncbijs.git",
+    "directory": "packages/jats"
+  },
+  "homepage": "https://github.com/gagle/ncbijs/tree/main/packages/jats#readme",
+  "bugs": {
+    "url": "https://github.com/gagle/ncbijs/issues"
+  },
+  "keywords": [
+    "ncbijs",
+    "ncbi",
+    "jats",
+    "pmc",
+    "xml",
+    "full-text",
+    "parser",
+    "rag",
+    "chunking",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "dependencies": {
+    "@ncbijs/xml": "workspace:*"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "prepublishOnly": "echo 'Use CI to publish' && exit 1"
+  }
+}

@@ -1,0 +1,15 @@
+1	|	1	|	no rank	|		|
+2	|	1	|	superkingdom	|		|
+6	|	2	|	genus	|		|
+7	|	6	|	species	|		|
+9	|	2	|	species	|		|
+562	|	2	|	species	|		|
+7227	|	7711	|	species	|		|
+7711	|	1	|	phylum	|		|
+9443	|	40674	|	order	|		|
+9526	|	9443	|	parvorder	|		|
+9604	|	9526	|	family	|		|
+9605	|	9604	|	genus	|		|
+9606	|	9605	|	species	|		|
+10090	|	40674	|	species	|		|
+40674	|	7711	|	class	|		|

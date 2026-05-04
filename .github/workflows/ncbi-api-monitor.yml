@@ -1,0 +1,124 @@
+name: NCBI API Monitor
+
+on:
+  schedule:
+    - cron: '0 9 * * 1' # Monday 9am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Detect NCBI API changes
+        id: detect
+        env:
+          NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
+        run: |
+          pnpm tsx scripts/ncbi-api-monitor/detect.ts > /tmp/report.json
+          cat /tmp/report.json
+
+          CHANGE_COUNT=$(jq '.changes | length' /tmp/report.json)
+          echo "change_count=$CHANGE_COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: Count actionable changes
+        id: actionable
+        run: |
+          COUNT=$(jq '[.changes[] | select(.severity == "high" or .severity == "medium")] | length' /tmp/report.json)
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: Ensure issue label exists
+        if: steps.actionable.outputs.count != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh label create ncbi-api-monitor --description "Automated NCBI API change detection" --color "d93f0b" --force
+
+      - name: Check for existing open issue
+        if: steps.actionable.outputs.count != '0'
+        id: existing
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          COUNT=$(gh issue list --label ncbi-api-monitor --state open --json number --jq length)
+          echo "open_issues=$COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: Open GitHub issue
+        if: steps.actionable.outputs.count != '0' && steps.existing.outputs.open_issues == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TITLE=$(jq -r '
+            "NCBI API changes detected (\(.date | split("T")[0])): \(.summary)"
+          ' /tmp/report.json)
+
+          BODY=$(jq -r '
+            "## NCBI API Changes Detected\n\n" +
+            "**Summary**: \(.summary)\n\n" +
+
+            (if ([.changes[] | select(.severity == "high")] | length) > 0 then
+              "### :red_circle: HIGH (action required)\n\n" +
+              ([.changes[] | select(.severity == "high") |
+                if (.affectedPackages | length) > 0 then
+                  "- **\(.affectedPackages | join(", "))**: \(.description)"
+                else
+                  "- \(.description)"
+                end
+              ] | join("\n")) + "\n\n"
+            else "" end) +
+
+            (if ([.changes[] | select(.severity == "medium")] | length) > 0 then
+              "### :orange_circle: MEDIUM (investigate)\n\n" +
+              ([.changes[] | select(.severity == "medium") |
+                if (.affectedPackages | length) > 0 then
+                  "- **\(.affectedPackages | join(", "))**: \(.description)"
+                else
+                  "- \(.description)"
+                end
+              ] | join("\n")) + "\n\n"
+            else "" end) +
+
+            (if ([.changes[] | select(.severity == "low")] | length) > 0 then
+              "### :white_circle: LOW (informational)\n\n" +
+              ([.changes[] | select(.severity == "low") |
+                if (.affectedPackages | length) > 0 then
+                  "- **\(.affectedPackages | join(", "))**: \(.description)"
+                else
+                  "- \(.description)"
+                end
+              ] | join("\n")) + "\n\n"
+            else "" end) +
+
+            (if (.errors | length) > 0 then
+              "### Errors\n\n" +
+              ([.errors[] | "- \(.)"] | join("\n")) + "\n\n"
+            else "" end) +
+
+            "---\n\nRun the `/ncbi-check-updates` skill locally to investigate and apply fixes."
+          ' /tmp/report.json)
+
+          gh issue create --title "$TITLE" --body "$BODY" --label "ncbi-api-monitor"
+
+      - name: Commit updated baselines
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .ncbi-check-updates/
+          git diff --cached --quiet || {
+            git commit -m "chore(workspace): update NCBI API monitor baselines"
+            git pull --rebase origin main
+            git push
+          }

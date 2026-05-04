@@ -1,0 +1,31 @@
+{
+  "name": "ncbijs-e2e-pipeline",
+  "targets": {
+    "e2e": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "@ncbijs/pipeline:build",
+        "@ncbijs/store:build",
+        "@ncbijs/mesh:build",
+        "@ncbijs/clinvar:build",
+        "@ncbijs/datasets:build",
+        "@ncbijs/id-converter:build"
+      ],
+      "options": {
+        "command": "vitest run --config e2e/pipeline/vitest.config.ts"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p e2e/pipeline/tsconfig.json"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["{projectRoot}/**/*.ts"]
+      }
+    }
+  }
+}

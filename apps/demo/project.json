@@ -1,0 +1,21 @@
+{
+  "name": "demo",
+  "sourceRoot": "apps/demo/src",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cd apps/demo && npx vite build"
+      },
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": { "lintFilePatterns": ["{projectRoot}/**/*.ts"] }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc --noEmit -p apps/demo/tsconfig.json" }
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "name": "ncbijs-workspace",
+  "version": "0.0.0",
+  "description": "TypeScript clients for NCBI APIs — PubMed, PMC, BLAST, SNP, ClinVar, PubChem, Datasets, and more",
+  "author": "Gabriel Llamas",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gagle/ncbijs.git"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@10.15.0",
+  "scripts": {
+    "build": "nx run-many -t build",
+    "test": "nx run-many -t test",
+    "lint": "nx run-many -t lint",
+    "typecheck": "nx run-many -t typecheck",
+    "npm-trust:setup": "npm-trust --scope @ncbijs --repo gagle/ncbijs --workflow release.yml",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.5.3",
+    "@commitlint/config-conventional": "^20.5.3",
+    "@eslint/js": "^10.0.1",
+    "@nx/devkit": "^22.7.1",
+    "@nx/eslint": "^22.7.1",
+    "@nx/eslint-plugin": "^22.7.1",
+    "@types/node": "^25.6.0",
+    "@vitest/coverage-v8": "^4.1.5",
+    "eslint": "^10.3.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "npm-trust": "^0.9.0",
+    "nx": "^22.7.1",
+    "prettier": "^3.8.3",
+    "tsc-esm-imports": "0.1.1",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.1",
+    "vitest": "^4.1.5"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "esbuild",
+      "lmdb",
+      "nx"
+    ]
+  }
+}

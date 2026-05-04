@@ -1,0 +1,54 @@
+{
+  "name": "@ncbijs/pubmed-xml",
+  "version": "0.0.0",
+  "description": "Spec-compliant parser for PubMed/MEDLINE XML format",
+  "author": "Gabriel Llamas",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gagle/ncbijs.git",
+    "directory": "packages/pubmed-xml"
+  },
+  "homepage": "https://github.com/gagle/ncbijs/tree/main/packages/pubmed-xml#readme",
+  "bugs": {
+    "url": "https://github.com/gagle/ncbijs/issues"
+  },
+  "keywords": [
+    "ncbijs",
+    "ncbi",
+    "pubmed",
+    "xml",
+    "medline",
+    "parser",
+    "bioinformatics",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "dependencies": {
+    "@ncbijs/xml": "workspace:*"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "prepublishOnly": "echo 'Use CI to publish' && exit 1"
+  }
+}

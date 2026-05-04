@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://cdn.jsdelivr.net; connect-src 'self' https://*.ncbi.nlm.nih.gov https://*.nlm.nih.gov https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; worker-src 'self' blob: https://cdn.jsdelivr.net;"
+    />
+    <title>ncbijs Data Explorer</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="header">
+      <h1 class="header-title">ncbijs Data Explorer</h1>
+      <p class="header-subtitle">A typed data access layer for NCBI's biomedical databases</p>
+      <p class="header-tagline">
+        40+ TypeScript packages that fetch, parse, type, chunk, and annotate data from PubMed, PMC,
+        MeSH, ClinVar, PubChem, Datasets, and more &mdash; in the browser or Node.js.
+      </p>
+    </header>
+
+    <main class="main">
+      <nav class="sidenav" id="sidenav">
+        <button class="sidenav-item sidenav-item--active" data-page="explorer">
+          <svg class="sidenav-icon" viewBox="0 0 16 16" fill="currentColor">
+            <path
+              d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm0 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6-6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-7zm0 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-7z"
+            />
+          </svg>
+          Data Explorer
+        </button>
+        <button class="sidenav-item" data-page="rag">
+          <svg class="sidenav-icon" viewBox="0 0 16 16" fill="currentColor">
+            <path
+              d="M3 0a2 2 0 0 0-2 2v1.3a2 2 0 0 0 .6 1.4L4.3 7.4a.5.5 0 0 1 .2.4v4.7a.5.5 0 0 0 .2.4l3 2a.5.5 0 0 0 .8-.4V7.8a.5.5 0 0 1 .1-.4l2.8-2.7A2 2 0 0 0 12 3.3V2a2 2 0 0 0-2-2H3z"
+            />
+          </svg>
+          RAG Pipelines
+        </button>
+      </nav>
+
+      <div class="content">
+        <div class="page page--active" id="page-explorer">
+          <section class="query-section">
+            <div class="examples" id="examples"></div>
+
+            <div class="search-bar">
+              <input
+                type="text"
+                id="search-input"
+                class="search-input"
+                placeholder="Select an example or type a query..."
+                autocomplete="off"
+              />
+              <button id="search-btn" class="search-btn">Run</button>
+            </div>
+          </section>
+
+          <section class="comparison" id="comparison">
+            <div class="panel panel--live" id="panel-live">
+              <div class="panel-header">
+                <span class="panel-badge panel-badge--live">NCBI Servers</span>
+                <span class="panel-stats" id="stats-live"></span>
+              </div>
+              <div class="panel-meta" id="meta-live"></div>
+              <div class="panel-body" id="body-live">
+                <p class="panel-placeholder">Results from NCBI HTTP APIs will appear here.</p>
+              </div>
+            </div>
+
+            <div class="panel panel--local" id="panel-local">
+              <div class="panel-header">
+                <span class="panel-badge panel-badge--local">Your Data (DuckDB)</span>
+                <span class="panel-stats" id="stats-local"></span>
+              </div>
+              <div class="panel-meta" id="meta-local"></div>
+              <div class="panel-body" id="body-local">
+                <p class="panel-placeholder">Results from your local database will appear here.</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="how-it-works">
+            <h2 class="section-title">How It Works</h2>
+            <div class="how-problem">
+              <p>
+                <strong>Problem:</strong> NCBI limits you to 3&ndash;10 requests per second. If you
+                need millions of queries, that takes days.
+              </p>
+              <p>
+                <strong>Solution:</strong> Download the data once into your own database. Query it
+                locally with the same <code>@ncbijs/*</code> packages. No rate limits.
+              </p>
+            </div>
+            <div class="pipeline-diagram">
+              <div class="pipeline-step">
+                <div class="pipeline-icon">1</div>
+                <div class="pipeline-label">Load</div>
+                <div class="pipeline-desc">
+                  <code>@ncbijs/etl</code> downloads bulk NCBI data, parses it, and writes
+                  structured records to any storage backend (DuckDB, PostgreSQL, MotherDuck).
+                </div>
+              </div>
+              <div class="pipeline-arrow"></div>
+              <div class="pipeline-step">
+                <div class="pipeline-icon">2</div>
+                <div class="pipeline-label">Query</div>
+                <div class="pipeline-desc">
+                  The same <code>@ncbijs/*</code> packages query both sources. The only difference
+                  is where the data lives.
+                </div>
+              </div>
+            </div>
+            <div class="how-code-comparison">
+              <div class="how-code-block">
+                <div class="how-code-label">NCBI Servers</div>
+                <pre><code>const datasets = new Datasets();
+const genes = await datasets.geneBySymbol(
+  ['TP53'], 'human'
+);</code></pre>
+              </div>
+              <div class="how-code-block">
+                <div class="how-code-label">Your Data (DuckDB)</div>
+                <pre><code>const datasets = Datasets.fromStorage(db);
+const genes = await datasets.geneBySymbol(
+  ['TP53'], 'human'
+);</code></pre>
+              </div>
+            </div>
+            <div class="how-details">
+              <p>
+                The <strong>NCBI Servers</strong> panel queries NCBI APIs in real time using
+                <code>@ncbijs/mesh</code>, <code>@ncbijs/datasets</code>,
+                <code>@ncbijs/clinvar</code>, <code>@ncbijs/pubchem</code>, and
+                <code>@ncbijs/id-converter</code>.
+              </p>
+              <p>
+                The <strong>Your Data (DuckDB)</strong> panel uses the exact same packages with
+                <code>.fromStorage()</code> &mdash; pointed at a ~4 MB DuckDB database bundled with
+                this demo as a sample. It contains a curated subset of real NCBI data (genes, MeSH
+                descriptors, ClinVar variants, PubChem compounds, and ID mappings). Same methods,
+                same return types, zero network requests.
+              </p>
+              <p>
+                In production, you'd run the ETL once (or on a schedule with
+                <code>@ncbijs/sync</code>), then query your own copy &mdash; from a server, cloud
+                database, or even the browser.
+              </p>
+            </div>
+          </section>
+        </div>
+
+        <div class="page" id="page-rag">
+          <section class="rag-section">
+            <h2 class="section-title">ncbijs in RAG Pipelines</h2>
+            <p class="rag-intro">
+              ncbijs is a <strong>data access layer</strong>, not a RAG system. It provides the
+              structured biomedical data that RAG pipelines need at every stage &mdash; you bring
+              the embeddings model, vector database, and LLM.
+            </p>
+
+            <div class="rag-pipeline">
+              <div class="rag-stage">
+                <div class="rag-stage-header">
+                  <span class="rag-stage-number">1</span>
+                  <span class="rag-stage-title">Ingest</span>
+                </div>
+                <div class="rag-stage-body">
+                  <p class="rag-stage-desc">
+                    Fetch full-text articles, split into chunks, extract entities, normalize
+                    vocabulary.
+                  </p>
+                  <div class="rag-packages">
+                    <span class="rag-pkg">pmc</span>
+                    <span class="rag-pkg">jats</span>
+                    <span class="rag-pkg">pubtator</span>
+                    <span class="rag-pkg">mesh</span>
+                    <span class="rag-pkg">pubmed</span>
+                  </div>
+                  <div class="rag-example">
+                    <code>toChunks(article, { maxTokens: 512 })</code> &rarr; overlapping text
+                    passages with section metadata
+                  </div>
+                </div>
+              </div>
+
+              <div class="rag-arrow"></div>
+
+              <div class="rag-stage">
+                <div class="rag-stage-header">
+                  <span class="rag-stage-number">2</span>
+                  <span class="rag-stage-title">Retrieve</span>
+                </div>
+                <div class="rag-stage-body">
+                  <p class="rag-stage-desc">
+                    Expand queries via MeSH hierarchy so &ldquo;chronic inflammation&rdquo; also
+                    finds passages about IL-6, TNF-alpha, and NF-kB.
+                  </p>
+                  <div class="rag-packages">
+                    <span class="rag-pkg">mesh</span>
+                    <span class="rag-pkg">datasets</span>
+                    <span class="rag-pkg">pubchem</span>
+                  </div>
+                  <div class="rag-example">
+                    <code>mesh.expand('Inflammation')</code> &rarr; all descendant MeSH terms for
+                    broader search
+                  </div>
+                </div>
+              </div>
+
+              <div class="rag-arrow"></div>
+
+              <div class="rag-stage">
+                <div class="rag-stage-header">
+                  <span class="rag-stage-number">3</span>
+                  <span class="rag-stage-title">Generate</span>
+                </div>
+                <div class="rag-stage-body">
+                  <p class="rag-stage-desc">
+                    LLM calls MCP tools in real time to verify claims, look up genes, and format
+                    citations &mdash; turning answers into evidence-based output.
+                  </p>
+                  <div class="rag-packages">
+                    <span class="rag-pkg">http-mcp</span>
+                    <span class="rag-pkg">cite</span>
+                    <span class="rag-pkg">pmc</span>
+                    <span class="rag-pkg">id-converter</span>
+                  </div>
+                  <div class="rag-example">
+                    27 MCP tools &mdash; Claude calls them directly during generation, zero glue
+                    code
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rag-diagram">
+              <div class="rag-diagram-title">What each layer provides</div>
+              <div class="rag-layers">
+                <div class="rag-layer rag-layer--ncbijs">
+                  <div class="rag-layer-label">ncbijs (data access layer)</div>
+                  <div class="rag-layer-items">
+                    Fetch &bull; Parse &bull; Type &bull; Chunk &bull; Annotate &bull; Normalize
+                    &bull; MCP tools
+                  </div>
+                </div>
+                <div class="rag-layer rag-layer--yours">
+                  <div class="rag-layer-label">Your infrastructure</div>
+                  <div class="rag-layer-items">
+                    Embeddings &bull; Vector DB &bull; Reranker &bull; LLM &bull; Orchestrator
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rag-mcp-section">
+              <h3 class="rag-mcp-title">MCP Server as LLM Tool Provider</h3>
+              <p class="rag-mcp-desc">
+                The <code>@ncbijs/http-mcp</code> server exposes 27 tools that any MCP-compatible
+                LLM agent can call. No wrapper code needed &mdash; register once and the LLM can
+                search PubMed, look up genes, fetch citations, and more.
+              </p>
+              <div class="how-code-block">
+                <div class="how-code-label">claude_desktop_config.json</div>
+                <pre><code>{
+  "mcpServers": {
+    "ncbijs": {
+      "command": "npx",
+      "args": ["-y", "@ncbijs/http-mcp"],
+      "env": { "NCBI_API_KEY": "" }
+    }
+  }
+}</code></pre>
+              </div>
+              <p class="rag-mcp-desc" style="margin-top: 1rem">
+                This turns a RAG system from closed-book (source materials only) into open-book
+                &mdash; the LLM verifies and enriches answers with current biomedical literature in
+                real time.
+              </p>
+            </div>
+
+            <div class="rag-data-format">
+              <h3 class="rag-data-format-title">What About the Data Format?</h3>
+              <p class="rag-data-format-desc">
+                NCBI data is already structured. ncbijs doesn't need OCR or layout detection &mdash;
+                it normalizes 40+ different API formats (XML, TSV, JSON) into clean, typed
+                JavaScript objects that serialize to JSON. LLMs read JSON natively.
+              </p>
+              <div class="rag-format-table-wrapper">
+                <table class="rag-format-table">
+                  <thead>
+                    <tr>
+                      <th>Aspect</th>
+                      <th>PDF to LLM</th>
+                      <th>NCBI to LLM (ncbijs)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Source format</td>
+                      <td>Unstructured (layout, fonts, images)</td>
+                      <td>Already structured (XML, TSV, JSON)</td>
+                    </tr>
+                    <tr>
+                      <td>Extraction</td>
+                      <td>OCR, table detection needed</td>
+                      <td>Already done by ncbijs parsers</td>
+                    </tr>
+                    <tr>
+                      <td>Chunking</td>
+                      <td>Generic text splitting</td>
+                      <td>Section-aware splitting (<code>toChunks</code>)</td>
+                    </tr>
+                    <tr>
+                      <td>Entity extraction</td>
+                      <td>General NER</td>
+                      <td>Domain-specific NER via PubTator3</td>
+                    </tr>
+                    <tr>
+                      <td>Vocabulary</td>
+                      <td>None</td>
+                      <td>MeSH controlled vocabulary (30K+ terms)</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="rag-architecture">
+              <h3 class="rag-architecture-title">Architecture</h3>
+              <div class="rag-arch-layers">
+                <div class="rag-arch-layer rag-arch-layer--app">
+                  <div class="rag-arch-layer-label">Your RAG System</div>
+                </div>
+                <div class="rag-arch-layer rag-arch-layer--ncbijs">
+                  <div class="rag-arch-layer-label">ncbijs &mdash; Data Access Layer</div>
+                  <div class="rag-arch-layer-items">
+                    <div class="rag-arch-group">
+                      <span class="rag-arch-group-label">Ingestion</span>
+                      <span class="rag-arch-group-pkgs">pmc, jats, pubtator, mesh, pubmed</span>
+                    </div>
+                    <div class="rag-arch-group">
+                      <span class="rag-arch-group-label">Retrieval</span>
+                      <span class="rag-arch-group-pkgs"
+                        >mesh (query expansion), datasets, pubchem</span
+                      >
+                    </div>
+                    <div class="rag-arch-group">
+                      <span class="rag-arch-group-label">Generation</span>
+                      <span class="rag-arch-group-pkgs"
+                        >http-mcp (27 tools), cite, id-converter</span
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div class="rag-arch-layer rag-arch-layer--infra">
+                  <div class="rag-arch-layer-label">Your Infrastructure</div>
+                  <div class="rag-arch-layer-items">
+                    <div class="rag-arch-group">
+                      <span class="rag-arch-group-label">Embeddings</span>
+                      <span class="rag-arch-group-pkgs">OpenAI, Cohere, Sentence-Transformers</span>
+                    </div>
+                    <div class="rag-arch-group">
+                      <span class="rag-arch-group-label">Vector DB</span>
+                      <span class="rag-arch-group-pkgs">Pinecone, pgvector, Weaviate, Qdrant</span>
+                    </div>
+                    <div class="rag-arch-group">
+                      <span class="rag-arch-group-label">LLM</span>
+                      <span class="rag-arch-group-pkgs">Claude, GPT, Llama, Gemini</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <p class="rag-footer">
+              See the full
+              <a
+                href="https://github.com/gagle/ncbijs/blob/main/docs/rag-integration.md"
+                target="_blank"
+                rel="noopener"
+                >RAG Integration Guide</a
+              >
+              for code examples, ingestion flow diagrams, and a priority assessment.
+            </p>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <a href="https://github.com/gagle/ncbijs" target="_blank" rel="noopener">GitHub</a>
+      <span class="footer-sep">|</span>
+      <a href="https://www.npmjs.com/org/ncbijs" target="_blank" rel="noopener">npm</a>
+    </footer>
+
+    <script type="module" src="./app.ts"></script>
+  </body>
+</html>

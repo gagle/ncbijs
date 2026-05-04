@@ -1,0 +1,200 @@
+#tax_id	GeneID	Symbol	LocusTag	Synonyms	dbXrefs	chromosome	map_location	description	type_of_gene	Symbol_from_nomenclature_authority	Full_name_from_nomenclature_authority	Nomenclature_status	Other_designations	Modification_date	Feature_type
+7	5692769	NEWENTRY	-	-	-	-	-	Record to support submission of GeneRIFs for a gene not in Gene (Azotirhizobium caulinodans.  Use when strain, subtype, isolate, etc. is unspecified, or when different from all specified ones in Gene.).	other	-	-	-	-	20241113	-
+9	2827857	NEWENTRY	-	-	-	-	-	Record to support submission of GeneRIFs for a gene not in Gene (Use when strain, subtype, isolate, etc. is unspecified, or when different from all specified ones in Gene.).	other	-	-	-	-	20241113	-
+11	10823747	NEWENTRY	-	-	-	-	-	Record to support submission of GeneRIFs for a gene not in Gene (Cellvibrio gilvus.  Use when strain, subtype, isolate, etc. is unspecified, or when different from all specified ones in Gene.).	other	-	-	-	-	20241101	-
+14	6951813	NEWENTRY	-	-	-	-	-	Record to support submission of GeneRIFs for a gene not in Gene (Use when strain, subtype, isolate, etc. is unspecified, or when different from all specified ones in Gene.).	other	-	-	-	-	20241204	-
+19	3758873	NEWENTRY	-	-	-	-	-	Record to support submission of GeneRIFs for a gene not in Gene (Pelobacter carbinolicus.  Use when strain, subtype, isolate, etc. is unspecified, or when different from all specified ones in Gene.).	other	-	-	-	-	20241204	-
+24	5129993	NEWENTRY	-	-	-	-	-	Record to support submission of GeneRIFs for a gene not in Gene (Alteromonas putrefaciens; Pseudomonas putrefaciens.  Use when strain, subtype, isolate, etc. is unspecified, or when different from all specified ones in Gene.).	other	-	-	-	-	20241113	-
+24	67441593	dnaA	JEZ96_RS00005	-	-	-	-	chromosomal replication initiator protein DnaA	protein-coding	-	-	-	chromosomal replication initiator protein DnaA	20260210	-
+24	67441594	dnaN	JEZ96_RS00010	-	-	-	-	DNA polymerase III subunit beta	protein-coding	-	-	-	DNA polymerase III subunit beta	20260210	-
+24	67441595	recF	JEZ96_RS00015	-	-	-	-	DNA replication/repair protein RecF	protein-coding	-	-	-	DNA replication/repair protein RecF	20260210	-
+24	67441596	gyrB	JEZ96_RS00020	-	-	-	-	DNA topoisomerase (ATP-hydrolyzing) subunit B	protein-coding	-	-	-	DNA topoisomerase (ATP-hydrolyzing) subunit B	20260210	-
+24	67441597	JEZ96_RS00025	JEZ96_RS00025	-	-	-	-	HDOD domain-containing protein	protein-coding	-	-	-	HDOD domain-containing protein	20260210	-
+24	67441598	glyS	JEZ96_RS00030	-	-	-	-	glycine--tRNA ligase subunit beta	protein-coding	-	-	-	glycine--tRNA ligase subunit beta	20260210	-
+24	67441599	glyQ	JEZ96_RS00035	-	-	-	-	glycine--tRNA ligase subunit alpha	protein-coding	-	-	-	glycine--tRNA ligase subunit alpha	20260210	-
+24	67441600	JEZ96_RS00040	JEZ96_RS00040	-	-	-	-	DNA-3-methyladenine glycosylase I	protein-coding	-	-	-	DNA-3-methyladenine glycosylase I	20260210	-
+24	67441601	JEZ96_RS00045	JEZ96_RS00045	-	-	-	-	amidohydrolase family protein	protein-coding	-	-	-	amidohydrolase family protein	20260210	-
+24	67441602	JEZ96_RS00050	JEZ96_RS00050	-	-	-	-	MOSC domain-containing protein	protein-coding	-	-	-	MOSC domain-containing protein	20260210	-
+24	67441603	tusA	JEZ96_RS00055	-	-	-	-	sulfurtransferase TusA	protein-coding	-	-	-	sulfurtransferase TusA	20260210	-
+24	67441604	fadA	JEZ96_RS00060	-	-	-	-	acetyl-CoA C-acyltransferase FadA	protein-coding	-	-	-	acetyl-CoA C-acyltransferase FadA	20260210	-
+24	67441605	fadB	JEZ96_RS00065	-	-	-	-	fatty acid oxidation complex subunit alpha FadB	protein-coding	-	-	-	fatty acid oxidation complex subunit alpha FadB	20260210	-
+24	67441606	pepQ	JEZ96_RS00070	-	-	-	-	pseudo	pseudo	-	-	-	-	20241215	-
+24	67441607	JEZ96_RS00075	JEZ96_RS00075	-	-	-	-	YigZ family protein	protein-coding	-	-	-	YigZ family protein	20260210	-
+24	67441608	JEZ96_RS00080	JEZ96_RS00080	-	-	-	-	TrkH family potassium uptake protein	protein-coding	-	-	-	TrkH family potassium uptake protein	20260210	-
+24	67441609	hemG	JEZ96_RS00085	-	-	-	-	menaquinone-dependent protoporphyrinogen IX dehydrogenase	protein-coding	-	-	-	menaquinone-dependent protoporphyrinogen IX dehydrogenase	20260210	-
+24	67441610	JEZ96_RS00090	JEZ96_RS00090	-	-	-	-	ArsR/SmtB family transcription factor	protein-coding	-	-	-	ArsR/SmtB family transcription factor	20260210	-
+24	67441611	hemG	JEZ96_RS00095	-	-	-	-	menaquinone-dependent protoporphyrinogen IX dehydrogenase	protein-coding	-	-	-	menaquinone-dependent protoporphyrinogen IX dehydrogenase	20260210	-
+24	67441612	JEZ96_RS00100	JEZ96_RS00100	-	-	-	-	TrkH family potassium uptake protein	protein-coding	-	-	-	TrkH family potassium uptake protein	20260210	-
+24	67441613	trkA	JEZ96_RS00105	-	-	-	-	Trk system potassium transporter TrkA	protein-coding	-	-	-	Trk system potassium transporter TrkA	20260210	-
+24	67441614	rsmB	JEZ96_RS00110	-	-	-	-	16S rRNA (cytosine(967)-C(5))-methyltransferase RsmB	protein-coding	-	-	-	16S rRNA (cytosine(967)-C(5))-methyltransferase RsmB	20260210	-
+24	67441615	fmt	JEZ96_RS00115	-	-	-	-	methionyl-tRNA formyltransferase	protein-coding	-	-	-	methionyl-tRNA formyltransferase	20260210	-
+24	67441616	def	JEZ96_RS00120	-	-	-	-	peptide deformylase	protein-coding	-	-	-	peptide deformylase	20260210	-
+24	67441617	JEZ96_RS00125	JEZ96_RS00125	-	-	-	-	LysM peptidoglycan-binding domain-containing protein	protein-coding	-	-	-	LysM peptidoglycan-binding domain-containing protein	20260210	-
+24	67441618	dprA	JEZ96_RS00130	-	-	-	-	DNA-processing protein DprA	protein-coding	-	-	-	DNA-processing protein DprA	20260210	-
+24	67441619	JEZ96_RS00135	JEZ96_RS00135	-	-	-	-	DUF494 family protein	protein-coding	-	-	-	DUF494 family protein	20260210	-
+24	67441620	JEZ96_RS00140	JEZ96_RS00140	-	-	-	-	DNA topoisomerase family protein	protein-coding	-	-	-	DNA topoisomerase family protein	20260210	-
+24	67441621	JEZ96_RS00145	JEZ96_RS00145	-	-	-	-	L-threonylcarbamoyladenylate synthase	protein-coding	-	-	-	L-threonylcarbamoyladenylate synthase	20260210	-
+24	67441622	hemF	JEZ96_RS00150	-	-	-	-	oxygen-dependent coproporphyrinogen oxidase	protein-coding	-	-	-	oxygen-dependent coproporphyrinogen oxidase	20260210	-
+24	67441623	JEZ96_RS00155	JEZ96_RS00155	-	-	-	-	group II truncated hemoglobin	protein-coding	-	-	-	group II truncated hemoglobin	20251214	-
+24	67441624	aroE	JEZ96_RS00160	-	-	-	-	shikimate dehydrogenase	protein-coding	-	-	-	shikimate dehydrogenase	20260210	-
+24	67441625	JEZ96_RS00165	JEZ96_RS00165	-	-	-	-	DUF1488 family protein	protein-coding	-	-	-	DUF1488 family protein	20260210	-
+24	67441626	JEZ96_RS00170	JEZ96_RS00170	-	-	-	-	gamma carbonic anhydrase family protein	protein-coding	-	-	-	gamma carbonic anhydrase family protein	20260210	-
+24	67441627	JEZ96_RS00175	JEZ96_RS00175	-	-	-	-	16S ribosomal RNA	rRNA	-	-	-	-	20241215	-
+24	67441628	JEZ96_RS00180	JEZ96_RS00180	-	-	-	-	23S ribosomal RNA	rRNA	-	-	-	-	20241215	-
+24	67441629	rrf	JEZ96_RS00185	-	-	-	-	5S ribosomal RNA	rRNA	-	-	-	-	20241215	-
+24	67441630	JEZ96_RS00190	JEZ96_RS00190	-	-	-	-	EAL domain-containing protein	protein-coding	-	-	-	EAL domain-containing protein	20260210	-
+24	67441631	JEZ96_RS00195	JEZ96_RS00195	-	-	-	-	alpha/beta fold hydrolase	protein-coding	-	-	-	alpha/beta fold hydrolase	20260210	-
+24	67441632	JEZ96_RS00200	JEZ96_RS00200	-	-	-	-	DUF885 domain-containing protein	protein-coding	-	-	-	DUF885 domain-containing protein	20260210	-
+24	67441633	add	JEZ96_RS00205	-	-	-	-	adenosine deaminase	protein-coding	-	-	-	adenosine deaminase	20260210	-
+24	67441634	hemN	JEZ96_RS00210	-	-	-	-	oxygen-independent coproporphyrinogen III oxidase	protein-coding	-	-	-	oxygen-independent coproporphyrinogen III oxidase	20251214	-
+24	67441635	JEZ96_RS00215	JEZ96_RS00215	-	-	-	-	DUF2489 domain-containing protein	protein-coding	-	-	-	DUF2489 domain-containing protein	20260210	-
+24	67441636	yihI	JEZ96_RS00220	-	-	-	-	Der GTPase-activating protein YihI	protein-coding	-	-	-	Der GTPase-activating protein YihI	20251214	-
+24	67441637	JEZ96_RS00225	JEZ96_RS00225	-	-	-	-	methyltransferase domain-containing protein	protein-coding	-	-	-	methyltransferase domain-containing protein	20260210	-
+24	67441638	JEZ96_RS00230	JEZ96_RS00230	-	-	-	-	c-type cytochrome	protein-coding	-	-	-	c-type cytochrome	20260210	-
+24	67441639	yihA	JEZ96_RS00235	-	-	-	-	ribosome biogenesis GTP-binding protein YihA/YsxC	protein-coding	-	-	-	ribosome biogenesis GTP-binding protein YihA/YsxC	20260210	-
+24	67441640	polA	JEZ96_RS00240	-	-	-	-	DNA polymerase I	protein-coding	-	-	-	DNA polymerase I	20260210	-
+24	67441641	elbB	JEZ96_RS00245	-	-	-	-	isoprenoid biosynthesis glyoxalase ElbB	protein-coding	-	-	-	isoprenoid biosynthesis glyoxalase ElbB	20260210	-
+24	67441642	glpG	JEZ96_RS00250	-	-	-	-	rhomboid family intramembrane serine protease GlpG	protein-coding	-	-	-	rhomboid family intramembrane serine protease GlpG	20260210	-
+24	67441643	glpE	JEZ96_RS00255	-	-	-	-	thiosulfate sulfurtransferase GlpE	protein-coding	-	-	-	thiosulfate sulfurtransferase GlpE	20260210	-
+24	67441644	tdh	JEZ96_RS00260	-	-	-	-	L-threonine 3-dehydrogenase	protein-coding	-	-	-	L-threonine 3-dehydrogenase	20260210	-
+24	67441645	JEZ96_RS00265	JEZ96_RS00265	-	-	-	-	glycine C-acetyltransferase	protein-coding	-	-	-	glycine C-acetyltransferase	20260210	-
+24	67441646	JEZ96_RS00270	JEZ96_RS00270	-	-	-	-	TetR/AcrR family transcriptional regulator	protein-coding	-	-	-	TetR/AcrR family transcriptional regulator	20260210	-
+24	67441647	waaA	JEZ96_RS00275	-	-	-	-	lipid IV(A) 3-deoxy-D-manno-octulosonic acid transferase	protein-coding	-	-	-	lipid IV(A) 3-deoxy-D-manno-octulosonic acid transferase	20260210	-
+24	67441648	JEZ96_RS00280	JEZ96_RS00280	-	-	-	-	3-deoxy-D-manno-octulosonic acid kinase	protein-coding	-	-	-	3-deoxy-D-manno-octulosonic acid kinase	20260210	-
+24	67441649	JEZ96_RS00285	JEZ96_RS00285	-	-	-	-	glycosyltransferase family 9 protein	protein-coding	-	-	-	glycosyltransferase family 9 protein	20260210	-
+24	67441650	JEZ96_RS00290	JEZ96_RS00290	-	-	-	-	glycosyltransferase family 25 protein	protein-coding	-	-	-	glycosyltransferase family 25 protein	20260210	-
+24	67441651	JEZ96_RS00295	JEZ96_RS00295	-	-	-	-	glycosyltransferase	protein-coding	-	-	-	glycosyltransferase	20260210	-
+24	67441652	rfbB	JEZ96_RS00300	-	-	-	-	dTDP-glucose 4,6-dehydratase	protein-coding	-	-	-	dTDP-glucose 4,6-dehydratase	20260210	-
+24	67441653	rfbA	JEZ96_RS00305	-	-	-	-	glucose-1-phosphate thymidylyltransferase RfbA	protein-coding	-	-	-	glucose-1-phosphate thymidylyltransferase RfbA	20260210	-
+24	67441654	JEZ96_RS00310	JEZ96_RS00310	-	-	-	-	sugar 3,4-ketoisomerase	protein-coding	-	-	-	sugar 3,4-ketoisomerase	20260210	-
+24	67441655	JEZ96_RS00315	JEZ96_RS00315	-	-	-	-	acyltransferase	protein-coding	-	-	-	acyltransferase	20260210	-
+24	67441656	JEZ96_RS00320	JEZ96_RS00320	-	-	-	-	DegT/DnrJ/EryC1/StrS family aminotransferase	protein-coding	-	-	-	DegT/DnrJ/EryC1/StrS family aminotransferase	20260210	-
+24	67441657	JEZ96_RS00325	JEZ96_RS00325	-	-	-	-	CDP-glycerol glycerophosphotransferase family protein	protein-coding	-	-	-	CDP-glycerol glycerophosphotransferase family protein	20260210	-
+24	67441658	JEZ96_RS00330	JEZ96_RS00330	-	-	-	-	glycosyltransferase family 2 protein	protein-coding	-	-	-	glycosyltransferase family 2 protein	20260210	-
+24	67441659	rfbD	JEZ96_RS00335	-	-	-	-	dTDP-4-dehydrorhamnose reductase	protein-coding	-	-	-	dTDP-4-dehydrorhamnose reductase	20260210	-
+24	67441660	rfbC	JEZ96_RS00340	-	-	-	-	dTDP-4-dehydrorhamnose 3,5-epimerase	protein-coding	-	-	-	dTDP-4-dehydrorhamnose 3,5-epimerase	20260210	-
+24	67441661	JEZ96_RS00345	JEZ96_RS00345	-	-	-	-	DUF3413 domain-containing protein	protein-coding	-	-	-	DUF3413 domain-containing protein	20260210	-
+24	67441662	coaD	JEZ96_RS00350	-	-	-	-	pantetheine-phosphate adenylyltransferase	protein-coding	-	-	-	pantetheine-phosphate adenylyltransferase	20260210	-
+24	67441663	JEZ96_RS00355	JEZ96_RS00355	-	-	-	-	capsule assembly Wzi family protein	protein-coding	-	-	-	capsule assembly Wzi family protein	20251214	-
+24	67441664	mutM	JEZ96_RS00360	-	-	-	-	bifunctional DNA-formamidopyrimidine glycosylase/DNA-(apurinic or apyrimidinic site) lyase	protein-coding	-	-	-	bifunctional DNA-formamidopyrimidine glycosylase/DNA-(apurinic or apyrimidinic site) lyase	20260210	-
+24	67441665	JEZ96_RS00365	JEZ96_RS00365	-	-	-	-	hypothetical protein	protein-coding	-	-	-	hypothetical protein	20260210	-
+24	67441666	moaA	JEZ96_RS00370	-	-	-	-	GTP 3',8-cyclase MoaA	protein-coding	-	-	-	GTP 3',8-cyclase MoaA	20260210	-
+24	67441667	JEZ96_RS00375	JEZ96_RS00375	-	-	-	-	bifunctional molybdopterin-guanine dinucleotide biosynthesis adaptor protein MobB/molybdopterin molybdotransferase MoeA	protein-coding	-	-	-	bifunctional molybdopterin-guanine dinucleotide biosynthesis adaptor protein MobB/molybdopterin molybdotransferase MoeA	20260210	-
+24	67441668	mobA	JEZ96_RS00380	-	-	-	-	molybdenum cofactor guanylyltransferase MobA	protein-coding	-	-	-	molybdenum cofactor guanylyltransferase MobA	20260210	-
+24	67441669	JEZ96_RS00385	JEZ96_RS00385	-	-	-	-	ABC transporter ATP-binding protein	protein-coding	-	-	-	ABC transporter ATP-binding protein	20260210	-
+24	67441670	JEZ96_RS00390	JEZ96_RS00390	-	-	-	-	ABC transporter permease	protein-coding	-	-	-	ABC transporter permease	20260210	-
+24	67441671	JEZ96_RS00395	JEZ96_RS00395	-	-	-	-	substrate-binding domain-containing protein	protein-coding	-	-	-	substrate-binding domain-containing protein	20260210	-
+24	67441672	JEZ96_RS00400	JEZ96_RS00400	-	-	-	-	sigma-54-dependent transcriptional regulator	protein-coding	-	-	-	sigma-54-dependent transcriptional regulator	20260210	-
+24	67441673	JEZ96_RS00405	JEZ96_RS00405	-	-	-	-	sensor histidine kinase	protein-coding	-	-	-	sensor histidine kinase	20260210	-
+24	67441674	JEZ96_RS00410	JEZ96_RS00410	-	-	-	-	GNAT family N-acetyltransferase	protein-coding	-	-	-	GNAT family N-acetyltransferase	20260210	-
+24	67441675	JEZ96_RS00415	JEZ96_RS00415	-	-	-	-	7-cyano-7-deazaguanine/7-aminomethyl-7-deazaguanine transporter	protein-coding	-	-	-	7-cyano-7-deazaguanine/7-aminomethyl-7-deazaguanine transporter	20260210	-
+24	67441676	JEZ96_RS00420	JEZ96_RS00420	-	-	-	-	hypothetical protein	protein-coding	-	-	-	hypothetical protein	20260210	-
+24	67441677	JEZ96_RS00425	JEZ96_RS00425	-	-	-	-	isochorismate synthase	protein-coding	-	-	-	isochorismate synthase	20260210	-
+24	67441678	JEZ96_RS00430	JEZ96_RS00430	-	-	-	-	ATP-binding cassette domain-containing protein	protein-coding	-	-	-	ATP-binding cassette domain-containing protein	20260210	-
+24	67441679	JEZ96_RS00435	JEZ96_RS00435	-	-	-	-	HD-GYP domain-containing protein	protein-coding	-	-	-	HD-GYP domain-containing protein	20260210	-
+24	67441680	JEZ96_RS00440	JEZ96_RS00440	-	-	-	-	paraquat-inducible protein A	protein-coding	-	-	-	paraquat-inducible protein A	20260210	-
+24	67441681	JEZ96_RS00445	JEZ96_RS00445	-	-	-	-	hypothetical protein	protein-coding	-	-	-	hypothetical protein	20260210	-
+24	67441682	JEZ96_RS00450	JEZ96_RS00450	-	-	-	-	YeiH family protein	protein-coding	-	-	-	YeiH family protein	20260210	-
+24	67441683	JEZ96_RS00455	JEZ96_RS00455	-	-	-	-	aldolase/citrate lyase/malate synthase family protein	protein-coding	-	-	-	aldolase/citrate lyase/malate synthase family protein	20260210	-
+24	67441684	JEZ96_RS00460	JEZ96_RS00460	-	-	-	-	DUF3612 domain-containing protein	protein-coding	-	-	-	DUF3612 domain-containing protein	20260210	-
+24	67441685	JEZ96_RS00465	JEZ96_RS00465	-	-	-	-	homocysteine S-methyltransferase family protein	protein-coding	-	-	-	homocysteine S-methyltransferase family protein	20260210	-
+24	67441686	JEZ96_RS00470	JEZ96_RS00470	-	-	-	-	basic amino acid/polyamine antiporter	protein-coding	-	-	-	basic amino acid/polyamine antiporter	20260210	-
+24	67441687	JEZ96_RS00475	JEZ96_RS00475	-	-	-	-	TonB-dependent siderophore receptor	protein-coding	-	-	-	TonB-dependent siderophore receptor	20260210	-
+24	67441688	cyoE	JEZ96_RS00480	-	-	-	-	heme o synthase	protein-coding	-	-	-	heme o synthase	20260210	-
+24	67441689	cyoD	JEZ96_RS00485	-	-	-	-	cytochrome o ubiquinol oxidase subunit IV	protein-coding	-	-	-	cytochrome o ubiquinol oxidase subunit IV	20260210	-
+24	67441690	cyoC	JEZ96_RS00490	-	-	-	-	cytochrome o ubiquinol oxidase subunit III	protein-coding	-	-	-	cytochrome o ubiquinol oxidase subunit III	20260210	-
+24	67441691	cyoB	JEZ96_RS00495	-	-	-	-	cytochrome o ubiquinol oxidase subunit I	protein-coding	-	-	-	cytochrome o ubiquinol oxidase subunit I	20260210	-
+24	67441692	cyoA	JEZ96_RS00500	-	-	-	-	ubiquinol oxidase subunit II	protein-coding	-	-	-	ubiquinol oxidase subunit II	20260210	-
+24	67441693	JEZ96_RS00505	JEZ96_RS00505	-	-	-	-	hypothetical protein	protein-coding	-	-	-	hypothetical protein	20260210	-
+24	67441694	JEZ96_RS00510	JEZ96_RS00510	-	-	-	-	EAL domain-containing protein	protein-coding	-	-	-	EAL domain-containing protein	20260210	-
+24	67441695	JEZ96_RS00515	JEZ96_RS00515	-	-	-	-	hypothetical protein	protein-coding	-	-	-	hypothetical protein	20260210	-
+24	67441696	JEZ96_RS00520	JEZ96_RS00520	-	-	-	-	DUF3300 domain-containing protein	protein-coding	-	-	-	DUF3300 domain-containing protein	20260210	-
+24	67441697	JEZ96_RS00525	JEZ96_RS00525	-	-	-	-	ATP-binding protein	protein-coding	-	-	-	ATP-binding protein	20260210	-
+24	67441698	JEZ96_RS00530	JEZ96_RS00530	-	-	-	-	response regulator transcription factor	protein-coding	-	-	-	response regulator transcription factor	20260210	-
+24	67441699	JEZ96_RS00535	JEZ96_RS00535	-	-	-	-	PepSY domain-containing protein	protein-coding	-	-	-	PepSY domain-containing protein	20260210	-
+24	67441700	JEZ96_RS00540	JEZ96_RS00540	-	-	-	-	choice-of-anchor H family protein	protein-coding	-	-	-	choice-of-anchor H family protein	20260210	-
+24	67441701	JEZ96_RS00545	JEZ96_RS00545	-	-	-	-	peroxiredoxin	protein-coding	-	-	-	peroxiredoxin	20260210	-
+24	67441702	JEZ96_RS00550	JEZ96_RS00550	-	-	-	-	methyl-accepting chemotaxis protein	protein-coding	-	-	-	methyl-accepting chemotaxis protein	20260210	-
+24	67441703	envZ	JEZ96_RS00555	-	-	-	-	pseudo	pseudo	-	-	-	-	20241215	-
+24	67441704	ompR	JEZ96_RS00560	-	-	-	-	osmolarity response regulator transcription factor OmpR	protein-coding	-	-	-	osmolarity response regulator transcription factor OmpR	20260210	-
+24	67441705	greB	JEZ96_RS00565	-	-	-	-	transcription elongation factor GreB	protein-coding	-	-	-	transcription elongation factor GreB	20260210	-
+24	67441706	JEZ96_RS00570	JEZ96_RS00570	-	-	-	-	Tex family protein	protein-coding	-	-	-	Tex family protein	20260210	-
+24	67441707	JEZ96_RS00575	JEZ96_RS00575	-	-	-	-	LTA synthase family protein	protein-coding	-	-	-	LTA synthase family protein	20260210	-
+24	67441708	JEZ96_RS00580	JEZ96_RS00580	-	-	-	-	hypothetical protein	protein-coding	-	-	-	hypothetical protein	20260210	-
+24	67441709	bioH	JEZ96_RS00585	-	-	-	-	pimeloyl-ACP methyl ester esterase BioH	protein-coding	-	-	-	pimeloyl-ACP methyl ester esterase BioH	20260210	-
+24	67441710	JEZ96_RS00590	JEZ96_RS00590	-	-	-	-	amidophosphoribosyltransferase	protein-coding	-	-	-	amidophosphoribosyltransferase	20260210	-
+24	67441711	JEZ96_RS00595	JEZ96_RS00595	-	-	-	-	response regulator transcription factor	protein-coding	-	-	-	response regulator transcription factor	20260210	-
+24	67441712	JEZ96_RS00600	JEZ96_RS00600	-	-	-	-	response regulator transcription factor	protein-coding	-	-	-	response regulator transcription factor	20260210	-
+24	67441713	JEZ96_RS00605	JEZ96_RS00605	-	-	-	-	sensor histidine kinase	protein-coding	-	-	-	sensor histidine kinase	20260210	-
+24	67441714	JEZ96_RS00610	JEZ96_RS00610	-	-	-	-	outer membrane protein OmpK	protein-coding	-	-	-	outer membrane protein OmpK	20260210	-
+24	67441715	urdA	JEZ96_RS00615	-	-	-	-	urocanate reductase	protein-coding	-	-	-	urocanate reductase	20251214	-
+24	67441716	nfuA	JEZ96_RS00620	-	-	-	-	Fe-S biogenesis protein NfuA	protein-coding	-	-	-	Fe-S biogenesis protein NfuA	20260210	-
+24	67441719	JEZ96_RS00635	JEZ96_RS00635	-	-	-	-	hypothetical protein	protein-coding	-	-	-	hypothetical protein	20260210	-
+24	67441721	JEZ96_RS00645	JEZ96_RS00645	-	-	-	-	RHS repeat domain-containing protein	protein-coding	-	-	-	RHS repeat domain-containing protein	20260210	-
+24	67441722	JEZ96_RS00650	JEZ96_RS00650	-	-	-	-	MATE family efflux transporter	protein-coding	-	-	-	MATE family efflux transporter	20260210	-
+24	67441723	JEZ96_RS00655	JEZ96_RS00655	-	-	-	-	polysaccharide deacetylase family protein	protein-coding	-	-	-	polysaccharide deacetylase family protein	20260210	-
+24	67441724	JEZ96_RS00660	JEZ96_RS00660	-	-	-	-	SCO family protein	protein-coding	-	-	-	SCO family protein	20260210	-
+24	67441725	cyoE	JEZ96_RS00665	-	-	-	-	heme o synthase	protein-coding	-	-	-	heme o synthase	20260210	-
+24	67441726	JEZ96_RS00670	JEZ96_RS00670	-	-	-	-	COX15/CtaA family protein	protein-coding	-	-	-	COX15/CtaA family protein	20260210	-
+24	67441727	JEZ96_RS00675	JEZ96_RS00675	-	-	-	-	hypothetical protein	protein-coding	-	-	-	hypothetical protein	20260210	-
+24	67441728	JEZ96_RS00680	JEZ96_RS00680	-	-	-	-	SURF1 family protein	protein-coding	-	-	-	SURF1 family protein	20260210	-
+24	67441729	JEZ96_RS00685	JEZ96_RS00685	-	-	-	-	DUF2909 family protein	protein-coding	-	-	-	DUF2909 family protein	20260210	-
+24	67441730	JEZ96_RS00690	JEZ96_RS00690	-	-	-	-	cytochrome c oxidase subunit 3	protein-coding	-	-	-	cytochrome c oxidase subunit 3	20260210	-
+24	67441731	JEZ96_RS00695	JEZ96_RS00695	-	-	-	-	cytochrome c oxidase assembly protein	protein-coding	-	-	-	cytochrome c oxidase assembly protein	20260210	-
+24	67441732	ctaD	JEZ96_RS00700	-	-	-	-	cytochrome c oxidase subunit I	protein-coding	-	-	-	cytochrome c oxidase subunit I	20260210	-
+24	67441733	coxB	JEZ96_RS00705	-	-	-	-	cytochrome c oxidase subunit II	protein-coding	-	-	-	cytochrome c oxidase subunit II	20260210	-
+24	67441734	JEZ96_RS00710	JEZ96_RS00710	-	-	-	-	cell division inhibitor SulA	protein-coding	-	-	-	cell division inhibitor SulA	20251214	-
+24	67441735	lexA	JEZ96_RS00715	-	-	-	-	transcriptional repressor LexA	protein-coding	-	-	-	transcriptional repressor LexA	20260210	-
+24	67441736	plsB	JEZ96_RS00720	-	-	-	-	glycerol-3-phosphate 1-O-acyltransferase PlsB	protein-coding	-	-	-	glycerol-3-phosphate 1-O-acyltransferase PlsB	20260210	-
+24	67441737	mtr	JEZ96_RS00725	-	-	-	-	tryptophan permease	protein-coding	-	-	-	tryptophan permease	20260210	-
+24	67441738	JEZ96_RS00730	JEZ96_RS00730	-	-	-	-	ribonuclease T2	protein-coding	-	-	-	ribonuclease T2	20260210	-
+24	67441739	murB	JEZ96_RS00735	-	-	-	-	UDP-N-acetylmuramate dehydrogenase	protein-coding	-	-	-	UDP-N-acetylmuramate dehydrogenase	20260210	-
+24	67441740	birA	JEZ96_RS00740	-	-	-	-	bifunctional biotin--	protein-coding	-	-	-	bifunctional biotin--	20260210	-
+24	67441741	coaA	JEZ96_RS00745	-	-	-	-	type I pantothenate kinase	protein-coding	-	-	-	type I pantothenate kinase	20260210	-
+24	67441742	JEZ96_RS00750	JEZ96_RS00750	-	-	-	-	tRNA-Thr	tRNA	-	-	-	-	20241215	-
+24	67441743	JEZ96_RS00755	JEZ96_RS00755	-	-	-	-	tRNA-Tyr	tRNA	-	-	-	-	20241215	-
+24	67441744	JEZ96_RS00760	JEZ96_RS00760	-	-	-	-	tRNA-Gly	tRNA	-	-	-	-	20241215	-
+24	67441745	JEZ96_RS00765	JEZ96_RS00765	-	-	-	-	tRNA-Thr	tRNA	-	-	-	-	20241215	-
+24	67441746	tuf	JEZ96_RS00770	-	-	-	-	elongation factor Tu	protein-coding	-	-	-	elongation factor Tu	20260210	-
+24	67441747	secE	JEZ96_RS00775	-	-	-	-	preprotein translocase subunit SecE	protein-coding	-	-	-	preprotein translocase subunit SecE	20260210	-
+24	67441748	nusG	JEZ96_RS00780	-	-	-	-	transcription termination/antitermination protein NusG	protein-coding	-	-	-	transcription termination/antitermination protein NusG	20260210	-
+24	67441749	rplK	JEZ96_RS00785	-	-	-	-	50S ribosomal protein L11	protein-coding	-	-	-	50S ribosomal protein L11	20260210	-
+24	67441750	rplA	JEZ96_RS00790	-	-	-	-	50S ribosomal protein L1	protein-coding	-	-	-	50S ribosomal protein L1	20260210	-
+24	67441751	rplJ	JEZ96_RS00795	-	-	-	-	50S ribosomal protein L10	protein-coding	-	-	-	50S ribosomal protein L10	20260210	-
+24	67441752	rplL	JEZ96_RS00800	-	-	-	-	50S ribosomal protein L7/L12	protein-coding	-	-	-	50S ribosomal protein L7/L12	20260210	-
+24	67441753	rpoB	JEZ96_RS00805	-	-	-	-	DNA-directed RNA polymerase subunit beta	protein-coding	-	-	-	DNA-directed RNA polymerase subunit beta	20260210	-
+24	67441754	rpoC	JEZ96_RS00810	-	-	-	-	DNA-directed RNA polymerase subunit beta'	protein-coding	-	-	-	DNA-directed RNA polymerase subunit beta'	20260210	-
+24	67441755	rpsL	JEZ96_RS00815	-	-	-	-	30S ribosomal protein S12	protein-coding	-	-	-	30S ribosomal protein S12	20260210	-
+24	67441756	rpsG	JEZ96_RS00820	-	-	-	-	30S ribosomal protein S7	protein-coding	-	-	-	30S ribosomal protein S7	20260210	-
+24	67441757	fusA	JEZ96_RS00825	-	-	-	-	elongation factor G	protein-coding	-	-	-	elongation factor G	20260210	-
+24	67441758	tuf	JEZ96_RS00830	-	-	-	-	elongation factor Tu	protein-coding	-	-	-	elongation factor Tu	20260210	-
+24	67441759	rpsJ	JEZ96_RS00835	-	-	-	-	30S ribosomal protein S10	protein-coding	-	-	-	30S ribosomal protein S10	20260210	-
+24	67441760	rplC	JEZ96_RS00840	-	-	-	-	50S ribosomal protein L3	protein-coding	-	-	-	50S ribosomal protein L3	20260210	-
+24	67441761	rplD	JEZ96_RS00845	-	-	-	-	50S ribosomal protein L4	protein-coding	-	-	-	50S ribosomal protein L4	20260210	-
+24	67441762	rplW	JEZ96_RS00850	-	-	-	-	50S ribosomal protein L23	protein-coding	-	-	-	50S ribosomal protein L23	20260210	-
+24	67441763	rplB	JEZ96_RS00855	-	-	-	-	50S ribosomal protein L2	protein-coding	-	-	-	50S ribosomal protein L2	20260210	-
+24	67441764	rpsS	JEZ96_RS00860	-	-	-	-	30S ribosomal protein S19	protein-coding	-	-	-	30S ribosomal protein S19	20260210	-
+24	67441765	rplV	JEZ96_RS00865	-	-	-	-	50S ribosomal protein L22	protein-coding	-	-	-	50S ribosomal protein L22	20260210	-
+24	67441766	rpsC	JEZ96_RS00870	-	-	-	-	30S ribosomal protein S3	protein-coding	-	-	-	30S ribosomal protein S3	20260210	-
+24	67441767	rplP	JEZ96_RS00875	-	-	-	-	50S ribosomal protein L16	protein-coding	-	-	-	50S ribosomal protein L16	20260210	-
+24	67441768	rpmC	JEZ96_RS00880	-	-	-	-	50S ribosomal protein L29	protein-coding	-	-	-	50S ribosomal protein L29	20260210	-
+24	67441769	rpsQ	JEZ96_RS00885	-	-	-	-	30S ribosomal protein S17	protein-coding	-	-	-	30S ribosomal protein S17	20260210	-
+24	67441770	rplN	JEZ96_RS00890	-	-	-	-	50S ribosomal protein L14	protein-coding	-	-	-	50S ribosomal protein L14	20260210	-
+24	67441771	rplX	JEZ96_RS00895	-	-	-	-	50S ribosomal protein L24	protein-coding	-	-	-	50S ribosomal protein L24	20260210	-
+24	67441772	rplE	JEZ96_RS00900	-	-	-	-	50S ribosomal protein L5	protein-coding	-	-	-	50S ribosomal protein L5	20260210	-
+24	67441773	rpsN	JEZ96_RS00905	-	-	-	-	30S ribosomal protein S14	protein-coding	-	-	-	30S ribosomal protein S14	20260210	-
+24	67441774	rpsH	JEZ96_RS00910	-	-	-	-	30S ribosomal protein S8	protein-coding	-	-	-	30S ribosomal protein S8	20260210	-
+24	67441775	rplF	JEZ96_RS00915	-	-	-	-	50S ribosomal protein L6	protein-coding	-	-	-	50S ribosomal protein L6	20260210	-
+24	67441776	rplR	JEZ96_RS00920	-	-	-	-	50S ribosomal protein L18	protein-coding	-	-	-	50S ribosomal protein L18	20260210	-
+24	67441777	rpsE	JEZ96_RS00925	-	-	-	-	30S ribosomal protein S5	protein-coding	-	-	-	30S ribosomal protein S5	20260210	-
+24	67441778	rpmD	JEZ96_RS00930	-	-	-	-	50S ribosomal protein L30	protein-coding	-	-	-	50S ribosomal protein L30	20260210	-
+24	67441779	rplO	JEZ96_RS00935	-	-	-	-	50S ribosomal protein L15	protein-coding	-	-	-	50S ribosomal protein L15	20260210	-
+24	67441780	secY	JEZ96_RS00940	-	-	-	-	preprotein translocase subunit SecY	protein-coding	-	-	-	preprotein translocase subunit SecY	20260210	-
+24	67441781	rpmJ	JEZ96_RS00945	-	-	-	-	50S ribosomal protein L36	protein-coding	-	-	-	50S ribosomal protein L36	20260210	-
+24	67441782	rpsM	JEZ96_RS00950	-	-	-	-	30S ribosomal protein S13	protein-coding	-	-	-	30S ribosomal protein S13	20260210	-
+24	67441783	rpsK	JEZ96_RS00955	-	-	-	-	30S ribosomal protein S11	protein-coding	-	-	-	30S ribosomal protein S11	20260210	-
+24	67441784	rpsD	JEZ96_RS00960	-	-	-	-	30S ribosomal protein S4	protein-coding	-	-	-	30S ribosomal protein S4	20260210	-
+24	67441785	JEZ96_RS00965	JEZ96_RS00965	-	-	-	-	DNA-directed RNA polymerase subunit alpha	protein-coding	-	-	-	DNA-directed RNA polymerase subunit alpha	20260210	-
+24	67441786	rplQ	JEZ96_RS00970	-	-	-	-	50S ribosomal protein L17	protein-coding	-	-	-	50S ribosomal protein L17	20260210	-
+24	67441787	ccmE	JEZ96_RS00975	-	-	-	-	cytochrome c maturation protein CcmE	protein-coding	-	-	-	cytochrome c maturation protein CcmE	20260210	-
+24	67441788	ccmD	JEZ96_RS00980	-	-	-	-	heme exporter protein CcmD	protein-coding	-	-	-	heme exporter protein CcmD	20260210	-

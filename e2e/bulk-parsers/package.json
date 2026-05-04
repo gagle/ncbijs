@@ -1,0 +1,20 @@
+{
+  "name": "ncbijs-e2e-bulk-parsers",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@ncbijs/cdd": "workspace:*",
+    "@ncbijs/clinical-trials": "workspace:*",
+    "@ncbijs/clinvar": "workspace:*",
+    "@ncbijs/datasets": "workspace:*",
+    "@ncbijs/icite": "workspace:*",
+    "@ncbijs/id-converter": "workspace:*",
+    "@ncbijs/litvar": "workspace:*",
+    "@ncbijs/medgen": "workspace:*",
+    "@ncbijs/mesh": "workspace:*",
+    "@ncbijs/pmc": "workspace:*",
+    "@ncbijs/pubchem": "workspace:*",
+    "@ncbijs/snp": "workspace:*"
+  }
+}

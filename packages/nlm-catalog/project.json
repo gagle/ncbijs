@@ -1,0 +1,25 @@
+{
+  "name": "@ncbijs/nlm-catalog",
+  "sourceRoot": "packages/nlm-catalog/src",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p packages/nlm-catalog/tsconfig.build.json && tsc-esm-imports packages/nlm-catalog/dist --external-deep --ignore '@ncbijs/*'"
+      },
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vitest run --config packages/nlm-catalog/vitest.config.ts" }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": { "lintFilePatterns": ["{projectRoot}/**/*.ts"] }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc --noEmit -p packages/nlm-catalog/tsconfig.json" }
+    }
+  }
+}

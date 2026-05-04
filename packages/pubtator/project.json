@@ -1,0 +1,25 @@
+{
+  "name": "@ncbijs/pubtator",
+  "sourceRoot": "packages/pubtator/src",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p packages/pubtator/tsconfig.build.json && tsc-esm-imports packages/pubtator/dist --external-deep --ignore '@ncbijs/*'"
+      },
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vitest run --config packages/pubtator/vitest.config.ts" }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": { "lintFilePatterns": ["{projectRoot}/**/*.ts"] }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc --noEmit -p packages/pubtator/tsconfig.json" }
+    }
+  }
+}

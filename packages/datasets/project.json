@@ -1,0 +1,25 @@
+{
+  "name": "@ncbijs/datasets",
+  "sourceRoot": "packages/datasets/src",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p packages/datasets/tsconfig.build.json && tsc-esm-imports packages/datasets/dist --external-deep --ignore '@ncbijs/*'"
+      },
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vitest run --config packages/datasets/vitest.config.ts" }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": { "lintFilePatterns": ["{projectRoot}/**/*.ts"] }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc --noEmit -p packages/datasets/tsconfig.json" }
+    }
+  }
+}

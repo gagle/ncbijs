@@ -1,0 +1,30 @@
+214330	CHL00001	rpoB	RNA polymerase beta subunit	1070	Cdd
+214331	CHL00002	matK	maturase K	504	Cdd
+176948	CHL00003	psbA	photosystem II protein D1	338	Cdd
+176949	CHL00004	psbD	photosystem II protein D2	353	Cdd
+176950	CHL00005	rps16	ribosomal protein S16	82	Cdd
+176951	CHL00008	petG	cytochrome b6/f complex subunit V	37	Cdd
+176952	CHL00009	petN	cytochrome b6/f complex subunit VIII	29	Cdd
+214332	CHL00010	infA	translation initiation factor 1	78	Cdd
+176954	CHL00011	ndhD	NADH dehydrogenase subunit 4	498	Cdd
+176955	CHL00012	ndhJ	NADH dehydrogenase subunit J	158	Cdd
+238152	cd00001	KH	K homology RNA-binding domain	70	Cdd
+238153	cd00002	LIM	LIM domain	54	Cdd
+238154	cd00003	SAM	Sterile alpha motif	65	Cdd
+238155	cd00004	SH2	Src homology 2 domain	98	Cdd
+238156	cd00005	SH3	Src homology 3 domain	56	Cdd
+99776	smart00100	BBOX	B-box-type zinc finger	40	SMART
+99777	smart00101	nBBOX	Another B-box-type zinc finger	44	SMART
+99778	smart00102	SM00102	not known to be functional	17	SMART
+99779	smart00103	SM00103	not known to be functional	29	SMART
+100048	smart00324	BRCT	BRCA1 C Terminus	92	SMART
+100049	smart00325	CH	Calponin Homology domain	109	SMART
+99715	smart00050	PHD	PHD zinc finger	55	SMART
+281218	pfam00001	7tm_1	7 transmembrane receptor (rhodopsin family)	265	Pfam
+281219	pfam00002	7tm_2	7 transmembrane receptor (Secretin family)	221	Pfam
+281220	pfam00003	7tm_3	7 transmembrane sweet-taste receptor of 3 GCPR	275	Pfam
+281221	pfam00004	AAA	ATPase family associated with various cellular activities	132	Pfam
+281222	pfam00005	ABC_tran	ABC transporter	137	Pfam
+281223	pfam00006	Abhydrolase_1	Alpha/beta hydrolase fold	199	Pfam
+281224	pfam00007	Abi	Abortive infection phage resistance	87	Pfam
+281225	pfam00008	Acyl_transf_1	Acyltransferase family	305	Pfam

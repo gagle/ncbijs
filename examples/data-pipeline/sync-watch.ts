@@ -1,0 +1,97 @@
+/**
+ * Watch NCBI data sources for updates and auto-reload into DuckDB.
+ *
+ * Usage: pnpm exec tsx examples/data-pipeline/sync-watch.ts [--db-path <path>] [--interval <minutes>] [--dataset <name>]
+ *
+ * This is Step 2 of the data pipeline workflow:
+ *
+ *   Step 1 (initial load): Run http-to-duckdb.ts or loadAll() to populate DuckDB
+ *   Step 2 (keep fresh):   Run this script to poll for upstream changes and re-sync
+ *
+ * On first run (or after restart with InMemorySyncState), every dataset appears
+ * "new" because there is no stored checksum or timestamp to compare against.
+ * This triggers a full reload of all watched datasets — effectively combining
+ * the initial load and ongoing sync into a single process. For large datasets,
+ * prefer running the initial load separately with http-to-duckdb.ts, then
+ * starting this watcher afterward.
+ *
+ * Change detection strategy is selected automatically per dataset:
+ *   - MD5 checksum (ClinVar, Taxonomy, PubChem): downloads tiny .md5 companion
+ *     files (~50 bytes) and compares against stored checksum
+ *   - HTTP Last-Modified (Gene, MeSH, PMC IDs): sends HEAD request and compares
+ *     the Last-Modified header
+ */
+
+import { join } from 'node:path';
+import { createCheckers, listDatasets, load } from '@ncbijs/etl';
+import type { EtlDatasetType } from '@ncbijs/etl';
+import { SyncScheduler, InMemorySyncState } from '@ncbijs/sync';
+import { DuckDbFileStorage } from '@ncbijs/store';
+import type { DatasetType } from '@ncbijs/store';
+
+function parseArgValue(flag: string): string | undefined {
+  const flagIndex = process.argv.indexOf(flag);
+
+  if (flagIndex === -1) {
+    return undefined;
+  }
+
+  return process.argv[flagIndex + 1];
+}
+
+async function main(): Promise<void> {
+  const dbPath = parseArgValue('--db-path') ?? join(process.cwd(), 'data', 'ncbijs.duckdb');
+  const intervalMinutes = Number(parseArgValue('--interval') ?? '60');
+  const datasetFilter = parseArgValue('--dataset');
+
+  const allDatasets = listDatasets();
+  const datasetIds =
+    datasetFilter !== undefined
+      ? allDatasets.filter((info) => info.id === datasetFilter).map((info) => info.id)
+      : allDatasets.map((info) => info.id);
+
+  if (datasetIds.length === 0) {
+    const validIds = allDatasets.map((info) => info.id).join(', ');
+    console.error(`Unknown dataset: ${datasetFilter ?? '(none)'}. Valid: ${validIds}`);
+    process.exit(1);
+  }
+
+  console.log(`Database: ${dbPath}`);
+  console.log(`Check interval: ${String(intervalMinutes)} minutes`);
+  console.log(`Watching: ${datasetIds.join(', ')}\n`);
+
+  const storage = await DuckDbFileStorage.open(dbPath);
+  const controller = new AbortController();
+
+  const scheduler = new SyncScheduler(new InMemorySyncState(), createCheckers(datasetIds), {
+    checkIntervalMs: intervalMinutes * 60_000,
+    datasets: datasetIds,
+    signal: controller.signal,
+    onUpdate: async (dataset) => {
+      console.log(`[sync] ${dataset} has new data, reloading...`);
+      const start = Date.now();
+      await load(dataset as EtlDatasetType, storage.createSink(dataset as DatasetType));
+      const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+      console.log(`[sync] ${dataset} reload complete (${elapsed}s)`);
+    },
+    onError: (dataset, error) => {
+      console.error(`[sync] ${dataset} check failed: ${error.message}`);
+    },
+  });
+
+  process.on('SIGINT', () => {
+    console.log('\n[sync] Shutting down...');
+    controller.abort();
+    void storage.close().then(() => {
+      process.exit(0);
+    });
+  });
+
+  console.log('[sync] Starting — first check runs immediately\n');
+  await scheduler.start();
+}
+
+main().catch((error: unknown) => {
+  console.error(error);
+  process.exit(1);
+});

@@ -1,0 +1,200 @@
+#tax_id	GeneID	GO_ID	Evidence	Qualifier	GO_term	PubMed	Category
+2711	102577933	GO:0004449	IEA	enables	isocitrate dehydrogenase (NAD+) activity	30032202	Function
+2711	102577933	GO:0005739	IEA	located_in	mitochondrion	30032202	Component
+2711	102577933	GO:0006099	IEA	involved_in	tricarboxylic acid cycle	22301074|30032202	Process
+2711	102577933	GO:0006102	IEA	involved_in	isocitrate metabolic process	30032202	Process
+2711	102577934	GO:0004497	IEA	enables	monooxygenase activity	22301074	Function
+2711	102577934	GO:0005506	IEA	enables	iron ion binding	22301074	Function
+2711	102577934	GO:0016705	IEA	enables	oxidoreductase activity, acting on paired donors, with incorporation or reduction of molecular oxygen	22301074	Function
+2711	102577934	GO:0020037	IEA	enables	heme binding	22301074	Function
+2711	102577935	GO:0005634	IEA	located_in	nucleus	30032202	Component
+2711	102577935	GO:0006301	IEA	involved_in	DNA damage tolerance	30032202	Process
+2711	102577935	GO:0061631	IEA	enables	ubiquitin conjugating enzyme activity	30032202	Function
+2711	102577935	GO:0070534	IEA	involved_in	protein K63-linked ubiquitination	30032202	Process
+2711	102577937	GO:0008271	IEA	enables	secondary active sulfate transmembrane transporter activity	22301074	Function
+2711	102577937	GO:0016020	IEA	located_in	membrane	22301074|30032202	Component
+2711	102577937	GO:0055085	IEA	involved_in	transmembrane transport	22301074|30032202	Process
+2711	102577938	GO:0000978	IEA	enables	RNA polymerase II cis-regulatory region sequence-specific DNA binding	30032202	Function
+2711	102577938	GO:0000981	IEA	enables	DNA-binding transcription factor activity, RNA polymerase II-specific	30032202	Function
+2711	102577938	GO:0005634	IEA	located_in	nucleus	22301074	Component
+2711	102577938	GO:0045944	IEA	involved_in	positive regulation of transcription by RNA polymerase II	22301074	Process
+2711	102577938	GO:0046983	IEA	enables	protein dimerization activity	22301074	Function
+2711	102577939	GO:0000978	IEA	enables	RNA polymerase II cis-regulatory region sequence-specific DNA binding	30032202	Function
+2711	102577939	GO:0000981	IEA	enables	DNA-binding transcription factor activity, RNA polymerase II-specific	30032202	Function
+2711	102577939	GO:0005634	IEA	located_in	nucleus	22301074	Component
+2711	102577939	GO:0045944	IEA	involved_in	positive regulation of transcription by RNA polymerase II	22301074	Process
+2711	102577939	GO:0046983	IEA	enables	protein dimerization activity	22301074	Function
+2711	102577940	GO:0008911	IEA	enables	lactaldehyde dehydrogenase (NAD+) activity	30032202	Function
+2711	102577941	GO:0008506	IEA	enables	sucrose:proton symporter activity	30032202	Function
+2711	102577941	GO:0016020	IEA	located_in	membrane	30032202	Component
+2711	102577941	GO:0055085	IEA	involved_in	transmembrane transport	22301074	Process
+2711	102577942	GO:0000226	IEA	involved_in	microtubule cytoskeleton organization	30032202	Process
+2711	102577942	GO:0000278	IEA	involved_in	mitotic cell cycle	30032202	Process
+2711	102577942	GO:0003924	IEA	enables	GTPase activity	22301074	Function
+2711	102577942	GO:0005200	IEA	enables	structural constituent of cytoskeleton	22301074|30032202	Function
+2711	102577942	GO:0005525	IEA	enables	GTP binding	22301074|30032202	Function
+2711	102577942	GO:0005737	IEA	located_in	cytoplasm	30032202	Component
+2711	102577942	GO:0005874	IEA	located_in	microtubule	22301074|30032202	Component
+2711	102577943	GO:0000994	IEA	enables	RNA polymerase III core binding	30032202	Function
+2711	102577943	GO:0005634	IEA	located_in	nucleus	30032202	Component
+2711	102577943	GO:0016480	IEA	involved_in	negative regulation of transcription by RNA polymerase III	22301074|30032202	Process
+2711	102577945	GO:0030599	IEA	enables	pectinesterase activity	22301074|30032202	Function
+2711	102577945	GO:0042545	IEA	involved_in	cell wall modification	22301074	Process
+2711	102577945	GO:0046910	IEA	enables	pectinesterase inhibitor activity	30032202	Function
+2711	102577946	GO:0000272	IEA	involved_in	polysaccharide catabolic process	22301074|30032202	Process
+2711	102577946	GO:0016161	IEA	enables	beta-amylase activity	22301074|30032202	Function
+2711	102577948	GO:0009522	IEA	part_of	photosystem I	22301074|30032202	Component
+2711	102577948	GO:0009538	IEA	part_of	photosystem I reaction center	22301074|30032202	Component
+2711	102577948	GO:0015979	IEA	involved_in	photosynthesis	22301074|30032202	Process
+2711	102577949	GO:0016117	IEA	involved_in	carotenoid biosynthetic process	22301074	Process
+2711	102577949	GO:0016491	IEA	enables	oxidoreductase activity	22301074	Function
+2711	102577949	GO:0046608	IEA	enables	carotenoid isomerase activity	22301074	Function
+2711	102577950	GO:0005759	IEA	located_in	mitochondrial matrix	30032202	Component
+2711	102577950	GO:0005975	IEA	involved_in	carbohydrate metabolic process	30032202	Process
+2711	102577950	GO:0006099	IEA	involved_in	tricarboxylic acid cycle	22301074|30032202	Process
+2711	102577950	GO:0006101	IEA	involved_in	citrate metabolic process	22301074	Process
+2711	102577951	GO:0004373	IEA	enables	alpha-1,4-glucan glucosyltransferase (UDP-glucose donor) activity	22301074	Function
+2711	102577953	GO:0005576	IEA	located_in	extracellular region	22301074	Component
+2711	102577953	GO:0009664	IEA	involved_in	plant-type cell wall organization	22301074|30032202	Process
+2711	102577954	GO:0005515	IEA	enables	protein binding	22301074	Function
+2711	102577954	GO:0005634	IEA	located_in	nucleus	30032202	Component
+2711	102577954	GO:0005737	IEA	located_in	cytoplasm	22301074	Component
+2711	102577954	GO:0006607	IEA	involved_in	NLS-bearing protein import into nucleus	30032202	Process
+2711	102577954	GO:0008139	IEA	enables	nuclear localization sequence binding	30032202	Function
+2711	102577954	GO:0061608	IEA	enables	nuclear import signal receptor activity	22301074|30032202	Function
+2711	102577955	GO:0015145	IEA	enables	monosaccharide transmembrane transporter activity	22301074	Function
+2711	102577955	GO:0015749	IEA	involved_in	monosaccharide transmembrane transport	22301074	Process
+2711	102577955	GO:0016020	IEA	located_in	membrane	22301074	Component
+2711	102577956	GO:0004031	IEA	enables	aldehyde oxidase activity	30032202	Function
+2711	102577956	GO:0005506	IEA	enables	iron ion binding	22301074|30032202	Function
+2711	102577956	GO:0051537	IEA	enables	2 iron, 2 sulfur cluster binding	22301074	Function
+2711	102577956	GO:0071949	IEA	enables	FAD binding	22301074	Function
+2711	102577959	GO:0000287	IEA	enables	magnesium ion binding	22301074	Function
+2711	102577959	GO:0010333	IEA	enables	terpene synthase activity	22301074	Function
+2711	102577959	GO:0016102	IEA	involved_in	diterpenoid biosynthetic process	22301074	Process
+2711	102577960	GO:0001678	IEA	involved_in	intracellular glucose homeostasis	22301074|30032202	Process
+2711	102577960	GO:0004340	IEA	enables	glucokinase activity	30032202	Function
+2711	102577960	GO:0005524	IEA	enables	ATP binding	22301074|30032202	Function
+2711	102577960	GO:0005536	IEA	enables	D-glucose binding	22301074|30032202	Function
+2711	102577960	GO:0005739	IEA	located_in	mitochondrion	30032202	Component
+2711	102577960	GO:0005829	IEA	located_in	cytosol	30032202	Component
+2711	102577960	GO:0006096	IEA	involved_in	glycolytic process	30032202	Process
+2711	102577960	GO:0008865	IEA	enables	fructokinase activity	30032202	Function
+2711	102577960	GO:0019158	IEA	enables	mannokinase activity	30032202	Function
+2711	102577960	GO:0051156	IEA	involved_in	glucose 6-phosphate metabolic process	30032202	Process
+2711	102577962	GO:0009522	IEA	part_of	photosystem I	22301074|30032202	Component
+2711	102577962	GO:0009538	IEA	part_of	photosystem I reaction center	22301074|30032202	Component
+2711	102577962	GO:0015979	IEA	involved_in	photosynthesis	22301074|30032202	Process
+2711	102577963	GO:0003677	IEA	enables	DNA binding	22301074|30032202	Function
+2711	102577963	GO:0005515	IEA	enables	protein binding	22301074	Function
+2711	102577963	GO:0005634	IEA	located_in	nucleus	22301074	Component
+2711	102577963	GO:0006355	IEA	involved_in	regulation of DNA-templated transcription	22301074|30032202	Process
+2711	102577963	GO:0009725	IEA	involved_in	response to hormone	22301074|30032202	Process
+2711	102577964	GO:0000226	IEA	involved_in	microtubule cytoskeleton organization	30032202	Process
+2711	102577964	GO:0000278	IEA	involved_in	mitotic cell cycle	30032202	Process
+2711	102577964	GO:0005200	IEA	enables	structural constituent of cytoskeleton	22301074|30032202	Function
+2711	102577964	GO:0005525	IEA	enables	GTP binding	22301074|30032202	Function
+2711	102577964	GO:0005737	IEA	located_in	cytoplasm	30032202	Component
+2711	102577964	GO:0005874	IEA	located_in	microtubule	22301074|30032202	Component
+2711	102577965	GO:0004364	IEA	enables	glutathione transferase activity	22301074|30032202	Function
+2711	102577965	GO:0005737	IEA	located_in	cytoplasm	30032202	Component
+2711	102577965	GO:0006749	IEA	involved_in	glutathione metabolic process	22301074|30032202	Process
+2711	102577966	GO:0009534	IEA	located_in	chloroplast thylakoid	30032202	Component
+2711	102577966	GO:0016117	IEA	involved_in	carotenoid biosynthetic process	22301074|30032202	Process
+2711	102577966	GO:0016166	IEA	enables	phytoene dehydrogenase activity	22301074|30032202	Function
+2711	102577967	GO:0006777	IEA	involved_in	Mo-molybdopterin cofactor biosynthetic process	22301074	Process
+2711	102577967	GO:0008265	IEA	enables	molybdenum cofactor sulfurtransferase activity	22301074	Function
+2711	102577967	GO:0030151	IEA	enables	molybdenum ion binding	22301074	Function
+2711	102577967	GO:0030170	IEA	enables	pyridoxal phosphate binding	22301074	Function
+2711	102577968	GO:0004556	IEA	enables	alpha-amylase activity	22301074	Function
+2711	102577968	GO:0005509	IEA	enables	calcium ion binding	22301074	Function
+2711	102577968	GO:0005975	IEA	involved_in	carbohydrate metabolic process	22301074	Process
+2711	102577969	GO:0016117	IEA	involved_in	carotenoid biosynthetic process	22301074	Process
+2711	102577969	GO:0016719	IEA	enables	9,9'-di-cis-zeta-carotene desaturase activity	22301074	Function
+2711	102577970	GO:0004553	IEA	enables	hydrolase activity, hydrolyzing O-glycosyl compounds	22301074	Function
+2711	102577970	GO:0005975	IEA	involved_in	carbohydrate metabolic process	22301074	Process
+2711	102577971	GO:0000155	IEA	enables	phosphorelay sensor kinase activity	22301074	Function
+2711	102577971	GO:0005515	IEA	enables	protein binding	22301074	Function
+2711	102577971	GO:0005783	IEA	located_in	endoplasmic reticulum	30032202	Component
+2711	102577971	GO:0005789	IEA	located_in	endoplasmic reticulum membrane	22301074	Component
+2711	102577971	GO:0007165	IEA	involved_in	signal transduction	22301074	Process
+2711	102577971	GO:0009723	IEA	involved_in	response to ethylene	22301074	Process
+2711	102577971	GO:0016310	IEA	involved_in	phosphorylation	22301074	Process
+2711	102577971	GO:0038199	IEA	enables	ethylene receptor activity	22301074|30032202	Function
+2711	102577971	GO:0051740	IEA	enables	ethylene binding	22301074|30032202	Function
+2711	102577972	GO:0005789	IEA	located_in	endoplasmic reticulum membrane	30032202	Component
+2711	102577972	GO:0008610	IEA	involved_in	lipid biosynthetic process	22301074	Process
+2711	102577972	GO:0045338	IEA	involved_in	farnesyl diphosphate metabolic process	30032202	Process
+2711	102577972	GO:0051996	IEA	enables	squalene synthase [NAD(P)H] activity	30032202	Function
+2711	102577973	GO:0000287	IEA	enables	magnesium ion binding	22301074	Function
+2711	102577973	GO:0016831	IEA	enables	carboxy-lyase activity	22301074|30032202	Function
+2711	102577973	GO:0030976	IEA	enables	thiamine pyrophosphate binding	22301074	Function
+2711	102577974	GO:0005829	IEA	located_in	cytosol	30032202	Component
+2711	102577974	GO:0009688	IEA	involved_in	abscisic acid biosynthetic process	30032202	Process
+2711	102577974	GO:0010301	IEA	enables	xanthoxin dehydrogenase (NAD+) activity	30032202	Function
+2711	102577975	GO:0045735	IEA	enables	nutrient reservoir activity	22301074	Function
+2711	102577976	GO:0000978	IEA	enables	RNA polymerase II cis-regulatory region sequence-specific DNA binding	30032202	Function
+2711	102577976	GO:0000981	IEA	enables	DNA-binding transcription factor activity, RNA polymerase II-specific	30032202	Function
+2711	102577976	GO:0005634	IEA	located_in	nucleus	30032202	Component
+2711	102577976	GO:0006355	IEA	involved_in	regulation of DNA-templated transcription	30032202	Process
+2711	102577977	GO:0003730	IEA	enables	mRNA 3'-UTR binding	30032202	Function
+2711	102577977	GO:0005634	IEA	located_in	nucleus	30032202	Component
+2711	102577977	GO:0005829	IEA	located_in	cytosol	30032202	Component
+2711	102577977	GO:0008143	IEA	enables	poly(A) binding	30032202	Function
+2711	102577977	GO:0008266	IEA	enables	poly(U) RNA binding	30032202	Function
+2711	102577977	GO:1990904	IEA	part_of	ribonucleoprotein complex	30032202	Component
+2711	102577978	GO:0004672	IEA	enables	protein kinase activity	22301074	Function
+2711	102577978	GO:0005515	IEA	enables	protein binding	22301074	Function
+2711	102577978	GO:0005524	IEA	enables	ATP binding	22301074	Function
+2711	102577978	GO:0006468	IEA	involved_in	protein phosphorylation	22301074	Process
+2711	102577979	GO:0005634	IEA	located_in	nucleus	30032202	Component
+2711	102577979	GO:0006301	IEA	involved_in	DNA damage tolerance	30032202	Process
+2711	102577979	GO:0070534	IEA	involved_in	protein K63-linked ubiquitination	30032202	Process
+2711	102577983	GO:0000036	IEA	enables	acyl carrier activity	30032202	Function
+2711	102577983	GO:0006633	IEA	involved_in	fatty acid biosynthetic process	22301074|30032202	Process
+2711	102577983	GO:0016297	IEA	enables	fatty acyl-[ACP] hydrolase activity	30032202	Function
+2711	102577984	GO:0005515	IEA	enables	protein binding	22301074	Function
+2711	102577984	GO:0009507	IEA	located_in	chloroplast	22301074	Component
+2711	102577984	GO:0009688	IEA	involved_in	abscisic acid biosynthetic process	22301074	Process
+2711	102577984	GO:0016020	IEA	located_in	membrane	22301074	Component
+2711	102577984	GO:0052662	IEA	enables	zeaxanthin epoxidase activity	22301074	Function
+2711	102577984	GO:0071949	IEA	enables	FAD binding	22301074	Function
+2711	102577985	GO:0003743	IEA	enables	translation initiation factor activity	22301074|30032202	Function
+2711	102577985	GO:0006413	IEA	involved_in	translational initiation	22301074|30032202	Process
+2711	102577985	GO:0008237	IEA	enables	metallopeptidase activity	22301074	Function
+2711	102577985	GO:0031369	IEA	enables	translation initiation factor binding	22301074|30032202	Function
+2711	102577985	GO:0071541	IEA	part_of	eukaryotic translation initiation factor 3 complex, eIF3m	30032202	Component
+2711	102577987	GO:0009415	IEA	involved_in	response to water	22301074|30032202	Process
+2711	102577987	GO:0016020	IEA	located_in	membrane	30032202	Component
+2711	102577988	GO:0004471	IEA	enables	malate dehydrogenase (decarboxylating) (NAD+) activity	22301074	Function
+2711	102577988	GO:0004473	IEA	enables	malate dehydrogenase (decarboxylating) (NADP+) activity	30032202	Function
+2711	102577988	GO:0006090	IEA	involved_in	pyruvate metabolic process	30032202	Process
+2711	102577988	GO:0006108	IEA	involved_in	malate metabolic process	30032202	Process
+2711	102577988	GO:0009507	IEA	located_in	chloroplast	30032202	Component
+2711	102577988	GO:0051287	IEA	enables	NAD binding	22301074	Function
+2711	102577989	GO:0000272	IEA	involved_in	polysaccharide catabolic process	22301074|30032202	Process
+2711	102577989	GO:0016161	IEA	enables	beta-amylase activity	22301074|30032202	Function
+2711	102577991	GO:0009408	IEA	involved_in	response to heat	30032202	Process
+2711	102577991	GO:0010115	IEA	involved_in	regulation of abscisic acid biosynthetic process	30032202	Process
+2711	102577992	GO:0003700	IEA	enables	DNA-binding transcription factor activity	30032202	Function
+2711	102577992	GO:0005634	IEA	located_in	nucleus	30032202	Component
+2711	102577992	GO:0006355	IEA	involved_in	regulation of DNA-templated transcription	30032202	Process
+2711	102577992	GO:0046983	IEA	enables	protein dimerization activity	22301074	Function
+2711	102577993	GO:0004553	IEA	enables	hydrolase activity, hydrolyzing O-glycosyl compounds	22301074	Function
+2711	102577993	GO:0005975	IEA	involved_in	carbohydrate metabolic process	22301074	Process
+2711	102577994	GO:0010028	IEA	involved_in	xanthophyll cycle	30032202	Process
+2711	102577994	GO:0046422	IEA	enables	violaxanthin de-epoxidase activity	22301074|30032202	Function
+2711	102577995	GO:0009416	IEA	involved_in	response to light stimulus	30032202	Process
+2711	102577995	GO:0009535	IEA	located_in	chloroplast thylakoid membrane	30032202	Component
+2711	102577995	GO:0009768	IEA	involved_in	photosynthesis, light harvesting in photosystem I	30032202	Process
+2711	102577995	GO:0009941	IEA	located_in	chloroplast envelope	30032202	Component
+2711	102577995	GO:0010287	IEA	located_in	plastoglobule	30032202	Component
+2711	102577996	GO:0003723	IEA	enables	RNA binding	22301074	Function
+2711	102577998	GO:0006099	IEA	involved_in	tricarboxylic acid cycle	30032202	Process
+2711	102577998	GO:0006107	IEA	involved_in	oxaloacetate metabolic process	30032202	Process
+2711	102577998	GO:0006108	IEA	involved_in	malate metabolic process	22301074|30032202	Process
+2711	102577998	GO:0030060	IEA	enables	L-malate dehydrogenase (NAD+) activity	22301074|30032202	Function
+2711	102577999	GO:0000289	IEA	involved_in	nuclear-transcribed mRNA poly(A) tail shortening	30032202	Process
+2711	102577999	GO:0000932	IEA	located_in	P-body	30032202	Component
+2711	102577999	GO:0006355	IEA	involved_in	regulation of DNA-templated transcription	22301074	Process
+2711	102577999	GO:0030015	IEA	part_of	CCR4-NOT core complex	30032202	Component

@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "../dist/e2e",
+    "declaration": false,
+    "declarationMap": false,
+    "types": ["vitest/globals", "node"]
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["storage/**"]
+}

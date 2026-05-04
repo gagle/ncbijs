@@ -1,0 +1,1 @@
+pnpm nx run-many -t lint typecheck build test

@@ -1,0 +1,248 @@
+import { TokenBucket } from '@ncbijs/rate-limiter';
+import { fetchJson } from './snp-client';
+import type { SnpClientConfig } from './snp-client';
+import type {
+  HgvsResult,
+  RefSnpReport,
+  SnpAllele,
+  SnpAlleleAnnotation,
+  SnpClinicalSignificance,
+  SnpConfig,
+  SnpFrequency,
+  SnpPlacement,
+  SpdiContextual,
+  VcfFields,
+} from '../interfaces/snp.interface';
+
+const BASE_URL = 'https://api.ncbi.nlm.nih.gov/variation/v0';
+const REQUESTS_PER_SECOND = 5;
+
+/** dbSNP Variation Services API client for RefSNP reports and notation conversion. */
+export class Snp {
+  private readonly _config: SnpClientConfig;
+
+  constructor(config?: SnpConfig) {
+    this._config = {
+      ...(config?.apiKey !== undefined && { apiKey: config.apiKey }),
+      maxRetries: config?.maxRetries ?? 3,
+      rateLimiter: new TokenBucket({ requestsPerSecond: REQUESTS_PER_SECOND }),
+    };
+  }
+
+  /** Fetch a RefSNP report by rs ID. */
+  public async refsnp(rsId: number): Promise<RefSnpReport> {
+    const url = `${BASE_URL}/refsnp/${encodeURIComponent(String(rsId))}`;
+    const raw = await fetchJson<RawRefSnpResponse>(url, this._config);
+
+    return mapRefSnpReport(raw);
+  }
+
+  /** Fetch RefSNP reports for multiple rs IDs sequentially. */
+  public async refsnpBatch(rsIds: ReadonlyArray<number>): Promise<ReadonlyArray<RefSnpReport>> {
+    const reports: Array<RefSnpReport> = [];
+    for (const rsId of rsIds) {
+      const report = await this.refsnp(rsId);
+      reports.push(report);
+    }
+    return reports;
+  }
+
+  /** Convert an SPDI notation to HGVS. */
+  public async spdiToHgvs(spdi: string): Promise<HgvsResult> {
+    const url = `${BASE_URL}/spdi/${encodeURIComponent(spdi)}/hgvs`;
+    const raw = await fetchJson<RawHgvsResponse>(url, this._config);
+
+    return { hgvs: raw.data?.hgvs ?? '' };
+  }
+
+  /** Convert an HGVS expression to contextual SPDI alleles. */
+  public async hgvsToSpdi(hgvs: string): Promise<ReadonlyArray<SpdiContextual>> {
+    const url = `${BASE_URL}/hgvs/${encodeURIComponent(hgvs)}/contextuals`;
+    const raw = await fetchJson<RawContextualsResponse>(url, this._config);
+
+    return (raw.data?.spdis ?? []).map(mapSpdiContextual);
+  }
+
+  /** Convert VCF fields (chrom, pos, ref, alt) to contextual SPDI alleles. */
+  public async vcfToSpdi(
+    chrom: string,
+    pos: number,
+    ref: string,
+    alt: string,
+  ): Promise<ReadonlyArray<SpdiContextual>> {
+    const url = `${BASE_URL}/vcf/${encodeURIComponent(chrom)}/${encodeURIComponent(String(pos))}/${encodeURIComponent(ref)}/${encodeURIComponent(alt)}/contextuals`;
+    const raw = await fetchJson<RawContextualsResponse>(url, this._config);
+
+    return (raw.data?.spdis ?? []).map(mapSpdiContextual);
+  }
+
+  /** Convert an SPDI notation to VCF-style fields. */
+  public async spdiToVcfFields(spdi: string): Promise<VcfFields> {
+    const url = `${BASE_URL}/spdi/${encodeURIComponent(spdi)}/vcf_fields`;
+    const raw = await fetchJson<RawVcfFieldsResponse>(url, this._config);
+
+    return {
+      chrom: raw.data?.chrom ?? '',
+      pos: raw.data?.pos ?? 0,
+      ref: raw.data?.ref ?? '',
+      alt: raw.data?.alt ?? '',
+    };
+  }
+}
+
+interface RawRefSnpResponse {
+  readonly refsnp_id?: string;
+  readonly create_date?: string;
+  readonly primary_snapshot_data?: RawPrimarySnapshotData;
+}
+
+interface RawPrimarySnapshotData {
+  readonly placements_with_allele?: ReadonlyArray<RawPlacement>;
+  readonly allele_annotations?: ReadonlyArray<RawAlleleAnnotation>;
+}
+
+interface RawPlacement {
+  readonly seq_id?: string;
+  readonly placement_annot?: RawPlacementAnnot;
+  readonly alleles?: ReadonlyArray<RawAlleleWrapper>;
+}
+
+interface RawPlacementAnnot {
+  readonly seq_type?: string;
+  readonly seq_id_traits_by_assembly?: ReadonlyArray<RawAssemblyTrait>;
+}
+
+interface RawAssemblyTrait {
+  readonly assembly_name?: string;
+}
+
+interface RawAlleleWrapper {
+  readonly allele?: RawAlleleData;
+}
+
+interface RawAlleleData {
+  readonly spdi?: RawSpdi;
+}
+
+interface RawSpdi {
+  readonly seq_id?: string;
+  readonly position?: number;
+  readonly deleted_sequence?: string;
+  readonly inserted_sequence?: string;
+}
+
+interface RawAlleleAnnotation {
+  readonly frequency?: ReadonlyArray<RawFrequency>;
+  readonly clinical?: ReadonlyArray<RawClinical>;
+}
+
+interface RawFrequency {
+  readonly study_name?: string;
+  readonly allele_count?: number;
+  readonly total_count?: number;
+  readonly observation?: RawObservation;
+}
+
+interface RawObservation {
+  readonly deleted_sequence?: string;
+  readonly inserted_sequence?: string;
+}
+
+interface RawClinical {
+  readonly clinical_significances?: ReadonlyArray<string>;
+  readonly disease_names?: ReadonlyArray<string>;
+  readonly review_status?: string;
+}
+
+interface RawHgvsResponse {
+  readonly data?: { readonly hgvs?: string };
+}
+
+interface RawContextualsResponse {
+  readonly data?: { readonly spdis?: ReadonlyArray<RawSpdi> };
+}
+
+interface RawVcfFieldsResponse {
+  readonly data?: {
+    readonly chrom?: string;
+    readonly pos?: number;
+    readonly ref?: string;
+    readonly alt?: string;
+  };
+}
+
+function mapSpdiContextual(raw: RawSpdi): SpdiContextual {
+  return {
+    seqId: raw.seq_id ?? '',
+    position: raw.position ?? 0,
+    deletedSequence: raw.deleted_sequence ?? '',
+    insertedSequence: raw.inserted_sequence ?? '',
+  };
+}
+
+function mapRefSnpReport(raw: RawRefSnpResponse): RefSnpReport {
+  const snapshot = raw.primary_snapshot_data;
+  const rawPlacements = snapshot?.placements_with_allele ?? [];
+  const chromosomePlacements = rawPlacements.filter(
+    (placement) => placement.placement_annot?.seq_type === 'refseq_chromosome',
+  );
+
+  return {
+    refsnpId: raw.refsnp_id ?? '',
+    createDate: raw.create_date ?? '',
+    placements: chromosomePlacements.map(mapPlacement),
+    alleleAnnotations: (snapshot?.allele_annotations ?? []).map(mapAlleleAnnotation),
+  };
+}
+
+function mapPlacement(raw: RawPlacement): SnpPlacement {
+  const assemblyTraits = raw.placement_annot?.seq_id_traits_by_assembly ?? [];
+  const assemblyName = assemblyTraits[0]?.assembly_name ?? '';
+
+  return {
+    seqId: raw.seq_id ?? '',
+    assemblyName,
+    alleles: (raw.alleles ?? []).map(mapAllele),
+  };
+}
+
+function mapAllele(wrapper: RawAlleleWrapper): SnpAllele {
+  const spdi = wrapper.allele?.spdi;
+
+  return {
+    seqId: spdi?.seq_id ?? '',
+    position: spdi?.position ?? 0,
+    deletedSequence: spdi?.deleted_sequence ?? '',
+    insertedSequence: spdi?.inserted_sequence ?? '',
+  };
+}
+
+function mapAlleleAnnotation(raw: RawAlleleAnnotation): SnpAlleleAnnotation {
+  return {
+    frequency: (raw.frequency ?? []).map(mapFrequency),
+    clinical: (raw.clinical ?? []).map(mapClinical),
+  };
+}
+
+function mapFrequency(raw: RawFrequency): SnpFrequency {
+  const alleleCount = raw.allele_count ?? 0;
+  const totalCount = raw.total_count ?? 0;
+  const frequency = totalCount > 0 ? alleleCount / totalCount : 0;
+
+  return {
+    studyName: raw.study_name ?? '',
+    alleleCount,
+    totalCount,
+    frequency,
+    deletedSequence: raw.observation?.deleted_sequence ?? '',
+    insertedSequence: raw.observation?.inserted_sequence ?? '',
+  };
+}
+
+function mapClinical(raw: RawClinical): SnpClinicalSignificance {
+  return {
+    significances: raw.clinical_significances ?? [],
+    diseaseNames: raw.disease_names ?? [],
+    reviewStatus: raw.review_status ?? '',
+  };
+}

@@ -1,0 +1,1111 @@
+[
+  {
+    "protocolSection": {
+      "identificationModule": {
+        "nctId": "NCT06494878",
+        "orgStudyIdInfo": {
+          "id": "REB24-0317"
+        },
+        "organization": {
+          "fullName": "University of Calgary",
+          "class": "OTHER"
+        },
+        "briefTitle": "The PARTUM Trial: Postpartum Aspirin to Reduce Thromboembolism Undue Morbidity",
+        "officialTitle": "The PARTUM (Postpartum Aspirin to Reduce Thromboembolism Undue Morbidity) Trial"
+      },
+      "statusModule": {
+        "statusVerifiedDate": "2025-02",
+        "overallStatus": "NOT_YET_RECRUITING",
+        "expandedAccessInfo": {
+          "hasExpandedAccess": false
+        },
+        "startDateStruct": {
+          "date": "2025-04",
+          "type": "ESTIMATED"
+        },
+        "primaryCompletionDateStruct": {
+          "date": "2030-08",
+          "type": "ESTIMATED"
+        },
+        "completionDateStruct": {
+          "date": "2030-12",
+          "type": "ESTIMATED"
+        },
+        "studyFirstSubmitDate": "2024-06-12",
+        "studyFirstSubmitQcDate": "2024-07-02",
+        "studyFirstPostDateStruct": {
+          "date": "2024-07-10",
+          "type": "ACTUAL"
+        },
+        "lastUpdateSubmitDate": "2025-02-26",
+        "lastUpdatePostDateStruct": {
+          "date": "2025-03-03",
+          "type": "ACTUAL"
+        }
+      },
+      "sponsorCollaboratorsModule": {
+        "responsibleParty": {
+          "type": "SPONSOR"
+        },
+        "leadSponsor": {
+          "name": "University of Calgary",
+          "class": "OTHER"
+        },
+        "collaborators": [
+          {
+            "name": "Canadian Institutes of Health Research (CIHR)",
+            "class": "OTHER_GOV"
+          }
+        ]
+      },
+      "oversightModule": {
+        "oversightHasDmc": true,
+        "isFdaRegulatedDrug": false,
+        "isFdaRegulatedDevice": false,
+        "isUsExport": false
+      },
+      "descriptionModule": {
+        "briefSummary": "The goal of the PARTUM trial is to determine if taking low-dose aspirin daily for 6 weeks after delivery is similar (non-inferior) to usual care low-molecular-weight heparin injections to prevent venous thromboembolism (VTE: blood clots in the legs or lungs) for postpartum individuals with VTE risk factors.",
+        "detailedDescription": "The PARTUM trial design is a Prospective Randomized Open Blinded End-point (PROBE) non-inferiority trial. Participants with risk factors for venous thromboembolism (VTE) as defined by the inclusion criteria will be identified during pregnancy, labor and delivery, and up to 48 hours after delivery.\n\nEligible and consenting participants will be randomly assigned to one of two study arms: Low-dose aspirin (75-100mg according to country availability) daily for 42 days post-randomization, or a usual care site-specific low-molecular-weight-heparin (LMWH) regimen with the dose and duration of LMWH determined by the participant's healthcare provider.\n\nFollow-up will occur at 6 weeks and 90 days post-randomization."
+      },
+      "conditionsModule": {
+        "conditions": [
+          "Venous Thromboembolism",
+          "Postpartum Period",
+          "Aspirin",
+          "Low Molecular Weight Heparin"
+        ],
+        "keywords": [
+          "deep vein thrombosis",
+          "pulmonary embolism",
+          "postpartum",
+          "pregnancy",
+          "thrombophilia",
+          "cesarean delivery",
+          "preeclampsia",
+          "small-for-gestational age infant",
+          "postpartum hemorrhage",
+          "postpartum infection"
+        ]
+      },
+      "designModule": {
+        "studyType": "INTERVENTIONAL",
+        "phases": ["PHASE3"],
+        "designInfo": {
+          "allocation": "RANDOMIZED",
+          "interventionModel": "PARALLEL",
+          "primaryPurpose": "PREVENTION",
+          "maskingInfo": {
+            "masking": "NONE"
+          }
+        },
+        "enrollmentInfo": {
+          "count": 8805,
+          "type": "ESTIMATED"
+        }
+      },
+      "armsInterventionsModule": {
+        "armGroups": [
+          {
+            "label": "Aspirin",
+            "type": "EXPERIMENTAL",
+            "description": "Low-dose aspirin (75-100 mg) once daily for 6 weeks.",
+            "interventionNames": ["Drug: Aspirin"]
+          },
+          {
+            "label": "Low-molecular-weight heparin",
+            "type": "ACTIVE_COMPARATOR",
+            "description": "Site-specific low-molecular-weight heparin regimen as prescribed by the treating physician.",
+            "interventionNames": ["Drug: Low-molecular-weight heparin"]
+          }
+        ],
+        "interventions": [
+          {
+            "type": "DRUG",
+            "name": "Aspirin",
+            "description": "75-100 mg taken once daily by mouth.",
+            "armGroupLabels": ["Aspirin"]
+          },
+          {
+            "type": "DRUG",
+            "name": "Low-molecular-weight heparin",
+            "description": "Low-molecular-weight heparin injections daily as prescribed by the treating physician.",
+            "armGroupLabels": ["Low-molecular-weight heparin"],
+            "otherNames": ["Dalteparin, Enoxaparin, Nadroparin, Tinzaparin"]
+          }
+        ]
+      },
+      "outcomesModule": {
+        "primaryOutcomes": [
+          {
+            "measure": "Symptomatic VTE",
+            "description": "Proximal lower or upper extremity DVT, PE involving segmental or higher arteries or multiple subsegmental arteries, and unusual site \\[non-limb\\] venous thromboembolism",
+            "timeFrame": "6 weeks"
+          }
+        ],
+        "secondaryOutcomes": [
+          {
+            "measure": "Late symptomatic VTE",
+            "description": "Proximal lower or upper extremity DVT, PE involving segmental or higher arteries or multiple subsegmental arteries, and unusual site \\[non-limb\\] venous thromboembolism",
+            "timeFrame": "90 days"
+          },
+          {
+            "measure": "Superficial vein thrombosis",
+            "description": "A non-compressible vein segment on ultrasound that involves the superficial veins in the lower or upper extremity",
+            "timeFrame": "At 6 weeks and at 90 days"
+          },
+          {
+            "measure": "Distal deep vein thrombosis",
+            "description": "A non-compressible vein segment on ultrasound involving the deep veins that is distal to the popliteal vein in the lower extremity, or distal to the axillary vein in the upper extremity",
+            "timeFrame": "At 6 weeks and at 90 days"
+          },
+          {
+            "measure": "Single subsegmental pulmonary embolism (SSPE)",
+            "description": "Intraluminal filling defect that involves one subsegmental artery only",
+            "timeFrame": "At 6 weeks and at 90 days"
+          },
+          {
+            "measure": "Major bleeding",
+            "description": "Based on the ISTH definition",
+            "timeFrame": "At 6 weeks and at 90 days"
+          },
+          {
+            "measure": "Clinically relevant non-major bleeding",
+            "description": "Based on the ISTH definition",
+            "timeFrame": "At 6 weeks and at 90 days"
+          },
+          {
+            "measure": "Wound hematoma requiring intervention",
+            "description": "Requiring intervention such as hematoma evacuation or wound packing",
+            "timeFrame": "At 6 weeks and at 90 days"
+          },
+          {
+            "measure": "Symptomatic arterial thromboembolism",
+            "description": "Ischemic stroke/transient ischemic attack, myocardial infarction, or peripheral arterial embolism",
+            "timeFrame": "At 6 weeks and at 90 days"
+          },
+          {
+            "measure": "Postpartum preeclampsia",
+            "description": "New preeclampsia presenting in the postpartum period",
+            "timeFrame": "At 6 weeks and at 90 days"
+          },
+          {
+            "measure": "Heparin-induced thrombocytopenia",
+            "description": "According to a priori categories of definite or possible HIT.",
+            "timeFrame": "At 6 weeks and at 90 days"
+          },
+          {
+            "measure": "All-cause mortality",
+            "timeFrame": "At 6 weeks and at 90 days"
+          }
+        ]
+      },
+      "eligibilityModule": {
+        "eligibilityCriteria": "Inclusion Criteria:\n\n* ONE (or more) First Order Criterion:\n\n  1. Known inherited thrombophilia diagnosed prior to enrolment, regardless of family history of VTE:\n\n     i. Heterozygous factor V Leiden, or ii. Heterozygous prothrombin gene variant, or iii. Protein C deficiency, or iv. Protein S deficiency, and/or\n  2. Antepartum immobilization for ≥7 days. Immobilization is defined as bed rest with 90% of waking hours spent in bed at any time during the antepartum period AND/OR\n\nTWO (or more) Second Order Criteria:\n\n1. Pre-pregnancy BMI ≥30 kg/m²\n2. Smoking in the current pregnancy or within 3 months prior to pregnancy\n3. Previous clinical history of superficial vein thrombosis\n4. Preeclampsia\n5. Current pregnancy ending in stillbirth (pregnancy loss \\>20 weeks gestation)\n6. Unplanned cesarean delivery (unplanned = not a scheduled cesarean delivery)\n7. Small-for-gestational-age infant at time of delivery (\\<3rd percentile adjusted for gestational age and sex)\n8. Peripartum or postpartum infection (symptoms/signs of infection and documented fever and laboratory evidence of infection with positive blood cultures or an elevated white blood cell count based on local laboratory cutoffs)\n9. Postpartum hemorrhage (≥1000 mL of blood loss, regardless of delivery mode)\n\nExclusion Criteria:\n\n1. More than 48 hours since delivery at the time of randomization\n2. Received more than 1 dose of LMWH since delivery\n3. Need for postpartum LMWH prophylaxis or systemic anticoagulation as judged by their physician and/or local investigator. May include but is not limited to:\n\n   1. Documented history of provoked or unprovoked VTE\n   2. Mechanical heart valve(s)\n   3. Known antiphospholipid syndrome (APS)\n   4. Known high-risk inherited thrombophilia i) Antithrombin deficiency, or ii) Homozygous factor V Leiden, or iii) Homozygous prothrombin gene mutation, or iv) More than 1 thrombophilia: any combination of 2 or more: factor V Leiden, prothrombin gene mutation, protein C deficiency, protein S deficiency\n4. Need for postpartum ASA as judged by their physician and/or local investigator. May include but is not limited to:\n\n   1. Documented history of myocardial infarction\n   2. Documented history of ischemic stroke or transient ischemic attack (TIA)\n5. Active bleeding, excluding normal vaginal bleeding, at the time of randomization\n6. Known medical condition as judged by their physician and/or local investigator to be a contraindication to ASA or LMWH including known ASA or LMWH allergy\n7. \\<18 years of age\n8. Unable or declined consent",
+        "healthyVolunteers": false,
+        "sex": "FEMALE",
+        "minimumAge": "18 Years",
+        "stdAges": ["ADULT", "OLDER_ADULT"]
+      },
+      "contactsLocationsModule": {
+        "centralContacts": [
+          {
+            "name": "Leslie Skeith, MD",
+            "role": "CONTACT",
+            "phone": "403-944-5246",
+            "email": "laskeith@ucalgary.ca"
+          },
+          {
+            "name": "Jill Baxter, BSc",
+            "role": "CONTACT",
+            "phone": "403-220-7103",
+            "email": "jbaxter@ucalgary.ca"
+          }
+        ],
+        "overallOfficials": [
+          {
+            "name": "Leslie Skeith, MD",
+            "affiliation": "University of Calgary",
+            "role": "PRINCIPAL_INVESTIGATOR"
+          },
+          {
+            "name": "Marc Rodger, MD",
+            "affiliation": "McGill University Health Centre/Research Institute of the McGill University Health Centre",
+            "role": "PRINCIPAL_INVESTIGATOR"
+          }
+        ],
+        "locations": [
+          {
+            "facility": "Foothills Medical Centre",
+            "city": "Calgary",
+            "state": "Alberta",
+            "zip": "T2N 2T9",
+            "country": "Canada",
+            "contacts": [
+              {
+                "name": "Leslie Skeith, MD",
+                "role": "CONTACT",
+                "phone": "403-944-5246",
+                "email": "laskeith@ucalgary.ca"
+              },
+              {
+                "name": "Jill Baxter, BSc Kin",
+                "role": "CONTACT",
+                "phone": "403-220-7103",
+                "email": "jbaxter@ucalgary.ca"
+              }
+            ],
+            "geoPoint": {
+              "lat": 51.05011,
+              "lon": -114.08529
+            }
+          },
+          {
+            "facility": "The Ottawa Hospital - General Campus",
+            "city": "Ottawa",
+            "state": "Ontario",
+            "zip": "K1H 8L6",
+            "country": "Canada",
+            "contacts": [
+              {
+                "name": "Darine El-Chaar, MD",
+                "role": "CONTACT",
+                "phone": "613-737-8797",
+                "email": "delchaar@toh.ca"
+              }
+            ],
+            "geoPoint": {
+              "lat": 45.41117,
+              "lon": -75.69812
+            }
+          },
+          {
+            "facility": "Mount Sinai Hospital",
+            "city": "Toronto",
+            "state": "Ontario",
+            "zip": "M5G 1Z5",
+            "country": "Canada",
+            "contacts": [
+              {
+                "name": "A. Kinga Malinowski, MD",
+                "role": "CONTACT",
+                "phone": "416-586-4800",
+                "phoneExt": "5309",
+                "email": "Ann.Malinowski@sinaihealth.ca"
+              }
+            ],
+            "geoPoint": {
+              "lat": 43.70643,
+              "lon": -79.39864
+            }
+          }
+        ]
+      },
+      "ipdSharingStatementModule": {
+        "ipdSharing": "YES",
+        "description": "Data will be shared upon request."
+      }
+    },
+    "derivedSection": {
+      "miscInfoModule": {
+        "versionHolder": "2026-04-22"
+      },
+      "conditionBrowseModule": {
+        "meshes": [
+          {
+            "id": "D054556",
+            "term": "Venous Thromboembolism"
+          },
+          {
+            "id": "D020246",
+            "term": "Venous Thrombosis"
+          },
+          {
+            "id": "D011655",
+            "term": "Pulmonary Embolism"
+          },
+          {
+            "id": "D019851",
+            "term": "Thrombophilia"
+          },
+          {
+            "id": "D011225",
+            "term": "Pre-Eclampsia"
+          },
+          {
+            "id": "D006473",
+            "term": "Postpartum Hemorrhage"
+          }
+        ],
+        "ancestors": [
+          {
+            "id": "D013923",
+            "term": "Thromboembolism"
+          },
+          {
+            "id": "D016769",
+            "term": "Embolism and Thrombosis"
+          },
+          {
+            "id": "D014652",
+            "term": "Vascular Diseases"
+          },
+          {
+            "id": "D002318",
+            "term": "Cardiovascular Diseases"
+          },
+          {
+            "id": "D013927",
+            "term": "Thrombosis"
+          },
+          {
+            "id": "D008171",
+            "term": "Lung Diseases"
+          },
+          {
+            "id": "D012140",
+            "term": "Respiratory Tract Diseases"
+          },
+          {
+            "id": "D004617",
+            "term": "Embolism"
+          },
+          {
+            "id": "D006402",
+            "term": "Hematologic Diseases"
+          },
+          {
+            "id": "D006425",
+            "term": "Hemic and Lymphatic Diseases"
+          },
+          {
+            "id": "D046110",
+            "term": "Hypertension, Pregnancy-Induced"
+          },
+          {
+            "id": "D011248",
+            "term": "Pregnancy Complications"
+          },
+          {
+            "id": "D005261",
+            "term": "Female Urogenital Diseases and Pregnancy Complications"
+          },
+          {
+            "id": "D000091642",
+            "term": "Urogenital Diseases"
+          },
+          {
+            "id": "D007744",
+            "term": "Obstetric Labor Complications"
+          },
+          {
+            "id": "D011644",
+            "term": "Puerperal Disorders"
+          },
+          {
+            "id": "D014592",
+            "term": "Uterine Hemorrhage"
+          },
+          {
+            "id": "D006470",
+            "term": "Hemorrhage"
+          },
+          {
+            "id": "D010335",
+            "term": "Pathologic Processes"
+          },
+          {
+            "id": "D013568",
+            "term": "Pathological Conditions, Signs and Symptoms"
+          }
+        ]
+      },
+      "interventionBrowseModule": {
+        "meshes": [
+          {
+            "id": "D001241",
+            "term": "Aspirin"
+          },
+          {
+            "id": "D006495",
+            "term": "Heparin, Low-Molecular-Weight"
+          },
+          {
+            "id": "D017985",
+            "term": "Dalteparin"
+          },
+          {
+            "id": "D017984",
+            "term": "Enoxaparin"
+          },
+          {
+            "id": "D017762",
+            "term": "Nadroparin"
+          },
+          {
+            "id": "D000078222",
+            "term": "Tinzaparin"
+          }
+        ],
+        "ancestors": [
+          {
+            "id": "D012459",
+            "term": "Salicylates"
+          },
+          {
+            "id": "D062385",
+            "term": "Hydroxybenzoates"
+          },
+          {
+            "id": "D010636",
+            "term": "Phenols"
+          },
+          {
+            "id": "D001555",
+            "term": "Benzene Derivatives"
+          },
+          {
+            "id": "D006841",
+            "term": "Hydrocarbons, Aromatic"
+          },
+          {
+            "id": "D006844",
+            "term": "Hydrocarbons, Cyclic"
+          },
+          {
+            "id": "D006838",
+            "term": "Hydrocarbons"
+          },
+          {
+            "id": "D009930",
+            "term": "Organic Chemicals"
+          },
+          {
+            "id": "D006493",
+            "term": "Heparin"
+          },
+          {
+            "id": "D006025",
+            "term": "Glycosaminoglycans"
+          },
+          {
+            "id": "D011134",
+            "term": "Polysaccharides"
+          },
+          {
+            "id": "D002241",
+            "term": "Carbohydrates"
+          }
+        ]
+      }
+    },
+    "hasResults": false
+  },
+  {
+    "protocolSection": {
+      "identificationModule": {
+        "nctId": "NCT01238185",
+        "orgStudyIdInfo": {
+          "id": "INHANSE-ASPOD"
+        },
+        "secondaryIdInfos": [
+          {
+            "id": "CDR0000688122",
+            "type": "REGISTRY",
+            "domain": "PDQ (Physician Data Query)"
+          },
+          {
+            "id": "ISRCTN31503555",
+            "type": "REGISTRY",
+            "domain": "ISRCTN (International Standard Randomised Controlled Trial Number Register)"
+          },
+          {
+            "id": "EU-21083"
+          }
+        ],
+        "organization": {
+          "fullName": "National Cancer Institute (NCI)",
+          "class": "NIH"
+        },
+        "briefTitle": "Aspirin Mouthwash in Treating Patients With Oral Leukoplakia",
+        "officialTitle": "Oral Topical Cyclooxygenase Inhibitor (Aspirin) Mouthwash for Treatment of Oral Dysplasia"
+      },
+      "statusModule": {
+        "statusVerifiedDate": "2010-11",
+        "overallStatus": "COMPLETED",
+        "expandedAccessInfo": {
+          "hasExpandedAccess": false
+        },
+        "startDateStruct": {
+          "date": "2010-02"
+        },
+        "primaryCompletionDateStruct": {
+          "date": "2011-10",
+          "type": "ACTUAL"
+        },
+        "completionDateStruct": {
+          "date": "2011-10",
+          "type": "ACTUAL"
+        },
+        "studyFirstSubmitDate": "2010-11-09",
+        "studyFirstSubmitQcDate": "2010-11-09",
+        "studyFirstPostDateStruct": {
+          "date": "2010-11-10",
+          "type": "ESTIMATED"
+        },
+        "lastUpdateSubmitDate": "2013-08-09",
+        "lastUpdatePostDateStruct": {
+          "date": "2013-08-12",
+          "type": "ESTIMATED"
+        }
+      },
+      "sponsorCollaboratorsModule": {
+        "leadSponsor": {
+          "name": "Institute of Head and Neck Studies and Education, United Kingdom",
+          "class": "OTHER"
+        }
+      },
+      "descriptionModule": {
+        "briefSummary": "RATIONALE: Aspirin mouthwash may stop the growth of tumor cells by blocking some of the enzymes needed for cell growth.\n\nPURPOSE: This phase I trial is studying the side effects and best dose of aspirin mouthwash in treating patients with oral leukoplakia.",
+        "detailedDescription": "OBJECTIVES:\n\n* To determine if oral topical acetylsalicylic acid mouthwash achieves modulation of COX-1, COX-2, and prostaglandin in oral dysplasia tissues in patients with oral leukoplakia.\n* To determine if this drug achieves alteration of histopathology and gene and protein expression in tissue.\n* To determine if this drug achieves aspirin-induced tissue changes relating to altered tumor biology.\n* To assess local and general tolerability and safety of this drug in these patients.\n\nOUTLINE: All patients undergo tissue biopsy for histological diagnosis. Patients without a histological diagnosis of precancerous oral dysplasia undergo routine follow-up. Patients with a histological diagnosis of precancerous oral dysplasia are sequentially allocated to 1 of 4 treatment groups.\n\n* Group 1: Patients receive acetylsalicylic acid mouthwash (one 75 mg tablet dissolved in 250 mL of water) twice daily for 4-6 weeks, gargling for 60 seconds then expectorate it fully, before planned definitive surgical excision.\n* Group 2: Patients receive acetylsalicylic acid mouthwash (two 75 mg tablets of acetylsalicylic acid dissolved in 250 mL of water) twice daily for 4-6 weeks, gargling for 60 seconds then expectorate it fully, before planned definitive surgical excision.\n* Group 3: Patients receive acetylsalicylic acid mouthwash (one 300 mg tablet of acetylsalicylic acid dissolved in 250 mL of water) twice daily for 4-6 weeks, gargling for 60 seconds then expectorate it fully, before planned definitive surgical excision.\n* Group 4: Patients receive acetylsalicylic acid mouthwash (one 300 mg tablet of acetylsalicylic acid dissolved in 250 mL of water) three times daily for 4-6 weeks, gargling for 60 seconds then expectorate it fully, before planned definitive surgical excision.\n\nAt the time of definitive surgical excision, the patient is asked to gargle with the last dose of acetylsalicylic acid mouthwash just before being anesthetized. A small biopsy of the dysplasia lesion is taken and examined for immediate effects of the acetylsalicylic acid mouthwash on the dysplasia lesion. The surgically excised tissue is treated in the same way as the initial biopsy tissue (i.e., half being used for routine histology to confirm the diagnosis and the other half for research purposes). Tissue samples are analyzed via enzyme immunosorbent assay, qRT-PCR, immunoblotting, ELISA, immunohistochemistry, gene array analysis, and microvessel density analysis.\n\nPatients complete a questionnaire assessing local and general tolerability as well as adverse effects during the period of use of the mouthwash.\n\nAfter completion of study treatment, patients are followed periodically.\n\nPeer Reviewed and Funded or Endorsed by Cancer Research UK"
+      },
+      "conditionsModule": {
+        "conditions": ["Precancerous Condition"],
+        "keywords": ["oral leukoplakia"]
+      },
+      "designModule": {
+        "studyType": "INTERVENTIONAL",
+        "phases": ["PHASE1"],
+        "designInfo": {
+          "primaryPurpose": "TREATMENT",
+          "maskingInfo": {
+            "masking": "NONE"
+          }
+        },
+        "enrollmentInfo": {
+          "count": 40,
+          "type": "ESTIMATED"
+        }
+      },
+      "armsInterventionsModule": {
+        "interventions": [
+          {
+            "type": "DRUG",
+            "name": "acetylsalicylic acid"
+          },
+          {
+            "type": "GENETIC",
+            "name": "gene expression analysis"
+          },
+          {
+            "type": "GENETIC",
+            "name": "protein expression analysis"
+          },
+          {
+            "type": "OTHER",
+            "name": "laboratory biomarker analysis"
+          },
+          {
+            "type": "OTHER",
+            "name": "questionnaire administration"
+          },
+          {
+            "type": "PROCEDURE",
+            "name": "biopsy"
+          }
+        ]
+      },
+      "outcomesModule": {
+        "primaryOutcomes": [
+          {
+            "measure": "PGE2 levels as assessed by enzyme immunosorbent assay"
+          },
+          {
+            "measure": "COX-1 and COX-2 mRNA as assessed by qRT-PCR"
+          },
+          {
+            "measure": "COX-1 and COX-2 protein expression as assessed by immunohistochemistry and quantified by immunoblotting to determine whether COX inhibition in oral dysplasia tissues is actually possible by use of the mouthwash formulation"
+          }
+        ],
+        "secondaryOutcomes": [
+          {
+            "measure": "Comparison of WHO histological grade and clinical size of dysplastic lesions before and after treatment and assessment of proliferating cell nuclear antigen"
+          },
+          {
+            "measure": "Tolerability and possible oral and other adverse effects using a questionnaire"
+          },
+          {
+            "measure": "VEGF mRNA expression as assessed by qRT-PCR"
+          },
+          {
+            "measure": "Protein expression as assessed by ELISA and immunohistochemistry for VEGFA"
+          },
+          {
+            "measure": "Global gene response of dysplastic tissue as assessed by Affymetrix gene expression microarrays"
+          }
+        ]
+      },
+      "eligibilityModule": {
+        "eligibilityCriteria": "DISEASE CHARACTERISTICS:\n\n* Clinically diagnosed oral leukoplakia requiring a tissue biopsy for histological diagnosis\n* Attending the outpatient clinic\n\nPATIENT CHARACTERISTICS:\n\n* Not nursing\n* No known or suspected sensitivity to aspirin or other nonsteroidal anti-inflammatory drugs\n* No diagnosis of asthma or angioedema\n* No contraindications, including any of the following:\n\n  * Active peptic ulceration or a history of peptic ulceration\n  * Hemophilia or a history of bleeding disorders\n  * Gout or a history of gout\n\nPRIOR CONCURRENT THERAPY:\n\n* No concurrent regular use of aspirin for heart disease or other reasons\n* No other concurrent nonsteroidal anti-inflammatory drugs",
+        "healthyVolunteers": false,
+        "sex": "ALL",
+        "stdAges": ["CHILD", "ADULT", "OLDER_ADULT"]
+      },
+      "contactsLocationsModule": {
+        "overallOfficials": [
+          {
+            "name": "Hisham Mehanna, MD",
+            "affiliation": "Institute of Head and Neck Studies and Education, United Kingdom",
+            "role": "PRINCIPAL_INVESTIGATOR"
+          }
+        ],
+        "locations": [
+          {
+            "facility": "University of Birmingham",
+            "city": "Birmingham",
+            "state": "England",
+            "zip": "B15 2TT",
+            "country": "United Kingdom",
+            "geoPoint": {
+              "lat": 52.48142,
+              "lon": -1.89983
+            }
+          },
+          {
+            "facility": "Institute of Head and Neck Studies and Education",
+            "city": "Coventry",
+            "state": "England",
+            "zip": "CV2 2DX",
+            "country": "United Kingdom",
+            "geoPoint": {
+              "lat": 52.40656,
+              "lon": -1.51217
+            }
+          }
+        ]
+      }
+    },
+    "derivedSection": {
+      "miscInfoModule": {
+        "versionHolder": "2026-04-22"
+      },
+      "conditionBrowseModule": {
+        "meshes": [
+          {
+            "id": "D011230",
+            "term": "Precancerous Conditions"
+          },
+          {
+            "id": "D007972",
+            "term": "Leukoplakia, Oral"
+          }
+        ],
+        "ancestors": [
+          {
+            "id": "D009369",
+            "term": "Neoplasms"
+          },
+          {
+            "id": "D009062",
+            "term": "Mouth Neoplasms"
+          },
+          {
+            "id": "D006258",
+            "term": "Head and Neck Neoplasms"
+          },
+          {
+            "id": "D009371",
+            "term": "Neoplasms by Site"
+          },
+          {
+            "id": "D007971",
+            "term": "Leukoplakia"
+          },
+          {
+            "id": "D009059",
+            "term": "Mouth Diseases"
+          },
+          {
+            "id": "D009057",
+            "term": "Stomatognathic Diseases"
+          },
+          {
+            "id": "D020763",
+            "term": "Pathological Conditions, Anatomical"
+          },
+          {
+            "id": "D013568",
+            "term": "Pathological Conditions, Signs and Symptoms"
+          }
+        ]
+      },
+      "interventionBrowseModule": {
+        "meshes": [
+          {
+            "id": "D001241",
+            "term": "Aspirin"
+          },
+          {
+            "id": "D020869",
+            "term": "Gene Expression Profiling"
+          },
+          {
+            "id": "D001706",
+            "term": "Biopsy"
+          }
+        ],
+        "ancestors": [
+          {
+            "id": "D012459",
+            "term": "Salicylates"
+          },
+          {
+            "id": "D062385",
+            "term": "Hydroxybenzoates"
+          },
+          {
+            "id": "D010636",
+            "term": "Phenols"
+          },
+          {
+            "id": "D001555",
+            "term": "Benzene Derivatives"
+          },
+          {
+            "id": "D006841",
+            "term": "Hydrocarbons, Aromatic"
+          },
+          {
+            "id": "D006844",
+            "term": "Hydrocarbons, Cyclic"
+          },
+          {
+            "id": "D006838",
+            "term": "Hydrocarbons"
+          },
+          {
+            "id": "D009930",
+            "term": "Organic Chemicals"
+          },
+          {
+            "id": "D005821",
+            "term": "Genetic Techniques"
+          },
+          {
+            "id": "D008919",
+            "term": "Investigative Techniques"
+          },
+          {
+            "id": "D003581",
+            "term": "Cytodiagnosis"
+          },
+          {
+            "id": "D003584",
+            "term": "Cytological Techniques"
+          },
+          {
+            "id": "D019411",
+            "term": "Clinical Laboratory Techniques"
+          },
+          {
+            "id": "D019937",
+            "term": "Diagnostic Techniques and Procedures"
+          },
+          {
+            "id": "D003933",
+            "term": "Diagnosis"
+          },
+          {
+            "id": "D013048",
+            "term": "Specimen Handling"
+          },
+          {
+            "id": "D003949",
+            "term": "Diagnostic Techniques, Surgical"
+          },
+          {
+            "id": "D013514",
+            "term": "Surgical Procedures, Operative"
+          }
+        ]
+      }
+    },
+    "hasResults": false
+  },
+  {
+    "protocolSection": {
+      "identificationModule": {
+        "nctId": "NCT05237843",
+        "orgStudyIdInfo": {
+          "id": "HCQ in URPL"
+        },
+        "organization": {
+          "fullName": "Ain Shams University",
+          "class": "OTHER"
+        },
+        "briefTitle": "Hydroxychloroquine in Unexplained Recurrent Pregnancy Loss",
+        "officialTitle": "Hydroxychloroquine in Unexplained Recurrent Pregnancy Loss ,Double Blinded Randomized Controlled Trial ."
+      },
+      "statusModule": {
+        "statusVerifiedDate": "2021-11",
+        "overallStatus": "UNKNOWN",
+        "lastKnownStatus": "NOT_YET_RECRUITING",
+        "expandedAccessInfo": {
+          "hasExpandedAccess": false
+        },
+        "startDateStruct": {
+          "date": "2022-03-01",
+          "type": "ESTIMATED"
+        },
+        "primaryCompletionDateStruct": {
+          "date": "2022-11",
+          "type": "ESTIMATED"
+        },
+        "completionDateStruct": {
+          "date": "2023-01",
+          "type": "ESTIMATED"
+        },
+        "studyFirstSubmitDate": "2021-11-23",
+        "studyFirstSubmitQcDate": "2022-02-09",
+        "studyFirstPostDateStruct": {
+          "date": "2022-02-14",
+          "type": "ACTUAL"
+        },
+        "lastUpdateSubmitDate": "2022-02-09",
+        "lastUpdatePostDateStruct": {
+          "date": "2022-02-14",
+          "type": "ACTUAL"
+        }
+      },
+      "sponsorCollaboratorsModule": {
+        "responsibleParty": {
+          "type": "SPONSOR"
+        },
+        "leadSponsor": {
+          "name": "Ain Shams University",
+          "class": "OTHER"
+        }
+      },
+      "oversightModule": {
+        "isFdaRegulatedDrug": false,
+        "isFdaRegulatedDevice": false
+      },
+      "descriptionModule": {
+        "briefSummary": "To investigate efficacy and safety of Hydroxychloroquin in improving pregnancy outcome in women with unexplained recurrent pregnancy loss .",
+        "detailedDescription": "Recurrent pregnancy loss (RPL) remains a significant challenge in obstetrical practice. It is not only emotionally devastating for expectant women but is also medically challenging. Approximately 1-3% of women have recurrent spontaneous abortion, defined as ≥3 pregnancy losses before the age of viability .The European Society of Human Reproduction and Embryology (ESHRE 2021) defined RPL as three or more consecutive losses. The American College of Obstetrics and Gynecology (ACOG 2020) defined RPL as two or more consecutive losses and the American Society for Reproductive Medicine (ASRM 2021) defined RPL as two or more failed pregnancies.\n\nRPL maybe due to uterine anatomic anomalies, endocrine/hormonal abnormalities, genetic/chromosomal abnormalities, and blood coagulation/platelet defects . Many of these causes are treatable . However, in about 40%-50% of pregnancy-loss cases, there is no identifiable cause. As such, the term \"unexplained recurrent pregnancy loss\" (URPL) is the spontaneous loss of three or more consecutive pregnancies without an identifiable risk factor .\n\nEndometrial environment plays a crucial place in embryo implantation and early placental development. In normal pregnancy, the survival of the semi-allogeneic fetus is dependent on the induction of maternal immune tolerance, with decrease regulatory T cells and Th-2 anti-inflammatory profile in peripheral blood and endometrium .\n\nSeveral reports show a misbalance of immune cells and cytokines expression such as increased Th1 to Th2 cytokine ratio in women with recurrent miscarriage and implantation failure .The excess activation of the proinflammatory pathways may inhibit the proliferation and invasion of the extravillous trophoblast and induce the activation of the immune cells with a direct damage to the trophoblast . So several studies have highlighted the immune deregulation to explain URM , Consequently, it has been hypothesized that immunomodulatory drugs could be a relevant therapy in URM .Among them, various treatments have been recently used, as HCQ . .\n\nHeparin-based drugs are essential in treating thrombosis and embolisms and preventing thromboembolic phenomena. Heparin works primarily by inhibiting thrombin (factor IIa) and factor Xa. Heparin use is associated with the risk of bleeding, osteoporosis and heparin-induced thrombocytopenia so requiring close monitoring .Apart from its antithrombotic effects, heparin has anti-inflammatory effect which consist to prevent the endothelial cells adhesion to the endothelium; heparin can bind selectins and integrins and interfere with complement activation. But these anti-thrombotic treatments have been used for several years to enhance live birth rates in URM, but failed to reach significant efficacy .\n\nBesides anti-thrombotic effects, hydroxychloroquine have immunoregulatory properties and can block the production of pro-inflammatory cytokines , Few in vitro studies showed a potential benefit of hydroxychloroquine in early trophoblastic migration and implantation. Hydroxychloroquine restored trophoblastic fusion and differentiation and restored the annexin A5 expression .\n\nHydroxychloroquine is widely used during the pregnancy, in particular in patients with systemic lupus erythematous. The main severe adverse effects in mothers include the allergic reactions, potential heart toxicity, and retinopathy. The retinal toxicity mainly concerns treatment duration of more than 5 years and the risk remain low in patients with regular follow-up . Audio-vestibular and ophthalmological studies of children at 12 months of life born from mothers under hydroxychloroquine during pregnancy showed no apparent abnormality and were similar to non-exposed children."
+      },
+      "conditionsModule": {
+        "conditions": ["Recurrent Pregnancy Loss"]
+      },
+      "designModule": {
+        "studyType": "INTERVENTIONAL",
+        "phases": ["PHASE1"],
+        "designInfo": {
+          "allocation": "RANDOMIZED",
+          "interventionModel": "PARALLEL",
+          "interventionModelDescription": "Group A (control group) : 35 women in this group will receive only the standard treatment in the form of low- dose aspirin (LDA) 81 mg/day (Jusprin® 81mg which manufactured by Future Pharmaceutical Company), and LMWH (Enoxaparin, Clexane® which manufactured by SANOFI company) with a dose ( .5 mg/kg) subcutaneously injected/24 hr . LDA ought to be begun before origination, while LMWH ought to be begun after confirmation of pregnancy by detecting fetal viability by ultrasound plus Placebo specially manufactured tablets in our Ain shams faculty of pharmacy .\n\nGroup B ( Hydroxychloroquine group ) : This group included 35 women who will administered Hydroxychloroquine 200 mg (Hydroquine® 200mg which fabricated by MinaPharm Company) one tablets / day in addition to the standard therapy",
+          "primaryPurpose": "PREVENTION",
+          "maskingInfo": {
+            "masking": "TRIPLE",
+            "maskingDescription": "Each 70 sequential patient numbers were composed murky envelope while task code composed different paper that then fixed inside. At hour predisposition visit individual control opened envelope to uncover task, continued like manner (bunch A or B ).",
+            "whoMasked": ["PARTICIPANT", "CARE_PROVIDER", "INVESTIGATOR"]
+          }
+        },
+        "enrollmentInfo": {
+          "count": 70,
+          "type": "ESTIMATED"
+        }
+      },
+      "armsInterventionsModule": {
+        "armGroups": [
+          {
+            "label": "Group A (control group)",
+            "type": "PLACEBO_COMPARATOR",
+            "description": "35 women in this group will receive only the standard treatment in the form of :\n\n* low- dose aspirin (LDA) 81 mg/day orally (Jusprin® 81mg which manufactured by Future Pharmaceutical Company),\n* LMWH (Enoxaparin, Clexane® which manufactured by SANOFI company) with a dose ( .5 mg/kg) subcutaneously injected/24 hr .\n\nLDA ought to be begun before origination, while LMWH ought to be begun after confirmation of pregnancy by detecting fetal viability by ultrasound till age of viability (20wks)\n\n-PLUS Placebo specially manufactured tablets in Ain shams faculty of pharmacy will start once known she is pregnan",
+            "interventionNames": ["Drug: Hydroxychloroquine"]
+          },
+          {
+            "label": "Group B ( Hydroxychloroquine group )",
+            "type": "EXPERIMENTAL",
+            "description": "This group included 35 women who will administered Hydroxychloroquine 200 mg (Hydroquine® 200mg which fabricated by MinaPharm Company) one tablets / day once known she is pregnant in addition to the standard therapy (LMWH + LDA )",
+            "interventionNames": ["Drug: Hydroxychloroquine"]
+          },
+          {
+            "label": "Study Director",
+            "type": "NO_INTERVENTION",
+            "description": "Only those directing the study know the treatment that each participant receives Placebo OR Hydroxychloroquin"
+          }
+        ],
+        "interventions": [
+          {
+            "type": "DRUG",
+            "name": "Hydroxychloroquine",
+            "description": "Besides anti-thrombotic effects, hydroxychloroquine have immunoregulatory properties and can block the production of pro-inflammatory cytokines ( Mekinian A et al ,2015 ) , Few in vitro studies showed a potential benefit of hydroxychloroquine in early trophoblastic migration and implantation. Hydroxychloroquine restored trophoblastic fusion and differentiation and restored the annexin A5 expression.( Guller S et al ,2011 )",
+            "armGroupLabels": ["Group A (control group)", "Group B ( Hydroxychloroquine group )"],
+            "otherNames": ["placebo - Aspirin (LDA) - Clexan (LMWH)"]
+          }
+        ]
+      },
+      "outcomesModule": {
+        "primaryOutcomes": [
+          {
+            "measure": "To investigate HCQ as a new edition in URPL protocol in change rate of pregnancy loss side by side with anticoagulant traditional treatment",
+            "description": "Describing 200 mg of HCQ daily in unexplained recurrent pregnancy loss start once she makes sure of pregnancy till 20 weeks of pregnancy",
+            "timeFrame": "one year to be completed"
+          }
+        ]
+      },
+      "eligibilityModule": {
+        "eligibilityCriteria": "Inclusion Criteria:\n\n* Women aged between 18 and 35 years inclusive.\n* Women with at least three previous consecutive miscarriages in the first trimester of pregnancy of unknown origin with no uterine cavity abnormality that might explain recurrent miscarriage at 3D ultrasonography\n* Women who have given their informed consent.\n* Patient who did received standard treatment and failed in an ongoing pregnancy\n\nExclusion Criteria:\n\n* Previous history VTE (venous thromboembolization)\n* Persistent positive APL antibodies: lupus anticoagulant and/or APL (anticardiolipin or anticardiolipin IgG or IgM) titers \\>99th percentile or \\>40 with at least 12 weeks interval between two positive determinations (persistent antibodies) or a specific clinical setting of APS (thrombotic or obstetrical, apart from RM in the first trimester of pregnancy) .\n* Known contraindication to a treatment by HCQ (retinopathy, hypersensitivity to chloroquine or HCQ, G6PD deficiency, acute intermittent porphyria, chronic liver or kidney insufficiency, extensive cutaneous psoriasis not controlled by local treatment, significant chronic digestive or haematologic disease) .\n* Indication to a treatment by HCQ (rheumatoid arthritis, Lupus, solar eczema) or previous exposure for \\>5years to HCQ.\n* BMI \\> 35\n* Condition may have an effect on immune reaction e.g. history of HCV or HBV .\n* Endocrinopathies such as ( DM ,thyroid disorders , hyperprolactinemia ) .\n* History of hormonal contraception or intrauterine device usage in last 3 months preceeding .",
+        "healthyVolunteers": false,
+        "sex": "FEMALE",
+        "genderBased": true,
+        "genderDescription": "study will go on pregnant females",
+        "minimumAge": "18 Years",
+        "maximumAge": "35 Years",
+        "stdAges": ["ADULT"]
+      },
+      "referencesModule": {
+        "references": [
+          {
+            "pmid": "23942472",
+            "type": "RESULT",
+            "citation": "Alijotas-Reig J, Garrido-Gimenez C. Current concepts and new trends in the diagnosis and management of recurrent miscarriage. Obstet Gynecol Surv. 2013 Jun;68(6):445-66. doi: 10.1097/OGX.0b013e31828aca19."
+          },
+          {
+            "pmid": "24995856",
+            "type": "RESULT",
+            "citation": "de Jong PG, Kaandorp S, Di Nisio M, Goddijn M, Middeldorp S. Aspirin and/or heparin for women with unexplained recurrent miscarriage with or without inherited thrombophilia. Cochrane Database Syst Rev. 2014 Jul 4;2014(7):CD004734. doi: 10.1002/14651858.CD004734.pub4."
+          },
+          {
+            "pmid": "19439078",
+            "type": "RESULT",
+            "citation": "Sperber K, Hom C, Chao CP, Shapiro D, Ash J. Systematic review of hydroxychloroquine use in pregnant patients with autoimmune diseases. Pediatr Rheumatol Online J. 2009 May 13;7:9. doi: 10.1186/1546-0096-7-9."
+          },
+          {
+            "pmid": "25681385",
+            "type": "RESULT",
+            "citation": "Garrido-Gimenez C, Alijotas-Reig J. Recurrent miscarriage: causes, evaluation and management. Postgrad Med J. 2015 Mar;91(1073):151-62. doi: 10.1136/postgradmedj-2014-132672. Epub 2015 Feb 13."
+          },
+          {
+            "pmid": "21718553",
+            "type": "RESULT",
+            "citation": "Duckitt K, Qureshi A. Recurrent miscarriage. BMJ Clin Evid. 2011 Feb 1;2011:1409."
+          },
+          {
+            "pmid": "24581729",
+            "type": "RESULT",
+            "citation": "Alijotas-Reig J, Llurba E, Gris JM. Potentiating maternal immune tolerance in pregnancy: a new challenging role for regulatory T cells. Placenta. 2014 Apr;35(4):241-8. doi: 10.1016/j.placenta.2014.02.004. Epub 2014 Feb 14."
+          },
+          {
+            "pmid": "26371706",
+            "type": "RESULT",
+            "citation": "Liang PY, Diao LH, Huang CY, Lian RC, Chen X, Li GG, Zhao J, Li YY, He XB, Zeng Y. The pro-inflammatory and anti-inflammatory cytokine profile in peripheral blood of women with recurrent implantation failure. Reprod Biomed Online. 2015 Dec;31(6):823-6. doi: 10.1016/j.rbmo.2015.08.009. Epub 2015 Aug 21."
+          },
+          {
+            "pmid": "10632428",
+            "type": "RESULT",
+            "citation": "Lim KJ, Odukoya OA, Ajjan RA, Li TC, Weetman AP, Cooke ID. The role of T-helper cytokines in human reproduction. Fertil Steril. 2000 Jan;73(1):136-42. doi: 10.1016/s0015-0282(99)00457-4."
+          },
+          {
+            "pmid": "21112094",
+            "type": "RESULT",
+            "citation": "Otun HA, Lash GE, Innes BA, Bulmer JN, Naruse K, Hannon T, Searle RF, Robson SC. Effect of tumour necrosis factor-alpha in combination with interferon-gamma on first trimester extravillous trophoblast invasion. J Reprod Immunol. 2011 Jan;88(1):1-11. doi: 10.1016/j.jri.2010.10.003. Epub 2010 Nov 26."
+          },
+          {
+            "pmid": "9344498",
+            "type": "RESULT",
+            "citation": "Haddad EK, Duclos AJ, Antecka E, Lapp WS, Baines MG. Role of interferon-gamma in the priming of decidual macrophages for nitric oxide production and early pregnancy loss. Cell Immunol. 1997 Oct 10;181(1):68-75. doi: 10.1006/cimm.1997.1199."
+          },
+          {
+            "pmid": "27100512",
+            "type": "RESULT",
+            "citation": "Onishi A, St Ange K, Dordick JS, Linhardt RJ. Heparin and anticoagulation. Front Biosci (Landmark Ed). 2016 Jun 1;21(7):1372-92. doi: 10.2741/4462."
+          },
+          {
+            "pmid": "25653897",
+            "type": "RESULT",
+            "citation": "Quaranta M, Erez O, Mastrolia SA, Koifman A, Leron E, Eshkoli T, Mazor M, Holcberg G. The physiologic and therapeutic role of heparin in implantation and placentation. PeerJ. 2015 Jan 6;3:e691. doi: 10.7717/peerj.691. eCollection 2015."
+          },
+          {
+            "pmid": "21871597",
+            "type": "RESULT",
+            "citation": "Wu XX, Guller S, Rand JH. Hydroxychloroquine reduces binding of antiphospholipid antibodies to syncytiotrophoblasts and restores annexin A5 expression. Am J Obstet Gynecol. 2011 Dec;205(6):576.e7-14. doi: 10.1016/j.ajog.2011.06.064. Epub 2011 Jun 24."
+          },
+          {
+            "pmid": "22002012",
+            "type": "RESULT",
+            "citation": "Osadchy A, Ratnapalan T, Koren G. Ocular toxicity in children exposed in utero to antimalarial drugs: review of the literature. J Rheumatol. 2011 Dec;38(12):2504-8. doi: 10.3899/jrheum.110686. Epub 2011 Oct 15."
+          }
+        ]
+      },
+      "ipdSharingStatementModule": {
+        "ipdSharing": "YES",
+        "description": "Data obtained through this study may be provided to new guide for recurrent pregnancy lss. Data or samples shared will be coded, with no PHI included. Approval of the request and execution of all applicable agreements (i.e. a material transfer agreement) are prerequisites to the sharing of data with the requesting party",
+        "infoTypes": ["STUDY_PROTOCOL", "CSR"],
+        "timeFrame": "Basline",
+        "accessCriteria": "Access to trial IPD can be requested by qualified researchers engaging in independent scientific research, and will be provided following review and approval of a research proposal and Statistical Analysis Plan (SAP) and execution of a Data Sharing Agreement (DSA). For more information or to submit a request, please contact: yasmineabdoud@gmail.com"
+      }
+    },
+    "derivedSection": {
+      "miscInfoModule": {
+        "versionHolder": "2026-04-22"
+      },
+      "interventionBrowseModule": {
+        "meshes": [
+          {
+            "id": "D006886",
+            "term": "Hydroxychloroquine"
+          },
+          {
+            "id": "D006495",
+            "term": "Heparin, Low-Molecular-Weight"
+          }
+        ],
+        "ancestors": [
+          {
+            "id": "D002738",
+            "term": "Chloroquine"
+          },
+          {
+            "id": "D000634",
+            "term": "Aminoquinolines"
+          },
+          {
+            "id": "D011804",
+            "term": "Quinolines"
+          },
+          {
+            "id": "D006574",
+            "term": "Heterocyclic Compounds, 2-Ring"
+          },
+          {
+            "id": "D000072471",
+            "term": "Heterocyclic Compounds, Fused-Ring"
+          },
+          {
+            "id": "D006571",
+            "term": "Heterocyclic Compounds"
+          },
+          {
+            "id": "D006493",
+            "term": "Heparin"
+          },
+          {
+            "id": "D006025",
+            "term": "Glycosaminoglycans"
+          },
+          {
+            "id": "D011134",
+            "term": "Polysaccharides"
+          },
+          {
+            "id": "D002241",
+            "term": "Carbohydrates"
+          }
+        ]
+      }
+    },
+    "hasResults": false
+  }
+]

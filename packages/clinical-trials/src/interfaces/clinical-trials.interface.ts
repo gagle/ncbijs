@@ -1,0 +1,85 @@
+/** Configuration for the ClinicalTrials client. */
+export interface ClinicalTrialsConfig {
+  readonly maxRetries?: number;
+}
+
+/** Options for searching clinical trial studies. */
+export interface StudySearchOptions {
+  readonly filter?: StudySearchFilter;
+  readonly pageSize?: number;
+  readonly sort?: string;
+  readonly fields?: ReadonlyArray<string>;
+}
+
+/** Filter criteria for study searches. */
+export interface StudySearchFilter {
+  readonly overallStatus?: ReadonlyArray<string>;
+  readonly condition?: ReadonlyArray<string>;
+  readonly intervention?: ReadonlyArray<string>;
+  readonly sponsor?: string;
+  readonly phase?: ReadonlyArray<string>;
+  readonly studyType?: string;
+}
+
+/** Full report for a clinical trial study. */
+export interface StudyReport {
+  readonly nctId: string;
+  readonly briefTitle: string;
+  readonly officialTitle: string;
+  readonly overallStatus: string;
+  readonly phase: string;
+  readonly studyType: string;
+  readonly startDate: string;
+  readonly completionDate: string;
+  readonly enrollment: number;
+  readonly conditions: ReadonlyArray<string>;
+  readonly interventions: ReadonlyArray<StudyIntervention>;
+  readonly sponsors: ReadonlyArray<StudySponsor>;
+  readonly locations: ReadonlyArray<StudyLocation>;
+}
+
+/** Intervention applied in a clinical trial. */
+export interface StudyIntervention {
+  readonly type: string;
+  readonly name: string;
+  readonly description: string;
+}
+
+/** Sponsor or collaborator of a clinical trial. */
+export interface StudySponsor {
+  readonly name: string;
+  readonly role: string;
+}
+
+/** Geographic location of a clinical trial site. */
+export interface StudyLocation {
+  readonly facility: string;
+  readonly city: string;
+  readonly state: string;
+  readonly country: string;
+}
+
+/** Aggregate statistics about the ClinicalTrials.gov database. */
+export interface StudyStats {
+  readonly totalStudies: number;
+}
+
+/** Distinct value and its occurrence count for a study field. */
+export interface FieldValueCount {
+  readonly value: string;
+  readonly count: number;
+}
+
+/** Metadata describing available study fields in the API. */
+export interface StudyMetadata {
+  readonly fields: ReadonlyArray<StudyFieldDefinition>;
+}
+
+/** Definition of a single study field. */
+export interface StudyFieldDefinition {
+  readonly name: string;
+  readonly type: string;
+  readonly description: string;
+  readonly sourceField: string;
+  readonly isEnum: boolean;
+}
