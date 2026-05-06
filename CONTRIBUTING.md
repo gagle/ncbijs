@@ -114,7 +114,17 @@ brew install uv  # required for code-review-graph
 claude plugins add --marketplace https://github.com/addyosmani/agent-skills agent-skills
 ```
 
-### 5. Verify
+### 5. Install the solo-npm plugin
+
+This repo's release, audit, and verify wrappers (`.claude/skills/release/`, `.claude/skills/verify/`) compose with the [`solo-npm`](https://github.com/gagle/solo-npm) marketplace plugin. The marketplace and plugin enablement are already declared in `.claude/settings.json#extraKnownMarketplaces` + `#enabledPlugins`, so you only need to install the plugin code locally:
+
+```bash
+claude plugins add --marketplace https://github.com/gagle/solo-npm solo-npm
+```
+
+After installation, run `/reload-plugins` inside Claude Code (or restart it). Without this plugin, `/release`, `/verify`, `/solo-npm:audit`, and `/solo-npm:deps` will fail because the wrappers invoke `/solo-npm:*` commands.
+
+### 6. Verify
 
 Open Claude Code in the repo root. It should automatically read `CLAUDE.md`, `.claude/` conventions, and connect to the MCP servers.
 
