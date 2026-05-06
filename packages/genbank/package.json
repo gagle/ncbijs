@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/genbank",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "GenBank flat file parser for protein and nucleotide records",
   "author": "Gabriel Llamas",
   "license": "MIT",

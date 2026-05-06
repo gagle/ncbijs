@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/rxnorm",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Typed client for the RxNorm REST API — drug name normalization, concept lookup, drug classes, and NDC codes",
   "author": "Gabriel Llamas",
   "license": "MIT",

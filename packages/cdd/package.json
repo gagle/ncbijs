@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/cdd",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Typed client for NCBI CDD (Conserved Domain Database)",
   "author": "Gabriel Llamas",
   "license": "MIT",

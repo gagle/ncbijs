@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/sync",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Watch NCBI data sources for updates and trigger pipeline re-runs",
   "author": "Gabriel Llamas",
   "license": "MIT",

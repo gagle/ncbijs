@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/snp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Typed client for the NCBI Variation Services API (dbSNP)",
   "author": "Gabriel Llamas",
   "license": "MIT",

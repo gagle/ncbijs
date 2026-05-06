@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/mesh",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MeSH vocabulary tree traversal, query expansion, and descriptor lookup",
   "author": "Gabriel Llamas",
   "license": "MIT",

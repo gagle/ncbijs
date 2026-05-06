@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/omim",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Typed client for NCBI OMIM (Online Mendelian Inheritance in Man)",
   "author": "Gabriel Llamas",
   "license": "MIT",

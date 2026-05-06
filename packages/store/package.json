@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/store",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Storage interfaces and DuckDB strategy for local NCBI data",
   "author": "Gabriel Llamas",
   "license": "MIT",

@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/etl",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Pre-wired NCBI data loaders: one function call to download, parse, and sink any dataset",
   "author": "Gabriel Llamas",
   "license": "MIT",

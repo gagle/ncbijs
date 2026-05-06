@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/protein",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Typed client for NCBI Protein database (EFetch) with FASTA and GenBank format support",
   "author": "Gabriel Llamas",
   "license": "MIT",

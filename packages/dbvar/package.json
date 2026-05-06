@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/dbvar",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Typed client for NCBI dbVar structural variation database",
   "author": "Gabriel Llamas",
   "license": "MIT",
