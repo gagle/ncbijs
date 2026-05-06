@@ -48,7 +48,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@ncbijs/store": "workspace:*",
-    "zod": "^4.4.2"
+    "zod": "^4.4.3"
   },
   "scripts": {
     "prepublishOnly": "echo 'Use CI to publish' && exit 1"

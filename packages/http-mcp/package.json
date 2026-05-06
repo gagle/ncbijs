@@ -62,7 +62,7 @@
     "@ncbijs/pubtator": "workspace:*",
     "@ncbijs/rxnorm": "workspace:*",
     "@ncbijs/snp": "workspace:*",
-    "zod": "^4.4.2"
+    "zod": "^4.4.3"
   },
   "scripts": {
     "prepublishOnly": "echo 'Use CI to publish' && exit 1"
