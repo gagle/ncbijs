@@ -98,6 +98,7 @@ interface RawICitePublication {
   readonly authors?: ReadonlyArray<RawICiteAuthor>;
   readonly journal?: string;
   readonly is_research_article?: boolean;
+  readonly is_clinical?: boolean;
   readonly relative_citation_ratio?: number | null;
   readonly nih_percentile?: number | null;
   readonly cited_by_clin?: ReadonlyArray<number>;
@@ -134,6 +135,7 @@ function mapPublication(raw: RawICitePublication): ICitePublication {
     authors: (raw.authors ?? []).map(mapAuthor),
     journal: raw.journal ?? '',
     isResearchArticle: raw.is_research_article ?? false,
+    isClinical: raw.is_clinical ?? false,
     relativeCitationRatio: raw.relative_citation_ratio ?? undefined,
     nihPercentile: raw.nih_percentile ?? undefined,
     citedByCount: raw.citation_count ?? 0,

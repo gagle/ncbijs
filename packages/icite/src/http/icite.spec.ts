@@ -25,6 +25,7 @@ function buildPublicationResponse(): Record<string, unknown> {
         ],
         journal: 'Nature',
         is_research_article: true,
+        is_clinical: false,
         relative_citation_ratio: 85.2,
         nih_percentile: 99.9,
         citation_count: 1500,
@@ -65,6 +66,7 @@ describe('ICite', () => {
       expect(pubs[0]!.nihPercentile).toBe(99.9);
       expect(pubs[0]!.citedByCount).toBe(1500);
       expect(pubs[0]!.citedByClinicalArticle).toBe(true);
+      expect(pubs[0]!.isClinical).toBe(false);
       expect(pubs[0]!.doi).toBe('10.1038/s41586-020-03049-6');
       expect(pubs[0]!.citationsPerYear).toBe(375.0);
       expect(pubs[0]!.provisional).toBe(false);
@@ -144,6 +146,7 @@ describe('ICite', () => {
       expect(pubs[0]!.authors).toEqual([]);
       expect(pubs[0]!.journal).toBe('');
       expect(pubs[0]!.isResearchArticle).toBe(false);
+      expect(pubs[0]!.isClinical).toBe(false);
       expect(pubs[0]!.citedByCount).toBe(0);
       expect(pubs[0]!.referencesCount).toBe(0);
       expect(pubs[0]!.citedByClinicalArticle).toBe(false);

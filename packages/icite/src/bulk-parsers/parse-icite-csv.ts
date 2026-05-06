@@ -42,6 +42,7 @@ interface ColumnIndices {
   readonly authors: number;
   readonly journal: number;
   readonly isResearchArticle: number;
+  readonly isClinical: number;
   readonly relativeCitationRatio: number;
   readonly nihPercentile: number;
   readonly citationCount: number;
@@ -77,6 +78,7 @@ function resolveColumnIndices(headerLine: string): ColumnIndices | undefined {
     authors: headers.indexOf('authors'),
     journal: headers.indexOf('journal'),
     isResearchArticle: headers.indexOf('is_research_article'),
+    isClinical: headers.indexOf('is_clinical'),
     relativeCitationRatio: headers.indexOf('relative_citation_ratio'),
     nihPercentile: headers.indexOf('nih_percentile'),
     citationCount: headers.indexOf('citation_count'),
@@ -113,6 +115,7 @@ function mapPublication(fields: ReadonlyArray<string>, indices: ColumnIndices): 
     authors: parseAuthors(fieldAt(fields, indices.authors)),
     journal: fieldAt(fields, indices.journal),
     isResearchArticle: parseBool(fieldAt(fields, indices.isResearchArticle)),
+    isClinical: parseBool(fieldAt(fields, indices.isClinical)),
     relativeCitationRatio,
     nihPercentile,
     citedByCount: parseIntSafe(fieldAt(fields, indices.citationCount)),

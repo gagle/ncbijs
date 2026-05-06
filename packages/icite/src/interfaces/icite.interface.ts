@@ -18,6 +18,8 @@ export interface ICitePublication {
   readonly authors: ReadonlyArray<ICiteAuthor>;
   readonly journal: string;
   readonly isResearchArticle: boolean;
+  /** Whether this article itself reports clinical research. */
+  readonly isClinical: boolean;
   readonly relativeCitationRatio: number | undefined;
   readonly nihPercentile: number | undefined;
   readonly citedByCount: number;

@@ -88,8 +88,10 @@ describe('parseIciteCsv', () => {
     const result = parseIciteCsv(SAMPLE_CSV);
 
     expect(result[0]!.citedByClinicalArticle).toBe(false);
+    expect(result[0]!.isClinical).toBe(false);
     expect(result[0]!.provisional).toBe(false);
     expect(result[1]!.citedByClinicalArticle).toBe(true);
+    expect(result[1]!.isClinical).toBe(true);
     expect(result[1]!.provisional).toBe(true);
   });
 
