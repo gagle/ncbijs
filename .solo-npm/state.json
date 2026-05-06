@@ -48,5 +48,11 @@
     ],
     "lastFullCheck": "2026-05-04T11:35:00Z",
     "ttlDays": 7
+  },
+  "audit": {
+    "tier1Count": 0,
+    "tier2Count": 0,
+    "lastFullScan": "2026-05-04T12:00:00Z",
+    "ttlDays": 1
   }
 }
