@@ -23,7 +23,7 @@ Composable git workflow with three independent actions. Parse `$ARGUMENTS` for: 
 
 3. **Analyze changes** — determine:
    - **type**: `feat` | `fix` | `refactor` | `chore` | `docs` | `test` | `style` | `ci` | `perf` | `build`
-   - **scope**: must be one of the commitlint-enforced scopes: `eutils`, `pubmed-xml`, `pubmed`, `jats`, `pmc`, `id-converter`, `pubtator`, `mesh`, `cite`, `mcp`, `rate-limiter`, `xml`, `workspace`
+   - **scope**: must be one of the commitlint-enforced scopes (single source of truth: `commitlint.config.ts`): `eutils`, `pubmed-xml`, `pubmed`, `jats`, `pmc`, `id-converter`, `pubtator`, `mesh`, `cite`, `http-mcp`, `store-mcp`, `rate-limiter`, `xml`, `fasta`, `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `genbank`, `protein`, `nucleotide`, `omim`, `medgen`, `gtr`, `geo`, `dbvar`, `sra`, `structure`, `cdd`, `books`, `nlm-catalog`, `rxnorm`, `litvar`, `clinical-trials`, `icite`, `bioc`, `clinical-tables`, `store`, `pipeline`, `sync`, `etl`, `dailymed`, `workspace`
    - **description**: concise summary of what changed and why
 
 4. **Commit** — single-line message, no body, no `Co-Authored-By`:
