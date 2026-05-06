@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/fasta",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Parse FASTA format sequences into typed records",
   "author": "Gabriel Llamas",
   "license": "MIT",

@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/dailymed",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Typed client for the DailyMed REST API v2 — drug labels, SPL data, NDC codes, and drug classes",
   "author": "Gabriel Llamas",
   "license": "MIT",

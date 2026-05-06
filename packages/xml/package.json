@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/xml",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Zero-dependency regex-based XML reader for NCBI document formats",
   "author": "Gabriel Llamas",
   "license": "MIT",

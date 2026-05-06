@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/nucleotide",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Typed client for NCBI Nucleotide database (EFetch) with FASTA and GenBank format support",
   "author": "Gabriel Llamas",
   "license": "MIT",

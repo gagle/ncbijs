@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/sra",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Typed client for NCBI SRA (Sequence Read Archive)",
   "author": "Gabriel Llamas",
   "license": "MIT",

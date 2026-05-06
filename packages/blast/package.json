@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/blast",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "NCBI BLAST sequence alignment client with async submit/poll/retrieve workflow",
   "author": "Gabriel Llamas",
   "license": "MIT",

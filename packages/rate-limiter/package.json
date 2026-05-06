@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/rate-limiter",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Zero-dependency token bucket rate limiter for browser and Node.js",
   "author": "Gabriel Llamas",
   "license": "MIT",

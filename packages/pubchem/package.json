@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/pubchem",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Typed client for the PubChem PUG REST API (compound properties, synonyms, descriptions)",
   "author": "Gabriel Llamas",
   "license": "MIT",

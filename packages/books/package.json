@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/books",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Typed client for NCBI Books (Bookshelf)",
   "author": "Gabriel Llamas",
   "license": "MIT",

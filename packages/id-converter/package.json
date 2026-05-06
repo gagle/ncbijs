@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/id-converter",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Batch article ID conversion between PMID, PMCID, DOI, and Manuscript ID",
   "author": "Gabriel Llamas",
   "license": "MIT",

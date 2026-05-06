@@ -1,6 +1,6 @@
 {
   "name": "@ncbijs/cite",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Citation formatting via NCBI Literature Citation Exporter — RIS, MEDLINE, CSL-JSON, and pre-rendered citations",
   "author": "Gabriel Llamas",
   "license": "MIT",
