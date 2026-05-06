@@ -6,6 +6,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 const MCP_PACKAGE_DIR = resolve(import.meta.dirname, '..', 'packages', 'http-mcp');
 const SERVER_PATH = resolve(MCP_PACKAGE_DIR, 'dist', 'index.js');
 
+type SkipContext = { skip: (note?: string) => void };
+
 describe('MCP Server E2E', () => {
   let client: Client;
   let transport: StdioClientTransport;
@@ -28,11 +30,17 @@ describe('MCP Server E2E', () => {
     await client.close();
   });
 
-  function textContent(result: Awaited<ReturnType<typeof client.callTool>>): string {
+  function textContent(
+    ctx: SkipContext,
+    result: Awaited<ReturnType<typeof client.callTool>>,
+  ): string {
     const { content } = result as { content: Array<{ type: string; text: string }> };
     const first = content[0];
     if (first === undefined || first.type !== 'text') {
       throw new Error('Expected text content');
+    }
+    if (first.text === 'terminated') {
+      ctx.skip('NCBI upstream returned "terminated" — transient HTTP abort');
     }
     return first.text;
   }
@@ -65,205 +73,208 @@ describe('MCP Server E2E', () => {
     expect(names).toContain('search-litvar');
   });
 
-  it('should search PubMed', async () => {
+  it('should search PubMed', async (ctx) => {
     const result = await client.callTool({
       name: 'search-pubmed',
       arguments: { query: 'CRISPR', maxResults: 3 },
     });
 
-    const articles = JSON.parse(textContent(result)) as Array<{ pmid: string; title: string }>;
+    const articles = JSON.parse(textContent(ctx, result)) as Array<{ pmid: string; title: string }>;
     expect(articles.length).toBeGreaterThan(0);
     expect(articles.length).toBeLessThanOrEqual(3);
     expect(articles[0]!.pmid).toBeTruthy();
     expect(articles[0]!.title).toBeTruthy();
   });
 
-  it('should get related articles', async () => {
+  it('should get related articles', async (ctx) => {
     const result = await client.callTool({
       name: 'search-related',
       arguments: { pmid: '33533846' },
     });
 
-    const related = JSON.parse(textContent(result)) as Array<unknown>;
+    const related = JSON.parse(textContent(ctx, result)) as Array<unknown>;
     expect(related.length).toBeGreaterThan(0);
   });
 
-  it('should get full text from PMC', async () => {
+  it('should get full text from PMC', async (ctx) => {
     const result = await client.callTool({
       name: 'get-full-text',
       arguments: { pmcid: 'PMC7886120' },
     });
 
-    const markdown = textContent(result);
+    const markdown = textContent(ctx, result);
     expect(markdown).toContain('PMC7886120');
     expect(markdown).toContain('License:');
     expect(markdown.length).toBeGreaterThan(100);
   });
 
-  it('should get full text chunks from PMC', async () => {
+  it('should get full text chunks from PMC', async (ctx) => {
     const result = await client.callTool({
       name: 'get-full-text-chunks',
       arguments: { pmcid: 'PMC7886120', maxTokens: 256 },
     });
 
-    const chunks = JSON.parse(textContent(result)) as Array<{ section: string; text: string }>;
+    const chunks = JSON.parse(textContent(ctx, result)) as Array<{ section: string; text: string }>;
     expect(chunks.length).toBeGreaterThan(0);
     expect(chunks[0]!.text).toBeTruthy();
   });
 
-  it('should find a biomedical entity', async () => {
+  it('should find a biomedical entity', async (ctx) => {
     const result = await client.callTool({
       name: 'find-entity',
       arguments: { query: 'BRCA1', entityType: 'gene' },
     });
 
-    const entities = JSON.parse(textContent(result)) as Array<{ name: string }>;
+    const entities = JSON.parse(textContent(ctx, result)) as Array<{ name: string }>;
     expect(entities.length).toBeGreaterThan(0);
   });
 
-  it('should annotate text', async () => {
+  it('should annotate text', async (ctx) => {
     const result = await client.callTool({
       name: 'annotate-text',
       arguments: { text: 'BRCA1 is associated with breast cancer' },
     });
 
-    const annotation = textContent(result);
+    const annotation = textContent(ctx, result);
     expect(annotation.length).toBeGreaterThan(0);
   });
 
-  it('should convert article IDs', async () => {
+  it('should convert article IDs', async (ctx) => {
     const result = await client.callTool({
       name: 'convert-ids',
       arguments: { ids: ['17284678'] },
     });
 
-    const converted = JSON.parse(textContent(result)) as Array<{ pmid: string; pmcid: string }>;
+    const converted = JSON.parse(textContent(ctx, result)) as Array<{
+      pmid: string;
+      pmcid: string;
+    }>;
     expect(converted).toHaveLength(1);
     expect(converted[0]!.pmid).toBe('17284678');
     expect(converted[0]!.pmcid).toBeTruthy();
   });
 
-  it('should get a citation', async () => {
+  it('should get a citation', async (ctx) => {
     const result = await client.callTool({
       name: 'get-citation',
       arguments: { pmid: '33533846', format: 'ris' },
     });
 
-    const ris = textContent(result);
+    const ris = textContent(ctx, result);
     expect(ris).toContain('TY  -');
   });
 
-  it('should look up a MeSH term', async () => {
+  it('should look up a MeSH term', async (ctx) => {
     const result = await client.callTool({
       name: 'mesh-lookup',
       arguments: { term: 'Neoplasms' },
     });
 
-    const matches = JSON.parse(textContent(result)) as Array<{ label: string }>;
+    const matches = JSON.parse(textContent(ctx, result)) as Array<{ label: string }>;
     expect(matches.length).toBeGreaterThan(0);
   });
 
-  it('should search genes', async () => {
+  it('should search genes', async (ctx) => {
     const result = await client.callTool({
       name: 'search-gene',
       arguments: { geneIds: [672] },
     });
 
-    const reports = JSON.parse(textContent(result)) as Array<{ gene: { geneId: number } }>;
+    const reports = JSON.parse(textContent(ctx, result)) as Array<{ gene: { geneId: number } }>;
     expect(reports.length).toBeGreaterThan(0);
   });
 
-  it('should look up taxonomy', async () => {
+  it('should look up taxonomy', async (ctx) => {
     const result = await client.callTool({
       name: 'lookup-taxonomy',
       arguments: { taxons: [9606] },
     });
 
     expect(result.isError).not.toBe(true);
-    const text = textContent(result);
+    const text = textContent(ctx, result);
     const reports = JSON.parse(text) as Array<unknown>;
     expect(reports).toBeInstanceOf(Array);
   });
 
-  it('should look up a variant', async () => {
+  it('should look up a variant', async (ctx) => {
     const result = await client.callTool({
       name: 'lookup-variant',
       arguments: { rsIds: [7412] },
     });
 
-    const reports = JSON.parse(textContent(result)) as Array<{ rsId: number }>;
+    const reports = JSON.parse(textContent(ctx, result)) as Array<{ rsId: number }>;
     expect(reports.length).toBeGreaterThan(0);
   });
 
-  it('should search ClinVar', async () => {
+  it('should search ClinVar', async (ctx) => {
     const result = await client.callTool({
       name: 'search-clinvar',
       arguments: { term: 'BRCA1', retmax: 3 },
     });
 
-    const text = textContent(result);
+    const text = textContent(ctx, result);
     expect(text.length).toBeGreaterThan(0);
     expect(result.isError).not.toBe(true);
   });
 
-  it('should look up a RefSNP variant', async () => {
+  it('should look up a RefSNP variant', async (ctx) => {
     const result = await client.callTool({
       name: 'lookup-refsnp',
       arguments: { rsid: 7412 },
     });
 
-    const report = JSON.parse(textContent(result)) as { rsid: number };
+    const report = JSON.parse(textContent(ctx, result)) as { rsid: number };
     expect(report.rsid).toBe(7412);
   });
 
-  it('should look up variant frequency', async () => {
+  it('should look up variant frequency', async (ctx) => {
     const result = await client.callTool({
       name: 'lookup-frequency',
       arguments: { rsid: 7412 },
     });
 
-    const text = textContent(result);
+    const text = textContent(ctx, result);
     expect(text.length).toBeGreaterThan(0);
   });
 
-  it('should get citation metrics', async () => {
+  it('should get citation metrics', async (ctx) => {
     const result = await client.callTool({
       name: 'citation-metrics',
       arguments: { pmids: [33533846] },
     });
 
-    const pubs = JSON.parse(textContent(result)) as Array<{ pmid: number }>;
+    const pubs = JSON.parse(textContent(ctx, result)) as Array<{ pmid: number }>;
     expect(pubs.length).toBeGreaterThan(0);
     expect(pubs[0]!.pmid).toBe(33533846);
   });
 
-  it('should look up a drug by fuzzy name', async () => {
+  it('should look up a drug by fuzzy name', async (ctx) => {
     const result = await client.callTool({
       name: 'drug-lookup',
       arguments: { name: 'aspirin', maxResults: 5 },
     });
 
-    const candidates = JSON.parse(textContent(result)) as Array<{ name: string }>;
+    const candidates = JSON.parse(textContent(ctx, result)) as Array<{ name: string }>;
     expect(candidates.length).toBeGreaterThan(0);
   });
 
-  it('should search LitVar for a variant', async () => {
+  it('should search LitVar for a variant', async (ctx) => {
     const result = await client.callTool({
       name: 'search-litvar',
       arguments: { rsid: 'rs328' },
     });
 
-    const text = textContent(result);
+    const text = textContent(ctx, result);
     expect(text.length).toBeGreaterThan(0);
   });
 
-  it('should search PubChem compound', async () => {
+  it('should search PubChem compound', async (ctx) => {
     const result = await client.callTool({
       name: 'search-compound',
       arguments: { name: 'aspirin' },
     });
 
-    const data = JSON.parse(textContent(result)) as {
+    const data = JSON.parse(textContent(ctx, result)) as {
       properties: { molecularFormula: string };
     };
     expect(data.properties.molecularFormula).toBeTruthy();
