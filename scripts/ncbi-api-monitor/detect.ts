@@ -80,6 +80,8 @@ interface EndpointConfig {
 
 interface VersionEndpointConfig extends EndpointConfig {
   readonly fields: ReadonlyArray<string>;
+  /** Subset of `fields` whose change indicates an API contract change (MEDIUM). Other field changes are LOW (data-refresh). */
+  readonly apiContractFields: ReadonlyArray<string>;
 }
 
 interface ProbeConfig {
@@ -115,12 +117,14 @@ const VERSION_ENDPOINTS: ReadonlyArray<VersionEndpointConfig> = [
     key: 'clinicaltrials',
     url: 'https://clinicaltrials.gov/api/v2/version',
     fields: ['apiVersion', 'dataTimestamp'],
+    apiContractFields: ['apiVersion'],
     packages: ['@ncbijs/clinical-trials'],
   },
   {
     key: 'rxnorm',
     url: 'https://rxnav.nlm.nih.gov/REST/version.json',
     fields: ['version', 'apiVersion'],
+    apiContractFields: ['apiVersion'],
     packages: ['@ncbijs/rxnorm'],
   },
 ];
@@ -516,9 +520,12 @@ export async function checkVersionEndpoints(
     }
 
     if (changedFields.length > 0) {
+      const contractChanged = endpoint.apiContractFields.some(
+        (field) => previous[field] !== currentValues[field],
+      );
       changes.push({
         category: 'version',
-        severity: 'medium',
+        severity: contractChanged ? 'medium' : 'low',
         description: `${endpoint.key} version bumped (${changedFields.join(', ')})`,
         affectedPackages: [...endpoint.packages],
       });
@@ -766,18 +773,21 @@ export async function checkEinfoDatabases(currentState: Record<string, EinfoEntr
     const text = await response.text();
     const body: {
       readonly einforesult?: {
-        readonly dbinfo?: ReadonlyArray<{
-          readonly lastupdate?: string;
-          readonly dbbuild?: string;
-        }>;
+        readonly dbinfo?: ReadonlyArray<
+          string | { readonly lastupdate?: string; readonly dbbuild?: string }
+        >;
       };
     } = JSON.parse(text);
     const dbinfo = body.einforesult?.dbinfo?.[0];
+    if (typeof dbinfo === 'string') {
+      return { database, skipped: true as const };
+    }
     if (!dbinfo?.dbbuild) {
       throw new Error(`Missing dbinfo for ${database}`);
     }
     return {
       database,
+      skipped: false as const,
       lastupdate: dbinfo.lastupdate ?? '',
       dbbuild: dbinfo.dbbuild,
     };
@@ -786,6 +796,9 @@ export async function checkEinfoDatabases(currentState: Record<string, EinfoEntr
   for (const result of results) {
     if (result.status === 'rejected') {
       errors.push(`EInfo fetch failed: ${String(result.reason)}`);
+      continue;
+    }
+    if (result.value.skipped) {
       continue;
     }
     const { database, lastupdate, dbbuild } = result.value;

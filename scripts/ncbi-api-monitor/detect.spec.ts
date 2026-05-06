@@ -202,6 +202,27 @@ describe('checkVersionEndpoints', () => {
     expect(result.changes).toHaveLength(0);
     expect(Object.keys(result.state)).toHaveLength(2);
   });
+
+  it('should report low severity when only data-refresh fields change', async () => {
+    const currentState: Record<string, Record<string, string>> = {
+      clinicaltrials: { apiVersion: '2.0.5', dataTimestamp: '2026-01-01' },
+      rxnorm: { version: '06-Jan-2026', apiVersion: '3.1.350' },
+    };
+
+    mockFetch.mockImplementation(async (url) => {
+      const urlString = String(url);
+      if (urlString.includes('clinicaltrials')) {
+        return jsonResponse({ apiVersion: '2.0.5', dataTimestamp: '2026-04-26' });
+      }
+      return jsonResponse({ version: '06-Jan-2026', apiVersion: '3.1.350' });
+    });
+
+    const result = await checkVersionEndpoints(currentState);
+
+    expect(result.changes).toHaveLength(1);
+    expect(result.changes[0]?.severity).toBe('low');
+    expect(result.changes[0]?.description).toContain('clinicaltrials');
+  });
 });
 
 describe('checkDeprecationHeaders', () => {
@@ -428,6 +449,22 @@ describe('checkEinfoDatabases', () => {
 
     expect(result.changes).toHaveLength(0);
     expect(Object.keys(result.state)).toHaveLength(17);
+  });
+
+  it('should silently skip databases when NCBI returns a no-data string', async () => {
+    mockFetch.mockResolvedValue(
+      jsonResponse({
+        einforesult: {
+          dbinfo: ['Can not retrieve DbInfo for db=geo'],
+        },
+      }),
+    );
+
+    const result = await checkEinfoDatabases({});
+
+    expect(result.changes).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+    expect(Object.keys(result.state)).toHaveLength(0);
   });
 });
 
