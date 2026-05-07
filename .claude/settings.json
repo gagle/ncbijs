@@ -5,10 +5,17 @@
         "source": "github",
         "repo": "gagle/solo-npm"
       }
+    },
+    "addy-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "addyosmani/agent-skills"
+      }
     }
   },
   "enabledPlugins": {
-    "solo-npm@gllamas-skills": true
+    "solo-npm@gllamas-skills": true,
+    "agent-skills@addy-agent-skills": true
   },
   "hooks": {
     "PostToolUse": [
