@@ -23,7 +23,7 @@ Composable git workflow with three independent actions. Parse `$ARGUMENTS` for: 
 
 3. **Analyze changes** — determine:
    - **type**: `feat` | `fix` | `refactor` | `chore` | `docs` | `test` | `style` | `ci` | `perf` | `build`
-   - **scope**: must be one of the commitlint-enforced scopes (single source of truth: `commitlint.config.ts`): `eutils`, `pubmed-xml`, `pubmed`, `jats`, `pmc`, `id-converter`, `pubtator`, `mesh`, `cite`, `http-mcp`, `store-mcp`, `rate-limiter`, `xml`, `fasta`, `datasets`, `blast`, `snp`, `clinvar`, `pubchem`, `genbank`, `protein`, `nucleotide`, `omim`, `medgen`, `gtr`, `geo`, `dbvar`, `sra`, `structure`, `cdd`, `books`, `nlm-catalog`, `rxnorm`, `litvar`, `clinical-trials`, `icite`, `bioc`, `clinical-tables`, `store`, `pipeline`, `sync`, `etl`, `dailymed`, `workspace`
+   - **scope**: package directory name in `packages/` (without `@ncbijs/` prefix), or `workspace` for monorepo-wide changes. See `.claude/rules/commits.md`. Discover live scopes via `ls packages/`.
    - **description**: concise summary of what changed and why
 
 4. **Commit** — single-line message, no body, no `Co-Authored-By`:
@@ -32,7 +32,7 @@ Composable git workflow with three independent actions. Parse `$ARGUMENTS` for: 
    git commit -m "type(scope): description"
    ```
 
-   Must pass commitlint validation (husky commit-msg hook enforces this).
+   Use conventional commit format (`type(scope): description`); see `.claude/rules/commits.md`.
 
 5. **Verify** — `git log --oneline -1`
 
@@ -76,6 +76,6 @@ Composable git workflow with three independent actions. Parse `$ARGUMENTS` for: 
 - Never use `git add -A` or `git add .` — add files by name
 - Single-line commit messages only — no body, no `Co-Authored-By`
 - Always use `--force-with-lease` over `--force`
-- Commit messages must be commitlint-compatible (conventional commits with enforced scope enum)
+- Commit messages should follow conventional commits format (see `.claude/rules/commits.md`)
 - Squash synthesizes a new message from all branch commits — not just the first one
 - If `squash push` is given, run squash first, then push

@@ -79,6 +79,7 @@ This repo includes `.claude/` configuration that Claude reads automatically:
 - **`.claude/rules/testing.md`** -- 18 testing rules, spec structure, coverage requirements
 - **`.claude/rules/review-criteria.md`** -- Code review evaluation criteria and severity scoring
 - **`.claude/rules/package-architecture.md`** -- Package layout conventions (flat vs. split with http/bulk-parsers)
+- **`.claude/rules/commits.md`** -- Conventional Commits format with dynamic scope from `packages/` (no runtime enforcement since commitlint was removed)
 
 **Skills** (invoked on demand via `/skill-name`):
 
