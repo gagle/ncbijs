@@ -1,3 +1,16 @@
+---
+title: 'RAG Integration'
+purpose: 'How ncbijs slots into a RAG pipeline as the data-access layer — chunking, embedding, retrieval, citation.'
+audience: ['agent', 'human']
+size: 'medium'
+related_packages:
+  - '@ncbijs/pmc'
+  - '@ncbijs/jats'
+  - '@ncbijs/pubtator'
+  - '@ncbijs/cite'
+  - '@ncbijs/mesh'
+last_audited: '2026-04-01'
+---
 # ncbijs as a Data Access Layer for RAG Pipelines
 
 ncbijs is a **data access layer** for NCBI's biomedical databases. It is not a RAG system. It fetches, parses, types, chunks, and annotates biomedical data — providing the structured inputs that RAG pipelines need at every stage.

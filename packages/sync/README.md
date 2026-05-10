@@ -129,3 +129,8 @@ interface SyncStateStore {
 ## Wiring with @ncbijs/etl
 
 See [`examples/data-pipeline/sync-watch.ts`](../../examples/data-pipeline/sync-watch.ts) for a complete example that watches all ETL datasets and auto-reloads into DuckDB when changes are detected.
+
+## See also
+
+- [`CLAUDE.md`](./CLAUDE.md) — agent reference (deep API, cross-package wiring, common pitfalls)
+- [Architecture overview](../../docs/architecture.md)

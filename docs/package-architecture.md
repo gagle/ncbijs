@@ -1,3 +1,11 @@
+---
+title: 'Package Architecture'
+purpose: 'Flat vs split layout decision, required files (README + CLAUDE.md), CLAUDE.md template, @import policy, doc taxonomy.'
+audience: ['agent', 'human']
+size: 'small'
+related_packages: []
+last_audited: '2026-04-01'
+---
 # Package Architecture
 
 Conventions for how packages are structured in the ncbijs monorepo.
@@ -141,6 +149,52 @@ If the package exposes functionality useful to LLM agents:
 | `tsconfig.base.json`   | Path alias: `"@ncbijs/{name}": ["./packages/{name}/src/index.ts"]` |
 | `commitlint.config.ts` | Scope name in `scope-enum` array                                   |
 | `CLAUDE.md`            | Scope in formatting section, dependency graph, build order         |
+
+## Doc taxonomy: README.md vs CLAUDE.md
+
+Every package ships **both** a `README.md` (humans / npm) and a `CLAUDE.md` (agents / deep reference). They have different audiences and framings — don't merge them.
+
+| File          | Audience       | Loaded                                                | Content style                                            |
+| ------------- | -------------- | ----------------------------------------------------- | -------------------------------------------------------- |
+| `README.md`   | humans / npm   | rendered on npm; not auto-loaded by Claude Code       | tagline, install, quick start, narrative API tour        |
+| `CLAUDE.md`   | agents         | **auto-loaded** by Claude Code when in this subtree   | YAML frontmatter, tables, dense pitfalls, file map       |
+
+Reference the locked template — copy structure, not content — from any of:
+
+- `packages/eutils/CLAUDE.md` (flat HTTP)
+- `packages/mesh/CLAUDE.md` (split layout + storage_mode)
+- `packages/pipeline/CLAUDE.md` (zero-dep)
+- `packages/xml/CLAUDE.md` (pure utility, no HTTP)
+- `packages/http-mcp/CLAUDE.md` (MCP server)
+
+### Required CLAUDE.md sections (in order)
+
+1. YAML frontmatter — `package`, `purpose`, `layout`, `storage_mode`, `zero_dep`, `depends_on`, `used_by`, `exports`, `related_docs`, `last_audited` (ISO date)
+2. `# @ncbijs/<name>` heading
+3. `## Purpose` — one paragraph
+4. `## When to use` — bullets
+5. `## When NOT to use` — table mapping wrong-fit goals to alternative `@ncbijs/*` packages
+6. `## Exports` — table of every public export
+7. `## API surface` — method-by-method with TS signatures
+8. `## Configuration` — constructor options table (omit if no constructor)
+9. `## Rate limiting & credentials` — HTTP packages only
+10. `## Storage mode` — only if `storage_mode: true`
+11. `## Cross-package wiring` — Imports, Used by, Composes with
+12. `## Common pitfalls` — numbered, package-specific (symptom + cause + fix)
+13. `## Testing` — commands and fixture locations
+14. `## Files` — annotated tree
+
+### `@import` policy in CLAUDE.md
+
+Claude Code supports `@filename` in CLAUDE.md to auto-include external files. **Default: don't use `@import` here.** It bypasses on-demand loading and inflates always-loaded context.
+
+| Use `@import` for                                                | Don't `@import`                                          |
+| ---------------------------------------------------------------- | -------------------------------------------------------- |
+| Tiny snippets (< 50 lines) referenced in **every** turn          | Whole package READMEs (linking is enough)                |
+| Frontmatter manifests when sync-docs auto-generates them         | `docs/*.md` cross-cutting deep-dives                     |
+| nothing currently in this repo qualifies                         | Other packages' CLAUDE.md (defeats subtree-scoped load)  |
+
+If in doubt: link, don't import. Reserve `@import` for the rare case where a small snippet really does belong everywhere.
 
 ## Verification
 

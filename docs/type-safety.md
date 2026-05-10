@@ -1,3 +1,11 @@
+---
+title: 'Type Safety Guide'
+purpose: 'Three-layer type pattern (raw / domain / parsed), format-dependent overloads, no-any rationale, why API-first types.'
+audience: ['agent', 'human']
+size: 'small'
+related_packages: []
+last_audited: '2026-04-01'
+---
 # Type Safety Guide
 
 ## Principle

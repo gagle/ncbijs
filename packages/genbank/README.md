@@ -107,3 +107,8 @@ interface GenBankQualifier {
   readonly value: string;
 }
 ```
+
+## See also
+
+- [`CLAUDE.md`](./CLAUDE.md) — agent reference (deep API, cross-package wiring, common pitfalls)
+- [Architecture overview](../../docs/architecture.md)

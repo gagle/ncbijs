@@ -1,3 +1,19 @@
+---
+title: 'Bulk Parser Catalog'
+purpose: 'Inventory of bulk-data parsers and the NCBI distributions they ingest — input formats, sample sizes, parser entry points, downstream sinks.'
+audience: ['agent', 'human']
+size: 'large'
+related_packages:
+  - '@ncbijs/pipeline'
+  - '@ncbijs/etl'
+  - '@ncbijs/sync'
+  - '@ncbijs/mesh'
+  - '@ncbijs/clinvar'
+  - '@ncbijs/datasets'
+  - '@ncbijs/pubchem'
+  - '@ncbijs/id-converter'
+last_audited: '2026-04-01'
+---
 # Bulk Parser Catalog
 
 Inventory of all 21 bulk parsers across the ncbijs ecosystem, plus the full NCBI downloadable data catalog.

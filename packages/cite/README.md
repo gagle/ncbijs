@@ -204,3 +204,9 @@ interface CitationStyle {
   readonly format: string;
 }
 ```
+
+## See also
+
+- [`CLAUDE.md`](./CLAUDE.md) — agent reference (deep API, cross-package wiring, common pitfalls)
+- [Architecture overview](../../docs/architecture.md)
+- [NCBI API catalog](../../docs/ncbi-api-catalog.md)

@@ -7,7 +7,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Built_with-AI-7e47ff" alt="Built with AI" />
   <a href="https://github.com/gagle/ncbijs/blob/main/LICENSE"><img src="https://img.shields.io/github/license/gagle/ncbijs" alt="license" /></a>
-  <a href="https://github.com/gagle/ncbijs/actions"><img src="https://img.shields.io/github/actions/workflow/status/gagle/ncbijs/ci.yml" alt="CI" /></a>
   <a href="./docs/rag-integration.md"><img src="https://img.shields.io/badge/RAG-Ready-blueviolet" alt="RAG Ready" /></a>
   <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-Server-blue" alt="MCP Server" /></a>
   <a href="./packages/http-mcp"><img src="https://img.shields.io/badge/LLM_Tools-27_tools-green" alt="LLM Tools" /></a>
@@ -33,6 +32,7 @@ It is designed for two audiences:
 
 ### What can you do with ncbijs?
 
+<!-- sync-docs:workflows:start -->
 | Workflow                                              | Packages                            |
 | ----------------------------------------------------- | ----------------------------------- |
 | Search PubMed and retrieve article metadata           | `@ncbijs/pubmed` + `@ncbijs/eutils` |
@@ -41,7 +41,7 @@ It is designed for two audiences:
 | Generate formatted citations (RIS, MEDLINE, CSL-JSON) | `@ncbijs/cite`                      |
 | Convert between PMID, PMCID, and DOI                  | `@ncbijs/id-converter`              |
 | Expand MeSH terms for comprehensive searches          | `@ncbijs/mesh`                      |
-| Chunk full-text articles for RAG pipelines            | `@ncbijs/jats` (toChunks)           |
+| Chunk full-text articles for RAG pipelines            | `@ncbijs/jats (toChunks)`           |
 | Look up genes, genomes, and taxonomy                  | `@ncbijs/datasets`                  |
 | Parse FASTA nucleotide/protein sequences              | `@ncbijs/fasta`                     |
 | Run BLAST sequence alignments                         | `@ncbijs/blast`                     |
@@ -72,60 +72,76 @@ It is designed for two audiences:
 | Get annotated text with entity recognition            | `@ncbijs/bioc`                      |
 | Autocomplete ICD-10, LOINC, SNOMED codes              | `@ncbijs/clinical-tables`           |
 | Store NCBI data locally in DuckDB                     | `@ncbijs/store`                     |
-| Query stored data with the same package API           | `fromStorage()` on domain packages  |
+| Query stored data with the same package API           | `fromStorage() on domain packages`  |
 | Build data pipelines (Source → Parse → Sink)          | `@ncbijs/pipeline`                  |
 | Load any NCBI dataset with one function call          | `@ncbijs/etl`                       |
 | Watch NCBI sources for updates and re-sync            | `@ncbijs/sync`                      |
 | Expose all tools to LLM agents via MCP                | `@ncbijs/http-mcp`                  |
 | Query local NCBI data via MCP                         | `@ncbijs/store-mcp`                 |
+<!-- sync-docs:workflows:end -->
+
+## For AI agents and LLMs
+
+The most effective way to consume ncbijs through an AI agent is to point the agent at this repository directly — clone it locally so the agent's working directory sits inside the repo, or give the agent read access on GitHub.
+
+Every package ships two docs side by side:
+
+- `README.md` — human-facing, what npm renders.
+- `CLAUDE.md` — agent-optimised deep reference: full API surface, type metadata, cross-package wiring, common pitfalls, and "when NOT to use this".
+
+Claude Code (and any agent that honours nested `CLAUDE.md` discovery) auto-loads `packages/{name}/CLAUDE.md` when the agent's working directory is inside that subtree. The root [`CLAUDE.md`](./CLAUDE.md) is the global router — workflow table, packages index, decision tree — so the agent lands on the right package without scanning the whole repo.
+
+Clone, drop your agent in, and discovery just works.
 
 ## Packages
 
+<!-- sync-docs:packages:start -->
 | Package                                                 | Description                                                         | Version                                                                                                               |
 | ------------------------------------------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| [`@ncbijs/pubmed`](./packages/pubmed)                   | High-level PubMed search and retrieval with fluent query builder    | [![npm](https://img.shields.io/npm/v/@ncbijs/pubmed)](https://www.npmjs.com/package/@ncbijs/pubmed)                   |
-| [`@ncbijs/pmc`](./packages/pmc)                         | PMC full-text retrieval via E-utilities, OA Service, and OAI-PMH    | [![npm](https://img.shields.io/npm/v/@ncbijs/pmc)](https://www.npmjs.com/package/@ncbijs/pmc)                         |
-| [`@ncbijs/eutils`](./packages/eutils)                   | Spec-compliant client for all 9 NCBI E-utilities                    | [![npm](https://img.shields.io/npm/v/@ncbijs/eutils)](https://www.npmjs.com/package/@ncbijs/eutils)                   |
-| [`@ncbijs/cite`](./packages/cite)                       | Citation formatting in 4 styles (RIS, MEDLINE, CSL-JSON, Citation)  | [![npm](https://img.shields.io/npm/v/@ncbijs/cite)](https://www.npmjs.com/package/@ncbijs/cite)                       |
-| [`@ncbijs/id-converter`](./packages/id-converter)       | Batch conversion between PMID, PMCID, DOI, and Manuscript ID        | [![npm](https://img.shields.io/npm/v/@ncbijs/id-converter)](https://www.npmjs.com/package/@ncbijs/id-converter)       |
-| [`@ncbijs/mesh`](./packages/mesh)                       | MeSH vocabulary tree traversal and query expansion                  | [![npm](https://img.shields.io/npm/v/@ncbijs/mesh)](https://www.npmjs.com/package/@ncbijs/mesh)                       |
-| [`@ncbijs/pubtator`](./packages/pubtator)               | PubTator3 text mining — entity search and BioC annotation export    | [![npm](https://img.shields.io/npm/v/@ncbijs/pubtator)](https://www.npmjs.com/package/@ncbijs/pubtator)               |
-| [`@ncbijs/pubmed-xml`](./packages/pubmed-xml)           | PubMed/MEDLINE XML and plain-text parser                            | [![npm](https://img.shields.io/npm/v/@ncbijs/pubmed-xml)](https://www.npmjs.com/package/@ncbijs/pubmed-xml)           |
-| [`@ncbijs/jats`](./packages/jats)                       | JATS XML parser with markdown, plain-text, and RAG chunking         | [![npm](https://img.shields.io/npm/v/@ncbijs/jats)](https://www.npmjs.com/package/@ncbijs/jats)                       |
-| [`@ncbijs/blast`](./packages/blast)                     | BLAST sequence alignment with async submit/poll/retrieve workflow   | [![npm](https://img.shields.io/npm/v/@ncbijs/blast)](https://www.npmjs.com/package/@ncbijs/blast)                     |
-| [`@ncbijs/snp`](./packages/snp)                         | dbSNP variation data — placements, allele annotations, frequencies  | [![npm](https://img.shields.io/npm/v/@ncbijs/snp)](https://www.npmjs.com/package/@ncbijs/snp)                         |
-| [`@ncbijs/clinvar`](./packages/clinvar)                 | ClinVar clinical variant significance, genes, traits, locations     | [![npm](https://img.shields.io/npm/v/@ncbijs/clinvar)](https://www.npmjs.com/package/@ncbijs/clinvar)                 |
-| [`@ncbijs/pubchem`](./packages/pubchem)                 | PubChem compound data — properties, synonyms, descriptions          | [![npm](https://img.shields.io/npm/v/@ncbijs/pubchem)](https://www.npmjs.com/package/@ncbijs/pubchem)                 |
-| [`@ncbijs/datasets`](./packages/datasets)               | NCBI Datasets API v2 client for genes, genomes, and taxonomy        | [![npm](https://img.shields.io/npm/v/@ncbijs/datasets)](https://www.npmjs.com/package/@ncbijs/datasets)               |
-| [`@ncbijs/protein`](./packages/protein)                 | Protein sequence retrieval in FASTA and GenBank formats             | [![npm](https://img.shields.io/npm/v/@ncbijs/protein)](https://www.npmjs.com/package/@ncbijs/protein)                 |
-| [`@ncbijs/nucleotide`](./packages/nucleotide)           | Nucleotide sequence retrieval in FASTA and GenBank formats          | [![npm](https://img.shields.io/npm/v/@ncbijs/nucleotide)](https://www.npmjs.com/package/@ncbijs/nucleotide)           |
-| [`@ncbijs/genbank`](./packages/genbank)                 | Zero-dependency GenBank flat file format parser                     | [![npm](https://img.shields.io/npm/v/@ncbijs/genbank)](https://www.npmjs.com/package/@ncbijs/genbank)                 |
-| [`@ncbijs/omim`](./packages/omim)                       | OMIM genetic disorders — Mendelian inheritance catalog              | [![npm](https://img.shields.io/npm/v/@ncbijs/omim)](https://www.npmjs.com/package/@ncbijs/omim)                       |
-| [`@ncbijs/medgen`](./packages/medgen)                   | MedGen medical genetics concepts and disease-gene links             | [![npm](https://img.shields.io/npm/v/@ncbijs/medgen)](https://www.npmjs.com/package/@ncbijs/medgen)                   |
-| [`@ncbijs/gtr`](./packages/gtr)                         | Genetic Testing Registry — test catalog and clinical validity       | [![npm](https://img.shields.io/npm/v/@ncbijs/gtr)](https://www.npmjs.com/package/@ncbijs/gtr)                         |
-| [`@ncbijs/geo`](./packages/geo)                         | GEO gene expression datasets — microarray and RNA-seq metadata      | [![npm](https://img.shields.io/npm/v/@ncbijs/geo)](https://www.npmjs.com/package/@ncbijs/geo)                         |
-| [`@ncbijs/dbvar`](./packages/dbvar)                     | dbVar structural variants — copy number, inversions, translocations | [![npm](https://img.shields.io/npm/v/@ncbijs/dbvar)](https://www.npmjs.com/package/@ncbijs/dbvar)                     |
-| [`@ncbijs/sra`](./packages/sra)                         | SRA sequencing experiment metadata with embedded XML parsing        | [![npm](https://img.shields.io/npm/v/@ncbijs/sra)](https://www.npmjs.com/package/@ncbijs/sra)                         |
-| [`@ncbijs/structure`](./packages/structure)             | 3D molecular structure records from MMDB/PDB                        | [![npm](https://img.shields.io/npm/v/@ncbijs/structure)](https://www.npmjs.com/package/@ncbijs/structure)             |
-| [`@ncbijs/cdd`](./packages/cdd)                         | Conserved Domain Database — protein domain annotations              | [![npm](https://img.shields.io/npm/v/@ncbijs/cdd)](https://www.npmjs.com/package/@ncbijs/cdd)                         |
-| [`@ncbijs/books`](./packages/books)                     | NCBI Bookshelf entries — textbooks, reports, chapters               | [![npm](https://img.shields.io/npm/v/@ncbijs/books)](https://www.npmjs.com/package/@ncbijs/books)                     |
-| [`@ncbijs/nlm-catalog`](./packages/nlm-catalog)         | NLM Catalog journal and serial records with ISSN data               | [![npm](https://img.shields.io/npm/v/@ncbijs/nlm-catalog)](https://www.npmjs.com/package/@ncbijs/nlm-catalog)         |
-| [`@ncbijs/clinical-trials`](./packages/clinical-trials) | ClinicalTrials.gov v2 — study search, stats, and field values       | [![npm](https://img.shields.io/npm/v/@ncbijs/clinical-trials)](https://www.npmjs.com/package/@ncbijs/clinical-trials) |
-| [`@ncbijs/icite`](./packages/icite)                     | NIH iCite citation metrics — RCR, percentiles, clinical citations   | [![npm](https://img.shields.io/npm/v/@ncbijs/icite)](https://www.npmjs.com/package/@ncbijs/icite)                     |
-| [`@ncbijs/rxnorm`](./packages/rxnorm)                   | RxNorm drug normalization — concepts, classes, NDC codes            | [![npm](https://img.shields.io/npm/v/@ncbijs/rxnorm)](https://www.npmjs.com/package/@ncbijs/rxnorm)                   |
-| [`@ncbijs/dailymed`](./packages/dailymed)               | DailyMed drug labels — SPLs, NDC packaging, drug classes            | [![npm](https://img.shields.io/npm/v/@ncbijs/dailymed)](https://www.npmjs.com/package/@ncbijs/dailymed)               |
-| [`@ncbijs/litvar`](./packages/litvar)                   | LitVar2 variant-literature linking — publications by rsID           | [![npm](https://img.shields.io/npm/v/@ncbijs/litvar)](https://www.npmjs.com/package/@ncbijs/litvar)                   |
-| [`@ncbijs/bioc`](./packages/bioc)                       | BioC annotated text — PubMed/PMC articles with named entities       | [![npm](https://img.shields.io/npm/v/@ncbijs/bioc)](https://www.npmjs.com/package/@ncbijs/bioc)                       |
-| [`@ncbijs/clinical-tables`](./packages/clinical-tables) | Clinical Table Search — ICD-10, LOINC, SNOMED autocomplete          | [![npm](https://img.shields.io/npm/v/@ncbijs/clinical-tables)](https://www.npmjs.com/package/@ncbijs/clinical-tables) |
-| [`@ncbijs/fasta`](./packages/fasta)                     | Zero-dependency FASTA format parser for sequences                   | [![npm](https://img.shields.io/npm/v/@ncbijs/fasta)](https://www.npmjs.com/package/@ncbijs/fasta)                     |
-| [`@ncbijs/xml`](./packages/xml)                         | Zero-dependency regex-based XML reader for NCBI formats             | [![npm](https://img.shields.io/npm/v/@ncbijs/xml)](https://www.npmjs.com/package/@ncbijs/xml)                         |
-| [`@ncbijs/store`](./packages/store)                     | Storage interfaces and DuckDB implementation for local NCBI data    | [![npm](https://img.shields.io/npm/v/@ncbijs/store)](https://www.npmjs.com/package/@ncbijs/store)                     |
-| [`@ncbijs/pipeline`](./packages/pipeline)               | Composable data pipelines: Source → Parse → Sink                    | [![npm](https://img.shields.io/npm/v/@ncbijs/pipeline)](https://www.npmjs.com/package/@ncbijs/pipeline)               |
-| [`@ncbijs/etl`](./packages/etl)                         | Pre-wired NCBI data loaders: `load('mesh', mySink)`                 | [![npm](https://img.shields.io/npm/v/@ncbijs/etl)](https://www.npmjs.com/package/@ncbijs/etl)                         |
-| [`@ncbijs/sync`](./packages/sync)                       | NCBI update detection and scheduled re-sync                         | [![npm](https://img.shields.io/npm/v/@ncbijs/sync)](https://www.npmjs.com/package/@ncbijs/sync)                       |
-| [`@ncbijs/http-mcp`](./packages/http-mcp)               | MCP server exposing all ncbijs tools for LLM agents                 | [![npm](https://img.shields.io/npm/v/@ncbijs/http-mcp)](https://www.npmjs.com/package/@ncbijs/http-mcp)               |
-| [`@ncbijs/store-mcp`](./packages/store-mcp)             | MCP server for querying locally stored NCBI data via DuckDB         | [![npm](https://img.shields.io/npm/v/@ncbijs/store-mcp)](https://www.npmjs.com/package/@ncbijs/store-mcp)             |
-| [`@ncbijs/rate-limiter`](./packages/rate-limiter)       | Token bucket rate limiter for browser and Node.js                   | [![npm](https://img.shields.io/npm/v/@ncbijs/rate-limiter)](https://www.npmjs.com/package/@ncbijs/rate-limiter)       |
+| [`@ncbijs/bioc`](./packages/bioc) | BioC API client — annotated PubMed and PMC articles (named entity… | [![npm](https://img.shields.io/npm/v/@ncbijs/bioc)](https://www.npmjs.com/package/@ncbijs/bioc) |
+| [`@ncbijs/blast`](./packages/blast) | NCBI BLAST sequence alignment client. Async submit/poll/retrieve w… | [![npm](https://img.shields.io/npm/v/@ncbijs/blast)](https://www.npmjs.com/package/@ncbijs/blast) |
+| [`@ncbijs/books`](./packages/books) | Typed client for NCBI Bookshelf — search and fetch biomedical book… | [![npm](https://img.shields.io/npm/v/@ncbijs/books)](https://www.npmjs.com/package/@ncbijs/books) |
+| [`@ncbijs/cdd`](./packages/cdd) | Typed client for NCBI Conserved Domain Database (CDD) — search and… | [![npm](https://img.shields.io/npm/v/@ncbijs/cdd)](https://www.npmjs.com/package/@ncbijs/cdd) |
+| [`@ncbijs/cite`](./packages/cite) | Citation formatting in 4 styles (RIS, MEDLINE, CSL-JSON, NLM Citat… | [![npm](https://img.shields.io/npm/v/@ncbijs/cite)](https://www.npmjs.com/package/@ncbijs/cite) |
+| [`@ncbijs/clinical-tables`](./packages/clinical-tables) | Typed client for the NLM Clinical Tables Search API. Autocomplete… | [![npm](https://img.shields.io/npm/v/@ncbijs/clinical-tables)](https://www.npmjs.com/package/@ncbijs/clinical-tables) |
+| [`@ncbijs/clinical-trials`](./packages/clinical-trials) | Typed client for the ClinicalTrials.gov v2 REST API. Search interv… | [![npm](https://img.shields.io/npm/v/@ncbijs/clinical-trials)](https://www.npmjs.com/package/@ncbijs/clinical-trials) |
+| [`@ncbijs/clinvar`](./packages/clinvar) | NCBI ClinVar clinical variant data — search and fetch variants via… | [![npm](https://img.shields.io/npm/v/@ncbijs/clinvar)](https://www.npmjs.com/package/@ncbijs/clinvar) |
+| [`@ncbijs/dailymed`](./packages/dailymed) | Typed client for the FDA DailyMed REST API v2 — drug name search,… | [![npm](https://img.shields.io/npm/v/@ncbijs/dailymed)](https://www.npmjs.com/package/@ncbijs/dailymed) |
+| [`@ncbijs/datasets`](./packages/datasets) | Typed client for the NCBI Datasets API v2 — gene reports, taxonomy… | [![npm](https://img.shields.io/npm/v/@ncbijs/datasets)](https://www.npmjs.com/package/@ncbijs/datasets) |
+| [`@ncbijs/dbvar`](./packages/dbvar) | Typed client for NCBI dbVar — search and fetch structural variatio… | [![npm](https://img.shields.io/npm/v/@ncbijs/dbvar)](https://www.npmjs.com/package/@ncbijs/dbvar) |
+| [`@ncbijs/etl`](./packages/etl) | Pre-wired NCBI dataset loaders. One function call to download, par… | [![npm](https://img.shields.io/npm/v/@ncbijs/etl)](https://www.npmjs.com/package/@ncbijs/etl) |
+| [`@ncbijs/eutils`](./packages/eutils) | Spec-compliant client for all 9 NCBI E-utilities (esearch, efetch,… | [![npm](https://img.shields.io/npm/v/@ncbijs/eutils)](https://www.npmjs.com/package/@ncbijs/eutils) |
+| [`@ncbijs/fasta`](./packages/fasta) | Zero-dependency FASTA format parser. Pure synchronous function: st… | [![npm](https://img.shields.io/npm/v/@ncbijs/fasta)](https://www.npmjs.com/package/@ncbijs/fasta) |
+| [`@ncbijs/genbank`](./packages/genbank) | Zero-dependency parser for the NCBI GenBank flat-file format. Spli… | [![npm](https://img.shields.io/npm/v/@ncbijs/genbank)](https://www.npmjs.com/package/@ncbijs/genbank) |
+| [`@ncbijs/geo`](./packages/geo) | Typed client for NCBI Gene Expression Omnibus (GEO) — search and f… | [![npm](https://img.shields.io/npm/v/@ncbijs/geo)](https://www.npmjs.com/package/@ncbijs/geo) |
+| [`@ncbijs/gtr`](./packages/gtr) | Typed client for the NCBI Genetic Testing Registry (GTR) — search… | [![npm](https://img.shields.io/npm/v/@ncbijs/gtr)](https://www.npmjs.com/package/@ncbijs/gtr) |
+| [`@ncbijs/http-mcp`](./packages/http-mcp) | Model Context Protocol server exposing ncbijs domain packages as L… | [![npm](https://img.shields.io/npm/v/@ncbijs/http-mcp)](https://www.npmjs.com/package/@ncbijs/http-mcp) |
+| [`@ncbijs/icite`](./packages/icite) | Typed client for the NIH iCite API. Retrieve citation metrics — Re… | [![npm](https://img.shields.io/npm/v/@ncbijs/icite)](https://www.npmjs.com/package/@ncbijs/icite) |
+| [`@ncbijs/id-converter`](./packages/id-converter) | Batch conversion between PMID, PMCID, DOI, and NIH Manuscript ID v… | [![npm](https://img.shields.io/npm/v/@ncbijs/id-converter)](https://www.npmjs.com/package/@ncbijs/id-converter) |
+| [`@ncbijs/jats`](./packages/jats) | Parser for JATS XML (NISO Z39.96) full-text articles with markdown… | [![npm](https://img.shields.io/npm/v/@ncbijs/jats)](https://www.npmjs.com/package/@ncbijs/jats) |
+| [`@ncbijs/litvar`](./packages/litvar) | LitVar2 client — links genetic variants (rsIDs) to PubMed/PMC lite… | [![npm](https://img.shields.io/npm/v/@ncbijs/litvar)](https://www.npmjs.com/package/@ncbijs/litvar) |
+| [`@ncbijs/medgen`](./packages/medgen) | Typed client for NCBI MedGen medical-genetics concepts — search an… | [![npm](https://img.shields.io/npm/v/@ncbijs/medgen)](https://www.npmjs.com/package/@ncbijs/medgen) |
+| [`@ncbijs/mesh`](./packages/mesh) | NLM Medical Subject Headings (MeSH) vocabulary — tree traversal, q… | [![npm](https://img.shields.io/npm/v/@ncbijs/mesh)](https://www.npmjs.com/package/@ncbijs/mesh) |
+| [`@ncbijs/nlm-catalog`](./packages/nlm-catalog) | Typed client for NLM Catalog — search and fetch journal and serial… | [![npm](https://img.shields.io/npm/v/@ncbijs/nlm-catalog)](https://www.npmjs.com/package/@ncbijs/nlm-catalog) |
+| [`@ncbijs/nucleotide`](./packages/nucleotide) | Typed client for the NCBI Nucleotide database. Fetches DNA/RNA seq… | [![npm](https://img.shields.io/npm/v/@ncbijs/nucleotide)](https://www.npmjs.com/package/@ncbijs/nucleotide) |
+| [`@ncbijs/omim`](./packages/omim) | Typed client for NCBI OMIM (Online Mendelian Inheritance in Man) —… | [![npm](https://img.shields.io/npm/v/@ncbijs/omim)](https://www.npmjs.com/package/@ncbijs/omim) |
+| [`@ncbijs/pipeline`](./packages/pipeline) | Composable streaming ETL primitive — Source → Parse → Sink. Zero d… | [![npm](https://img.shields.io/npm/v/@ncbijs/pipeline)](https://www.npmjs.com/package/@ncbijs/pipeline) |
+| [`@ncbijs/pmc`](./packages/pmc) | PMC full-text article retrieval over three NCBI surfaces (E-utilit… | [![npm](https://img.shields.io/npm/v/@ncbijs/pmc)](https://www.npmjs.com/package/@ncbijs/pmc) |
+| [`@ncbijs/protein`](./packages/protein) | Typed client for the NCBI Protein database. Fetches sequences via… | [![npm](https://img.shields.io/npm/v/@ncbijs/protein)](https://www.npmjs.com/package/@ncbijs/protein) |
+| [`@ncbijs/pubchem`](./packages/pubchem) | Typed client for the PubChem PUG REST and PUG View APIs — compound… | [![npm](https://img.shields.io/npm/v/@ncbijs/pubchem)](https://www.npmjs.com/package/@ncbijs/pubchem) |
+| [`@ncbijs/pubmed`](./packages/pubmed) | High-level PubMed search and retrieval client. Fluent query builde… | [![npm](https://img.shields.io/npm/v/@ncbijs/pubmed)](https://www.npmjs.com/package/@ncbijs/pubmed) |
+| [`@ncbijs/pubmed-xml`](./packages/pubmed-xml) | Spec-compliant pure parser for PubMed/MEDLINE XML and MEDLINE plai… | [![npm](https://img.shields.io/npm/v/@ncbijs/pubmed-xml)](https://www.npmjs.com/package/@ncbijs/pubmed-xml) |
+| [`@ncbijs/pubtator`](./packages/pubtator) | Client for the PubTator3 text-mining API — biomedical entity autoc… | [![npm](https://img.shields.io/npm/v/@ncbijs/pubtator)](https://www.npmjs.com/package/@ncbijs/pubtator) |
+| [`@ncbijs/rate-limiter`](./packages/rate-limiter) | Zero-dependency token-bucket rate limiter and retry-aware fetch he… | [![npm](https://img.shields.io/npm/v/@ncbijs/rate-limiter)](https://www.npmjs.com/package/@ncbijs/rate-limiter) |
+| [`@ncbijs/rxnorm`](./packages/rxnorm) | Typed client for the NLM RxNav RxNorm REST API. Resolve drug names… | [![npm](https://img.shields.io/npm/v/@ncbijs/rxnorm)](https://www.npmjs.com/package/@ncbijs/rxnorm) |
+| [`@ncbijs/snp`](./packages/snp) | NCBI dbSNP Variation Services API client (RefSNP reports, allele p… | [![npm](https://img.shields.io/npm/v/@ncbijs/snp)](https://www.npmjs.com/package/@ncbijs/snp) |
+| [`@ncbijs/sra`](./packages/sra) | Typed client for NCBI SRA (Sequence Read Archive) — search and fet… | [![npm](https://img.shields.io/npm/v/@ncbijs/sra)](https://www.npmjs.com/package/@ncbijs/sra) |
+| [`@ncbijs/store`](./packages/store) | Storage interfaces (Storage / ReadableStorage / WritableStorage /… | [![npm](https://img.shields.io/npm/v/@ncbijs/store)](https://www.npmjs.com/package/@ncbijs/store) |
+| [`@ncbijs/store-mcp`](./packages/store-mcp) | Model Context Protocol server exposing locally stored NCBI data (D… | [![npm](https://img.shields.io/npm/v/@ncbijs/store-mcp)](https://www.npmjs.com/package/@ncbijs/store-mcp) |
+| [`@ncbijs/structure`](./packages/structure) | Typed client for NCBI Structure (MMDB / PDB) — search and fetch ma… | [![npm](https://img.shields.io/npm/v/@ncbijs/structure)](https://www.npmjs.com/package/@ncbijs/structure) |
+| [`@ncbijs/sync`](./packages/sync) | NCBI update detection and scheduled re-sync. Polls upstream source… | [![npm](https://img.shields.io/npm/v/@ncbijs/sync)](https://www.npmjs.com/package/@ncbijs/sync) |
+| [`@ncbijs/xml`](./packages/xml) | Zero-dependency regex-based XML reader for NCBI formats — no HTTP,… | [![npm](https://img.shields.io/npm/v/@ncbijs/xml)](https://www.npmjs.com/package/@ncbijs/xml) |
+<!-- sync-docs:packages:end -->
 
 ## RAG integration
 
@@ -386,77 +402,85 @@ for (const article of articles) {
 
 ## Which package do I need?
 
+<!-- sync-docs:decision-tree:start -->
 ```
 I want to...
 │
 ├── Search biomedical literature
-│   ├── High-level PubMed search ──────────→ @ncbijs/pubmed
-│   ├── Low-level Entrez queries ──────────→ @ncbijs/eutils
-│   └── Find literature by genetic variant ─→ @ncbijs/litvar
+│   ├── High-level PubMed search ────────────────→ @ncbijs/pubmed
+│   ├── Low-level Entrez queries ────────────────→ @ncbijs/eutils
+│   └── Find literature by genetic variant ──────→ @ncbijs/litvar
 │
 ├── Retrieve full-text articles
-│   ├── PMC open-access articles ──────────→ @ncbijs/pmc
-│   └── Annotated text with NER ───────────→ @ncbijs/bioc
+│   ├── PMC open-access articles ────────────────→ @ncbijs/pmc
+│   └── Annotated text with NER ─────────────────→ @ncbijs/bioc
 │
 ├── Extract entities from text
-│   ├── Genes, diseases, chemicals ────────→ @ncbijs/pubtator
-│   └── Annotated passages (BioC format) ──→ @ncbijs/bioc
+│   ├── Genes, diseases, chemicals ──────────────→ @ncbijs/pubtator
+│   └── Annotated passages (BioC format) ────────→ @ncbijs/bioc
 │
 ├── Work with citations
-│   ├── Format citations (RIS, CSL, etc.) ─→ @ncbijs/cite
-│   ├── Convert PMID/PMCID/DOI ────────────→ @ncbijs/id-converter
-│   └── Citation impact metrics (RCR) ─────→ @ncbijs/icite
+│   ├── Format citations (RIS, CSL, etc.) ───────→ @ncbijs/cite
+│   ├── Convert PMID/PMCID/DOI ──────────────────→ @ncbijs/id-converter
+│   └── Citation impact metrics (RCR) ───────────→ @ncbijs/icite
 │
 ├── Work with genes and sequences
-│   ├── Gene/genome metadata ──────────────→ @ncbijs/datasets
-│   ├── Protein sequences ─────────────────→ @ncbijs/protein
-│   ├── Nucleotide sequences ──────────────→ @ncbijs/nucleotide
-│   ├── Sequence alignment (BLAST) ────────→ @ncbijs/blast
-│   ├── Parse FASTA format ────────────────→ @ncbijs/fasta
-│   └── Parse GenBank format ──────────────→ @ncbijs/genbank
+│   ├── Gene/genome metadata ────────────────────→ @ncbijs/datasets
+│   ├── Protein sequences ───────────────────────→ @ncbijs/protein
+│   ├── Nucleotide sequences ────────────────────→ @ncbijs/nucleotide
+│   ├── Sequence alignment (BLAST) ──────────────→ @ncbijs/blast
+│   ├── Parse FASTA format ──────────────────────→ @ncbijs/fasta
+│   └── Parse GenBank format ────────────────────→ @ncbijs/genbank
 │
 ├── Work with variants and clinical data
-│   ├── SNP/variant lookup (dbSNP) ────────→ @ncbijs/snp
-│   ├── HGVS/SPDI/VCF conversion ─────────→ @ncbijs/snp
-│   ├── Clinical significance (ClinVar) ───→ @ncbijs/clinvar
-│   ├── Genetic disorders (OMIM) ──────────→ @ncbijs/omim
-│   └── Medical genetics (MedGen) ─────────→ @ncbijs/medgen
+│   ├── SNP/variant lookup (dbSNP) ──────────────→ @ncbijs/snp
+│   ├── HGVS/SPDI/VCF conversion ────────────────→ @ncbijs/snp
+│   ├── Clinical significance (ClinVar) ─────────→ @ncbijs/clinvar
+│   ├── Genetic disorders (OMIM) ────────────────→ @ncbijs/omim
+│   └── Medical genetics (MedGen) ───────────────→ @ncbijs/medgen
 │
 ├── Work with drugs and chemicals
-│   ├── Compound properties ───────────────→ @ncbijs/pubchem
-│   ├── Compound annotations (GHS, etc.) ──→ @ncbijs/pubchem
-│   ├── Drug normalization (RxCUI) ────────→ @ncbijs/rxnorm
-│   ├── Drug classes (ATC, VA, MEDRT) ─────→ @ncbijs/rxnorm
-│   ├── NDC code lookup ───────────────────→ @ncbijs/rxnorm
-│   └── Drug labels and SPLs ─────────────→ @ncbijs/dailymed
+│   ├── Compound properties ─────────────────────→ @ncbijs/pubchem
+│   ├── Compound annotations (GHS, etc.) ────────→ @ncbijs/pubchem
+│   ├── Drug normalization (RxCUI) ──────────────→ @ncbijs/rxnorm
+│   ├── Drug classes (ATC, VA, MEDRT) ───────────→ @ncbijs/rxnorm
+│   ├── NDC code lookup ─────────────────────────→ @ncbijs/rxnorm
+│   └── Drug labels and SPLs ────────────────────→ @ncbijs/dailymed
 │
 ├── Autocomplete medical codes
-│   ├── ICD-10, LOINC, SNOMED ─────────────→ @ncbijs/clinical-tables
-│   └── RxTerms drug names ────────────────→ @ncbijs/clinical-tables
+│   ├── ICD-10, LOINC, SNOMED ───────────────────→ @ncbijs/clinical-tables
+│   └── RxTerms drug names ──────────────────────→ @ncbijs/clinical-tables
 │
-├── Search clinical trials ────────────────→ @ncbijs/clinical-trials
+├── Search clinical trials ──────────────────→ @ncbijs/clinical-trials
 │
 ├── Work with vocabularies
-│   └── MeSH term expansion ───────────────→ @ncbijs/mesh
+│   └── MeSH term expansion ─────────────────────→ @ncbijs/mesh
 │
 ├── Search other NCBI databases
-│   ├── Gene expression (GEO) ─────────────→ @ncbijs/geo
-│   ├── Structural variants (dbVar) ───────→ @ncbijs/dbvar
-│   ├── Sequencing data (SRA) ─────────────→ @ncbijs/sra
-│   ├── 3D structures (MMDB/PDB) ──────────→ @ncbijs/structure
-│   ├── Protein domains (CDD) ─────────────→ @ncbijs/cdd
-│   ├── Genetic tests (GTR) ───────────────→ @ncbijs/gtr
-│   ├── Books/textbooks ───────────────────→ @ncbijs/books
-│   └── Journal records (NLM Catalog) ─────→ @ncbijs/nlm-catalog
+│   ├── Gene expression (GEO) ───────────────────→ @ncbijs/geo
+│   ├── Structural variants (dbVar) ─────────────→ @ncbijs/dbvar
+│   ├── Sequencing data (SRA) ───────────────────→ @ncbijs/sra
+│   ├── 3D structures (MMDB/PDB) ────────────────→ @ncbijs/structure
+│   ├── Protein domains (CDD) ───────────────────→ @ncbijs/cdd
+│   ├── Genetic tests (GTR) ─────────────────────→ @ncbijs/gtr
+│   ├── Books/textbooks ─────────────────────────→ @ncbijs/books
+│   └── Journal records (NLM Catalog) ───────────→ @ncbijs/nlm-catalog
 │
-├── Store NCBI data locally ───────────────→ @ncbijs/store
-├── Query stored data with same API ───────→ fromStorage() on domain packages
-├── Data pipeline (Source → Parse → Sink) ─→ @ncbijs/pipeline
-├── Load any NCBI dataset in one call ─────→ @ncbijs/etl
-├── Watch NCBI sources for updates ────────→ @ncbijs/sync
-├── Expose tools to LLM agents (live API) ─→ @ncbijs/http-mcp
-└── Query local data via MCP ─────────────→ @ncbijs/store-mcp
+├── Store NCBI data locally ─────────────────→ @ncbijs/store
+│
+├── Query stored data with same API ─────────→ fromStorage() on domain packages
+│
+├── Data pipeline (Source → Parse → Sink) ───→ @ncbijs/pipeline
+│
+├── Load any NCBI dataset in one call ───────→ @ncbijs/etl
+│
+├── Watch NCBI sources for updates ──────────→ @ncbijs/sync
+│
+├── Expose tools to LLM agents (live API) ───→ @ncbijs/http-mcp
+│
+└── Query local data via MCP ────────────────→ @ncbijs/store-mcp
 ```
+<!-- sync-docs:decision-tree:end -->
 
 ### Package capabilities
 

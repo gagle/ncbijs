@@ -40,6 +40,31 @@ pnpm nx run-many -t lint typecheck build test
 
 Nx parallelizes across packages and reuses cached results for unchanged ones.
 
+### 1.5 Documentation drift gate
+
+The root `README.md` and `CLAUDE.md` carry routing tables (workflows, packages, decision tree) generated from `docs-manifest/*.ts` + per-package `CLAUDE.md` frontmatter. Drift is mechanically detected:
+
+```bash
+pnpm sync-docs --check
+pnpm check-claude-md budget
+pnpm check-claude-md freshness
+pnpm check-claude-md links
+pnpm check-claude-md dep-graph
+```
+
+| Failure                                | Action                                                                                                                                                                |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sync-docs --check` exits non-zero     | Run `pnpm sync-docs` (without `--check`) to regenerate, commit the diff, re-verify.                                                                                   |
+| `check-claude-md budget` exits non-zero | A CLAUDE.md exceeds its hard token budget. Trim or split before merging.                                                                                              |
+| `check-claude-md freshness` warns      | Informational. Re-audit `last_audited` for any CLAUDE.md older than 6 months.                                                                                         |
+| `check-claude-md links` exits non-zero | Broken `related_docs:` or inline doc link. Fix the path in the offending CLAUDE.md.                                                                                   |
+| `check-claude-md dep-graph` exits non-zero | `depends_on` / `used_by` asymmetry between two packages. Edit the frontmatter on one or both sides until the relationship is mutual.                              |
+
+Run manually or quarterly (not part of the gate):
+- `pnpm check-claude-md exports` — known false positives on barrel re-exports through subpaths.
+- `pnpm check-claude-md examples` — informational coverage check.
+- `pnpm check-claude-md pitfalls <package>` — surfaces commit/test/issue candidates for ongoing audits.
+
 ### 2. E2E tests
 
 Requires `NCBI_API_KEY`. The key is loaded automatically:

@@ -298,3 +298,8 @@ All types are exported for use in your own interfaces:
 ```typescript
 import type { TokenBucketOptions, RateLimiterOptions, AcquireOptions } from '@ncbijs/rate-limiter';
 ```
+
+## See also
+
+- [`CLAUDE.md`](./CLAUDE.md) — agent reference (deep API, cross-package wiring, common pitfalls)
+- [Architecture overview](../../docs/architecture.md)

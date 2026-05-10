@@ -1,3 +1,11 @@
+---
+title: 'Release and Publish Strategy'
+purpose: 'Tag-triggered npm publishing with OIDC provenance, per-package CHANGELOG flow, /release skill integration.'
+audience: ['agent', 'human']
+size: 'small'
+related_packages: []
+last_audited: '2026-04-01'
+---
 # Release and Publish Strategy
 
 ## `/release` Skill

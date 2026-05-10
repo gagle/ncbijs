@@ -49,6 +49,21 @@ Split packages: `mesh`, `snp`, `pubchem`, `clinvar`, `cite`, `id-converter`, `da
 6. **100% coverage** -- statements, branches, functions, lines.
 7. **JSDoc on all exports** -- one-line minimum. Bulk parsers add `@see` download URL.
 8. **E2E tests** in `e2e/{name}.spec.ts` using `ncbiApiKey` from `e2e/test-config.ts`.
+9. **Required docs** -- every package must have BOTH `README.md` (humans / npm) AND `CLAUDE.md` (agents / deep reference). The two have different audiences and framings — don't merge them. See `docs/package-architecture.md` for the CLAUDE.md template.
+
+## Required files per package
+
+| File                   | Audience         | Loaded by Claude Code                              |
+| ---------------------- | ---------------- | -------------------------------------------------- |
+| `README.md`            | humans / npm     | no — browsed manually                              |
+| `CLAUDE.md`            | agents           | **yes — auto-loaded when working in this subtree** |
+| `package.json`         | tooling          | no                                                 |
+| `project.json`         | Nx               | no                                                 |
+| `tsconfig.json`        | TypeScript       | no                                                 |
+| `tsconfig.build.json`  | TypeScript       | no                                                 |
+| `vitest.config.ts`     | Vitest           | no                                                 |
+| `eslint.config.mjs`    | ESLint           | no                                                 |
+| `src/index.ts`         | public API       | no                                                 |
 
 ## Checklist
 

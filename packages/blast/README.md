@@ -163,3 +163,9 @@ Built-in rate limiting enforces NCBI guidelines:
 
 - Submit: max 1 request per 10 seconds
 - Poll: max 1 request per 60 seconds
+
+## See also
+
+- [`CLAUDE.md`](./CLAUDE.md) — agent reference (deep API, cross-package wiring, common pitfalls)
+- [Architecture overview](../../docs/architecture.md)
+- [NCBI API catalog](../../docs/ncbi-api-catalog.md)

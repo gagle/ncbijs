@@ -104,3 +104,8 @@ pnpm exec tsx examples/data-pipeline/load.ts
 - "What compound has CID 2244?"
 - "Convert PMID 12345678 to PMCID"
 - "How many records are loaded in the store?"
+
+## See also
+
+- [`CLAUDE.md`](./CLAUDE.md) — agent reference (deep API, cross-package wiring, common pitfalls)
+- [Architecture overview](../../docs/architecture.md)

@@ -170,3 +170,8 @@ await scheduler.start();
 ## Taxonomy note
 
 The taxonomy dataset is distributed as a `tar.gz` archive containing `names.dmp` and `nodes.dmp` files. The `createSource` in the registry throws with guidance because `createHttpSource` can decompress gzip but cannot extract tar entries. To load taxonomy, pre-extract the files and use `createCompositeSource` from `@ncbijs/pipeline` directly.
+
+## See also
+
+- [`CLAUDE.md`](./CLAUDE.md) — agent reference (deep API, cross-package wiring, common pitfalls)
+- [Architecture overview](../../docs/architecture.md)

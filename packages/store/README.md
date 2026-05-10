@@ -96,3 +96,8 @@ pnpm exec tsx examples/data-pipeline/download.ts
 pnpm exec tsx examples/data-pipeline/load.ts
 pnpm exec tsx examples/data-pipeline/verify.ts
 ```
+
+## See also
+
+- [`CLAUDE.md`](./CLAUDE.md) — agent reference (deep API, cross-package wiring, common pitfalls)
+- [Architecture overview](../../docs/architecture.md)

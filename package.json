@@ -19,6 +19,8 @@
     "test": "nx run-many -t test",
     "lint": "nx run-many -t lint",
     "typecheck": "nx run-many -t typecheck",
+    "sync-docs": "tsx scripts/sync-docs.ts",
+    "check-claude-md": "tsx scripts/check-claude-md.ts",
     "prepare": "husky"
   },
   "devDependencies": {

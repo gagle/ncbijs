@@ -1,3 +1,12 @@
+---
+title: 'Adding a New Package'
+purpose: 'Twelve-step checklist for adding a new package to the monorepo: scaffold, verify against the live API, source files, tests, examples, MCP wiring, global config.'
+audience: ['agent', 'human']
+size: 'small'
+related_packages: []
+last_audited: '2026-04-01'
+---
+
 # Adding a New Package
 
 Checklist for adding a new package to the ncbijs monorepo. Every step is mandatory.
@@ -59,9 +68,9 @@ Add the package to the E2E test suite in `e2e/`. E2E tests hit real APIs and run
 
 ## 6. Documentation
 
-### Package README
+### Package README (humans)
 
-Create `packages/{name}/README.md` following the existing pattern:
+Create `packages/{name}/README.md` following the existing pattern. This is what npm renders.
 
 - Package name heading + one-line description
 - Installation section
@@ -70,15 +79,34 @@ Create `packages/{name}/README.md` following the existing pattern:
 - Error handling section
 - Response types section with interface definitions
 
-### Root README
+### Package CLAUDE.md (agents) — REQUIRED
 
-Update `README.md`:
+Create `packages/{name}/CLAUDE.md`. This is what Claude Code auto-loads when working in the package's subtree. **Different audience, different framing — don't duplicate the README.**
 
-- Add a row to the "What can you do with ncbijs?" workflow table
-- Add a row to the "Packages" table with npm badge
-- Add the package to the "Which package do I need?" decision tree
-- Update the "Package capabilities" table if the package has notable capabilities
-- Update the "Architecture" section (dependency graph + build order)
+Required sections (per the template; copy from `packages/eutils/CLAUDE.md` or `packages/pipeline/CLAUDE.md` as a model):
+
+- YAML frontmatter (`package`, `purpose`, `layout`, `storage_mode`, `zero_dep`, `depends_on`, `used_by`, `exports`, `related_docs`, `last_audited`)
+- `## Purpose` — one paragraph, what NCBI surface it wraps
+- `## When to use` — bullets
+- `## When NOT to use` — table mapping wrong-fit goals to alternative packages
+- `## Exports` — table of every public export
+- `## API surface` — method-by-method
+- `## Configuration` — constructor options table
+- `## Rate limiting & credentials` (if HTTP)
+- `## Storage mode` (if `storage_mode: true`)
+- `## Cross-package wiring` — depends-on, used-by, composition patterns
+- `## Common pitfalls` — symptom + cause + fix per item
+- `## Testing` — commands and fixture locations
+- `## Files` — annotated tree
+
+### Root README and root CLAUDE.md
+
+Update both:
+
+- Add a row to the "What can you do with ncbijs?" workflow table (in **both** `README.md` and `CLAUDE.md`)
+- Add a row to the "Packages" table — `README.md` with npm badge, root `CLAUDE.md` with `path | depends_on` columns
+- Add the package to the "Which package do I need?" decision tree (in **both**)
+- Update the "Architecture" section in root `CLAUDE.md` (dependency graph + build order)
 
 ### Examples
 
@@ -124,7 +152,23 @@ Configure OIDC trusted publishing so the release workflow can publish the packag
 
 Steps 2–3 require npm 2FA. After the first `npm trust` call, npm skips 2FA for 5 minutes.
 
-## 10. Verification
+## 10. CLAUDE.md audit cadence
+
+The new package's `CLAUDE.md` ships with `last_audited: '<today>'` (ISO date). The `freshness` gate warns when this is more than 6 months old:
+
+```bash
+pnpm check-claude-md freshness
+```
+
+When the warning fires, re-audit the file:
+
+1. Run `pnpm check-claude-md pitfalls <package>` to surface candidate sources (recent fix commits, test names, TODO/FIXME, GitHub issues).
+2. Update the CLAUDE.md sections that drifted — Common pitfalls especially.
+3. Bump `last_audited` to the day of the audit.
+
+Audit dates are deliberately staggered across the workspace so warnings don't all fire on the same day.
+
+## 11. Verification
 
 ```bash
 pnpm install

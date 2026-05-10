@@ -128,3 +128,9 @@ Once the MCP server is configured, you can ask your AI assistant things like:
 - "What do we know about SNP rs7412?"
 - "Look up the clinical significance of BRCA1 variants in ClinVar"
 - "What are the properties of aspirin in PubChem?"
+
+## See also
+
+- [`CLAUDE.md`](./CLAUDE.md) — agent reference (deep API, cross-package wiring, common pitfalls)
+- [Architecture overview](../../docs/architecture.md)
+- [NCBI API catalog](../../docs/ncbi-api-catalog.md)

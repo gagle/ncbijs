@@ -1,3 +1,12 @@
+---
+title: 'Architecture Guide'
+purpose: 'High-level monorepo design — Nx workspace, ESM-only, zero-dep philosophy, dependency graph, build order.'
+audience: ['agent', 'human']
+size: 'small'
+related_packages: []
+last_audited: '2026-04-01'
+---
+
 # Architecture Guide
 
 ## Monorepo Structure

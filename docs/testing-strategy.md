@@ -1,3 +1,11 @@
+---
+title: 'Testing Strategy'
+purpose: 'Vitest conventions — fetch mocking, XML fixtures, 100% coverage policy, restoreMocks.'
+audience: ['agent', 'human']
+size: 'small'
+related_packages: []
+last_audited: '2026-04-01'
+---
 # Testing Strategy
 
 ## Unit Tests

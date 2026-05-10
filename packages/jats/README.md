@@ -226,3 +226,8 @@ import type {
   PartialDate,
 } from '@ncbijs/jats';
 ```
+
+## See also
+
+- [`CLAUDE.md`](./CLAUDE.md) — agent reference (deep API, cross-package wiring, common pitfalls)
+- [Architecture overview](../../docs/architecture.md)

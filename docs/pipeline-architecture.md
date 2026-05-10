@@ -1,3 +1,15 @@
+---
+title: 'Pipeline Architecture'
+purpose: 'Storage strategy, sync engine internals, DuckDB schema, data inventory across the bulk pipeline. Read by section, not whole.'
+audience: ['agent', 'human']
+size: 'large'
+related_packages:
+  - '@ncbijs/pipeline'
+  - '@ncbijs/etl'
+  - '@ncbijs/sync'
+  - '@ncbijs/store'
+last_audited: '2026-04-01'
+---
 # Pipeline Architecture
 
 Storage-agnostic architecture for running ncbijs against local NCBI data at RAG-pipeline throughput (no API rate limits). For the pipeline API guide (Source, Sink, streaming, error handling), see [pipeline.md](./pipeline.md).

@@ -179,4 +179,4 @@ A GitHub Actions workflow (`.github/workflows/ncbi-api-monitor.yml`) runs the de
 - The script tolerates network errors gracefully: if one endpoint times out, it skips that check and includes the error in the report
 - The full API catalog is at `docs/ncbi-api-catalog.md` — if a new API endpoint is discovered, add it there
 - Source code for the detection script: `scripts/ncbi-api-monitor/detect.ts`
-- Tests: `scripts/ncbi-api-monitor/detect.spec.ts` (run with `pnpm nx run ncbijs-api-monitor:test`)
+- Tests: `scripts/ncbi-api-monitor/detect.spec.ts` (run with `pnpm nx run ncbijs-scripts:test`)

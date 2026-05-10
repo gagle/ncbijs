@@ -1,3 +1,11 @@
+---
+title: 'NCBI API Catalog'
+purpose: 'Exhaustive reference of every NCBI / NLM HTTP endpoint and bulk download URL covered by the ecosystem. Use grep — do not load whole.'
+audience: ['agent', 'human']
+size: 'reference'
+related_packages: []
+last_audited: '2026-04-01'
+---
 # NCBI API Catalog
 
 Complete reference of all public NCBI/NLM HTTP APIs and bulk download endpoints. Use this to discover which APIs exist, what they offer, and whether ncbijs has a wrapper package.
