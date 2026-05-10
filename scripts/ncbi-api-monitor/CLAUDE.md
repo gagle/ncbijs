@@ -183,13 +183,28 @@ pnpm tsx scripts/ncbi-api-monitor/detect.ts > /tmp/report.json
 
 ### CI workflow
 
-`.github/workflows/ncbi-api-monitor.yml` runs the detection script on a weekly schedule (Monday 9am UTC). On any detected change (HIGH, MEDIUM, LOW), it opens a GitHub issue with the `ncbi-api-monitor` label and the title format:
+`.github/workflows/ncbi-api-monitor.yml` runs the detection script on a weekly schedule (Monday 9am UTC). When **HIGH or MEDIUM** changes are detected (LOW alone is silent), it opens a GitHub issue with the `ncbi-api-monitor` label and the title format:
 
 ```
 NCBI API changes detected (DATE): N changes detected: X HIGH, Y MEDIUM, Z LOW
 ```
 
 The workflow also commits updated baseline state files back to the repo so subsequent runs only report new changes. It can be triggered manually via `workflow_dispatch`.
+
+### Email notification
+
+When a new issue is opened, the workflow ALSO sends an email with the same title and body via [Resend](https://resend.com)'s HTTP API. The body is rendered to HTML via GitHub's own `/markdown` endpoint (GFM mode) so Gmail and other HTML-capable clients display it the same way GitHub does — headings, emoji, lists, links.
+
+**Setup (one-time):**
+
+1. Make the GitHub profile email public at `https://github.com/settings/profile` → "Public email". The workflow resolves the destination via `gh api /users/${{ github.actor }} --jq .email`. If the field is `null`, the email step short-circuits with a warning.
+2. Sign up for Resend (free tier — 100/day, 3000/month) using the same email so test-mode sending via `onboarding@resend.dev` works without domain verification.
+3. Create a Resend API key.
+4. Add `RESEND_API_KEY` as a repo secret at `https://github.com/gagle/ncbijs/settings/secrets/actions`.
+
+**Verification.** Run the dedicated `.github/workflows/notify-test.yml` workflow on demand (Actions → "Notify test" → "Run workflow"). It exercises the full path (resolve email → render markdown → POST to Resend) with a recognisable test message. Production sends 1:1 with new issues; test can be re-run any time without side effects.
+
+**Disable.** Either delete `RESEND_API_KEY` (the email step prints "skipping" and exits 0), set the GitHub profile email back to private (resolve step warns and short-circuits), or remove the email steps from the workflow.
 
 ## Risk assessment
 

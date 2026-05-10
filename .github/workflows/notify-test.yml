@@ -1,0 +1,83 @@
+name: Notify test (verify Resend email integration)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve notification email
+        id: email
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EMAIL=$(gh api /users/${{ github.actor }} --jq .email)
+          if [ -z "$EMAIL" ] || [ "$EMAIL" = "null" ]; then
+            echo "::error::GitHub profile email for ${{ github.actor }} is private. Set 'Public email' in https://github.com/settings/profile and re-run."
+            exit 1
+          fi
+          echo "email=$EMAIL" >> "$GITHUB_OUTPUT"
+
+      - name: Render test body as HTML via GitHub Markdown API
+        id: html
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NOTIFY_TO: ${{ steps.email.outputs.email }}
+        run: |
+          BODY=$(cat <<EOF
+          ## :white_check_mark: NCBI API Monitor — email integration test
+
+          If you can read this email **with formatting** (headings rendered, this line bold, the checklist below as a list), the full Resend + GitHub Markdown rendering path is wired up correctly.
+
+          **What was tested:**
+
+          - GitHub profile email resolution (\`gh api /users/${{ github.actor }}\`)
+          - Markdown → HTML rendering via GitHub's \`/markdown\` API
+          - Resend HTTP API delivery to \`$NOTIFY_TO\`
+
+          Nothing to do — this is a verification ping.
+          EOF
+          )
+          HTML=$(gh api -X POST /markdown -f text="$BODY" -f mode=gfm) || HTML=""
+          {
+            echo 'body<<__BODY_EOF__'
+            echo "$BODY"
+            echo '__BODY_EOF__'
+            echo 'html<<__HTML_EOF__'
+            echo "$HTML"
+            echo '__HTML_EOF__'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Send test email via Resend
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          NOTIFY_TO: ${{ steps.email.outputs.email }}
+          BODY: ${{ steps.html.outputs.body }}
+          HTML: ${{ steps.html.outputs.html }}
+        run: |
+          if [ -z "$RESEND_API_KEY" ]; then
+            echo "::error::RESEND_API_KEY secret not set. Add it at https://github.com/gagle/ncbijs/settings/secrets/actions and re-run."
+            exit 1
+          fi
+          if [ -n "$HTML" ]; then
+            PAYLOAD=$(jq -n \
+              --arg body "$BODY" \
+              --arg html "$HTML" \
+              --arg to "$NOTIFY_TO" \
+              '{from: "NCBI API Monitor <onboarding@resend.dev>", to: [$to], subject: "[ncbijs] NCBI API Monitor — email integration test", text: $body, html: $html}')
+          else
+            PAYLOAD=$(jq -n \
+              --arg body "$BODY" \
+              --arg to "$NOTIFY_TO" \
+              '{from: "NCBI API Monitor <onboarding@resend.dev>", to: [$to], subject: "[ncbijs] NCBI API Monitor — email integration test", text: $body}')
+          fi
+          curl -fsS -X POST https://api.resend.com/emails \
+            -H "Authorization: Bearer $RESEND_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
+          echo "✓ Test email sent to $NOTIFY_TO"

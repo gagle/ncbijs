@@ -56,10 +56,9 @@ jobs:
           COUNT=$(gh issue list --label ncbi-api-monitor --state open --json number --jq length)
           echo "open_issues=$COUNT" >> "$GITHUB_OUTPUT"
 
-      - name: Open GitHub issue
+      - name: Format report
         if: steps.actionable.outputs.count != '0' && steps.existing.outputs.open_issues == '0'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        id: format
         run: |
           TITLE=$(jq -r '
             "NCBI API changes detected (\(.date | split("T")[0])): \(.summary)"
@@ -110,7 +109,84 @@ jobs:
             "---\n\nRun the `/ncbi-check-updates` skill locally to investigate and apply fixes."
           ' /tmp/report.json)
 
+          {
+            echo "title=$TITLE"
+            echo 'body<<__BODY_EOF__'
+            echo "$BODY"
+            echo '__BODY_EOF__'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Open GitHub issue
+        if: steps.actionable.outputs.count != '0' && steps.existing.outputs.open_issues == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TITLE: ${{ steps.format.outputs.title }}
+          BODY: ${{ steps.format.outputs.body }}
+        run: |
           gh issue create --title "$TITLE" --body "$BODY" --label "ncbi-api-monitor"
+
+      - name: Resolve notification email
+        if: steps.actionable.outputs.count != '0' && steps.existing.outputs.open_issues == '0'
+        id: email
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EMAIL=$(gh api /users/${{ github.actor }} --jq .email)
+          if [ -z "$EMAIL" ] || [ "$EMAIL" = "null" ]; then
+            echo "::warning::GitHub profile email for ${{ github.actor }} is private; skipping email notification. Set 'Public email' in https://github.com/settings/profile to enable."
+            echo "email=" >> "$GITHUB_OUTPUT"
+          else
+            echo "email=$EMAIL" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Render body as HTML via GitHub Markdown API
+        if: steps.actionable.outputs.count != '0' && steps.existing.outputs.open_issues == '0' && steps.email.outputs.email != ''
+        id: html
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BODY: ${{ steps.format.outputs.body }}
+        run: |
+          HTML=$(gh api -X POST /markdown -f text="$BODY" -f mode=gfm) || HTML=""
+          {
+            echo 'html<<__HTML_EOF__'
+            echo "$HTML"
+            echo '__HTML_EOF__'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Send email notification
+        if: steps.actionable.outputs.count != '0' && steps.existing.outputs.open_issues == '0' && steps.email.outputs.email != ''
+        continue-on-error: true
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          NOTIFY_TO: ${{ steps.email.outputs.email }}
+          TITLE: ${{ steps.format.outputs.title }}
+          BODY: ${{ steps.format.outputs.body }}
+          HTML: ${{ steps.html.outputs.html }}
+        run: |
+          if [ -z "$RESEND_API_KEY" ]; then
+            echo "RESEND_API_KEY not set; skipping email notification."
+            exit 0
+          fi
+          if [ -n "$HTML" ]; then
+            PAYLOAD=$(jq -n \
+              --arg title "$TITLE" \
+              --arg body "$BODY" \
+              --arg html "$HTML" \
+              --arg to "$NOTIFY_TO" \
+              '{from: "NCBI API Monitor <onboarding@resend.dev>", to: [$to], subject: $title, text: $body, html: $html}')
+          else
+            PAYLOAD=$(jq -n \
+              --arg title "$TITLE" \
+              --arg body "$BODY" \
+              --arg to "$NOTIFY_TO" \
+              '{from: "NCBI API Monitor <onboarding@resend.dev>", to: [$to], subject: $title, text: $body}')
+          fi
+          curl -fsS -X POST https://api.resend.com/emails \
+            -H "Authorization: Bearer $RESEND_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
+          echo "✓ Email sent to $NOTIFY_TO"
 
       - name: Commit updated baselines
         run: |
