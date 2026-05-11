@@ -71,7 +71,14 @@ export function parseFrontmatter(content: string): Partial<PackageFrontmatter> |
       result[key] = items;
       i++;
     } else {
-      const stripped = valueStr.replace(/^['"]|['"]$/g, '');
+      const singleQuoted = valueStr.startsWith("'") && valueStr.endsWith("'");
+      const doubleQuoted = valueStr.startsWith('"') && valueStr.endsWith('"');
+      let stripped = valueStr.replace(/^['"]|['"]$/g, '');
+      if (singleQuoted) {
+        stripped = stripped.replace(/''/g, "'");
+      } else if (doubleQuoted) {
+        stripped = stripped.replace(/\\"/g, '"');
+      }
       let v: unknown = stripped;
       if (stripped === 'true') {
         v = true;
@@ -226,13 +233,21 @@ export function renderDocIndexTable(docs: ReadonlyArray<DocInfo>): string {
     const purpose = truncatePurpose(d.purpose, 100);
     lines.push(`| ${link} | ${purpose} | ${SIZE_NOTE[d.size]} |`);
   }
-  // Always-present manual rows that don't have frontmatter.
-  lines.push(
-    `| [\`scripts/ncbi-api-monitor/CLAUDE.md\`](./scripts/ncbi-api-monitor/CLAUDE.md) | NCBI API drift detection strategy + script reference; auto-loads when working in that subtree | Read when triaging \`/ncbi-check-updates\` findings |`,
-  );
-  lines.push(
-    `| [\`docs/adr/\`](./docs/adr/) | Architecture decision records | Read when changing architectural decisions |`,
-  );
+  // Manual rows for special files that don't carry frontmatter. Only emit
+  // when the target actually exists in the repo — otherwise the rendered
+  // index would link to a non-existent path.
+  const adrPath = join(REPO_ROOT, 'docs', 'adr');
+  if (existsSync(adrPath)) {
+    lines.push(
+      `| [\`docs/adr/\`](./docs/adr/) | Architecture decision records | Read when changing architectural decisions |`,
+    );
+  }
+  const apiMonitorClaudeMd = join(REPO_ROOT, 'scripts', 'ncbi-api-monitor', 'CLAUDE.md');
+  if (existsSync(apiMonitorClaudeMd)) {
+    lines.push(
+      `| [\`scripts/ncbi-api-monitor/CLAUDE.md\`](./scripts/ncbi-api-monitor/CLAUDE.md) | NCBI API drift detection strategy + script reference; auto-loads when working in that subtree | Read when triaging \`/ncbi-check-updates\` findings |`,
+    );
+  }
   return lines.join('\n');
 }
 
@@ -321,8 +336,17 @@ export function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+function hasRegionMarkers(source: string, name: string): boolean {
+  return source.includes(`<!-- sync-docs:${name}:start -->`);
+}
+
 export function applyAllRegions(source: string, regions: ReadonlyArray<Region>): string {
-  return regions.reduce((acc, r) => replaceRegion(acc, r), source);
+  return regions.reduce((acc, r) => {
+    if (!hasRegionMarkers(acc, r.name)) {
+      return acc;
+    }
+    return replaceRegion(acc, r);
+  }, source);
 }
 
 interface RunResult {

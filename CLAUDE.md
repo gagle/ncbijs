@@ -243,8 +243,8 @@ specific-line `Read`, not whole-file loads.
 | [`docs/release-and-publish.md`](./docs/release-and-publish.md) | Tag-triggered npm publishing with OIDC provenance, per-package CHANGELOG flow, /release skill integ… | small (read whole) |
 | [`docs/testing-strategy.md`](./docs/testing-strategy.md) | Vitest conventions — fetch mocking, XML fixtures, 100% coverage policy, restoreMocks. | small (read whole) |
 | [`docs/type-safety.md`](./docs/type-safety.md) | Three-layer type pattern (raw / domain / parsed), format-dependent overloads, no-any rationale, why… | small (read whole) |
-| [`scripts/ncbi-api-monitor/CLAUDE.md`](./scripts/ncbi-api-monitor/CLAUDE.md) | NCBI API drift detection strategy + script reference; auto-loads when working in that subtree | Read when triaging `/ncbi-check-updates` findings |
 | [`docs/adr/`](./docs/adr/) | Architecture decision records | Read when changing architectural decisions |
+| [`scripts/ncbi-api-monitor/CLAUDE.md`](./scripts/ncbi-api-monitor/CLAUDE.md) | NCBI API drift detection strategy + script reference; auto-loads when working in that subtree | Read when triaging `/ncbi-check-updates` findings |
 <!-- sync-docs:doc-index:end -->
 
 ---
