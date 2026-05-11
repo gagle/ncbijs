@@ -1,7 +1,15 @@
 {
   "eutils-pubmed": {
-    "depth0": ["header", "result"],
-    "depth1": ["33533846", "type", "uids", "version"],
+    "depth0": [
+      "header",
+      "result"
+    ],
+    "depth1": [
+      "33533846",
+      "type",
+      "uids",
+      "version"
+    ],
     "depth2": [
       "articleids",
       "attributes",
@@ -47,11 +55,28 @@
       "vernaculartitle",
       "volume"
     ],
-    "depth3": ["authtype", "clusterid", "date", "idtype", "idtypen", "name", "pubstatus", "value"]
+    "depth3": [
+      "authtype",
+      "clusterid",
+      "date",
+      "idtype",
+      "idtypen",
+      "name",
+      "pubstatus",
+      "value"
+    ]
   },
   "eutils-cdd": {
-    "depth0": ["header", "result"],
-    "depth1": ["223044", "type", "uids", "version"],
+    "depth0": [
+      "header",
+      "result"
+    ],
+    "depth1": [
+      "223044",
+      "type",
+      "uids",
+      "version"
+    ],
     "depth2": [
       "abstract",
       "accession",
@@ -71,12 +96,23 @@
     ]
   },
   "pubchem": {
-    "depth0": ["PropertyTable"],
-    "depth1": ["Properties"],
-    "depth2": ["CID", "IUPACName", "MolecularFormula", "MolecularWeight"]
+    "depth0": [
+      "PropertyTable"
+    ],
+    "depth1": [
+      "Properties"
+    ],
+    "depth2": [
+      "CID",
+      "IUPACName",
+      "MolecularFormula",
+      "MolecularWeight"
+    ]
   },
   "icite": {
-    "depth0": ["data"],
+    "depth0": [
+      "data"
+    ],
     "depth1": [
       "_id",
       "animal",
@@ -106,10 +142,17 @@
       "y_coord",
       "year"
     ],
-    "depth2": ["39814201", "firstName", "fullName", "lastName"]
+    "depth2": [
+      "39814201",
+      "firstName",
+      "fullName",
+      "lastName"
+    ]
   },
   "pubtator": {
-    "depth0": ["PubTator3"],
+    "depth0": [
+      "PubTator3"
+    ],
     "depth1": [
       "_id",
       "authors",
@@ -124,8 +167,24 @@
       "relations",
       "relations_display"
     ],
-    "depth2": ["annotations", "infons", "offset", "relations", "sentences", "text"],
-    "depth3": ["authors", "id", "infons", "journal", "locations", "text", "type", "year"],
+    "depth2": [
+      "annotations",
+      "infons",
+      "offset",
+      "relations",
+      "sentences",
+      "text"
+    ],
+    "depth3": [
+      "authors",
+      "id",
+      "infons",
+      "journal",
+      "locations",
+      "text",
+      "type",
+      "year"
+    ],
     "depth4": [
       "accession",
       "biotype",
@@ -141,11 +200,24 @@
     ]
   },
   "rxnorm": {
-    "depth0": ["properties"],
-    "depth1": ["language", "name", "rxcui", "suppress", "synonym", "tty", "umlscui"]
+    "depth0": [
+      "properties"
+    ],
+    "depth1": [
+      "language",
+      "name",
+      "rxcui",
+      "suppress",
+      "synonym",
+      "tty",
+      "umlscui"
+    ]
   },
   "dailymed": {
-    "depth0": ["data", "metadata"],
+    "depth0": [
+      "data",
+      "metadata"
+    ],
     "depth1": [
       "current_page",
       "current_url",
@@ -165,8 +237,16 @@
   },
   "clinical-tables": {},
   "eutils-clinvar": {
-    "depth0": ["header", "result"],
-    "depth1": ["7105", "type", "uids", "version"],
+    "depth0": [
+      "header",
+      "result"
+    ],
+    "depth1": [
+      "7105",
+      "type",
+      "uids",
+      "version"
+    ],
     "depth2": [
       "accession",
       "accession_version",
