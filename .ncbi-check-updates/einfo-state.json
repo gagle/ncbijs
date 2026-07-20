@@ -1,66 +1,66 @@
 {
   "pubmed": {
-    "lastupdate": "2026/07/13 01:39",
-    "dbbuild": "Build-2026.07.13.01.39"
+    "lastupdate": "2026/07/20 00:52",
+    "dbbuild": "Build-2026.07.20.00.52"
   },
   "pmc": {
-    "lastupdate": "2026/07/13 06:48",
-    "dbbuild": "Build-2026.07.13.06.48"
+    "lastupdate": "2026/07/20 00:52",
+    "dbbuild": "Build-2026.07.20.00.52"
   },
   "books": {
-    "lastupdate": "2026/07/13 03:04",
-    "dbbuild": "Build260713-0220.1"
+    "lastupdate": "2026/07/20 03:32",
+    "dbbuild": "Build260720-0245.1"
   },
   "snp": {
     "lastupdate": "2025/03/11 08:22",
     "dbbuild": "Build250306-1408.1"
   },
   "medgen": {
-    "lastupdate": "2026/07/08 14:44",
-    "dbbuild": "Build260708-1427.1"
+    "lastupdate": "2026/07/19 17:48",
+    "dbbuild": "Build260719-1727.1"
   },
   "dbvar": {
     "lastupdate": "2025/08/27 14:12",
     "dbbuild": "Build250827-1240.1"
   },
   "sra": {
-    "lastupdate": "2026/07/13 05:36",
-    "dbbuild": "Build260713-0318m.1"
+    "lastupdate": "2026/07/20 03:27",
+    "dbbuild": "Build260720-0058m.1"
   },
   "clinvar": {
-    "lastupdate": "2026/07/07 11:53",
-    "dbbuild": "Build260707-0840.1"
+    "lastupdate": "2026/07/15 22:51",
+    "dbbuild": "Build260715-1910.1"
   },
   "gene": {
-    "lastupdate": "2026/07/12 08:18",
-    "dbbuild": "Build260711-2225m.1"
+    "lastupdate": "2026/07/19 08:26",
+    "dbbuild": "Build260718-2220m.1"
   },
   "protein": {
-    "lastupdate": "2026/07/13 04:38",
-    "dbbuild": "Build260710-2214.1"
+    "lastupdate": "2026/07/19 13:18",
+    "dbbuild": "Build260718-1336m.1"
   },
   "cdd": {
     "lastupdate": "2025/07/02 19:21",
     "dbbuild": "Build250702-1738.1"
   },
   "omim": {
-    "lastupdate": "2026/07/13 03:18",
-    "dbbuild": "Build260713-0305.1"
+    "lastupdate": "2026/07/20 03:18",
+    "dbbuild": "Build260720-0305.1"
   },
   "nucleotide": {
-    "lastupdate": "2026/07/10 16:08",
-    "dbbuild": "Build260709-1100m.1"
+    "lastupdate": "2026/07/20 00:03",
+    "dbbuild": "Build260718-2100m.1"
   },
   "gtr": {
-    "lastupdate": "2026/07/13 01:20",
-    "dbbuild": "Build260713-0035.1"
+    "lastupdate": "2026/07/20 01:24",
+    "dbbuild": "Build260720-0030.1"
   },
   "structure": {
-    "lastupdate": "2026/07/08 19:34",
-    "dbbuild": "Build260708-1900.1"
+    "lastupdate": "2026/07/15 19:56",
+    "dbbuild": "Build260715-1900.1"
   },
   "nlmcatalog": {
-    "lastupdate": "2026/07/09 06:38",
-    "dbbuild": "Build260709-0615.1"
+    "lastupdate": "2026/07/19 06:36",
+    "dbbuild": "Build260719-0610.1"
   }
 }
