@@ -1,10 +1,10 @@
 {
   "clinicaltrials": {
     "apiVersion": "2.0.5",
-    "dataTimestamp": "2026-10-26T09:00:04"
+    "dataTimestamp": "2026-11-02T10:00:05"
   },
   "rxnorm": {
-    "version": "05-Oct-2026",
-    "apiVersion": "3.1.356"
+    "version": "02-Nov-2026",
+    "apiVersion": "3.1.357"
   }
 }
